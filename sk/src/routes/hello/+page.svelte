@@ -4,7 +4,7 @@
 
   let { data } = $props();
   $effect(() => {
-    $metadata.title = $metadata.headline = "Hello Page";
+    $metadata.title = "Hello Page";
   });
   async function sendEmail(e: SubmitEvent) {
     e.preventDefault();

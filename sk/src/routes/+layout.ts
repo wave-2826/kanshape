@@ -1,6 +1,5 @@
 import type { LayoutLoad } from "./$types";
 import { client } from "$lib/pocketbase";
-import { alerts } from "$lib/components/Alerts.svelte";
 
 // turn off SSR - we're JAMstack here
 export const ssr = false;
@@ -10,21 +9,21 @@ export const prerender = false;
 export const trailingSlash = "always";
 
 export const load: LayoutLoad = async ({ fetch }) => {
-  let config: {
-    site: {
-      name: string;
-      copyright: string;
-      year: number;
+    let config: {
+        site: {
+            name: string;
+            copyright: string;
+            year: number;
+        };
+        signupAllowed: boolean;
+    } = {} as any;
+    
+    try {
+        config = await client.send("/api/config", { fetch, requestKey: "config" });
+    } catch (e: any) {
+        console.error("Failed to load config:", e);
+    }
+    return {
+        config,
     };
-    signupAllowed: boolean;
-  } = {} as any;
-
-  try {
-    config = await client.send("/api/config", { fetch, requestKey: "config" });
-  } catch (e: any) {
-    alerts.error(e.toString());
-  }
-  return {
-    config,
-  };
 };

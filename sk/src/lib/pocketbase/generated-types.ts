@@ -11,9 +11,11 @@ export enum Collections {
 	Mfas = "_mfas",
 	Otps = "_otps",
 	Superusers = "_superusers",
-	Auditlog = "auditlog",
-	Hooks = "hooks",
-	Posts = "posts",
+	Cards = "cards",
+	Config = "config",
+	Projects = "projects",
+	Sections = "sections",
+	Subprojects = "subprojects",
 	Users = "users",
 }
 
@@ -93,60 +95,63 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type AuditlogRecord<Tdata = unknown, Toriginal = unknown> = {
-	admin?: string
-	collection: string
+export type CardsRecord<Tdata = unknown> = {
+	assignments?: RecordIdString[]
 	created?: IsoDateString
+	created_by?: RecordIdString
 	data?: null | Tdata
-	event: string
+	description?: string
 	id: string
-	original?: null | Toriginal
-	record: string
+	moved_at?: IsoDateString
+	position?: number
+	section: RecordIdString
+	subproject?: RecordIdString
+	title?: string
 	updated?: IsoDateString
-	user?: RecordIdString
 }
 
-export enum HooksEventOptions {
-	"insert" = "insert",
-	"update" = "update",
-	"delete" = "delete",
-}
-
-export enum HooksActionTypeOptions {
-	"command" = "command",
-	"email" = "email",
-	"post" = "post",
-}
-export type HooksRecord = {
-	action: string
-	action_params?: string
-	action_type: HooksActionTypeOptions
-	collection: string
+export type ConfigRecord = {
 	created?: IsoDateString
-	disabled?: boolean
-	event: HooksEventOptions
-	expands?: string
 	id: string
+	key: string
 	updated?: IsoDateString
+	value?: string
 }
 
-export type PostsRecord = {
-	body: string
+export type ProjectsRecord = {
 	created?: IsoDateString
-	files?: string[]
+	current_part_id?: number
+	description?: string
 	id: string
-	slug: string
-	title: string
+	part_id_prefix?: string
+	title?: string
 	updated?: IsoDateString
-	user?: RecordIdString
 }
 
-export type UsersRecord = {
+export type SectionsRecord = {
+	created?: IsoDateString
+	id: string
+	position?: number
+	title?: string
+	updated?: IsoDateString
+}
+
+export type SubprojectsRecord = {
+	created?: IsoDateString
+	description?: string
+	id: string
+	name?: string
+	project?: RecordIdString
+	updated?: IsoDateString
+}
+
+export type UsersRecord<Tmetadata = unknown> = {
 	avatar?: string
 	created?: IsoDateString
 	email?: string
 	emailVisibility?: boolean
 	id: string
+	metadata?: null | Tmetadata
 	name?: string
 	password: string
 	tokenKey: string
@@ -161,10 +166,12 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type AuditlogResponse<Tdata = unknown, Toriginal = unknown, Texpand = unknown> = Required<AuditlogRecord<Tdata, Toriginal>> & BaseSystemFields<Texpand>
-export type HooksResponse<Texpand = unknown> = Required<HooksRecord> & BaseSystemFields<Texpand>
-export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type CardsResponse<Tdata = unknown, Texpand = unknown> = Required<CardsRecord<Tdata>> & BaseSystemFields<Texpand>
+export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
+export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
+export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
+export type SubprojectsResponse<Texpand = unknown> = Required<SubprojectsRecord> & BaseSystemFields<Texpand>
+export type UsersResponse<Tmetadata = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata>> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -174,9 +181,11 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
-	auditlog: AuditlogRecord
-	hooks: HooksRecord
-	posts: PostsRecord
+	cards: CardsRecord
+	config: ConfigRecord
+	projects: ProjectsRecord
+	sections: SectionsRecord
+	subprojects: SubprojectsRecord
 	users: UsersRecord
 }
 
@@ -186,9 +195,11 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
-	auditlog: AuditlogResponse
-	hooks: HooksResponse
-	posts: PostsResponse
+	cards: CardsResponse
+	config: ConfigResponse
+	projects: ProjectsResponse
+	sections: SectionsResponse
+	subprojects: SubprojectsResponse
 	users: UsersResponse
 }
 
@@ -201,8 +212,10 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_mfas'): RecordService<MfasResponse>
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'auditlog'): RecordService<AuditlogResponse>
-	collection(idOrName: 'hooks'): RecordService<HooksResponse>
-	collection(idOrName: 'posts'): RecordService<PostsResponse>
+	collection(idOrName: 'cards'): RecordService<CardsResponse>
+	collection(idOrName: 'config'): RecordService<ConfigResponse>
+	collection(idOrName: 'projects'): RecordService<ProjectsResponse>
+	collection(idOrName: 'sections'): RecordService<SectionsResponse>
+	collection(idOrName: 'subprojects'): RecordService<SubprojectsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }

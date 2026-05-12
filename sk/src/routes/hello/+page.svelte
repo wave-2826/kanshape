@@ -6,6 +6,7 @@
   $effect(() => {
     $metadata.title = "Hello Page";
   });
+  
   async function sendEmail(e: SubmitEvent) {
     e.preventDefault();
     client.send("/api/sendmail", {

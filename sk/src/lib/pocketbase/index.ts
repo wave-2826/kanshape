@@ -21,7 +21,7 @@ export const authModel = readable<AuthModel | null>(
     function (set, update) {
         client.authStore.onChange((token, model) => {
             update((oldval) => {
-                if (
+                if(
                     (oldval?.isValid && !model?.isValid) ||
                     (!oldval?.isValid && model?.isValid)
                 ) {
@@ -69,11 +69,9 @@ export async function save<T>(collection: string, record: any, create = false) {
 // convert obj to FormData in case one of the fields is instanceof FileList
 function objectToFormData(obj: {}) {
     // check if any field's value is an instanceof FileList
-    if(
-        !Object.values(obj).some(
-            (val) => val instanceof FileList || val instanceof File
-        )
-    ) {
+    if(!Object.values(obj).some(
+        (val) => val instanceof FileList || val instanceof File
+    )) {
         // if not, just return the original object
         return obj;
     }

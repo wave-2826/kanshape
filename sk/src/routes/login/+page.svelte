@@ -15,6 +15,13 @@ onMount(async () => {
         // Get OIDC providers from PocketBase
         const res = await client.send("/api/collections/users/auth-methods", {});
         providers = (res?.authProviders ?? []).filter((p: AuthProviderInfo) => p.name !== "password");
+
+        // If autologin is enabled, redirect to the provider immediately
+        if(data.config.auth.autoOAuth !== null) {
+            const autoProvider = providers.find(p => p.displayName === data.config.auth.autoOAuth);
+            if(autoProvider) providerLogin(autoProvider, client.collection("users"));
+            else error = `Auto-login provider "${data.config.auth.autoOAuth}" not found`;
+        }
     } catch(e: any) {
         error = `Failed to load login providers: ${e.message}`;
     }
@@ -30,7 +37,7 @@ onMount(async () => {
     <h1>{data.config.site.name}</h1>
     
     {#if error}
-        <p>{error}</p>
+        <p class="error">{error}</p>
     {/if}
     {#if providers.length === 0}
         <p>Loading providers...</p>
@@ -78,5 +85,9 @@ main {
         flex-direction: column;
         gap: 1rem;
     }
+}
+
+.error {
+    color: var(--error);
 }
 </style>

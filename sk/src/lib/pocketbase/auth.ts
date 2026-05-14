@@ -39,7 +39,7 @@ export function logout() {
 }
 
 export async function providerLogin(
-    provider: AuthProviderInfo,
+    provider: AuthProviderInfo | { name: string },
     authCollection: RecordService
 ) {
     const authResponse = await authCollection.authWithOAuth2({

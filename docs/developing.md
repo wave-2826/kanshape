@@ -1,18 +1,26 @@
+TODO: More custom documentation here 
+
+# Frontend with SvelteKit
+
+## Developing
+
+Once you've created a project and installed dependencies with `pnpm install`, start a development server:
+```bash
+pnpm run dev
+```
+
+## Building
+To create a production version of the app:
+```bash
+pnpm run build
+```
+
+You can preview the production build with `pnpm run preview`.
+
 # Backend with PocketBase
-
-There are two flavors of the backend:
-
-1. Standard release downloaded from https://github.com/pocketbase/pocketbase/releases. It even allows [extending with JavaScript](https://pocketbase.io/docs/js-overview/). This one is a good start, but if you want full control see next.
-2. Custom compiled (`go build`), possibly with my customizations and perhaps yours too.
-
-`entrypoint.sh` defaults to option 2 if `go` compiler is found. If not, then is just downloads
-`pocketbase` (option 1). Also, you can control it by looking at the `image` and `command` settings
-in `docker-compose.yml` and `docker-compose.override.yml`.
-
-# Setup
+We use the "release" flavor of pocketbase - the standard release downloaded from https://github.com/pocketbase/pocketbase/releases, which allows [extending with JavaScript](https://pocketbase.io/docs/js-overview/).
 
 ## Architecture
-
 > **Note:** For optimal setup, ensure you are using Linux (bare-metal, VM, WSL) or Docker. For other operating systems, you may run into issues, or need additional configuration.
 > A docker-compose setup is included with the project, which can be used on any OS.
 
@@ -22,7 +30,7 @@ Before you can run the actual backend, you must run the migrations using `./pock
 
 ## Run the backend
 
-You can run the PocketBase backend direct with `./pocketbase serve` or using `npm run backend` in the `sk` directory. Note that `npm run backend` it is included by default, but if you want the backend to also serve the frontend assets, then you must add the `--publicDir ../frontend/build` option. (Read more about this in [sk/package.json](../sk/package.json).)
+You can run the PocketBase backend direct with `pnpm run backend` in the `sk` directory. Note that `pnpm run backend` it is included by default, but if you want the backend to also serve the frontend assets, then you must add the `--publicDir ../frontend/build` option.
 
 ## Docker
 

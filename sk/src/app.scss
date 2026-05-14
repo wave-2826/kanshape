@@ -1,3 +1,17 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-site: #101113;
+    --bg-primary: #1a1b20;
+    --bg-secondary: #2b2f38;
+    --text-primary: #e2e5ec;
+    --text-secondary: #b4bcc8;
+    --border: #434d5a;
+    --accent: #4a9eff;
+}
+
 html {
     display: flex;
     flex-flow: column;
@@ -11,10 +25,36 @@ body {
     
     overflow-x: hidden;
     font-family: Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif;
+
+    background-color: var(--bg-site);
+    color: var(--text-primary);
+
+    margin: 0;
 }
 
-.container {
-    max-width: 1280px;
-    width: 100%;
-    margin: 0 auto;
+// Basic styles for form elements
+// The --bg-color variable can be used from component code to set background colors
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: var(--bg-color, var(--bg-secondary));
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    padding: 0.5em 1em;
+
+    transform: translateY(0);
+    transition: background-color 0.1s ease, border-color 0.1s ease, transform 0.1s ease;
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--accent) 3%, var(--bg-color, var(--bg-secondary)));
+    }
+
+    &:focus-visible {
+        border-color: var(--accent);
+    }
+}
+button:hover {
+    transform: translateY(-1px);
 }

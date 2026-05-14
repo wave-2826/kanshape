@@ -1,8 +1,11 @@
 <script lang="ts">
+import "../../app.scss";
 import { onMount } from "svelte";
 import { client } from "$lib/pocketbase";
-import { goto } from "$app/navigation";
 import type { AuthProviderInfo } from "pocketbase";
+import { providerLogin } from "$lib/pocketbase/auth";
+
+const { data } = $props();
 
 let providers: AuthProviderInfo[] = $state([]);
 let error = $state("");
@@ -16,36 +19,64 @@ onMount(async () => {
         error = `Failed to load login providers: ${e.message}`;
     }
 });
-
-async function loginWithProvider(provider: AuthProviderInfo) {
-    try {
-        const authData = await client.collection("users").authWithOAuth2({ provider: provider.name });
-        if(authData?.token) goto("/");
-    } catch(e: any) {
-        error = `Login failed: ${e.message}`;
-    }
-}
 </script>
 
-<h1>Login</h1>
-
-{#if error}
-    <p>{error}</p>
-{/if}
-{#if providers.length === 0}
-    <p>Loading providers...</p>
-{:else}
-    <ul>
-        {#each providers as provider}
-            <li>
-                <button onclick={() => loginWithProvider(provider)}>
-                    Login with {provider.displayName || provider.name}
-                </button>
-            </li>
-        {/each}
-    </ul>
-{/if}
+<header>
+    {#if data.config.site.logoUrl}
+        <img src={data.config.site.logoUrl} alt={data.config.site.name} />
+    {/if}
+</header>
+<main>
+    <h1>{data.config.site.name}</h1>
+    
+    {#if error}
+        <p>{error}</p>
+    {/if}
+    {#if providers.length === 0}
+        <p>Loading providers...</p>
+    {:else}
+        <ul>
+            {#each providers as provider}
+                <li>
+                    <button onclick={() => providerLogin(provider, client.collection("users"))}>
+                        Login with {provider.displayName || provider.name}
+                    </button>
+                </li>
+            {/each}
+        </ul>
+    {/if}
+</main>
 
 <style lang="scss">
+header {
+    padding: 1rem;
+}
+img {
+    height: 4rem;
+}
 
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    height: 80vh;
+
+    h1 {
+        margin-bottom: 2rem;
+        margin-top: -5rem;
+    }
+    p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+    ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
 </style>

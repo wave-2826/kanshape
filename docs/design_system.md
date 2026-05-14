@@ -1,0 +1,2 @@
+- Use theme variables defined on :root under `app.scss` and avoid overriding themed elements where possible
+- Most icon sets: https://lucide.dev/ (icons are ISC-licensed)

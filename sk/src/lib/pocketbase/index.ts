@@ -1,7 +1,7 @@
-import PocketBase, { type AuthProviderInfo, RecordService } from "pocketbase";
+import PocketBase from "pocketbase";
 import type {
-    AuthModel,
     ListResult,
+    RecordFullListOptions,
     RecordListOptions,
     RecordModel,
     UnsubscribeFunc,
@@ -9,64 +9,28 @@ import type {
 import { readable, type Readable, type Subscriber } from "svelte/store";
 import { browser } from "$app/environment";
 import { base } from "$app/paths";
-import { invalidateAll } from "$app/navigation";
-import type { TypedPocketBase } from "./generated-types";
+import { Collections, type CollectionRecords, type TypedPocketBase } from "./generated-types";
 
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
 ) as TypedPocketBase;
 
-export const authModel = readable<AuthModel | null>(
-    null,
-    function (set, update) {
-        client.authStore.onChange((token, model) => {
-            update((oldval) => {
-                if(
-                    (oldval?.isValid && !model?.isValid) ||
-                    (!oldval?.isValid && model?.isValid)
-                ) {
-                    // if the auth changed, invalidate all page load data
-                    invalidateAll();
-                }
-                return model;
-            });
-        }, true);
-    }
-);
-
-export async function login(
-    email: string,
-    password: string,
-    register = false,
-    rest: { [key: string]: any } = {}
-) {
-    if(register) {
-        const user = { ...rest, email, password, confirmPassword: password };
-        await client.collection("users").create({ ...user, metadata: {} });
-    }
-    await client.collection("users").authWithPassword(email, password);
-}
-
-export function logout() {
-    client.authStore.clear();
-}
-
-/*
-* Save (create/update) a record (a plain object). Automatically converts to
-* FormData if needed.
-*/
-export async function save<T>(collection: string, record: any, create = false) {
+/**
+ * Save (create/update) a record (a plain object). Automatically converts to
+ * FormData if needed.
+ */
+export async function save<T>(collectionName: Collections | string, record: any, create = false) {
     // convert obj to FormData in case one of the fields is instanceof FileList
     const data = objectToFormData(record);
     if(record.id && !create) {
         // "create" flag overrides update
-        return await client.collection(collection).update<T>(record.id, data);
+        return await client.collection(collectionName).update<T>(record.id, data);
     } else {
-        return await client.collection(collection).create<T>(data);
+        return await client.collection(collectionName).create<T>(data);
     }
 }
 
-// convert obj to FormData in case one of the fields is instanceof FileList
+// Convert obj to FormData in case one of the fields is instanceof FileList
 function objectToFormData(obj: {}) {
     // check if any field's value is an instanceof FileList
     if(!Object.values(obj).some(
@@ -104,13 +68,13 @@ export interface PageStore<T = any> extends Readable<ListResult<T>> {
 }
 
 export async function watch<T extends RecordModel>(
-    idOrName: string,
+    collectionName: Collections | string,
     queryParams = {} as RecordListOptions,
     page = 1,
     perPage = 20,
     realtime = browser
 ): Promise<PageStore<T>> {
-    const collection = client.collection(idOrName);
+    const collection = client.collection(collectionName);
     let result = await collection.getList<T>(page, perPage, queryParams);
     let set: Subscriber<ListResult<T>>;
     let unsubRealtime: UnsubscribeFunc | undefined;
@@ -176,38 +140,10 @@ export async function watch<T extends RecordModel>(
     };
 }
 
-export async function providerLogin(
-    provider: AuthProviderInfo,
-    authCollection: RecordService
-) {
-    const authResponse = await authCollection.authWithOAuth2({
-        provider: provider.name,
-        createData: {
-            // emailVisibility: true,
-        },
-    });
-
-    // update user "record" if "meta" has info it doesn't have
-    const { meta, record } = authResponse;
-    let changes = {} as { [key: string]: any };
-    if(!record.name && meta?.name) {
-        changes.name = meta.name;
-    }
-    
-    if(!record.avatar && meta?.avatarUrl) {
-        const response = await fetch(meta.avatarUrl);
-        if(response.ok) {
-            const type = response.headers.get("content-type") ?? "image/jpeg";
-            changes.avatar = new File([await response.blob()], "avatar", { type });
-        }
-    }
-
-    if(Object.keys(changes).length) {
-        authResponse.record = await save(authCollection.collectionIdOrName, {
-            ...record,
-            ...changes,
-        });
-    }
-
-    return authResponse;
+export async function query<C extends Collections | string>(
+    collectionName: C,
+    queryParams = {} as RecordFullListOptions
+): Promise<(C extends Collections ? CollectionRecords[C] : any)[]> {
+    const collection = client.collection(collectionName);
+    return await collection.getFullList(queryParams);
 }

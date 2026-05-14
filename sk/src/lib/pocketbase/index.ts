@@ -19,14 +19,17 @@ export const client = new PocketBase(
  * Save (create/update) a record (a plain object). Automatically converts to
  * FormData if needed.
  */
-export async function save<T>(collectionName: Collections | string, record: any, create = false) {
+export async function save<T>(
+    collectionName: Collections | string, record: any, create = false,
+    fetch: typeof window.fetch = window.fetch
+): Promise<T> {
     // convert obj to FormData in case one of the fields is instanceof FileList
     const data = objectToFormData(record);
     if(record.id && !create) {
         // "create" flag overrides update
-        return await client.collection(collectionName).update<T>(record.id, data);
+        return await client.collection(collectionName).update<T>(record.id, data, { fetch });
     } else {
-        return await client.collection(collectionName).create<T>(data);
+        return await client.collection(collectionName).create<T>(data, { fetch });
     }
 }
 

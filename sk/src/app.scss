@@ -62,6 +62,21 @@ button:hover {
     transform: translateY(-1px);
 }
 
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.1s ease;
+
+    &:hover {
+        color: color-mix(in srgb, var(--accent) 80%, var(--text-primary));
+    }
+}
+hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1rem 0;
+}
+
 h1 {
     font-size: 1.5rem;
     margin: 0;

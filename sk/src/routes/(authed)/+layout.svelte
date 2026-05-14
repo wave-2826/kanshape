@@ -28,7 +28,8 @@
 </script>
 
 <svelte:head>
-<title>{$metadata.title} - {config.site?.name}</title>
+<link rel="icon" href="{config.site.faviconUrl}" />
+<title>{$metadata.title} - {config.site.name}</title>
 </svelte:head>
 
 <div class="layout" class:showNav={showNav}>

@@ -38,6 +38,9 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
     {#if saving}<span class="saving">Saving...</span>{/if}
 </div>
 
+<!-- TODO (priority low): Dropdown type for auth provider -->
+<!-- TODO (priority low): Way to see/upload to the `files` table and reference files from URL fields -->
+
 <div class="settings">
     {#if config}
         {#each Object.entries(categories) as [category, items]}

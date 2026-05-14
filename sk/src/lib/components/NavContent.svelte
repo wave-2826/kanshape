@@ -3,7 +3,7 @@
     import { page } from "$app/state";
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { FolderKanban, Plus, Settings } from "lucide-svelte";
+    import { FolderKanban, Medal, Plus, Settings } from "lucide-svelte";
 
     const projects = await watch(Collections.Projects, {}, 1, 500, true).catch((err) => {
         console.error("Failed to load projects:", err);
@@ -14,6 +14,10 @@
 <button onclick={() => { goto("/"); }} class:selected={page.route.id === "/(authed)"}>
     <FolderKanban />
     Overview
+</button>
+<button onclick={() => { goto("/leaderboard"); }} class:selected={page.route.id === "/(authed)/leaderboard"}>
+    <Medal />
+    Leaderboard
 </button>
 
 <h2>Projects</h2>
@@ -40,6 +44,7 @@
 
 <div style="flex-grow: 1;"></div>
 
+<!-- TODO (priority medium): users page to see all application users, remove them (for admins), see assigned tasks, etc -->
 <button onclick={() => { goto("/settings"); }} class:selected={page.route.id === "/(authed)/settings"}>
     <Settings />
     Application settings

@@ -6,6 +6,12 @@ const config = {
     // Consult https://github.com/sveltejs/svelte-preprocess
     // for more information about preprocessors
     preprocess: preprocess(),
+
+    compilerOptions: {
+        experimental: {
+            async: true,
+        },
+    },
     
     kit: {
         alias: {
@@ -16,7 +22,7 @@ const config = {
             prerender: { entries: [] },
             fallback: "index.html", // enable SPA mode
         }),
-    },
+    }
 };
 
 export default config;

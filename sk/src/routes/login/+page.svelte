@@ -4,6 +4,7 @@ import { onMount } from "svelte";
 import { client } from "$lib/pocketbase";
 import type { AuthProviderInfo } from "pocketbase";
 import { providerLogin } from "$lib/pocketbase/auth";
+import { goto } from "$app/navigation";
 
 const { data } = $props();
 
@@ -11,6 +12,12 @@ let providers: AuthProviderInfo[] = $state([]);
 let error = $state("");
 
 onMount(async () => {
+    // If already logged in, redirect to home
+    if(client.authStore.isValid) {
+        goto("/");
+        return;
+    }
+
     try {
         // Get OIDC providers from PocketBase
         const res = await client.send("/api/collections/users/auth-methods", {});

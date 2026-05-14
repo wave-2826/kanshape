@@ -1,0 +1,71 @@
+<script lang="ts">
+    import { goto } from "$app/navigation";
+    import { page } from "$app/state";
+    import { watch } from "$lib/pocketbase";
+    import { Collections } from "$lib/pocketbase/generated-types";
+    import { FolderKanban, Plus, Settings } from "lucide-svelte";
+
+    const projects = await watch(Collections.Projects, {}, 1, 500, true).catch((err) => {
+        console.error("Failed to load projects:", err);
+        return null;
+    });
+</script>
+
+<button onclick={() => { goto("/"); }} class:selected={page.route.id === "/(authed)"}>
+    <FolderKanban />
+    Overview
+</button>
+
+<h2>Projects</h2>
+
+{#if projects !== null && $projects !== null}
+    <div class="projects">
+        {#each $projects.items as project}
+            <a href={`/projects/${project.id}`}>
+                <FolderKanban />
+                {project.name}
+            </a>
+        {/each}
+        {#if $projects.totalItems === 0}
+            <p>No projects found.</p>
+        {/if}
+    </div>
+    <button onclick={() => { goto("/projects/new"); }} class:selected={page.route.id === "/(authed)/projects/new"}>
+        <Plus />
+        New project
+    </button>
+{:else}
+    <p>Failed to load projects.</p>
+{/if}
+
+<div style="flex-grow: 1;"></div>
+
+<button onclick={() => { goto("/settings"); }} class:selected={page.route.id === "/(authed)/settings"}>
+    <Settings />
+    Application settings
+</button>
+
+<style lang="scss">
+button {
+    --bg-color: transparent;
+}
+button.selected {
+    --bg-color: var(--bg-secondary);
+}
+h2 {
+    margin-top: 1rem;
+}
+p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0.5rem 0 1rem 0.5rem;
+}
+
+.projects {
+    max-height: 80%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+</style>

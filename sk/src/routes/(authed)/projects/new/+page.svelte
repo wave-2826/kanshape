@@ -8,7 +8,6 @@ let description = $state("");
 let subprojects = $state<{
     name: string;
     description?: string;
-    visibleSections: string[];
 }[]>([]);
 
 let sections = $state<{
@@ -51,18 +50,13 @@ function createProject() {
     <h2>Subprojects</h2>
     <LeftPaneChooser
         options={subprojects.map(sp => sp.name)}
-        oncreate={() => subprojects.push({ name: `Subproject ${subprojects.length + 1}`, visibleSections: [] })}
+        oncreate={() => subprojects.push({ name: `Subproject ${subprojects.length + 1}` })}
         ondelete={(option) => subprojects.splice(option, 1)}
     >
         {#snippet pane(selected)}
             <div class="subproject">
                 <input type="text" placeholder="Subproject name" bind:value={subprojects[selected].name} />
                 <textarea placeholder="Subproject description (optional)" bind:value={subprojects[selected].description}></textarea>
-                <h3>Visible sections</h3>
-                <ListChooser
-                    options={sections.map(s => ({ text: s.name, tooltip: s.description, id: s.id }))}
-                    bind:selected={subprojects[selected].visibleSections}
-                />
             </div>
         {/snippet}
     </LeftPaneChooser>

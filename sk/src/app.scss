@@ -6,6 +6,7 @@
     --bg-site: #101113;
     --bg-primary: #18191e;
     --bg-secondary: #24262c;
+    --bg-selection: #263545;
     --text-primary: #e2e5ec;
     --text-secondary: #b4bcc8;
     --border: #434d5a;
@@ -84,6 +85,9 @@ hr {
     border-top: 1px solid var(--border);
     margin: 1rem 0;
 }
+p {
+    margin: 0;
+}
 
 h1 {
     font-size: 1.5rem;
@@ -91,5 +95,9 @@ h1 {
 }
 h2 {
     font-size: 1rem;
+    margin: 0;
+}
+h3 {
+    font-size: 0.9rem;
     margin: 0;
 }

@@ -20,7 +20,7 @@
 <div class="chooser">
     <ul>
         {#each options as option, i (i)}
-            <li class="button">
+            <li class="button" class:selected={selected === i}>
                 <button onclick={() => selected = i} class="unstyled label">{option}</button>
                 {#if ondelete}
                     <button onclick={() => {
@@ -34,7 +34,10 @@
         
         {#if oncreate}
             <li>
-                <button onclick={oncreate} class="label"><Plus />Create new</button>
+                <button onclick={() => {
+                    oncreate();
+                    selected = options.length - 1;
+                }} class="label"><Plus />Create new</button>
             </li>
         {/if}
     </ul>
@@ -42,7 +45,7 @@
         {#if selected !== null}
             {@render pane(selected)}
         {:else}
-            <p>Select an option</p>
+            <p class="select-option">Select an option</p>
         {/if}
     </div>
 </div>
@@ -63,21 +66,27 @@ ul {
     flex-direction: column;
     gap: 0.5rem;
     min-height: 200px;
-    max-height: 300px;
+    max-height: 400px;
     width: max(200px, 25%);
 
     overflow: auto;
 
     li {
         display: flex;
+        padding: 0;
+    }
+    li.selected {
+        background-color: var(--bg-selection);
     }
     .label {
         flex: 1;
+        padding: 0.5rem;
     }
     .action {
-        width: 1.25rem;
+        width: 2rem;
         color: var(--error);
         transition: color 0.2s;
+        padding: 0.5rem;
 
         &:hover {
             color: color-mix(var(--text-primary) 25%, var(--error));
@@ -91,5 +100,11 @@ ul, .pane {
 }
 .pane {
     flex: 1;
+}
+
+.select-option {
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0.5rem;
 }
 </style>

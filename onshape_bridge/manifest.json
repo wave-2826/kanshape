@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Kanshape Onshape Bridge",
+  "version": "1.0",
+
+  "permissions": [
+    "cookies"
+  ],
+
+  "host_permissions": [
+    "https://*.onshape.com/*"
+  ],
+
+  "background": {
+    "scripts": ["browser_polyfill.js", "background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.onshape.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+import type { AppConfig } from "$lib/config";
+
+let kanshapeExtensionDetected: boolean | null = null;
+
+// Caching
+const requestCache = new Map<string, { status: number; headers: Record<string, string>; body: any; timestamp: number }>();
+const CACHE_EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutes
+const CACHE_SIZE_LIMIT = 100;
+
+// Rate limiting
+// shouldn't really be hit, but the onshape docs are pretty explicit about limiting,
+// so we implement simple global backoff to avoid an accident
+let rateLimitBackoffUntil = 0;
+let rateLimitBackoffDuration = 2000; // 2 second initial backoff
+const MAX_BACKOFF_MS = 10 * 60 * 1000; // 10 minutes max
+const BACKOFF_MULTIPLIER = 2;
+
+async function hash(str: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function detectBridgeExtension(timeout = 100) {
+    if(kanshapeExtensionDetected !== null) return kanshapeExtensionDetected;
+
+    return new Promise((resolve) => {
+        const id = crypto.randomUUID();
+
+        const listener = (event: MessageEvent) => {
+            if(event.data?.type !== "kanshapePong") return;
+            if(event.data?.id !== id) return;
+
+            event.stopImmediatePropagation();
+            window.removeEventListener("message", listener);
+            kanshapeExtensionDetected = true;
+            resolve(true);
+        };
+
+        window.addEventListener("message", listener);
+
+        window.parent.postMessage({
+            type: "kanshapePing",
+            id,
+        }, "*");
+
+        setTimeout(() => {
+            window.removeEventListener("message", listener);
+            // kanshapeExtensionDetected = false;
+            resolve(false);
+        }, timeout);
+    });
+}
+
+export async function onshapeApiRequest<T>(config: AppConfig, method: string, path: string, body?: any): Promise<{
+    status: number;
+    headers: Record<string, string>;
+    body: T;
+    cached: boolean;
+}> {
+    // First, try to detect if the companion extension is installed, and if so, route reqests through it.
+    // This allows locally making API calls without needing to use API quota. It's really sketchy but not
+    // against TOS from what I can tell.
+
+    // Check if the extension is installed
+    if(await detectBridgeExtension()) {
+        // Check if still in rate limit backoff - fail fast
+        if(Date.now() < rateLimitBackoffUntil) {
+            const waitTime = rateLimitBackoffUntil - Date.now();
+            return Promise.reject(new Error(`Rate limited. Backoff period active for ${waitTime}ms`));
+        }
+        
+        // Create cache key from request parameters
+        const cacheKey = await hash(`${method}:${config.onshape.baseDomain}${path}:${JSON.stringify(body || "")}`);
+        
+        // Check if response is cached and not expired
+        if(requestCache.has(cacheKey)) {
+            const cached = requestCache.get(cacheKey)!;
+            if(Date.now() - cached.timestamp < CACHE_EXPIRATION_TIME) {
+                console.log("Returning cached response for:", path);
+                return { ...cached, cached: true }
+            }
+        }
+        
+        // If the extension is installed, send a message to it and wait for a response.
+        return new Promise((resolve, reject) => {
+            const id = crypto.randomUUID();
+
+            const listener = (event: MessageEvent) => {
+                if(event.data?.type !== "kanshapeProxyFetchResponse") return;
+                if(event.data?.id !== id) return;
+
+                event.stopImmediatePropagation();
+                window.removeEventListener("message", listener);
+
+                if(event.data?.error) {
+                    reject(new Error(event.data.error));
+                } else {
+                    const result = event.data.response;
+                    
+                    // Handle rate limiting
+                    if(
+                        result.status === 429 ||
+                        parseInt(result.headers['x-rate-limit-remaining'] || '1', 10) === 0
+                    ) {
+                        // Increase backoff exponentially
+                        rateLimitBackoffDuration = Math.min(rateLimitBackoffDuration * BACKOFF_MULTIPLIER, MAX_BACKOFF_MS);
+                        rateLimitBackoffUntil = Date.now() + rateLimitBackoffDuration;
+                        if(result.status === 429) {
+                            reject(new Error(`Rate limited (${result.status}). Backoff ${rateLimitBackoffDuration}ms`));
+                            return;
+                        }
+                    }
+                    // reset backoff
+                    if(result.status < 400) {
+                        rateLimitBackoffDuration = 1000;
+                        rateLimitBackoffUntil = 0;
+                    }
+                    
+                    // Cache the response
+                    requestCache.set(cacheKey, { ...result, timestamp: Date.now() });
+                    
+                    // Clean up expired entries
+                    for(const [key, value] of requestCache) {
+                        if(Date.now() - value.timestamp > CACHE_EXPIRATION_TIME) requestCache.delete(key);
+                    }
+                    if(requestCache.size > CACHE_SIZE_LIMIT) {
+                        const sortedEntries = Array.from(requestCache.entries()).sort((a, b) => a[1].timestamp - b[1].timestamp);
+                        const entriesToDelete = sortedEntries.slice(0, requestCache.size - CACHE_SIZE_LIMIT);
+                        for(const [key] of entriesToDelete) requestCache.delete(key);
+                    }
+                    
+                    resolve(result);
+                }
+            };
+
+            window.addEventListener("message", listener, {
+                capture: true
+            });
+
+            window.parent.postMessage({
+                type: "kanshapeProxyFetch",
+                id,
+                payload: {
+                    method,
+                    url: `${config.onshape.baseDomain}${path}`,
+                    body
+                }
+            }, "*");
+        });
+    } else {
+        // If the extension is not installed, make a direct fetch request to the Onshape API.
+        // ...eventually
+        // TODO
+        return Promise.reject(new Error("proxied Onshape API requests aren't implemented yet. load the extension under `onshape_bridge` unpacked for dev."));
+    }
+}

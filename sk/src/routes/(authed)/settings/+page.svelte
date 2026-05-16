@@ -1,6 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
-import { loadConfig, updateConfig, configTypes } from "$lib/config";
+import { updateConfig, configTypes, getConfig } from "$lib/config";
 import type { AppConfig, ConfigPath, ConfigValueType } from "$lib/config";
 import { metadata } from "$lib/metadata";
 
@@ -8,12 +7,8 @@ $effect(() => {
     $metadata.title = "Application settings";
 });
 
-let config: AppConfig | null = $state(null);
+let config: AppConfig = getConfig();
 let saving = $state(false);
-
-onMount(async () => {
-    config = await loadConfig();
-});
 
 const categories = Object.keys(configTypes).reduce((acc, path) => {
     const [category, key] = path.split("/");

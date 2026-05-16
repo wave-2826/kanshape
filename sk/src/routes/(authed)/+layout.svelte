@@ -5,11 +5,14 @@
     import { onMount } from "svelte";
     import { client } from "$lib/pocketbase";
     import { goto } from "$app/navigation";
-    import { LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
+    import { ExternalLink, LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/NavContent.svelte";
+    import { setConfig } from "$lib/config";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
+    // svelte-ignore state_referenced_locally
+    setConfig(config);
 
     $effect(() => {
         if(page.error) $metadata.title = `Error: ${page.error.message}`;
@@ -25,7 +28,8 @@
     });
 
     let navOpen = $state(true)
-    let showNav = $derived(!page.url.pathname.endsWith("/onshape/") && (navOpen || page.url.pathname === "/"));
+    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/(onshape)") ?? false);
+    let showNav = $derived(!onOnshape && (navOpen || page.url.pathname === "/"));
 </script>
 
 <svelte:head>
@@ -35,13 +39,19 @@
 
 <div class="layout" class:showNav={showNav}>
     <header class="container">
-        <button onclick={() => navOpen = !navOpen}>
-            {#if navOpen}
-                <PanelRightClose />
-            {:else}
-                <PanelRightOpen />
-            {/if}
-        </button>
+        {#if onOnshape}
+            <button onclick={() => window.open(window.location.origin, "_blank")}>
+                <ExternalLink />
+            </button>
+        {:else}
+            <button onclick={() => navOpen = !navOpen}>
+                {#if navOpen}
+                    <PanelRightClose />
+                {:else}
+                    <PanelRightOpen />
+                {/if}
+            </button>
+        {/if}
         {#if config.site.logoUrl}
             <img src={config.site.logoUrl} alt={config.site.name} />
         {/if}
@@ -56,11 +66,13 @@
             <LogOut />
         </button>
     </header>
-    <nav>
-        <div class="nav-content">
-            <NavContent />
-        </div>
-    </nav>
+    {#if !onOnshape}
+        <nav>
+            <div class="nav-content">
+                <NavContent />
+            </div>
+        </nav>
+    {/if}
     <main>
         {@render children()}
     </main>

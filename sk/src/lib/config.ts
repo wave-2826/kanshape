@@ -1,5 +1,9 @@
+import { createContext } from "svelte";
 import { query, save } from "./pocketbase";
 import { Collections } from "./pocketbase/generated-types";
+
+/** Svelte context for the application configuration, which is the main way to access the config in components. */
+export const [getConfig, setConfig] = createContext<AppConfig>();
 
 /**
  * Configuration for the application. This is stored in the `config` table in PocketBase and loaded on app startup,
@@ -28,8 +32,12 @@ export type AppConfig = {
         faviconUrl: string;
     };
     onshape: {
-        client_id: string;
-        client_secret: string;
+        /** The Onshape client ID for OAuth */
+        clientId: string;
+        /** The Onshape client secret for OAuth */
+        clientSecret: string;
+        /** The Onshape base server domain */
+        baseDomain: string;
     }
 };
 const defaultConfig: AppConfig = {
@@ -42,8 +50,9 @@ const defaultConfig: AppConfig = {
         faviconUrl: "/favicon.svg"
     },
     onshape: {
-        client_id: "",
-        client_secret: ""
+        clientId: "",
+        clientSecret: "",
+        baseDomain: "https://cad.onshape.com"
     }
 };
 export type ConfigValueType = {
@@ -56,8 +65,9 @@ export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
     "site/name": { optional: false, type: "string", name: "Site Name" },
     "site/logoUrl": { optional: true, type: "string", name: "Site Logo URL" },
     "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" },
-    "onshape/client_id": { optional: false, type: "string", name: "Onshape Client ID" },
-    "onshape/client_secret": { optional: false, type: "string", name: "Onshape Client Secret" }
+    "onshape/clientId": { optional: false, type: "string", name: "Onshape Client ID" },
+    "onshape/clientSecret": { optional: false, type: "string", name: "Onshape Client Secret" },
+    "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain" }
 
 } as const;
 

@@ -10,7 +10,8 @@
         project: ExpandResponse<ProjectsResponse, "subprojects">
     } = $props();
 
-    const selected = $derived(page.route.id?.startsWith("/(authed)/projects/[id]") && page.params.id === project.id);
+    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]");
+    const treeSelected = $derived(page.route.id?.startsWith("/(authed)/projects/[id]") && page.params.id === project.id);
     let collapsed = $state(true);
     // $effect(() => {
     //     // one-way state relationship, so we don't use derived
@@ -20,10 +21,10 @@
     const subprojects = $derived(cannonicalizeMultiExpand(project.expand.subprojects));
 </script>
 
-<div class="button project-button" class:selected={selected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>
+<div class="button project-button" class:selected={treeSelected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>
     <button
         onclick={() => {
-            if(selected) collapsed = !collapsed;
+            if(selfSelected) collapsed = !collapsed;
             else goto(`/projects/${project.id}`);
         }}
         class="unstyled"
@@ -42,7 +43,7 @@
     {/if}
 </div>
 
-{#if (!collapsed || selected) && subprojects.length > 0}
+{#if (!collapsed || treeSelected) && subprojects.length > 0}
     <div class="sublist" transition:grow style="--color: {project.color ?? 'var(--bg-secondary)'}">
         {#each project.subprojects as subprojectId}
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}

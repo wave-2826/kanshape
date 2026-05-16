@@ -12,7 +12,7 @@
   ],
 
   "background": {
-    "scripts": ["browser_polyfill.js", "background.js"]
+    "scripts": ["background.js"]
   },
 
   "content_scripts": [

@@ -1,3 +1,5 @@
+const browser = browser ?? chrome;
+
 const requestCache = new Map();
 const CACHE_EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutes
 const CACHE_SIZE_LIMIT = 100;

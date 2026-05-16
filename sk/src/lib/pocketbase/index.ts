@@ -20,19 +20,31 @@ export const client = new PocketBase(
 /**
  * Add a comma-separated expand list like `foo,bar` to the expand result of a returned query
  */
-type ExpandResponse<T extends {
+export type ExpandResponse<T extends {
 	id: string
 	collectionId: string
 	collectionName: Collections
 }, Expand extends string> = T & { expand: GetExpand<Expand> };
 
+export type ExpandedRecord<K extends keyof CollectionRecords> = undefined | CollectionRecords[K] | CollectionRecords[K][];
+
 type GetExpand<Expand extends string> = Expand extends `${infer Key},${infer Rest}`
     ? Key extends keyof CollectionRecords
-        ? { [K in Key]: CollectionRecords[K] | CollectionRecords[K][] } & GetExpand<Rest>
+        ? { [K in Key]: ExpandedRecord<K> } & GetExpand<Rest>
         : GetExpand<Rest>
     : Expand extends keyof CollectionRecords
-        ? { [K in Expand]: CollectionRecords[Expand] | CollectionRecords[Expand][] }
+        ? { [K in Expand]: ExpandedRecord<Expand> }
         : {};
+
+/**
+ * The PocketBase SDK returns expanded records as either undefined, T, or T[], depending on the relation type and
+ * whether there are any assigned. This function normalizes the result to always be an array of T.
+ */
+export function cannonicalizeExpand<K extends keyof CollectionRecords>(expand: ExpandedRecord<K>): CollectionRecords[K][] {
+    if(expand === undefined) return [];
+    if(Array.isArray(expand)) return expand;
+    return [expand];
+}
 
 export async function batch(run: (batch: BatchService) => Promise<void>): Promise<BatchRequestResult[]> {
     const batch = client.createBatch();

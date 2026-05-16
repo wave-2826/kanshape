@@ -1,10 +1,10 @@
-const browser = (typeof browser !== 'undefined') ? browser : chrome;
+const _browser = (typeof browser !== 'undefined') ? browser : chrome;
 
 const requestCache = new Map();
 const CACHE_EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutes
 const CACHE_SIZE_LIMIT = 100;
 
-browser.runtime.onMessage.addListener(async (msg, _sender) => {
+_browser.runtime.onMessage.addListener(async (msg, _sender) => {
     if(msg.type !== "kanshapeProxyFetch") return;
 
     try {

@@ -1,4 +1,4 @@
-const browser = (typeof browser !== 'undefined') ? browser : chrome;
+const _browser = (typeof _browser !== 'undefined') ? _browser : chrome;
 
 window.addEventListener("message", async (event) => {
     // TODO: Eventually check event.origin here; fine for development
@@ -18,7 +18,7 @@ window.addEventListener("message", async (event) => {
     }
 
     try {
-        const response = await browser.runtime.sendMessage({
+        const response = await _browser.runtime.sendMessage({
             type: "kanshapeProxyFetch",
             payload: data.payload,
         });

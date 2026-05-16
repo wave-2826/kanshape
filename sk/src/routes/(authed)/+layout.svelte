@@ -19,12 +19,13 @@
     onMount(() => {
         if(typeof window !== "undefined") {
             const isLoginPage = page.url.pathname.startsWith("/login");
-            if(!client.authStore.isValid && !isLoginPage) goto("/login");
+            const followPath = page.url.pathname;
+            if(!client.authStore.isValid && !isLoginPage) goto("/login?r=" + encodeURIComponent(followPath));
         }
     });
 
-    let navOpen = $state(true);
-    let showNav = $derived(navOpen || page.url.pathname === "/");
+    let navOpen = $state(true)
+    let showNav = $derived(!page.url.pathname.endsWith("/onshape/") && (navOpen || page.url.pathname === "/"));
 </script>
 
 <svelte:head>

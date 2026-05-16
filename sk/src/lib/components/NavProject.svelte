@@ -5,18 +5,33 @@
     import type { ProjectsResponse } from "$lib/pocketbase/generated-types";
     import { grow } from "$lib/transitions";
     import { ChevronDown, ChevronUp, Kanban, SquareKanban } from "lucide-svelte";
-
+    import { untrack } from "svelte";
+    
+    // svelte-ignore non_reactive_update ???
+    enum CollapsedState { Collapsed, Expanded, Auto };
+    
     const { project }: {
         project: ExpandResponse<ProjectsResponse, "subprojects">
     } = $props();
 
-    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]");
+    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]" && page.params.id === project.id);
     const treeSelected = $derived(page.route.id?.startsWith("/(authed)/projects/[id]") && page.params.id === project.id);
-    let collapsed = $state(true);
-    // $effect(() => {
-    //     // one-way state relationship, so we don't use derived
-    //     if(selected) collapsed = false;
-    // });
+    
+    let collapsed = $state<CollapsedState>(CollapsedState.Auto);
+    let showOpen = $derived.by(() => {
+        if(collapsed === CollapsedState.Collapsed) return false;
+        if(collapsed === CollapsedState.Expanded) return true;
+        return selfSelected;
+    });
+    function toggleCollapsed() {
+        if(collapsed === CollapsedState.Expanded) collapsed = CollapsedState.Collapsed;
+        else collapsed = CollapsedState.Expanded;
+    }
+    
+    $effect(() => {
+        // one-way state relationship, so we don't use derived
+        if(selfSelected && untrack(() => collapsed !== CollapsedState.Expanded)) collapsed = CollapsedState.Auto;
+    });
 
     const subprojects = $derived(cannonicalizeMultiExpand(project.expand.subprojects));
 </script>
@@ -24,7 +39,7 @@
 <div class="button project-button" class:selected={treeSelected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>
     <button
         onclick={() => {
-            if(selfSelected) collapsed = !collapsed;
+            if(selfSelected) toggleCollapsed();
             else goto(`/projects/${project.id}`);
         }}
         class="unstyled"
@@ -33,8 +48,8 @@
         {project.title}
     </button>
     {#if subprojects.length > 0}
-        <button class="unstyled" onclick={() => collapsed = !collapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
-            {#if collapsed}
+        <button class="unstyled" onclick={toggleCollapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
+            {#if collapsed === CollapsedState.Expanded}
                 <ChevronUp />
             {:else}
                 <ChevronDown />
@@ -43,7 +58,7 @@
     {/if}
 </div>
 
-{#if (!collapsed || treeSelected) && subprojects.length > 0}
+{#if showOpen && subprojects.length > 0}
     <div class="sublist" transition:grow style="--color: {project.color ?? 'var(--bg-secondary)'}">
         {#each project.subprojects as subprojectId}
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}

@@ -80,7 +80,7 @@
 
 <style lang="scss">
 .layout {
-    --open-nav-width: 300px;
+    --open-nav-width: 250px;
 
     display: grid;
     grid-template-areas:
@@ -103,9 +103,9 @@ header {
     align-items: center;
 
     padding: 0 0.5rem;
-    gap: 1rem;
+    gap: 0.5rem;
 
-    height: 2.5rem;
+    height: 2.25rem;
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border);
 
@@ -117,12 +117,10 @@ header {
         color: var(--text-primary);
         text-decoration: none;
     }
-
     button {
         --bg-color: transparent;
-        padding: 0.5rem;
-        display: grid;
-        place-items: center;
+        padding: 0.25rem;
+        width: 1.75rem;
     }
 }
 nav {
@@ -133,8 +131,9 @@ nav {
 .nav-content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
     padding: 0.5rem;
+    font-size: var(--font-text);
 
     width: var(--open-nav-width);
     height: 100%;
@@ -142,6 +141,7 @@ nav {
 main {
     grid-area: main;
     flex-grow: 1;
+    font-size: var(--font-text);
     
     overflow: hidden;
 }

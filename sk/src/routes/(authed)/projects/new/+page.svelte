@@ -166,7 +166,7 @@ h1 {
 .options {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 
     .option {
         display: flex;
@@ -181,7 +181,7 @@ h1 {
     gap: 0.5rem;
 }
 .part-id-preview {
-    font-size: 0.9rem;
+    font-size: var(--font-small);
     color: var(--text-secondary);
     margin-left: 1rem;
 }

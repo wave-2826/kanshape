@@ -85,7 +85,7 @@
         flex-grow: 1;
     }
     button {
-        padding: 0.5rem;
+        padding: 0.35em 0.5em;
     }
 }
 button, .button {
@@ -98,13 +98,9 @@ button.selected, .button.selected {
 .sublist {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    margin-left: 0.5rem;
-    padding-left: 0.5rem;
+    gap: 0;
+    margin-left: 1rem;
+    padding-left: 0.25rem;
     border-left: 1px solid var(--color);
-
-    > button {
-        padding: 0.25rem 0.5rem;
-    }
 }
 </style>

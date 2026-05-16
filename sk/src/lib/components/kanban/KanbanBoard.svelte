@@ -191,10 +191,10 @@
 
     display: flex;
     flex-direction: row;
-    gap: 0.75rem;
+    gap: 0.5rem;
     align-items: start;
 
-    padding: 0 1rem 1rem 1rem;
+    padding: 0.5rem;
 
     overflow-x: auto;
     overflow-y: hidden;
@@ -204,13 +204,14 @@ section {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding: 0.75rem;
+    padding: 0.5rem;
     border: 1px solid transparent;
     border-radius: 4px;
     background: var(--bg-primary);
     transition: border-color 0.1s ease;
-    min-width: 25rem;
-    max-width: 35rem;
+
+    min-width: 18rem;
+    max-width: 25rem;
 
     max-height: 100%;
 
@@ -223,11 +224,13 @@ section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.5rem;
 
+    h2 {
+        margin: 0;
+    }
     span {
         color: var(--text-secondary);
-        font-size: 0.9rem;
+        font-size: var(--font-small);
     }
 }
 
@@ -240,7 +243,7 @@ section {
 }
 
 .card {
-    padding: 0.75rem;
+    padding: 0.4rem 0.75rem;
     border-radius: 4px;
     background: var(--bg-secondary);
     cursor: grab;
@@ -260,7 +263,7 @@ section {
 
 .empty {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--font-small);
     padding: 0.25rem 0;
 }
 

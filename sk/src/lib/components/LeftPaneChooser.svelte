@@ -61,7 +61,7 @@
 .chooser {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    gap: 0.5rem;
     width: 100%;
 }
 
@@ -71,7 +71,7 @@ ul {
 
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
     min-height: 200px;
     max-height: 400px;
     width: max(200px, 25%);
@@ -84,13 +84,13 @@ ul {
     }
     .label {
         flex: 1;
-        padding: 0.5rem;
+        padding: 0.25em 0.5em;
     }
     .action {
         width: 2rem;
         color: var(--error);
         transition: color 0.2s;
-        padding: 0.5rem;
+        padding: 0.25rem 0.5em;
 
         &:hover {
             color: color-mix(var(--text-primary) 25%, var(--error));

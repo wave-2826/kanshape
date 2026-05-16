@@ -105,7 +105,7 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
 }
 .saving {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--font-small);
 }
 .settings {
     display: flex;
@@ -140,7 +140,7 @@ section {
         .required {
             color: var(--error);
             font-weight: normal;
-            font-size: 0.8rem;
+            font-size: 0.8em;
         }
     }
     input {

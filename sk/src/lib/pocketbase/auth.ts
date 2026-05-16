@@ -2,6 +2,8 @@ import { readable } from "svelte/store";
 import { client, save } from ".";
 import type { AuthModel, AuthProviderInfo, RecordService } from "pocketbase";
 import { goto, invalidateAll } from "$app/navigation";
+import { page } from "$app/state";
+
 
 export const authModel = readable<AuthModel | null>(
     null,
@@ -71,7 +73,8 @@ export async function providerLogin(
         });
     }
 
-    goto("/");
+    const followPath = page.url.searchParams.get("r") || "/";
+    goto(decodeURIComponent(followPath));
 
     return authResponse;
 }

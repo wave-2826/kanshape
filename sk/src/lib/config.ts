@@ -27,6 +27,10 @@ export type AppConfig = {
          */
         faviconUrl: string;
     };
+    onshape: {
+        client_id: string;
+        client_secret: string;
+    }
 };
 const defaultConfig: AppConfig = {
     auth: {
@@ -36,6 +40,10 @@ const defaultConfig: AppConfig = {
         name: "Kanshape",
         logoUrl: null,
         faviconUrl: "/favicon.svg"
+    },
+    onshape: {
+        client_id: "",
+        client_secret: ""
     }
 };
 export type ConfigValueType = {
@@ -47,7 +55,10 @@ export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
     "auth/autoOAuth": { optional: true, type: "string", name: "Automatically authenticate with OAuth provider" },
     "site/name": { optional: false, type: "string", name: "Site Name" },
     "site/logoUrl": { optional: true, type: "string", name: "Site Logo URL" },
-    "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" }
+    "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" },
+    "onshape/client_id": { optional: false, type: "string", name: "Onshape Client ID" },
+    "onshape/client_secret": { optional: false, type: "string", name: "Onshape Client Secret" }
+
 } as const;
 
 

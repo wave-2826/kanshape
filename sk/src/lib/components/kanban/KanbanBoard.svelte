@@ -139,7 +139,7 @@
                     ondrop={(event) => onSectionDrop(section.id, event)}
                 >
                     <div class="column-header">
-                        <h2>{section.title}</h2>
+                        <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
                         <span>{cards.length}</span>
                     </div>
 

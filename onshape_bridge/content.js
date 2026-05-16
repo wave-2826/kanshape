@@ -1,4 +1,4 @@
-const browser = browser ?? chrome;
+const browser = (typeof browser !== 'undefined') ? browser : chrome;
 
 window.addEventListener("message", async (event) => {
     // TODO: Eventually check event.origin here; fine for development

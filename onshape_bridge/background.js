@@ -1,4 +1,4 @@
-const browser = browser ?? chrome;
+const browser = (typeof browser !== 'undefined') ? browser : chrome;
 
 const requestCache = new Map();
 const CACHE_EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutes

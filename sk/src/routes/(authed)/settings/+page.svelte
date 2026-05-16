@@ -38,61 +38,70 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
 }
 </script>
 
-<div class="header">
-    <h1>Settings</h1>
-    {#if saving}<span class="saving">Saving...</span>{/if}
-</div>
+<div class="layout">
+    <div class="header">
+        <h1>Settings</h1>
+        {#if saving}<span class="saving">Saving...</span>{/if}
+    </div>
 
-<!-- TODO (priority low): Dropdown type for auth provider -->
-<!-- TODO (priority low): Way to see/upload to the `files` table and reference files from URL fields -->
+    <!-- TODO (priority low): Dropdown type for auth provider -->
+    <!-- TODO (priority low): Way to see/upload to the `files` table and reference files from URL fields -->
 
-<div class="settings">
-    {#if config}
-        {#each Object.entries(categories) as [category, items]}
-            <section>
-                <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
-                <div class="fields">
-                    {#each items as item}
-                        <div class="field">
-                            <label for={item.path}>{item.type.name || item.key} <span class="required">{item.type.optional ? '' : '*'}</span></label>
-                            {#if item.type.type === 'string'}
-                                <input 
-                                    id={item.path} 
-                                    type="text" 
-                                    bind:value={(config as any)[category][item.key]}
-                                    onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).value)}
-                                />
-                            {:else if item.type.type === 'boolean'}
-                                <input 
-                                    id={item.path} 
-                                    type="checkbox" 
-                                    bind:checked={(config as any)[category][item.key]}
-                                    onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).checked)}
-                                />
-                            {:else if item.type.type === 'number'}
-                                <input 
-                                    id={item.path} 
-                                    type="number" 
-                                    bind:value={(config as any)[category][item.key]}
-                                    onchange={(e) => handleSave(item.path, Number((e.target as HTMLInputElement).value))}
-                                />
-                            {/if}
-                        </div>
-                    {/each}
-                </div>
-            </section>
-        {/each}
-    {:else}
-        <p>Loading settings...</p>
-    {/if}
+    <div class="settings">
+        {#if config}
+            {#each Object.entries(categories) as [category, items]}
+                <section>
+                    <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
+                    <div class="fields">
+                        {#each items as item}
+                            <div class="field">
+                                <label for={item.path}>{item.type.name || item.key} <span class="required">{item.type.optional ? '' : '*'}</span></label>
+                                {#if item.type.type === 'string'}
+                                    <input 
+                                        id={item.path} 
+                                        type="text" 
+                                        bind:value={(config as any)[category][item.key]}
+                                        onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).value)}
+                                    />
+                                {:else if item.type.type === 'boolean'}
+                                    <input 
+                                        id={item.path} 
+                                        type="checkbox" 
+                                        bind:checked={(config as any)[category][item.key]}
+                                        onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).checked)}
+                                    />
+                                {:else if item.type.type === 'number'}
+                                    <input 
+                                        id={item.path} 
+                                        type="number" 
+                                        bind:value={(config as any)[category][item.key]}
+                                        onchange={(e) => handleSave(item.path, Number((e.target as HTMLInputElement).value))}
+                                    />
+                                {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </section>
+            {/each}
+        {:else}
+            <p>Loading settings...</p>
+        {/if}
 
-    <div>
-        <hr />
-        <p>Other settings can be found in the <a href="/_/">PocketBase admin dashboard.</a></p>
+        <div>
+            <hr />
+            <p>Other settings can be found in the <a href="/_/">PocketBase admin dashboard.</a></p>
+        </div>
     </div>
 </div>
 
 <style lang="scss">
+.layout {
+    overflow: auto;
+    max-height: 100%;
+    padding: 1rem;
+    overflow: auto;
+}
+
 .header {
     display: flex;
     align-items: center;

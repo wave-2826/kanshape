@@ -21,16 +21,16 @@
     let showOpen = $derived.by(() => {
         if(collapsed === CollapsedState.Collapsed) return false;
         if(collapsed === CollapsedState.Expanded) return true;
-        return selfSelected;
+        return treeSelected;
     });
     function toggleCollapsed() {
-        if(collapsed === CollapsedState.Expanded) collapsed = CollapsedState.Collapsed;
-        else collapsed = CollapsedState.Expanded;
+        if(collapsed === CollapsedState.Collapsed) collapsed = CollapsedState.Expanded;
+        else collapsed = CollapsedState.Collapsed;
     }
     
     $effect(() => {
         // one-way state relationship, so we don't use derived
-        if(selfSelected && untrack(() => collapsed !== CollapsedState.Expanded)) collapsed = CollapsedState.Auto;
+        if(treeSelected && untrack(() => collapsed !== CollapsedState.Expanded)) collapsed = CollapsedState.Auto;
     });
 
     const subprojects = $derived(cannonicalizeMultiExpand(project.expand.subprojects));

@@ -109,6 +109,7 @@ export type CardsRecord<Tdata = unknown> = {
 	id: string
 	moved_at?: IsoDateString
 	position?: number
+	project?: RecordIdString
 	section: RecordIdString
 	subproject?: RecordIdString
 	title?: string

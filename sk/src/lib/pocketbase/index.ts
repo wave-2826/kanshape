@@ -152,6 +152,57 @@ export interface PageStore<T = any> extends Readable<ListResult<T>> {
     prev(): Promise<void>;
 }
 
+export async function watchOne<
+    C extends Collections | string,
+    Expand extends string = "",
+    T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
+>(
+    collectionName: C,
+    recordId: string,
+    queryParams = {} as RecordListOptions & { expand?: Expand },
+    realtime = browser
+): Promise<Readable<T>> {
+    const collection = client.collection(collectionName);
+    let result = await collection.getOne<T>(recordId, queryParams);
+
+    let set: Subscriber<T>;
+    let unsubRealtime: UnsubscribeFunc | undefined;
+    // fetch first page
+    const store = readable<T>(result, (_set) => {
+        set = _set;
+        // watch for changes (only if you're in the browser)
+        if(realtime) collection.subscribe<T>(
+            recordId,
+            ({ action, record }) => {
+                (async function (action) {
+                    switch(action) {
+                        case "update":
+                            return record;
+                        case "delete":
+                            return undefined as any;
+                    }
+                    return result;
+                })(action).then((record) => set((result = record)));
+            },
+            queryParams
+        )
+        // remember for later
+        .then((unsub) => (unsubRealtime = unsub));
+    });
+
+    return {
+        ...store,
+        subscribe(run, invalidate) {
+            const unsubStore = store.subscribe(run, invalidate);
+            return async () => {
+                unsubStore();
+                // ISSUE: Technically, we should AWAIT here, but that will slow down navigation UX.
+                if(unsubRealtime) /* await */ unsubRealtime();
+            };
+        },
+    };
+}
+
 export async function watch<
     C extends Collections | string,
     Expand extends string = "",
@@ -171,12 +222,14 @@ export async function watch<
     const store = readable<ListResult<T>>(result, (_set) => {
         set = _set;
         // watch for changes (only if you're in the browser)
+        console.log(client.realtime.isConnected);
         if(realtime) collection.subscribe<T>(
             "*",
             ({ action, record }) => {
-                (async function (action: string) {
+                console.log(action);
+                (async function (action) {
                     // see https://github.com/pocketbase/pocketbase/discussions/505
-                    switch (action) {
+                    switch(action) {
                         // ISSUE: no subscribe event when a record is modified and no longer fits the "filter"
                         // @see https://github.com/pocketbase/pocketbase/issues/4717
                         case "update":

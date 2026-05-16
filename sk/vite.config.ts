@@ -13,7 +13,11 @@ const config: UserConfig = {
         allowedHosts: true,
         proxy: {
             // proxy "/api" and "/_" to pocketbase_url
-            "/api": pocketbase_url,
+            "/api": {
+                target: pocketbase_url,
+                changeOrigin: true,
+                ws: true
+            },
             "/_": pocketbase_url,
         },
     },

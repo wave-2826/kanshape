@@ -34,12 +34,13 @@
 
     async function createProject() {
         const result = await batch(async (batch) => {
-            for(const section of sections) {
+            for(const [i, section] of sections.entries()) {
                 saveBatch(Collections.Sections, {
                     title: section.name,
                     description: section.description,
                     color: section.color ?? undefined,
-                    is_completed: section.isCompleted
+                    is_completed: section.isCompleted,
+                    position: i * 10000 + Math.random() * 1000
                 }, batch);
             }
             
@@ -71,86 +72,93 @@
     }
 </script>
 
-<h1>New project</h1>
+<div class="layout">
+    <h1>New project</h1>
 
-<div class="options">
-    <h2>Project details</h2>
-    <input type="text" placeholder="Project name" bind:value={name} />
-    <textarea placeholder="Project description (optional)" bind:value={description}></textarea>
-    <div class="option">
-        <label for="color">Project color</label>
-        <button onclick={color = null} class:selected={color === null}>None</button>
-        <input
-            type="color"
-            id="color"
-            value={color ?? "#ffffff"}
-            onchange={(e) => color = e.currentTarget.value}
-            class:selected={color !== null}
-        />
+    <div class="options">
+        <h2>Project details</h2>
+        <input type="text" placeholder="Project name" bind:value={name} />
+        <textarea placeholder="Project description (optional)" bind:value={description}></textarea>
+        <div class="option">
+            <label for="color">Project color</label>
+            <button onclick={color = null} class:selected={color === null}>None</button>
+            <input
+                type="color"
+                id="color"
+                value={color ?? "#ffffff"}
+                onchange={(e) => color = e.currentTarget.value}
+                class:selected={color !== null}
+            />
+        </div>
+        <div class="option">
+            <label for="partIdPrefix">Part ID prefix</label>
+            <input type="text" placeholder="Part ID prefix" id="partIdPrefix" bind:value={partIdPrefix} maxlength="20" />
+            <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, 0, 1, 1)}</span>
+        </div>
+
+        <h2>Sections</h2>
+        <LeftPaneChooser
+            options={sections.map(s => ({ name: s.name, tooltip: s.description, color: s.color ?? undefined }))}
+            oncreate={() => sections.push({ name: `Section ${sections.length + 1}`, color: null, isCompleted: false })}
+            ondelete={(option) => sections.splice(option, 1)}
+        >
+            {#snippet pane(selected)}
+                <div class="section">
+                    <input type="text" placeholder="Section name" bind:value={sections[selected].name} />
+                    <textarea placeholder="Section description (optional)" bind:value={sections[selected].description}></textarea>
+                    <div class="option">
+                        <label for="color">Section color</label>
+                        <button onclick={sections[selected].color = null} class:selected={sections[selected].color === null}>None</button>
+                        <input
+                            type="color"
+                            id="color"
+                            value={sections[selected].color ?? "#ffffff"}
+                            onchange={(e) => sections[selected].color = e.currentTarget.value}
+                            class:selected={sections[selected].color !== null}
+                        />
+                    </div>
+                    <div class="option" title="Used only for leaderboards and display for now">
+                        <label for="isCompleted">Is Completed</label>
+                        <input
+                            type="checkbox"
+                            id="isCompleted"
+                            checked={sections[selected].isCompleted}
+                            onchange={(e) => sections[selected].isCompleted = e.currentTarget.checked}
+                        />
+                    </div>
+                </div>
+            {/snippet}
+        </LeftPaneChooser>
+
+        <h2>Subprojects</h2>
+        <LeftPaneChooser
+            options={subprojects.map(sp => ({ name: sp.name, tooltip: sp.description }))}
+            oncreate={() => subprojects.push({ name: `Subproject ${subprojects.length + 1}`, partIdOffset: (subprojects.length + 1) * 1000 })}
+            ondelete={(option) => subprojects.splice(option, 1)}
+        >
+            {#snippet pane(selected)}
+                {@const subproject = subprojects[selected]}
+                <div class="subproject">
+                    <input type="text" placeholder="Subproject name" bind:value={subproject.name} />
+                    <textarea placeholder="Subproject description (optional)" bind:value={subproject.description}></textarea>
+                    <div class="option">
+                        <input type="number" placeholder="Part ID offset" bind:value={subproject.partIdOffset} min="0" />
+                        <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, subproject.partIdOffset || 0, 1, 1)}</span>
+                    </div>
+                </div>
+            {/snippet}
+        </LeftPaneChooser>
+        
+        <button onclick={createProject} disabled={name.trim().length === 0 || partIdPrefix.trim().length === 0}><Plus />Create {name}</button>
     </div>
-    <div class="option">
-        <label for="partIdPrefix">Part ID prefix</label>
-        <input type="text" placeholder="Part ID prefix" id="partIdPrefix" bind:value={partIdPrefix} maxlength="20" />
-        <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, 0, 1, 1)}</span>
-    </div>
-
-    <h2>Sections</h2>
-    <LeftPaneChooser
-        options={sections.map(s => ({ name: s.name, tooltip: s.description, color: s.color ?? undefined }))}
-        oncreate={() => sections.push({ name: `Section ${sections.length + 1}`, color: null, isCompleted: false })}
-        ondelete={(option) => sections.splice(option, 1)}
-    >
-        {#snippet pane(selected)}
-            <div class="section">
-                <input type="text" placeholder="Section name" bind:value={sections[selected].name} />
-                <textarea placeholder="Section description (optional)" bind:value={sections[selected].description}></textarea>
-                <div class="option">
-                    <label for="color">Section color</label>
-                    <button onclick={sections[selected].color = null} class:selected={sections[selected].color === null}>None</button>
-                    <input
-                        type="color"
-                        id="color"
-                        value={sections[selected].color ?? "#ffffff"}
-                        onchange={(e) => sections[selected].color = e.currentTarget.value}
-                        class:selected={sections[selected].color !== null}
-                    />
-                </div>
-                <div class="option" title="Used only for leaderboards and display for now">
-                    <label for="isCompleted">Is Completed</label>
-                    <input
-                        type="checkbox"
-                        id="isCompleted"
-                        checked={sections[selected].isCompleted}
-                        onchange={(e) => sections[selected].isCompleted = e.currentTarget.checked}
-                    />
-                </div>
-            </div>
-        {/snippet}
-    </LeftPaneChooser>
-
-    <h2>Subprojects</h2>
-    <LeftPaneChooser
-        options={subprojects.map(sp => ({ name: sp.name, tooltip: sp.description }))}
-        oncreate={() => subprojects.push({ name: `Subproject ${subprojects.length + 1}`, partIdOffset: (subprojects.length + 1) * 1000 })}
-        ondelete={(option) => subprojects.splice(option, 1)}
-    >
-        {#snippet pane(selected)}
-            {@const subproject = subprojects[selected]}
-            <div class="subproject">
-                <input type="text" placeholder="Subproject name" bind:value={subproject.name} />
-                <textarea placeholder="Subproject description (optional)" bind:value={subproject.description}></textarea>
-                <div class="option">
-                    <input type="number" placeholder="Part ID offset" bind:value={subproject.partIdOffset} min="0" />
-                    <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, subproject.partIdOffset || 0, 1, 1)}</span>
-                </div>
-            </div>
-        {/snippet}
-    </LeftPaneChooser>
-    
-    <button onclick={createProject} disabled={name.trim().length === 0 || partIdPrefix.trim().length === 0}><Plus />Create {name}</button>
 </div>
 
 <style lang="scss">
+.layout {
+    overflow: auto;
+    max-height: 100%;
+    padding: 1rem;
+}
 h1 {
     margin-bottom: 2rem;
 }

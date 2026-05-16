@@ -5,7 +5,7 @@
     import { onMount } from "svelte";
     import { client } from "$lib/pocketbase";
     import { goto } from "$app/navigation";
-    import { ListMinus, ListPlus, LogOut, Menu } from 'lucide-svelte';
+    import { LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/NavContent.svelte";
 
     const { data, children } = $props();
@@ -36,9 +36,9 @@
     <header class="container">
         <button onclick={() => navOpen = !navOpen}>
             {#if navOpen}
-                <ListMinus />
+                <PanelRightClose />
             {:else}
-                <ListPlus />
+                <PanelRightOpen />
             {/if}
         </button>
         {#if config.site.logoUrl}
@@ -76,6 +76,7 @@
     grid-template-columns: 0px 1fr;
     grid-template-rows: auto 1fr;
     height: 100vh;
+    max-height: 100vh;
 
     transition: grid-template-columns 0.1s ease;
     &.showNav {
@@ -128,8 +129,7 @@ nav {
 main {
     grid-area: main;
     flex-grow: 1;
-    padding: 1rem;
     
-    overflow-y: auto;
+    overflow: hidden;
 }
 </style>

@@ -1,5 +1,7 @@
 import PocketBase from "pocketbase";
 import type {
+    BatchRequestResult,
+    BatchService,
     ListResult,
     RecordFullListOptions,
     RecordListOptions,
@@ -9,27 +11,95 @@ import type {
 import { readable, type Readable, type Subscriber } from "svelte/store";
 import { browser } from "$app/environment";
 import { base } from "$app/paths";
-import { Collections, type CollectionRecords, type TypedPocketBase } from "./generated-types";
+import { Collections, type BaseSystemFields, type CollectionRecords, type CollectionResponses, type TypedPocketBase } from "./generated-types";
 
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
 ) as TypedPocketBase;
 
 /**
- * Save (create/update) a record (a plain object). Automatically converts to
- * FormData if needed.
+ * Add a comma-separated expand list like `foo,bar` to the expand result of a returned query
  */
-export async function save<T>(
-    collectionName: Collections | string, record: any, create = false,
-    fetch: typeof window.fetch = window.fetch
-): Promise<T> {
+type ExpandResponse<T extends {
+	id: string
+	collectionId: string
+	collectionName: Collections
+}, Expand extends string> = T & { expand: GetExpand<Expand> };
+
+type GetExpand<Expand extends string> = Expand extends `${infer Key},${infer Rest}`
+    ? Key extends keyof CollectionRecords
+        ? { [K in Key]: CollectionRecords[K] | CollectionRecords[K][] } & GetExpand<Rest>
+        : GetExpand<Rest>
+    : Expand extends keyof CollectionRecords
+        ? { [K in Expand]: CollectionRecords[Expand] | CollectionRecords[Expand][] }
+        : {};
+
+export async function batch(run: (batch: BatchService) => Promise<void>): Promise<BatchRequestResult[]> {
+    const batch = client.createBatch();
+    await run(batch);
+    return await batch.send();
+}
+
+/**
+ * Save (create/update) a record (a plain object) in a batch. Automatically converts to
+ * FormData if needed.
+ * @param collectionName The name of the collection to save the record in.
+ * @param record The record to save (create/update).
+ * @param batch The batch to add the save operation to.
+ * @param options Options for the save operation.
+ */
+export async function saveBatch<C extends Collections | string>(
+    collectionName: C,
+    record: Partial<C extends Collections ? CollectionRecords[C] : RecordModel>,
+    batch: BatchService,
+    options?: {
+        create?: boolean,
+        fetch?: typeof window.fetch
+    }
+) {
     // convert obj to FormData in case one of the fields is instanceof FileList
     const data = objectToFormData(record);
-    if(record.id && !create) {
+    if(!options?.create && record["id"]) {
         // "create" flag overrides update
-        return await client.collection(collectionName).update<T>(record.id, data, { fetch });
+        batch.collection(collectionName).update(record.id, data, { fetch: options?.fetch });
     } else {
-        return await client.collection(collectionName).create<T>(data, { fetch });
+        batch.collection(collectionName).create(data, { fetch: options?.fetch });
+    }
+}
+
+/**
+ * Save (create/update) a record (a plain object). Automatically converts to
+ * FormData if needed.
+ * @param collectionName The name of the collection to save the record in.
+ * @param record The record to save (create/update).
+ * @param options Options for the save operation.
+ * @returns The saved record.
+ */
+export async function save<
+    C extends Collections | string,
+    Response extends C extends Collections ? CollectionResponses[C] : RecordModel
+>(
+    collectionName: C,
+    record: Partial<C extends Collections ? CollectionRecords[C] : RecordModel>,
+    options?: {
+        create?: boolean,
+        fetch?: typeof window.fetch
+    }
+): Promise<Response> {
+    // convert obj to FormData in case one of the fields is instanceof FileList
+    const data = objectToFormData(record);
+    if(!options?.create && record["id"]) {
+        // "create" flag overrides update
+        return await client.collection(collectionName).update<Response>(
+            record.id,
+            data,
+            { fetch: options?.fetch }
+        );
+    } else {
+        return await client.collection(collectionName).create<Response>(
+            data,
+            { fetch: options?.fetch }
+        );
     }
 }
 
@@ -70,9 +140,13 @@ export interface PageStore<T = any> extends Readable<ListResult<T>> {
     prev(): Promise<void>;
 }
 
-export async function watch<T extends RecordModel>(
-    collectionName: Collections | string,
-    queryParams = {} as RecordListOptions,
+export async function watch<
+    C extends Collections | string,
+    Expand extends string = "",
+    T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
+>(
+    collectionName: C,
+    queryParams = {} as RecordListOptions & { expand?: Expand },
     page = 1,
     perPage = 20,
     realtime = browser

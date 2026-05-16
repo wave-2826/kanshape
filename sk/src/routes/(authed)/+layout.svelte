@@ -75,7 +75,7 @@
         "nav main";
     grid-template-columns: 0px 1fr;
     grid-template-rows: auto 1fr;
-    min-height: 100vh;
+    height: 100vh;
 
     transition: grid-template-columns 0.1s ease;
     &.showNav {
@@ -129,5 +129,7 @@ main {
     grid-area: main;
     flex-grow: 1;
     padding: 1rem;
+    
+    overflow-y: auto;
 }
 </style>

@@ -10,7 +10,7 @@
         oncreate,
         ondelete
     }: {
-        options: string[],
+        options: { name: string; tooltip?: string; color?: string }[],
         pane: Snippet<[number]>,
         oncreate?: () => void,
         ondelete?: (option: number) => void
@@ -21,7 +21,14 @@
     <ul>
         {#each options as option, i (i)}
             <li class="button" class:selected={selected === i}>
-                <button onclick={() => selected = i} class="unstyled label">{option}</button>
+                <button
+                    onclick={() => selected = i}
+                    class="unstyled label"
+                    style={option.color ? `color: ${option.color}` : undefined}
+                    title={option.tooltip}
+                >
+                    {option.name}
+                </button>
                 {#if ondelete}
                     <button onclick={() => {
                         ondelete(i);
@@ -74,9 +81,6 @@ ul {
     li {
         display: flex;
         padding: 0;
-    }
-    li.selected {
-        background-color: var(--bg-selection);
     }
     .label {
         flex: 1;

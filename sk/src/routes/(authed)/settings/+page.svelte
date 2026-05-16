@@ -2,9 +2,14 @@
 import { onMount } from "svelte";
 import { loadConfig, updateConfig, configTypes } from "$lib/config";
 import type { AppConfig, ConfigPath, ConfigValueType } from "$lib/config";
+import { metadata } from "$lib/metadata";
 
-let config: AppConfig | null = null;
-let saving = false;
+$effect(() => {
+    $metadata.title = "Application settings";
+});
+
+let config: AppConfig | null = $state(null);
+let saving = $state(false);
 
 onMount(async () => {
     config = await loadConfig();
@@ -55,21 +60,21 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
                                     id={item.path} 
                                     type="text" 
                                     bind:value={(config as any)[category][item.key]}
-                                    on:change={(e) => handleSave(item.path, (e.target as HTMLInputElement).value)}
+                                    onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).value)}
                                 />
                             {:else if item.type.type === 'boolean'}
                                 <input 
                                     id={item.path} 
                                     type="checkbox" 
                                     bind:checked={(config as any)[category][item.key]}
-                                    on:change={(e) => handleSave(item.path, (e.target as HTMLInputElement).checked)}
+                                    onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).checked)}
                                 />
                             {:else if item.type.type === 'number'}
                                 <input 
                                     id={item.path} 
                                     type="number" 
                                     bind:value={(config as any)[category][item.key]}
-                                    on:change={(e) => handleSave(item.path, Number((e.target as HTMLInputElement).value))}
+                                    onchange={(e) => handleSave(item.path, Number((e.target as HTMLInputElement).value))}
                                 />
                             {/if}
                         </div>

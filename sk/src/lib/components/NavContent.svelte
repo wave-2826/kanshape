@@ -4,8 +4,11 @@
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { FolderKanban, Medal, Plus, Settings } from "lucide-svelte";
+    import NavProject from "./NavProject.svelte";
 
-    const projects = await watch(Collections.Projects, {}, 1, 500, true).catch((err) => {
+    const projects = await watch(Collections.Projects, {
+        expand: "subprojects"
+    }, 1, 500, true).catch((err) => {
         console.error("Failed to load projects:", err);
         return null;
     });
@@ -25,10 +28,7 @@
 {#if projects !== null && $projects !== null}
     <div class="projects">
         {#each $projects.items as project}
-            <a href={`/projects/${project.id}`}>
-                <FolderKanban />
-                {project.name}
-            </a>
+            <NavProject {project} />
         {/each}
         {#if $projects.totalItems === 0}
             <p>No projects found.</p>

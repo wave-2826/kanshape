@@ -39,8 +39,5 @@ let {
     button {
         --bg-color: var(--btn-bg, var(--bg-secondary));
     }
-    button.selected {
-        --bg-color: var(--bg-selection);
-    }
 }
 </style>

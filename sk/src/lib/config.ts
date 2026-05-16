@@ -103,7 +103,10 @@ export async function updateConfig<K extends ConfigPath>(
     if(!configPathIDs) loadConfig(fetch);
 
     const id = configPathIDs!.get(path);
-    await save(Collections.Config, { id, key: path, value }, id === undefined, fetch);
+    await save(Collections.Config, { id, key: path, value: value ?? undefined }, {
+        create: id === undefined,
+        fetch
+    });
 }
 
 /** Helper function to set a value at a specific path in an object. */

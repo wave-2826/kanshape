@@ -135,7 +135,7 @@
             return;
         }
 
-        const firstCard = sectionElem.querySelector(".card");
+        const firstCard = sectionElem.querySelector("[data-card-id]");
         if(!firstCard || !(firstCard instanceof HTMLElement)) {
             activeDropZone = { sectionId, cardId: "last" };
             return;
@@ -146,17 +146,17 @@
         const isBeforeFirstCard = event.clientY < midpoint;
 
         if(isBeforeFirstCard) {
-            activeDropZone = { sectionId, cardId: firstCard.dataset.id ?? "last" };
+            activeDropZone = { sectionId, cardId: firstCard.dataset.cardId ?? "last" };
         } else {
             // Find the closest card below the drop point
-            const cardsInSection = Array.from(sectionElem.querySelectorAll(".card")).filter((elem) => elem instanceof HTMLElement);
+            const cardsInSection = Array.from(sectionElem.querySelectorAll("[data-card-id]")).filter((elem) => elem instanceof HTMLElement);
             const cardBelow = cardsInSection.find((cardElem) => {
                 const rect = cardElem.getBoundingClientRect();
                 return event.clientY < rect.top + rect.height / 2;
             });
 
             if(cardBelow && cardBelow instanceof HTMLElement) {
-                activeDropZone = { sectionId, cardId: cardBelow.dataset.id ?? "last" };
+                activeDropZone = { sectionId, cardId: cardBelow.dataset.cardId ?? "last" };
             } else {
                 activeDropZone = { sectionId, cardId: "last" };
             }
@@ -199,8 +199,8 @@
                         {#each cards as card, i (card.id)}
                             <div
                                 class:dragging={draggedCardId === card.id}
-                                class="card"
-                                data-id={card.id}
+                                class="card-wrapper"
+                                data-card-id={card.id}
                                 draggable="true"
                                 ondragstart={(event) => onDragStart(card, event)}
                                 ondragend={onDragEnd}
@@ -311,10 +311,7 @@ section {
     padding-bottom: 0.5rem;
 }
 
-.card {
-    padding: 0.4rem 0.75rem;
-    border-radius: 4px;
-    background: var(--bg-secondary);
+.card-wrapper {
     cursor: grab;
     user-select: none;
     transition: transform 0.1s ease, opacity 0.1s ease, border-color 0.1s ease, background-color 0.1s ease;
@@ -326,8 +323,6 @@ section {
 
     &.dragging {
         opacity: 0.75;
-        border-color: var(--accent);
-        background: var(--bg-selection);
     }
 
     .drop-zone {

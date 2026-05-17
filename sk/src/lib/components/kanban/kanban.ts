@@ -1,4 +1,5 @@
-import type { CardsResponse } from "$lib/pocketbase/generated-types";
+import { save } from "$lib/pocketbase";
+import { Collections, type CardsResponse } from "$lib/pocketbase/generated-types";
 
 export function sortCards(list: CardsResponse[]) {
     return [...list].sort((left, right) => {
@@ -23,4 +24,49 @@ export function positionBetween(previousPosition: number | null | undefined, nex
     }
 
     return midpoint;
+}
+
+export function nextCardPosition(boardCards: CardsResponse[], sectionId: string) {
+    const positions = boardCards
+        .filter((card) => card.section === sectionId)
+        .map((card) => card.position ?? 0);
+    return (positions.length > 0 ? Math.max(...positions) : 0) + 1000;
+}
+
+export async function moveCard(
+    boardCards: CardsResponse[],
+    cardId: string, sectionId: string,
+    beforeCardId: string | "last" | "first" | null = "first"
+): Promise<CardsResponse[]> {
+    const card = boardCards.find((entry) => entry.id === cardId);
+    if(!card) return boardCards;
+
+    const sectionCards = sortCards(boardCards.filter((entry) => entry.section === sectionId && entry.id !== cardId));
+
+    if(beforeCardId === "last") beforeCardId = null;
+    if(beforeCardId === "first") beforeCardId = sectionCards[0]?.id ?? null;
+    const targetIndex = beforeCardId ? sectionCards.findIndex((entry) => entry.id === beforeCardId) : -1;
+    const targetPosition = targetIndex >= 0
+        ? positionBetween(sectionCards[targetIndex - 1]?.position, sectionCards[targetIndex]?.position)
+        : nextCardPosition(boardCards, sectionId);
+
+    if(card.section === sectionId && beforeCardId === card.id) return boardCards;
+
+    const savedCard = await save(Collections.Cards, {
+        id: card.id,
+        section: sectionId,
+        position: targetPosition,
+        moved_at: new Date().toISOString()
+    }).catch((err) => {
+        console.error("Failed to move card:", err);
+        return null;
+    });
+
+    if(!savedCard) return boardCards;
+
+    // Early local update
+    card.section = sectionId;
+    card.position = targetPosition;
+    boardCards = sortCards([...boardCards.filter((entry) => entry.id !== savedCard.id), savedCard]);
+    return boardCards;
 }

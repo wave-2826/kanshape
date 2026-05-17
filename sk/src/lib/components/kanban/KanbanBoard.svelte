@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Collections, type CardsResponse, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
-    import { cannonicalizeExpand, save, watch, type ExpandResponse } from "$lib/pocketbase";
+    import { cannonicalizeExpand as canonicalizeExpand, save, watch, type ExpandResponse } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
-    import { positionBetween, sortCards } from "./kanban";
+    import { moveCard, nextCardPosition, positionBetween, sortCards } from "./kanban";
 
     const {
         project
@@ -18,10 +18,8 @@
         return null;
     }));
 
-    $inspect(cards);
-
     const sections = $derived.by(() => {
-        const expandedSections = cannonicalizeExpand(project.expand.sections);
+        const expandedSections = canonicalizeExpand(project.expand.sections);
         const sectionsById = new Map(expandedSections.map((section) => [section.id, section]));
         const orderedSectionIds = project.sections ?? expandedSections.map((section) => section.id);
 
@@ -40,13 +38,6 @@
         return sortCards(boardCards.filter((card) => card.section === sectionId));
     }
 
-    function nextCardPosition(sectionId: string) {
-        const positions = boardCards
-            .filter((card) => card.section === sectionId)
-            .map((card) => card.position ?? 0);
-        return (positions.length > 0 ? Math.max(...positions) : 0) + 1000;
-    }
-
     $effect(() => {
         if($cards === null || draggedCardId !== null) return;
         boardCards = sortCards($cards.items);
@@ -60,7 +51,7 @@
             title,
             project: project.id,
             section: sectionId,
-            position: nextCardPosition(sectionId),
+            position: nextCardPosition(boardCards, sectionId),
             moved_at: new Date().toISOString()
         }, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);
@@ -71,36 +62,6 @@
 
         drafts[sectionId] = "";
         boardCards = sortCards([...boardCards.filter((card) => card.id !== savedCard.id), savedCard]);
-    }
-
-    async function moveCard(cardId: string, sectionId: string, beforeCardId: string | "last" | "first" | null = "first") {
-        const card = boardCards.find((entry) => entry.id === cardId);
-        if(!card) return;
-
-        const sectionCards = sortCards(boardCards.filter((entry) => entry.section === sectionId && entry.id !== cardId));
-
-        if(beforeCardId === "last") beforeCardId = null;
-        if(beforeCardId === "first") beforeCardId = sectionCards[0]?.id ?? null;
-        const targetIndex = beforeCardId ? sectionCards.findIndex((entry) => entry.id === beforeCardId) : -1;
-        const targetPosition = targetIndex >= 0
-            ? positionBetween(sectionCards[targetIndex - 1]?.position, sectionCards[targetIndex]?.position)
-            : nextCardPosition(sectionId);
-
-        if(card.section === sectionId && beforeCardId === card.id) return;
-
-        const savedCard = await save(Collections.Cards, {
-            id: card.id,
-            section: sectionId,
-            position: targetPosition,
-            moved_at: new Date().toISOString()
-        }).catch((err) => {
-            console.error("Failed to move card:", err);
-            return null;
-        });
-
-        if(!savedCard) return;
-
-        boardCards = sortCards([...boardCards.filter((entry) => entry.id !== savedCard.id), savedCard]);
     }
 
     function onDragStart(card: CardsResponse, event: DragEvent) {
@@ -163,7 +124,7 @@
         }
     }
 
-    function onSectionDrop(sectionId: string, event: DragEvent) {
+    async function onSectionDrop(sectionId: string, event: DragEvent) {
         const dropZone = activeDropZone;
         
         event.preventDefault();
@@ -174,7 +135,7 @@
         if(!cardId) return;
 
         const beforeCardId = dropZone?.cardId ?? "first";
-        moveCard(cardId, sectionId, beforeCardId);
+        boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId);
     }
 </script>
 

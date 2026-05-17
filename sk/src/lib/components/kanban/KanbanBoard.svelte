@@ -1,6 +1,8 @@
 <script lang="ts">
     import { Collections, type CardsResponse, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
     import { cannonicalizeExpand, save, watch, type ExpandResponse } from "$lib/pocketbase";
+    import KanbanCard from "./KanbanCard.svelte";
+    import { positionBetween, sortCards } from "./kanban";
 
     const {
         project
@@ -31,15 +33,8 @@
     let boardCards = $state<CardsResponse[]>([]);
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
+    let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);
     let drafts = $state<Record<string, string>>({});
-
-    function sortCards(list: CardsResponse[]) {
-        return [...list].sort((left, right) => {
-            const positionDelta = (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER);
-            if(positionDelta !== 0) return positionDelta;
-            return left.created.localeCompare(right.created);
-        });
-    }
 
     function cardsForSection(sectionId: string) {
         return sortCards(boardCards.filter((card) => card.section === sectionId));
@@ -67,7 +62,7 @@
             section: sectionId,
             position: nextCardPosition(sectionId),
             moved_at: new Date().toISOString()
-        }).catch((err) => {
+        }, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);
             return null;
         });
@@ -78,14 +73,25 @@
         boardCards = sortCards([...boardCards.filter((card) => card.id !== savedCard.id), savedCard]);
     }
 
-    async function moveCard(cardId: string, sectionId: string) {
+    async function moveCard(cardId: string, sectionId: string, beforeCardId: string | "last" | "first" | null = "first") {
         const card = boardCards.find((entry) => entry.id === cardId);
-        if(!card || card.section === sectionId) return;
+        if(!card) return;
+
+        const sectionCards = sortCards(boardCards.filter((entry) => entry.section === sectionId && entry.id !== cardId));
+
+        if(beforeCardId === "last") beforeCardId = null;
+        if(beforeCardId === "first") beforeCardId = sectionCards[0]?.id ?? null;
+        const targetIndex = beforeCardId ? sectionCards.findIndex((entry) => entry.id === beforeCardId) : -1;
+        const targetPosition = targetIndex >= 0
+            ? positionBetween(sectionCards[targetIndex - 1]?.position, sectionCards[targetIndex]?.position)
+            : nextCardPosition(sectionId);
+
+        if(card.section === sectionId && beforeCardId === card.id) return;
 
         const savedCard = await save(Collections.Cards, {
             id: card.id,
             section: sectionId,
-            position: nextCardPosition(sectionId),
+            position: targetPosition,
             moved_at: new Date().toISOString()
         }).catch((err) => {
             console.error("Failed to move card:", err);
@@ -106,29 +112,75 @@
     function onDragEnd() {
         draggedCardId = null;
         hoveredSectionId = null;
+        activeDropZone = null;
     }
 
     function onSectionDragOver(sectionId: string, event: DragEvent) {
         event.preventDefault();
         hoveredSectionId = sectionId;
+        updateDropZone(sectionId, event);
     }
 
     function onSectionDragLeave(sectionId: string) {
-        if(hoveredSectionId === sectionId) hoveredSectionId = null;
+        if(hoveredSectionId === sectionId) {
+            hoveredSectionId = null;
+            activeDropZone = null;
+        }
+    }
+
+    function updateDropZone(sectionId: string, event: DragEvent) {
+        const sectionElem = (event.target as HTMLElement)?.closest("section");
+        if(!sectionElem) {
+            activeDropZone = null;
+            return;
+        }
+
+        const firstCard = sectionElem.querySelector(".card");
+        if(!firstCard || !(firstCard instanceof HTMLElement)) {
+            activeDropZone = { sectionId, cardId: "last" };
+            return;
+        }
+
+        const firstCardRect = firstCard.getBoundingClientRect();
+        const midpoint = firstCardRect.top + firstCardRect.height / 2;
+        const isBeforeFirstCard = event.clientY < midpoint;
+
+        if(isBeforeFirstCard) {
+            activeDropZone = { sectionId, cardId: firstCard.dataset.id ?? "last" };
+        } else {
+            // Find the closest card below the drop point
+            const cardsInSection = Array.from(sectionElem.querySelectorAll(".card")).filter((elem) => elem instanceof HTMLElement);
+            const cardBelow = cardsInSection.find((cardElem) => {
+                const rect = cardElem.getBoundingClientRect();
+                return event.clientY < rect.top + rect.height / 2;
+            });
+
+            if(cardBelow && cardBelow instanceof HTMLElement) {
+                activeDropZone = { sectionId, cardId: cardBelow.dataset.id ?? "last" };
+            } else {
+                activeDropZone = { sectionId, cardId: "last" };
+            }
+        }
     }
 
     function onSectionDrop(sectionId: string, event: DragEvent) {
+        const dropZone = activeDropZone;
+        
         event.preventDefault();
         hoveredSectionId = null;
+        activeDropZone = null;
 
         const cardId = event.dataTransfer?.getData("text/plain") ?? draggedCardId;
-        if(cardId) void moveCard(cardId, sectionId);
+        if(!cardId) return;
+
+        const beforeCardId = dropZone?.cardId ?? "first";
+        moveCard(cardId, sectionId, beforeCardId);
     }
 </script>
 
 {#if cards !== null && $cards !== null}
     {#if sections.length > 0}
-        <div class="board">
+        <div class="board" class:dragging={draggedCardId !== null}>
             {#each sections as section (section.id)}
                 {@const cards = cardsForSection(section.id)}
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -144,15 +196,27 @@
                     </div>
 
                     <div class="card-list">
-                        {#each cards as card (card.id)}
+                        {#each cards as card, i (card.id)}
                             <div
                                 class:dragging={draggedCardId === card.id}
                                 class="card"
+                                data-id={card.id}
                                 draggable="true"
                                 ondragstart={(event) => onDragStart(card, event)}
                                 ondragend={onDragEnd}
                             >
-                                {card.title}
+                                <div
+                                    class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === card.id}
+                                    class="drop-zone top"
+                                    class:topmost={i === 0}
+                                ></div>
+                                <KanbanCard {card} />
+                                {#if i === cards.length - 1}
+                                    <div
+                                        class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
+                                        class="drop-zone bottom"
+                                    ></div>
+                                {/if}
                             </div>
                         {/each}
                         {#if cards.length === 0}
@@ -194,7 +258,7 @@
     gap: 0.5rem;
     align-items: start;
 
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 1rem 0.5rem;
 
     overflow-x: auto;
     overflow-y: hidden;
@@ -212,6 +276,7 @@ section {
 
     min-width: 18rem;
     max-width: 25rem;
+    flex: 1;
 
     max-height: 100%;
 
@@ -235,11 +300,15 @@ section {
 }
 
 .card-list {
+    --list-gap: 0.5rem;
+
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--list-gap);
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 0.5rem;
 }
 
 .card {
@@ -249,6 +318,7 @@ section {
     cursor: grab;
     user-select: none;
     transition: transform 0.1s ease, opacity 0.1s ease, border-color 0.1s ease, background-color 0.1s ease;
+    position: relative;
 
     &:active {
         cursor: grabbing;
@@ -259,6 +329,32 @@ section {
         border-color: var(--accent);
         background: var(--bg-selection);
     }
+
+    .drop-zone {
+        --shrink: -0.2rem;
+
+        min-height: calc(var(--list-gap) - var(--shrink) * 2);
+        border-radius: 4px;
+        transition: opacity 0.05s ease;
+        background-color: var(--accent);
+        opacity: 0;
+        pointer-events: none;
+
+        position: absolute;
+        left: 0;
+        right: 0;
+
+        &.zone-active {
+            opacity: 0.1;
+        }
+        &.top { bottom: calc(100% + var(--shrink)); }
+        &.topmost { top: var(--shrink); }
+        &.bottom { top: calc(100% + var(--shrink)); min-height: 0.5rem; }
+    }
+}
+
+.board.dragging .drop-zone {
+    pointer-events: all;
 }
 
 .empty {

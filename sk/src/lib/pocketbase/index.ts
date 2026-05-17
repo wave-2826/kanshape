@@ -222,11 +222,9 @@ export async function watch<
     const store = readable<ListResult<T>>(result, (_set) => {
         set = _set;
         // watch for changes (only if you're in the browser)
-        console.log(client.realtime.isConnected);
         if(realtime) collection.subscribe<T>(
             "*",
             ({ action, record }) => {
-                console.log(action);
                 (async function (action) {
                     // see https://github.com/pocketbase/pocketbase/discussions/505
                     switch(action) {

@@ -88,9 +88,9 @@ export class OnshapeClient {
             console.warn("Ignored message from unknown origin:", event.origin);
             return;
         }
+        if(event.data.type && event.data.type.startsWith("kanshape")) return;
 
         const data = event.data as OnshapeToClientMessage;
-        console.log(data.messageName);
 
         if(data && data.messageName) {
             switch(data.messageName) {

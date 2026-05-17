@@ -1,4 +1,4 @@
-const _browser = (typeof _browser !== 'undefined') ? _browser : chrome;
+const _browser = globalThis.browser ?? globalThis.chrome;
 
 window.addEventListener("message", async (event) => {
     // TODO: Eventually check event.origin here; fine for development
@@ -23,12 +23,16 @@ window.addEventListener("message", async (event) => {
             payload: data.payload,
         });
 
+        if(response.error) {
+            throw new Error(response.error);
+        }
+
         event.source.postMessage({
             type: "kanshapeProxyFetchResponse",
             id: data.id,
             response,
         }, event.origin);
-    } catch (err) {
+    } catch(err) {
         event.source.postMessage({
             type: "kanshapeProxyFetchResponse",
             id: data.id,

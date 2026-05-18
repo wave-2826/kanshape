@@ -11,7 +11,7 @@ import type {
 import { readable, type Readable, type Subscriber } from "svelte/store";
 import { browser } from "$app/environment";
 import { base } from "$app/paths";
-import { Collections, type BaseSystemFields, type CollectionRecords, type CollectionResponses, type TypedPocketBase } from "./generated-types";
+import { Collections, type BaseSystemFields, type CollectionRecords, type CollectionResponses, type IsoAutoDateString, type TypedPocketBase } from "./generated-types";
 
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
@@ -79,6 +79,16 @@ export async function saveBatch<C extends Collections | string>(
     }
 }
 
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+/** Make all properties K in T optional */
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+/** Make all fields of the given types K optional in T */
+type PartialByTypes<T, K> = Omit<T, {
+    [P in keyof T]: T[P] extends K ? P : never
+}[keyof T]> & Partial<Pick<T, {
+    [P in keyof T]: T[P] extends K ? P : never
+}[keyof T]>>
+
 /**
  * Save (create/update) a record (a plain object). Automatically converts to
  * FormData if needed.
@@ -89,12 +99,17 @@ export async function saveBatch<C extends Collections | string>(
  */
 export async function save<
     C extends Collections | string,
-    Response extends C extends Collections ? CollectionResponses[C] : RecordModel
+    Response extends C extends Collections ? CollectionResponses[C] : RecordModel,
+    Create extends boolean = false
 >(
     collectionName: C,
-    record: Partial<C extends Collections ? CollectionRecords[C] : RecordModel>,
+    record: Create extends true ?
+        // Make ID and auto dates optional when creating records, since they're not in the generated schema for some reason
+        (C extends Collections ? PartialByTypes<PartialBy<CollectionRecords[C], "id">, IsoAutoDateString> : RecordModel) :
+        // Make all fields optional when updating records. If id isn't included, a new record is created anyway.
+        (Partial<C extends Collections ? CollectionRecords[C] : RecordModel>),
     options?: {
-        create?: boolean,
+        create?: Create,
         fetch?: typeof window.fetch
     }
 ): Promise<Response> {

@@ -100,6 +100,13 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
+export const CardsPriorityOptions = {
+	"low": "low",
+	"medium": "medium",
+	"high": "high",
+	"critical": "critical",
+} as const
+export type CardsPriorityOptions = typeof CardsPriorityOptions[keyof typeof CardsPriorityOptions]
 export type CardsRecord<Tdata = unknown> = {
 	assignments?: RecordIdString[]
 	created: IsoAutoDateString
@@ -109,7 +116,8 @@ export type CardsRecord<Tdata = unknown> = {
 	id: string
 	moved_at?: IsoDateString
 	position?: number
-	project?: RecordIdString
+	priority?: CardsPriorityOptions
+	project: RecordIdString
 	section: RecordIdString
 	subproject?: RecordIdString
 	title?: string
@@ -139,16 +147,23 @@ export type LeaderboardRecord = {
 	user?: RecordIdString
 }
 
-export type ProjectsRecord = {
+export const ProjectsTypeOptions = {
+	"blank": "blank",
+	"manufacturing": "manufacturing",
+} as const
+export type ProjectsTypeOptions = typeof ProjectsTypeOptions[keyof typeof ProjectsTypeOptions]
+export type ProjectsRecord<Tcustom_card_fields = unknown> = {
 	color?: string
 	created: IsoAutoDateString
 	current_part_id?: number
+	custom_card_fields?: null | Tcustom_card_fields
 	description?: string
 	id: string
-	part_id_prefix: string
+	part_id_prefix?: string
 	sections?: RecordIdString[]
 	subprojects?: RecordIdString[]
 	title: string
+	type: ProjectsTypeOptions
 	updated: IsoAutoDateString
 }
 
@@ -197,7 +212,7 @@ export type CardsResponse<Tdata = unknown, Texpand = unknown> = Required<CardsRe
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
-export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
+export type ProjectsResponse<Tcustom_card_fields = unknown, Texpand = unknown> = Required<ProjectsRecord<Tcustom_card_fields>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Texpand = unknown> = Required<SubprojectsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Tmetadata = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata>> & AuthSystemFields<Texpand>

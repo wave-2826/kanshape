@@ -3,7 +3,7 @@
     import { metadata } from "$lib/metadata";
     import { createPartIDString } from "$lib/parts";
     import { batch, save, saveBatch } from "$lib/pocketbase";
-    import { Collections } from "$lib/pocketbase/generated-types";
+    import { Collections, ProjectsTypeOptions } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
 
     $effect(() => {
@@ -14,6 +14,7 @@
     let description = $state("");
     let color = $state<string | null>(null);
     let partIdPrefix = $state(new Date().getFullYear().toString());
+    let type = $state<ProjectsTypeOptions>("blank");
     let subprojects = $state<{
         name: string;
         description?: string;
@@ -64,7 +65,11 @@
             current_part_id: 1,
             color: color ?? undefined,
             sections: sectionIds,
-            subprojects: subprojectIds
+            subprojects: subprojectIds,
+            custom_card_fields: {},
+            type: "blank"
+        }, {
+            create: true
         });
 
         // Redirect to the new project page
@@ -90,6 +95,11 @@
                 class:selected={color !== null}
             />
         </div>
+
+        <h2>Project type</h2>
+        {#each (Object.keys(ProjectsTypeOptions) as ProjectsTypeOptions[]) as option}
+            <button class:selected={type === option} onclick={() => type = option}>{option}</button>
+        {/each}
         <div class="option">
             <label for="partIdPrefix">Part ID prefix</label>
             <input type="text" placeholder="Part ID prefix" id="partIdPrefix" bind:value={partIdPrefix} maxlength="20" />

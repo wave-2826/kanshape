@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Collections, type CardsResponse, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
-    import { cannonicalizeExpand as canonicalizeExpand, save, watch, type ExpandResponse } from "$lib/pocketbase";
+    import { cannonicalizeExpand as canonicalizeExpand, watch, type ExpandResponse } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
-    import { moveCard, nextCardPosition, positionBetween, sortCards } from "./kanban";
+    import { moveCard, sortCards } from "./kanban";
+    import { Plus, SquarePlus } from "lucide-svelte";
 
     const {
         project
@@ -32,7 +33,6 @@
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
     let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);
-    let drafts = $state<Record<string, string>>({});
 
     function cardsForSection(sectionId: string) {
         return sortCards(boardCards.filter((card) => card.section === sectionId));
@@ -43,26 +43,26 @@
         boardCards = sortCards($cards.items);
     });
 
-    async function createCard(sectionId: string) {
-        const title = (drafts[sectionId] ?? "").trim();
-        if(title.length === 0) return;
+    // async function createCard(sectionId: string) {
+    //     const title = (drafts[sectionId] ?? "").trim();
+    //     if(title.length === 0) return;
 
-        const savedCard = await save(Collections.Cards, {
-            title,
-            project: project.id,
-            section: sectionId,
-            position: nextCardPosition(boardCards, sectionId),
-            moved_at: new Date().toISOString()
-        }, { create: true }).catch((err) => {
-            console.error("Failed to create card:", err);
-            return null;
-        });
+    //     const savedCard = await save(Collections.Cards, {
+    //         title,
+    //         project: project.id,
+    //         section: sectionId,
+    //         position: nextCardPosition(boardCards, sectionId),
+    //         moved_at: new Date().toISOString()
+    //     }, { create: true }).catch((err) => {
+    //         console.error("Failed to create card:", err);
+    //         return null;
+    //     });
 
-        if(!savedCard) return;
+    //     if(!savedCard) return;
 
-        drafts[sectionId] = "";
-        boardCards = sortCards([...boardCards.filter((card) => card.id !== savedCard.id), savedCard]);
-    }
+    //     drafts[sectionId] = "";
+    //     boardCards = sortCards([...boardCards.filter((card) => card.id !== savedCard.id), savedCard]);
+    // }
 
     function onDragStart(card: CardsResponse, event: DragEvent) {
         draggedCardId = card.id;
@@ -139,6 +139,14 @@
     }
 </script>
 
+<menu>
+    <button onclick={() => {
+        // todo
+    }} disabled={sections.length === 0} class="new">
+        <SquarePlus />
+        New Card
+    </button>
+</menu>
 {#if cards !== null && $cards !== null}
     {#if sections.length > 0}
         <div class="board" class:dragging={draggedCardId !== null}>
@@ -151,55 +159,49 @@
                     ondragleave={() => onSectionDragLeave(section.id)}
                     ondrop={(event) => onSectionDrop(section.id, event)}
                 >
-                    <div class="column-header">
-                        <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
-                        <span>{cards.length}</span>
-                    </div>
+                    <div class="section-content">
+                        <div class="column-header">
+                            <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
+                            <span>{cards.length}</span>
+                            <!-- <button class="secondary" onclick={() => {}} title="Section settings">
+                                <Ellipsis />
+                            </button> -->
+                            <button onclick={() => {
+                                // TODO
+                            }} title="Add new card to this section">
+                                <Plus />
+                            </button>
+                        </div>
 
-                    <div class="card-list">
-                        {#each cards as card, i (card.id)}
-                            <div
-                                class:dragging={draggedCardId === card.id}
-                                class="card-wrapper"
-                                data-card-id={card.id}
-                                draggable="true"
-                                ondragstart={(event) => onDragStart(card, event)}
-                                ondragend={onDragEnd}
-                            >
+                        <div class="card-list">
+                            {#each cards as card, i (card.id)}
                                 <div
-                                    class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === card.id}
-                                    class="drop-zone top"
-                                    class:topmost={i === 0}
-                                ></div>
-                                <KanbanCard {card} />
-                                {#if i === cards.length - 1}
+                                    class:dragging={draggedCardId === card.id}
+                                    class="card-wrapper"
+                                    data-card-id={card.id}
+                                    draggable="true"
+                                    ondragstart={(event) => onDragStart(card, event)}
+                                    ondragend={onDragEnd}
+                                >
                                     <div
-                                        class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
-                                        class="drop-zone bottom"
+                                        class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === card.id}
+                                        class="drop-zone top"
+                                        class:topmost={i === 0}
                                     ></div>
-                                {/if}
-                            </div>
-                        {/each}
-                        {#if cards.length === 0}
-                            <p class="empty">No cards.</p>
-                        {/if}
+                                    <KanbanCard {card} />
+                                    {#if i === cards.length - 1}
+                                        <div
+                                            class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
+                                            class="drop-zone bottom"
+                                        ></div>
+                                    {/if}
+                                </div>
+                            {/each}
+                            {#if cards.length === 0}
+                                <p class="empty">Drop a card here to add it</p>
+                            {/if}
+                        </div>
                     </div>
-
-                    <!-- very very temporary -->
-                    <form class="new-card" onsubmit={(event) => {
-                        event.preventDefault();
-                        createCard(section.id);
-                    }}>
-                        <input
-                            type="text"
-                            placeholder="New card"
-                            value={drafts[section.id] ?? ""}
-                            oninput={(event) => drafts[section.id] = event.currentTarget.value}
-                        />
-                        <button type="submit" disabled={(drafts[section.id] ?? "").trim().length === 0}>
-                            Add card
-                        </button>
-                    </form>
                 </section>
             {/each}
         </div>
@@ -211,6 +213,12 @@
 {/if}
 
 <style lang="scss">
+menu {
+    background-color: var(--bg-primary);
+    padding: 0.25rem;
+    border-radius: 4px;
+    margin: 0 0.5rem;
+}
 .board {
     flex: 1;
 
@@ -226,23 +234,25 @@
 }
 
 section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background: var(--bg-primary);
-    transition: border-color 0.1s ease;
-
     min-width: 18rem;
     max-width: 25rem;
     flex: 1;
 
-    max-height: 100%;
+    height: 100%;
 
-    &.over {
+    &.over .section-content {
         border: 1px solid var(--border);
+    }
+    .section-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        transition: border-color 0.1s ease;
+        
+        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: var(--bg-primary);
     }
 }
 
@@ -253,10 +263,19 @@ section {
 
     h2 {
         margin: 0;
+        flex: 1;
     }
+    button {
+        --bg-color: transparent;
+        padding: 0.25rem;
+    }
+    // button.secondary {
+    //     color: var(--text-secondary);
+    // }
     span {
         color: var(--text-secondary);
         font-size: var(--font-small);
+        margin-right: 0.5rem;
     }
 }
 
@@ -273,7 +292,7 @@ section {
 }
 
 .card-wrapper {
-    cursor: grab;
+    cursor: pointer;
     user-select: none;
     transition: transform 0.1s ease, opacity 0.1s ease, border-color 0.1s ease, background-color 0.1s ease;
     position: relative;
@@ -314,15 +333,11 @@ section {
 }
 
 .empty {
-    color: var(--text-secondary);
-    font-size: var(--font-small);
+    color: var(--text-tertiary);
+    font-size: var(--font-tiny);
+    font-style: italic;
+    text-align: center;
     padding: 0.25rem 0;
-}
-
-.new-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
 }
 </style>
 

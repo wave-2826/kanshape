@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from "$app/state";
     import KanbanBoard from "$lib/components/kanban/KanbanBoard.svelte";
+    import { metadata } from "$lib/metadata";
     import { watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { untrack } from "svelte";
@@ -13,6 +14,10 @@
         console.error("Failed to load project:", err);
         return null;
     })) : null);
+
+    $effect(() => {
+        $metadata.title = $project ? `${$project.title}` : "Project";
+    });
 </script>
 
 <div class="page">
@@ -30,12 +35,11 @@
 
 <style lang="scss">
 h1 {
-    margin: 1rem 0 0 1rem;
+    margin: 1rem 0 0.5rem 1rem;
 }
 .page {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     height: 100%;
     max-height: 100%;
 }

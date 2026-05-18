@@ -7,14 +7,17 @@
 </script>
 
 <div class="card">
-    {card.title}
+    <h3>{card.title}</h3>
 </div>
 
 <style lang="scss">
 .card {
-    padding: 0.4rem 0.75rem;
+    padding: 0.35rem 0.7rem;
     border-radius: 4px;
     background: var(--bg-secondary);
+    font-size: var(--font-tiny);
+}
+h3 {
     font-size: var(--font-tiny);
 }
 </style>

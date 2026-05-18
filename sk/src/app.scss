@@ -8,7 +8,8 @@
     --bg-secondary: #24262c;
     --bg-selection: #263545;
     --text-primary: #e2e5ec;
-    --text-secondary: #b4bcc8;
+    --text-secondary: #a2abb7;
+    --text-tertiary: #6e7a8c;
     --font-large: 1.4rem;
     --font-medium: 1rem;
     --font-text: 0.9rem;
@@ -72,6 +73,9 @@ button, input, select, textarea, .button {
         background-color: transparent;
         padding: 0;
     }
+}
+button {
+    cursor: pointer;
 }
 input {
     // Smaller vertical padding looks weird on inputs

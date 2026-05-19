@@ -4,6 +4,7 @@
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards } from "./kanban";
     import { Funnel, Plus, SquarePlus } from "lucide-svelte";
+    import NewCardModal from "./NewCardModal.svelte";
 
     const {
         project
@@ -43,26 +44,7 @@
         boardCards = sortCards($cards.items);
     });
 
-    // async function createCard(sectionId: string) {
-    //     const title = (drafts[sectionId] ?? "").trim();
-    //     if(title.length === 0) return;
-
-    //     const savedCard = await save(Collections.Cards, {
-    //         title,
-    //         project: project.id,
-    //         section: sectionId,
-    //         position: nextCardPosition(boardCards, sectionId),
-    //         moved_at: new Date().toISOString()
-    //     }, { create: true }).catch((err) => {
-    //         console.error("Failed to create card:", err);
-    //         return null;
-    //     });
-
-    //     if(!savedCard) return;
-
-    //     drafts[sectionId] = "";
-    //     boardCards = sortCards([...boardCards.filter((card) => card.id !== savedCard.id), savedCard]);
-    // }
+    let newCardModal: NewCardModal | null = $state(null);
 
     function onDragStart(card: CardsResponse, event: DragEvent) {
         draggedCardId = card.id;
@@ -139,83 +121,90 @@
     }
 </script>
 
-<menu>
-    <button onclick={() => {
-        // todo
-    }} disabled={sections.length === 0} class="new">
-        <SquarePlus />
-        New Card
-    </button>
-    <button onclick={() => {
-        // todo
-    }}>
-        <Funnel />
-        Filter
-    </button>
-</menu>
-{#if cards !== null && $cards !== null}
-    {#if sections.length > 0}
-        <div class="board" class:dragging={draggedCardId !== null}>
-            {#each sections as section (section.id)}
-                {@const cards = cardsForSection(section.id)}
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <section
-                    class:over={hoveredSectionId === section.id}
-                    ondragover={(event) => onSectionDragOver(section.id, event)}
-                    ondragleave={() => onSectionDragLeave(section.id)}
-                    ondrop={(event) => onSectionDrop(section.id, event)}
-                >
-                    <div class="section-content">
-                        <div class="column-header">
-                            <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
-                            <span>{cards.length}</span>
-                            <button onclick={() => {
-                                // TODO
-                            }} title="Add new card to this section">
-                                <Plus />
-                            </button>
-                        </div>
+<div class="kanban">
+    <menu>
+        <button onclick={() => newCardModal?.open()} disabled={sections.length === 0} class="new">
+            <SquarePlus />
+            New Card
+        </button>
+        <button onclick={() => {
+            // todo
+        }}>
+            <Funnel />
+            Filter
+        </button>
+    </menu>
 
-                        <div class="card-list">
-                            {#each cards as card, i (card.id)}
-                                <div
-                                    class:dragging={draggedCardId === card.id}
-                                    class="card-wrapper"
-                                    data-card-id={card.id}
-                                    draggable="true"
-                                    ondragstart={(event) => onDragStart(card, event)}
-                                    ondragend={onDragEnd}
-                                >
+    <NewCardModal bind:this={newCardModal} {sections} {boardCards} projectId={project.id} />
+
+    {#if cards !== null && $cards !== null}
+        {#if sections.length > 0}
+            <div class="board" class:dragging={draggedCardId !== null}>
+                {#each sections as section (section.id)}
+                    {@const cards = cardsForSection(section.id)}
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <section
+                        class:over={hoveredSectionId === section.id}
+                        ondragover={(event) => onSectionDragOver(section.id, event)}
+                        ondragleave={() => onSectionDragLeave(section.id)}
+                        ondrop={(event) => onSectionDrop(section.id, event)}
+                    >
+                        <div class="section-content">
+                            <div class="column-header">
+                                <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
+                                <span>{cards.length}</span>
+                                <button onclick={() => newCardModal?.open(section.id)} title="Add new card to this section">
+                                    <Plus />
+                                </button>
+                            </div>
+
+                            <div class="card-list">
+                                {#each cards as card, i (card.id)}
                                     <div
-                                        class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === card.id}
-                                        class="drop-zone top"
-                                        class:topmost={i === 0}
-                                    ></div>
-                                    <KanbanCard {card} />
-                                    {#if i === cards.length - 1}
+                                        class:dragging={draggedCardId === card.id}
+                                        class="card-wrapper"
+                                        data-card-id={card.id}
+                                        draggable="true"
+                                        ondragstart={(event) => onDragStart(card, event)}
+                                        ondragend={onDragEnd}
+                                    >
                                         <div
-                                            class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
-                                            class="drop-zone bottom"
+                                            class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === card.id}
+                                            class="drop-zone top"
+                                            class:topmost={i === 0}
                                         ></div>
-                                    {/if}
-                                </div>
-                            {/each}
-                            {#if cards.length === 0}
-                                <p class="empty">Drop a card here to add it</p>
-                            {/if}
+                                        <KanbanCard {card} />
+                                        {#if i === cards.length - 1}
+                                            <div
+                                                class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
+                                                class="drop-zone bottom"
+                                            ></div>
+                                        {/if}
+                                    </div>
+                                {/each}
+                                {#if cards.length === 0}
+                                    <p class="empty">Drop a card here to add it</p>
+                                {/if}
+                            </div>
                         </div>
-                    </div>
-                </section>
-            {/each}
-        </div>
+                    </section>
+                {/each}
+            </div>
+        {:else}
+            <p>No sections found for this project.</p>
+        {/if}
     {:else}
-        <p>No sections found for this project.</p>
+        <p>Failed to load cards.</p>
     {/if}
-{:else}
-    <p>Failed to load cards.</p>
-{/if}
+</div>
 
 <style lang="scss">
+.kanban {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 menu {
     background-color: var(--bg-primary);
     padding: 0.25rem;

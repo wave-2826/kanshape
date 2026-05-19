@@ -46,10 +46,11 @@ header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem;
 }
 h1 {
     flex: 1;
+    margin-left: 0.5rem;
 }
 .page {
     display: flex;

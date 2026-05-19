@@ -75,6 +75,13 @@
     options={sections.map(s => ({ name: s.title ?? "", tooltip: s.description, color: s.color ?? undefined }))}
     oncreate={() => sections.push({ title: `Section ${sections.length + 1}`, color: undefined, is_completed: false })}
     ondelete={(option) => sections.splice(option, 1)}
+    ordered
+    onreorder={(from, to) => {
+        const selArr = sections.map((_, i) => i);
+        const selItem = selArr.splice(from, 1)[0];
+        selArr.splice(to, 0, selItem);
+        sections = selArr.map(i => sections[i]);
+    }}
 >
     {#snippet pane(selected)}
         <div class="section">

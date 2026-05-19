@@ -6,7 +6,6 @@
     import { watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Settings } from "lucide-svelte";
-    import { untrack } from "svelte";
 
     $effect(() => {
         $metadata.title = $project ? `${$project.title}` : "Project";
@@ -14,12 +13,12 @@
 
     const id = $derived(page.params.id);
 
-    const project = $derived(id ? await untrack(() => watchOne(Collections.Projects, id, {
+    const project = $derived(id ? await watchOne(Collections.Projects, id, {
         expand: "subprojects,sections"
     }).catch((err) => {
         console.error("Failed to load project:", err);
         return null;
-    })) : null);
+    }) : null);
 </script>
 
 <div class="page">

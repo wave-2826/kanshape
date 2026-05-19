@@ -39,7 +39,7 @@
         close();
     }
 }} transition:fade={{ duration: 100 }}>
-    <dialog class="modal" open transition:fly={{ duration: 150, y: -10 }} closedby="none">
+    <dialog class="modal" open transition:fly={{ duration: 250, y: -20 }} closedby="none">
         {@render children({ open, close })}
     </dialog>
 </div>

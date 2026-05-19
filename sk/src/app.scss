@@ -57,7 +57,7 @@ button, input, select, textarea, .button {
     gap: 0.5em;
     align-items: center;
 
-    &:hover:not(:disabled):not(.unstyled) {
+    &:hover:not(:disabled):not(.unstyled), &:focus-within:not(:disabled):not(.unstyled) {
         background-color: color-mix(in srgb, var(--accent) 3%, var(--bg-color, var(--bg-secondary)));
     }
 

@@ -15,7 +15,9 @@
     const cards = $derived(await watch(Collections.Cards, {
         filter: `project = "${project.id}"`,
         sort: "position,created"
-    }, 1, 500).catch((err) => {
+    }, 1, 500, {
+        waitForConnection: true
+    }).catch((err) => {
         console.error("Failed to load cards:", err);
         return null;
     }));

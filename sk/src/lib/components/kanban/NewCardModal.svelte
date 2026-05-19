@@ -41,6 +41,7 @@
 
     export function open(defaultSectionId?: string) {
         if(defaultSectionId) sectionId = defaultSectionId;
+        else sectionId = sections[0]?.id ?? "";
         modal.open();
     }
 

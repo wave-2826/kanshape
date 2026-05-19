@@ -182,24 +182,21 @@ export async function watchOne<
     const collection = client.collection(collectionName);
     let result = await collection.getOne<T>(recordId, queryParams);
 
-    let set: Subscriber<T>;
     let unsubRealtime: UnsubscribeFunc | undefined;
-    // fetch first page
-    const store = readable<T>(result, (_set) => {
-        set = _set;
-        // watch for changes (only if you're in the browser)
+    
+    const store = readable<T>(result, (set) => {
+        // watch for changes (only if in the browser)
         if(realtime) collection.subscribe<T>(
             recordId,
             ({ action, record }) => {
-                (async function (action) {
-                    switch(action) {
-                        case "update":
-                            return record;
-                        case "delete":
-                            return undefined as any;
-                    }
-                    return result;
-                })(action).then((record) => set((result = record)));
+                switch(action) {
+                    case "update":
+                        set((result = record));
+                        break;
+                    case "delete":
+                        set((result = undefined as any));
+                        break;
+                }
             },
             queryParams
         )
@@ -229,40 +226,65 @@ export async function watch<
     queryParams = {} as RecordListOptions & { expand?: Expand },
     page = 1,
     perPage = 20,
-    realtime = browser
+    {
+        realtime = browser,
+        /** Workaround for pocketbase weirdness; TODO: try to make this work without this hack */
+        waitForConnection = false
+    } = {}
 ): Promise<PageStore<T>> {
     const collection = client.collection(collectionName);
     let result = await collection.getList<T>(page, perPage, queryParams);
+
     let set: Subscriber<ListResult<T>>;
     let unsubRealtime: UnsubscribeFunc | undefined;
+
+    // Wait for client.realtime.isConnected to be true. I don't really understand why this needs to happen, and it's
+    // not documented, but watching _some_ collections before isConnected becomes true (which only happens once subscribing
+    // in the first place) will cause the subscription to never fire. This is a workaround for that.
+    if(realtime && waitForConnection) {
+        while(!client.realtime.isConnected) {
+            console.log("Waiting for PocketBase realtime connection...");
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    }
+
     // fetch first page
     const store = readable<ListResult<T>>(result, (_set) => {
         set = _set;
-        // watch for changes (only if you're in the browser)
+
+        console.log(client.realtime.isConnected);
+        console.log("Subscribing realtime to collection", collectionName, "with params", queryParams);
+
+        // watch for changes (only if in the browser)
         if(realtime) collection.subscribe<T>(
             "*",
             ({ action, record }) => {
-                (async function (action) {
-                    // see https://github.com/pocketbase/pocketbase/discussions/505
-                    switch(action) {
-                        // ISSUE: no subscribe event when a record is modified and no longer fits the "filter"
-                        // @see https://github.com/pocketbase/pocketbase/issues/4717
-                        case "update":
-                        case "create":
-                            // record = await expand(queryParams.expand, record);
-                            const index = result.items.findIndex( (r) => r.id === record.id);
-                            // replace existing if found, otherwise append
-                            if(index >= 0) {
-                                result.items[index] = record;
-                                return result.items;
-                            } else {
-                                return [...result.items, record];
-                            }
-                        case "delete":
-                            return result.items.filter((item) => item.id !== record.id);
-                    }
-                    return result.items;
-                })(action).then((items) => set((result = { ...result, items })));
+                console.log("Realtime event:", action, record);
+
+                let items = result.items;
+
+                // see https://github.com/pocketbase/pocketbase/discussions/505
+                switch(action) {
+                    // ISSUE: no subscribe event when a record is modified and no longer fits the "filter"
+                    // @see https://github.com/pocketbase/pocketbase/issues/4717
+                    case "update":
+                    case "create":
+                        // record = await expand(queryParams.expand, record);
+                        const index = result.items.findIndex( (r) => r.id === record.id);
+                        // replace existing if found, otherwise append
+                        if(index >= 0) {
+                            result.items[index] = record;
+                            items = result.items;
+                        } else {
+                            items = [...result.items, record];
+                        }
+                        break;
+                    case "delete":
+                        items = result.items.filter((item) => item.id !== record.id);
+                        break;
+                }
+
+                set((result = { ...result, items }));
             },
             queryParams
         )

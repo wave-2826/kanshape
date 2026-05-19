@@ -1,10 +1,16 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import KanbanBoard from "$lib/components/kanban/KanbanBoard.svelte";
     import { metadata } from "$lib/metadata";
     import { watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { Settings } from "lucide-svelte";
     import { untrack } from "svelte";
+
+    $effect(() => {
+        $metadata.title = $project ? `${$project.title}` : "Project";
+    });
 
     const id = $derived(page.params.id);
 
@@ -14,10 +20,6 @@
         console.error("Failed to load project:", err);
         return null;
     })) : null);
-
-    $effect(() => {
-        $metadata.title = $project ? `${$project.title}` : "Project";
-    });
 </script>
 
 <div class="page">
@@ -27,15 +29,27 @@
                 <p>Failed to load project.</p>
             {/snippet}
 
-            <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
+            <header>
+                <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
+                <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
+                    <Settings />
+                    Settings
+                </button>
+            </header>
             <KanbanBoard project={$project} />
         </svelte:boundary>
     {/if}
 </div>
 
 <style lang="scss">
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
 h1 {
-    margin: 1rem 0 0.5rem 1rem;
+    flex: 1;
 }
 .page {
     display: flex;

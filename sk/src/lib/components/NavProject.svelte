@@ -4,7 +4,7 @@
     import { cannonicalizeExpand as cannonicalizeMultiExpand, type ExpandResponse } from "$lib/pocketbase";
     import type { ProjectsResponse } from "$lib/pocketbase/generated-types";
     import { grow } from "$lib/transitions";
-    import { ChevronDown, ChevronUp, Kanban, SquareKanban } from "lucide-svelte";
+    import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban } from "lucide-svelte";
     import { untrack } from "svelte";
     
     // svelte-ignore non_reactive_update ???
@@ -60,6 +60,10 @@
 
 {#if showOpen && subprojects.length > 0}
     <div class="sublist" transition:grow style="--color: {project.color ?? 'var(--bg-secondary)'}">
+        <!-- Only show the settings button when on that page; it makes the UI cleaner and there are other navigation options -->
+        {#if page.route.id === "/(authed)/projects/[id]/settings"}
+            <button class="selected"><Settings />Settings</button>
+        {/if}
         {#each project.subprojects as subprojectId}
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}
             {#if subproject}

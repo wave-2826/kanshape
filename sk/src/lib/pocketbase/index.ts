@@ -79,15 +79,17 @@ export async function saveBatch<C extends Collections | string>(
     }
 }
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** Make all properties K in T optional */
-type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 /** Make all fields of the given types K optional in T */
 type PartialByTypes<T, K> = Omit<T, {
     [P in keyof T]: T[P] extends K ? P : never
 }[keyof T]> & Partial<Pick<T, {
     [P in keyof T]: T[P] extends K ? P : never
-}[keyof T]>>
+}[keyof T]>>;
+
+export type CreateRecord<T extends { id: string }> = PartialByTypes<PartialBy<T, "id">, IsoAutoDateString>;
 
 /**
  * Save (create/update) a record (a plain object). Automatically converts to
@@ -105,7 +107,7 @@ export async function save<
     collectionName: C,
     record: Create extends true ?
         // Make ID and auto dates optional when creating records, since they're not in the generated schema for some reason
-        (C extends Collections ? PartialByTypes<PartialBy<CollectionRecords[C], "id">, IsoAutoDateString> : RecordModel) :
+        (C extends Collections ? CreateRecord<CollectionRecords[C]> : RecordModel) :
         // Make all fields optional when updating records. If id isn't included, a new record is created anyway.
         (Partial<C extends Collections ? CollectionRecords[C] : RecordModel>),
     options?: {
@@ -301,4 +303,28 @@ export async function query<C extends Collections | string>(
 ): Promise<(C extends Collections ? CollectionRecords[C] : any)[]> {
     const collection = client.collection(collectionName);
     return await collection.getFullList(queryParams);
+}
+
+export async function queryOne<
+    C extends Collections | string,
+    Expand extends string = "",
+    T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
+>(
+    collectionName: C,
+    recordId: string,
+    queryParams = {} as RecordListOptions & { expand?: Expand }
+): Promise<T> {
+    const collection = client.collection(collectionName);
+    return await collection.getOne(recordId, queryParams);
+}
+
+export async function deleteRecord<C extends Collections | string>(
+    collectionName: C,
+    recordId: string,
+    options?: {
+        fetch?: typeof window.fetch
+    }
+): Promise<void> {
+    const collection = client.collection(collectionName);
+    await collection.delete(recordId, { fetch: options?.fetch });
 }

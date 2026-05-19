@@ -3,7 +3,7 @@
     import { cannonicalizeExpand as canonicalizeExpand, watch, type ExpandResponse } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards } from "./kanban";
-    import { Plus, SquarePlus } from "lucide-svelte";
+    import { Funnel, Plus, SquarePlus } from "lucide-svelte";
 
     const {
         project
@@ -146,6 +146,12 @@
         <SquarePlus />
         New Card
     </button>
+    <button onclick={() => {
+        // todo
+    }}>
+        <Funnel />
+        Filter
+    </button>
 </menu>
 {#if cards !== null && $cards !== null}
     {#if sections.length > 0}
@@ -163,9 +169,6 @@
                         <div class="column-header">
                             <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
                             <span>{cards.length}</span>
-                            <!-- <button class="secondary" onclick={() => {}} title="Section settings">
-                                <Ellipsis />
-                            </button> -->
                             <button onclick={() => {
                                 // TODO
                             }} title="Add new card to this section">
@@ -218,6 +221,10 @@ menu {
     padding: 0.25rem;
     border-radius: 4px;
     margin: 0 0.5rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
 }
 .board {
     flex: 1;

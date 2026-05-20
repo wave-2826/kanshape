@@ -156,13 +156,15 @@
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <section
                         class:over={hoveredSectionId === section.id}
+                        class:complete={section.is_completed}
                         ondragover={(event) => onSectionDragOver(section.id, event)}
                         ondragleave={() => onSectionDragLeave(section.id)}
                         ondrop={(event) => onSectionDrop(section.id, event)}
+                        style={section.color ? `--color: ${section.color};` : ""}
                     >
                         <div class="section-content">
                             <div class="column-header">
-                                <h2 style={`color: ${section.color || 'inherit'};`}>{section.title}</h2>
+                                <h2>{section.title}</h2>
                                 <span>{cards.length}</span>
                                 <button onclick={() => newCardModal?.open(section.id)} title="Add new card to this section">
                                     <Plus />
@@ -260,6 +262,14 @@ section {
         border: 1px solid transparent;
         border-radius: 4px;
         background: var(--bg-primary);
+    }
+
+    &.complete .section-content {
+        border-top: 1px solid var(--color);
+    }
+
+    h2 {
+        color: var(--color);
     }
 }
 

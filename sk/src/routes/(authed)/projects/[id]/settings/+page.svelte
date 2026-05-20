@@ -26,7 +26,7 @@
 
     let name: string = $state("");
     let description: string = $state("");
-    let color: string | null = $state(null);
+    let color: string | undefined = $state(undefined);
     let partIdPrefix: string = $state("");
     let type: ProjectsTypeOptions = $state("blank");
     let subprojects: SubprojectsRecord[] = $state([]);
@@ -103,7 +103,7 @@
             id: project.id,
             title: name,
             description,
-            color: color ?? undefined,
+            color: color,
             part_id_prefix: partIdPrefix,
             sections: sections.map(s => s.id),
             subprojects: subprojects.map(s => s.id),

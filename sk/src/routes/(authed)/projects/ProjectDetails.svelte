@@ -13,7 +13,7 @@
         sections = $bindable(),
         subprojects = $bindable()
     }: {
-        color: string | null;
+        color?: string;
         name: string;
         description: string;
         partIdPrefix: string;
@@ -36,7 +36,9 @@
             name: "Manufacturing",
             description: "Allows configuring part IDs"
         }
-    }
+    };
+
+    const colorSelected = $derived(color !== undefined && color.trim() !== "");
 </script>
 
 <h2>Project details</h2>
@@ -44,13 +46,13 @@
 <textarea placeholder="Project description (optional)" bind:value={description}></textarea>
 <div class="option">
     <label for="color">Project color</label>
-    <button onclick={color = null} class:selected={color === null}>None</button>
+    <button onclick={() => color = ""} class:selected={!colorSelected}>None</button>
     <input
         type="color"
         id="color"
         value={color ?? "#ffffff"}
         onchange={(e) => color = e.currentTarget.value}
-        class:selected={color !== null}
+        class:selected={colorSelected}
     />
 </div>
 
@@ -84,18 +86,19 @@
     }}
 >
     {#snippet pane(selected)}
+        {@const colorSelected = sections[selected].color !== undefined && sections[selected].color.trim() !== ""}
         <div class="section">
             <input type="text" placeholder="Section name" bind:value={sections[selected].title} />
             <textarea placeholder="Section description (optional)" bind:value={sections[selected].description}></textarea>
             <div class="option">
                 <label for="color">Section color</label>
-                <button onclick={sections[selected].color = undefined} class:selected={sections[selected].color === undefined}>None</button>
+                <button onclick={() => sections[selected].color = ""} class:selected={!colorSelected}>None</button>
                 <input
                     type="color"
                     id="color"
                     value={sections[selected].color ?? "#ffffff"}
                     onchange={(e) => sections[selected].color = e.currentTarget.value}
-                    class:selected={sections[selected].color !== undefined}
+                    class:selected={colorSelected}
                 />
             </div>
             <div class="option" title="Used only for leaderboards and display for now">

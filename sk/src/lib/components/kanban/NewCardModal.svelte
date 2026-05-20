@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { save } from "$lib/pocketbase";
-    import { Collections, type CardsResponse, type SectionsRecord } from "$lib/pocketbase/generated-types";
+    import { client, save } from "$lib/pocketbase";
+    import { CardsPriorityOptions, Collections, type CardsResponse, type SectionsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
     import { nextCardPosition } from "./kanban";
 
@@ -18,6 +18,7 @@
     // svelte-ignore state_referenced_locally
     let sectionId = $state(sections[0]?.id ?? "");
     let description = $state("");
+    let priority: CardsPriorityOptions = $state("low");
 
     let modal: Modal;
     async function create() {
@@ -28,7 +29,9 @@
             project: projectId,
             section: sectionId,
             position: nextCardPosition(boardCards, sectionId),
-            moved_at: new Date().toISOString()
+            moved_at: new Date().toISOString(),
+            created_by: client.authStore.record?.id,
+            priority: "low"
         }, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);
             return null;
@@ -63,6 +66,14 @@
                 {#each sections as section}
                     <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
                 {/each}
+            </select>
+
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority" bind:value={priority}>
+                <option value="low" style="color: lightgray">Low</option>
+                <option value="medium" style="color: gold">Medium</option>
+                <option value="high" style="color: orange">High</option>
+                <option value="critical" style="color: red">Critical</option>
             </select>
 
             <label for="description">Description</label>

@@ -5,11 +5,12 @@
     import { moveCard, sortCards } from "./kanban";
     import { Funnel, Plus, SquarePlus } from "lucide-svelte";
     import NewCardModal from "./NewCardModal.svelte";
+    import CardViewPanel from "./CardViewPanel.svelte";
 
     const {
         project
     }: {
-        project: ExpandResponse<ProjectsResponse, "sections">
+        project: ExpandResponse<ProjectsResponse, "subprojects,sections">
     } = $props();
 
     const cards = $derived(await watch(Collections.Cards, {
@@ -29,13 +30,16 @@
 
         return orderedSectionIds
             .map((sectionId) => sectionsById.get(sectionId))
-            .filter((section): section is SectionsResponse => section !== undefined);
+            .filter((section) => section !== undefined);
     });
+    const subprojects = $derived(canonicalizeExpand(project.expand.subprojects));
 
     let boardCards = $state<CardsResponse[]>([]);
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
     let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);
+
+    let openCardId: string | null = $state(null);
 
     function cardsForSection(sectionId: string) {
         return sortCards(boardCards.filter((card) => card.section === sectionId));
@@ -138,6 +142,11 @@
     </menu>
 
     <NewCardModal bind:this={newCardModal} {sections} {boardCards} projectId={project.id} />
+    <CardViewPanel
+        card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}
+        onclose={() => openCardId = null}
+        {sections} {subprojects}
+    />
 
     {#if cards !== null && $cards !== null}
         {#if sections.length > 0}
@@ -175,7 +184,7 @@
                                             class="drop-zone top"
                                             class:topmost={i === 0}
                                         ></div>
-                                        <KanbanCard {card} />
+                                        <KanbanCard {card} onclick={() => openCardId = card.id} />
                                         {#if i === cards.length - 1}
                                             <div
                                                 class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}

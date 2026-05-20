@@ -116,7 +116,7 @@ export type CardsRecord<Tdata = unknown> = {
 	id: string
 	moved_at?: IsoDateString
 	position?: number
-	priority?: CardsPriorityOptions
+	priority: CardsPriorityOptions
 	project: RecordIdString
 	section: RecordIdString
 	subproject?: RecordIdString

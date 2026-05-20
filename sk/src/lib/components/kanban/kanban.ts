@@ -52,12 +52,13 @@ export async function moveCard(
 
     if(card.section === sectionId && beforeCardId === card.id) return boardCards;
 
+    const changedSections = card.section !== sectionId;
     const savedCard = await save(Collections.Cards, {
         id: card.id,
         section: sectionId,
         position: targetPosition,
-        moved_at: new Date().toISOString()
-    }).catch((err) => {
+        moved_at: changedSections ? new Date().toISOString() : undefined
+    }, { create: false }).catch((err) => {
         console.error("Failed to move card:", err);
         return null;
     });

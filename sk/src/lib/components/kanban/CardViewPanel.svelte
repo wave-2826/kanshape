@@ -8,11 +8,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 -->
 
 <script lang="ts">
+    import { autoSize } from "$lib/actions";
     import { deleteRecord, save } from "$lib/pocketbase";
     import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { unproxy } from "$lib/util";
-    import { Trash } from "lucide-svelte";
+    import { ChartColumnBig, Flag, PencilLine, Trash } from "lucide-svelte";
     import { fade, slide } from "svelte/transition";
+    import { getPriorityColor, priorities } from "./cards";
 
     let {
         card = $bindable(),
@@ -166,6 +168,14 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     }
 </script>
 
+<svelte:document onkeydown={(e) => {
+    if(e.key === "Escape" && localCard !== null) {
+        onclose();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }
+}} />
+
 {#if localCard !== null}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -174,12 +184,12 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     }} transition:fade={{ duration: 200 }}>
         <div class="panel" transition:slide={{ duration: 200, axis: "x" }}>
             <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
-            <textarea class="description" bind:value={localCard.description} placeholder="Card description..."></textarea>
-
+            <textarea class="description" bind:value={localCard.description} placeholder="Card description..." use:autoSize></textarea>
+            
             <div class="horizontal-options">
                 <div class="option">
-                    <label for="section">Section</label>
-                    <select id="section" name="section" bind:value={localCard.section}>
+                    <label for="section"><ChartColumnBig />Section</label>
+                    <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
                         {#each sections as section}
                             <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
                         {/each}
@@ -187,12 +197,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 </div>
     
                 <div class="option">
-                    <label for="priority">Priority</label>
-                    <select id="priority" name="priority" bind:value={localCard.priority}>
-                        <option value="low" style="color: lightgray">Low</option>
-                        <option value="medium" style="color: gold">Medium</option>
-                        <option value="high" style="color: orange">High</option>
-                        <option value="critical" style="color: red">Critical</option>
+                    <label for="priority"><Flag />Priority</label>
+                    <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
+                        {#each Object.entries(priorities) as [key, v]}
+                            <option value={key} style="color: {v.color}">{v.label}</option>
+                        {/each}
                     </select>
                 </div>
             </div>
@@ -207,32 +216,31 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 </select>
             {/if}
 
-            <span class="label">Actions</span>
-            <div class="buttons">
-                <button onclick={deleteCard} class="delete"><Trash />Delete</button>
-            </div>
-
             <span class="label">Information</span>
             <table>
                 <tbody>
                     <tr>
-                        <td class="label">Created by:</td>
+                        <td class="item">Created by:</td>
                         <td>{localCard.created_by}</td>
                     </tr>
                     <tr>
-                        <td class="label">Created at:</td>
+                        <td class="item">Created at:</td>
                         <td>{new Date(localCard.created).toLocaleString()}</td>
                     </tr>
                     <tr>
-                        <td class="label">Updated at:</td>
+                        <td class="item">Updated at:</td>
                         <td>{new Date(localCard.updated).toLocaleString()}</td>
                     </tr>
                     <tr>
-                        <td class="label">Moved sections at:</td>
+                        <td class="item">Moved sections at:</td>
                         <td>{new Date(localCard.moved_at).toLocaleString()}</td>
                     </tr>
                 </tbody>
             </table>
+
+            <div class="buttons">
+                <button onclick={deleteCard} class="delete"><Trash />Delete</button>
+            </div>
         </div>
     </div>
 {/if}
@@ -265,20 +273,38 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 }
 
 .title {
-    font-size: var(--font-medium);
-    padding: 0.5rem 0.75rem;
-    font-weight: 500;
+    font-size: var(--font-large);
+    font-weight: 600;
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    --bg-color: transparent;
 }
 
+.description {
+    font-size: var(--font-medium);
+    padding: 0.25rem 0.75rem;
+    border-left: 1px solid var(--border);
+    margin-bottom: 1rem;
+    --bg-color: transparent;
+    border-radius: 0 4px 4px 0;
+}
 label, .label {
     margin-top: 0.5rem;
     font-weight: 500;
     color: var(--text-secondary);
+
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .buttons {
     display: flex;
     gap: 0.5rem;
+    justify-content: flex-end;
+    flex-direction: row;
+    margin: 0.25rem 0;
+    font-size: var(--font-medium);
 
     .delete {
         color: var(--error);
@@ -293,7 +319,7 @@ table {
         color: var(--text-secondary);
         padding: 0.25rem 0.5rem;
     }
-    .label {
+    .item {
         color: var(--text-tertiary);
         width: 150px;
     }
@@ -302,12 +328,16 @@ table {
 .horizontal-options {
     display: flex;
     gap: 1rem;
+}
 
-    .option {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        flex: 1;
+.option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+
+    select {
+        --bg-color: var(--bg-primary);
     }
 }
 </style>

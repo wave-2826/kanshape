@@ -51,6 +51,7 @@ button, input, select, textarea, .button {
     outline: none;
     border-radius: 4px;
     padding: 0.35em 0.5em;
+    margin: 0;
 
     transform: translateY(0);
     transition: background-color 0.1s ease, border-color 0.1s ease, transform 0.1s ease;

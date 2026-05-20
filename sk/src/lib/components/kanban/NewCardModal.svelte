@@ -2,6 +2,7 @@
     import { client, save } from "$lib/pocketbase";
     import { CardsPriorityOptions, Collections, type CardsResponse, type SectionsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
+    import { priorities } from "./cards";
     import { nextCardPosition } from "./kanban";
 
     let {
@@ -70,10 +71,9 @@
 
             <label for="priority">Priority</label>
             <select id="priority" name="priority" bind:value={priority}>
-                <option value="low" style="color: lightgray">Low</option>
-                <option value="medium" style="color: gold">Medium</option>
-                <option value="high" style="color: orange">High</option>
-                <option value="critical" style="color: red">Critical</option>
+                {#each Object.entries(priorities) as [key, v]}
+                    <option value={key} style="color: {v.color}">{v.label}</option>
+                {/each}
             </select>
 
             <label for="description">Description</label>

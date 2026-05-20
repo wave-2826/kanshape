@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { Collections, type CardsResponse, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
+    import { Collections, type CardsResponse, type ProjectsResponse } from "$lib/pocketbase/generated-types";
     import { cannonicalizeExpand as canonicalizeExpand, watch, type ExpandResponse } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards } from "./kanban";
-    import { Funnel, Plus, SquarePlus } from "lucide-svelte";
+    import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
     import NewCardModal from "./NewCardModal.svelte";
     import CardViewPanel from "./CardViewPanel.svelte";
 
@@ -138,6 +138,12 @@
         }}>
             <Funnel />
             Filter
+        </button>
+        <button onclick={() => {
+            // todo
+        }}>
+            <View />
+            View
         </button>
     </menu>
 

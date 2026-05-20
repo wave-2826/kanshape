@@ -1,19 +1,26 @@
 <script lang="ts">
-    import type { CardsResponse } from "$lib/pocketbase/generated-types";
-    import { Flag, TextInitial } from "lucide-svelte";
+    import type { CardsResponse, SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Flag, Kanban, TextInitial } from "lucide-svelte";
     import { getPriorityColor } from "./cards";
 
     const {
         card,
+        subprojects,
         onclick
     }: {
         card: CardsResponse;
+        subprojects: SubprojectsRecord[];
         onclick: () => void;
     } = $props();
 </script>
 
 <button class="unstyled card" {onclick} class:critical={card.priority === "critical"}>
-    <h3>{card.title}</h3>
+    <div class="header">
+        <h3>{card.title}</h3>
+        {#if card.subproject !== ""}
+            <span class="subproject"><Kanban />{subprojects.find((sp) => sp.id === card.subproject)?.name ?? card.subproject}</span>
+        {/if}
+    </div>
 
     {#if card.priority !== "low"}
         <span class="priority" style="color: {getPriorityColor(card.priority)}">
@@ -43,13 +50,27 @@
         border-top: 1px solid var(--error);
     }
 }
+
+.header {
+    h3 {
+        font-size: var(--font-small);
+        display: inline;
+    }
+    .subproject {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+        gap: 0.25rem;
+        color: var(--text-tertiary);
+        font-size: var(--font-tiny);
+    }
+}
+
 .priority {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-}
-h3 {
-    font-size: var(--font-small);
 }
 
 .description {

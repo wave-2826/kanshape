@@ -192,7 +192,7 @@
                                             class="drop-zone top"
                                             class:topmost={i === 0}
                                         ></div>
-                                        <KanbanCard {card} onclick={() => openCardId = card.id} />
+                                        <KanbanCard {card} {subprojects} onclick={() => openCardId = card.id} />
                                         {#if i === cards.length - 1}
                                             <div
                                                 class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}

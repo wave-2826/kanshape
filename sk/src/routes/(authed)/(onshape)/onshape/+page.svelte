@@ -26,7 +26,7 @@
     const req = onshapeApiRequest(config, "GET", "/api/v16/metadata/d/27513eb20fd7a7d9e3043aa2/w/f122e4cc32f851f888ad6e1b/e");
 </script>
 
-<h1>Onshape panel</h1>
+<h1>WIP Onshape panel</h1>
 
 {#await req}
     <p>Loading...</p>

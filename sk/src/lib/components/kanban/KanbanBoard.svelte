@@ -216,7 +216,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+
+    overflow: hidden;
 }
 menu {
     background-color: var(--bg-primary);
@@ -262,6 +264,8 @@ section {
         border: 1px solid transparent;
         border-radius: 4px;
         background: var(--bg-primary);
+
+        max-height: 100%;
     }
 
     &.complete .section-content {

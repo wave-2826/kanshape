@@ -34,3 +34,21 @@ export function debounce(func: Function, wait: number) {
         }, wait);
     };
 }
+
+export function unproxy<T>(obj: T): T {
+    if(typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+
+    if(Array.isArray(obj)) {
+        return obj.map(item => unproxy(item)) as any;
+    }
+
+    const result: any = {};
+    for(const key in obj) {
+        if(obj.hasOwnProperty(key)) {
+            result[key] = unproxy((obj as any)[key]);
+        }
+    }
+    return result;
+}

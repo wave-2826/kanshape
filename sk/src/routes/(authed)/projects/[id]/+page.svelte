@@ -26,6 +26,7 @@
         <svelte:boundary>
             {#snippet failed(error)}
                 <p>Failed to load project.</p>
+                <span class="error">{(error as any)["message"]}</span>
             {/snippet}
 
             <header>

@@ -10,6 +10,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 <script lang="ts">
     import { deleteRecord, save } from "$lib/pocketbase";
     import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { unproxy } from "$lib/util";
     import { Trash } from "lucide-svelte";
     import { fade, slide } from "svelte/transition";
 
@@ -32,8 +33,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     // field -> last local edit timestamp (ms)
     const dirtyMap = new Map<keyof CardsResponse, number>();
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
-    // last known server updated timestamp (ms)
-    let serverVersionTimestamp = 0;
 
     let suppressDirty = 0;
     let prevCardId: string | null = null;
@@ -59,21 +58,18 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 localCard = null;
             });
             dirtyMap.clear();
-            if (saveTimer) {
+            if(saveTimer) {
                 clearTimeout(saveTimer);
                 saveTimer = null;
             }
         } else if(localCard == null || card.id !== localCard.id) {
             // first time open
             withSuppressedDirty(() => {
-                localCard = JSON.parse(JSON.stringify(card));
+                localCard = structuredClone(unproxy(card));
             });
-            serverVersionTimestamp = Date.parse(card.updated);
             dirtyMap.clear();
         } else {
-            // same card prop updated externally — merge safely
-            const incomingTs = Date.parse(card.updated);
-            if(incomingTs > serverVersionTimestamp) mergeServerRecord(card);
+            mergeServerRecord(card);
         }
     });
 
@@ -126,12 +122,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     async function performSave() {
         if(!localCard) return;
 
-        // send the current localCard to server
-        const requestTs = Date.now();
         try {
-            const saved = await save(Collections.Cards, localCard, { create: false });
-            // merge the server's authoritative record but keep fields edited after
-            if(saved) mergeServerRecord(saved, requestTs);
+            await save(Collections.Cards, localCard, { create: false });
         } finally {
             if(saveTimer) {
                 clearTimeout(saveTimer);
@@ -145,32 +137,26 @@ save. This allows us to keep user edits intact while still reflecting remote upd
      * after the given request timestamp. This allows us to keep the local unsaved edits while still updating any
      * fields that were changed remotely or locally before the last save.
      */
-    function mergeServerRecord(serverRec: CardsResponse, requestTs?: number) {
+    function mergeServerRecord(serverRec: CardsResponse) {
         if(!localCard) {
             withSuppressedDirty(() => {
-                localCard = JSON.parse(JSON.stringify(serverRec));
+                localCard = structuredClone(serverRec);
             });
-            serverVersionTimestamp = Date.parse(serverRec.updated);
             dirtyMap.clear();
             return;
         }
-
-        const serverTs = Date.parse(serverRec.updated);
-        if(serverTs <= serverVersionTimestamp) return;
 
         // For each field in serverRec, update local value unless user has a more recent local edit
         withSuppressedDirty(() => {
             for(const key of Object.keys(serverRec) as (keyof CardsResponse)[]) {
                 const localDirtyTs = dirtyMap.get(key) ?? 0;
-                if(requestTs && localDirtyTs > requestTs) continue; // Edited after the save request
+                // If the user has edited this field locally after the last save, skip applying the server update for this field
+                if(localDirtyTs > 0) continue;
                 
                 // Apply server value
                 (localCard as any)[key] = serverRec[key];
-                dirtyMap.delete(key);
             }
         });
-
-        serverVersionTimestamp = serverTs;
     }
 
     function deleteCard() {

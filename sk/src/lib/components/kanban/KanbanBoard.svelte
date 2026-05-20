@@ -304,6 +304,9 @@ section {
     transition: transform 0.1s ease, opacity 0.1s ease, border-color 0.1s ease, background-color 0.1s ease;
     position: relative;
 
+    display: flex;
+    flex-direction: column;
+
     &:active {
         cursor: grabbing;
     }

@@ -107,12 +107,12 @@ export const CardsPriorityOptions = {
 	"critical": "critical",
 } as const
 export type CardsPriorityOptions = typeof CardsPriorityOptions[keyof typeof CardsPriorityOptions]
-export type CardsRecord<Tdata = unknown> = {
-	assignments?: RecordIdString[]
+export type CardsRecord<Tdata = unknown, Tdue_data = unknown> = {
 	created: IsoAutoDateString
 	created_by?: RecordIdString
 	data?: null | Tdata
 	description?: string
+	due_data?: null | Tdue_data
 	id: string
 	moved_at?: IsoDateString
 	position?: number
@@ -122,6 +122,7 @@ export type CardsRecord<Tdata = unknown> = {
 	subproject?: RecordIdString
 	title?: string
 	updated: IsoAutoDateString
+	user_assignments?: RecordIdString[]
 }
 
 export type ConfigRecord = {
@@ -208,7 +209,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CardsResponse<Tdata = unknown, Texpand = unknown> = Required<CardsRecord<Tdata>> & BaseSystemFields<Texpand>
+export type CardsResponse<Tdata = unknown, Tdue_data = unknown, Texpand = unknown> = Required<CardsRecord<Tdata, Tdue_data>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>

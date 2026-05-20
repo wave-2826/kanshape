@@ -1,5 +1,10 @@
 export function deepEqual(a: any, b: any): boolean {
     if(a === b) return true;
+    if(typeof a !== typeof b) return false;
+
+    if(a instanceof Date && b instanceof Date) {
+        return a.getTime() === b.getTime();
+    }
 
     if(typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
         return false;

@@ -133,18 +133,19 @@
             <SquarePlus />
             New Card
         </button>
-        <button onclick={() => {
+        <button disabled onclick={() => {
             // todo
         }}>
             <Funnel />
             Filter
         </button>
-        <button onclick={() => {
+        <button disabled onclick={() => {
             // todo
         }}>
             <View />
             View
         </button>
+        <input type="text" placeholder="Search cards..." disabled />
     </menu>
 
     <NewCardModal bind:this={newCardModal} {sections} {boardCards} projectId={project.id} />
@@ -235,6 +236,11 @@ menu {
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
+
+    input {
+        padding: 0 0.5rem;
+        width: 200px;
+    }
 }
 .board {
     flex: 1;

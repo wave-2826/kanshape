@@ -259,7 +259,7 @@ export async function watch<
         if(realtime) collection.subscribe<T>(
             "*",
             ({ action, record }) => {
-                console.log("Realtime event:", action, record);
+                // console.log("Realtime event:", action, record);
 
                 let items = result.items;
 

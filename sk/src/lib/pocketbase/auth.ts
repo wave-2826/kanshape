@@ -46,8 +46,9 @@ export async function providerLogin(
 ) {
     const authResponse = await authCollection.authWithOAuth2({
         provider: provider.name,
+        scopes: ["openid", "email", "profile", "groups"],
         createData: {
-            // emailVisibility: true,
+            emailVisibility: true,
         },
     });
 

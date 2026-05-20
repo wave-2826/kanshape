@@ -1,7 +1,9 @@
 <script lang="ts">
     import type { CardsResponse, SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Flag, Kanban, TextInitial } from "lucide-svelte";
+    import { Clock, Flag, Kanban, TextInitial } from "lucide-svelte";
     import { getPriorityColor } from "./cards";
+    import { relativeTime } from "$lib/datetime";
+    import RelativeTime from "../RelativeTime.svelte";
 
     const {
         card,
@@ -32,6 +34,15 @@
     {#if card.description}
         <span class="description"><TextInitial /><span>{card.description}</span></span>
     {/if}
+
+    {#if card.due_by}
+        <span class="due" style="{new Date(card.due_by) < new Date() ? 'color: var(--error)' : ""}" title={`Due ${
+            new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(card.due_by))
+        }`}>
+            <Clock />
+            <span>Due <RelativeTime date={new Date(card.due_by)} /></span>
+        </span>
+    {/if}
 </button>
 
 <style lang="scss">
@@ -41,7 +52,7 @@
     flex-direction: column;
     gap: 0.25rem;
 
-    padding: 0.35rem 0.7rem;
+    padding: 0.4rem 0.7rem;
     border-radius: 4px;
     background: var(--bg-secondary);
     font-size: var(--font-tiny);
@@ -86,5 +97,12 @@
         white-space: nowrap;
         flex: 1;
     }
+}
+.due {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-primary);
+    font-size: var(--font-tiny);
 }
 </style>

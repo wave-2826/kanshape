@@ -32,6 +32,7 @@ html {
 
 body {
     overflow-x: hidden;
+    // TODO: actually ship a font lol
     font-family: Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Segoe UI Emoji, Apple Color Emoji, sans-serif;
 
     background-color: var(--bg-site);
@@ -78,6 +79,11 @@ button, input, select, textarea, .button {
         background-color: transparent;
         padding: 0;
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 button {
     cursor: pointer;
@@ -95,10 +101,6 @@ textarea {
 }
 button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.unstyled) {
     transform: translateY(-1px);
-}
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 label {

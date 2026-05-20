@@ -11,10 +11,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { autoSize } from "$lib/actions";
     import { deleteRecord, save } from "$lib/pocketbase";
     import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { unproxy } from "$lib/util";
-    import { ChartColumnBig, Flag, PencilLine, Trash } from "lucide-svelte";
+    import { deepEqual, unproxy } from "$lib/util";
+    import { ChartColumnBig, Clock, Flag, Kanban, PencilLine, Trash } from "lucide-svelte";
     import { fade, slide } from "svelte/transition";
     import { getPriorityColor, priorities } from "./cards";
+    import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
 
     let {
         card = $bindable(),
@@ -106,9 +107,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         for(const key of Object.keys(localCard) as (keyof CardsResponse)[]) {
             const next = localCard[key];
             const prev = prevValues.get(key);
-            if(!Object.is(prev, next)) {
+            if(!deepEqual(prev, next)) {
                 prevValues.set(key, next);
                 dirtyMap.set(key, now);
+                console.log(`Field ${key} changed locally; marking dirty (prev: ${prev}, next: ${next})`);
                 anyChanged = true;
             }
         }
@@ -120,7 +122,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(saveTimer) clearTimeout(saveTimer);
         saveTimer = setTimeout(() => performSave(), saveDebounce);
     }
-
     async function performSave() {
         if(!localCard) return;
 
@@ -183,10 +184,12 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(e.target === e.currentTarget) onclose();
     }} transition:fade={{ duration: 200 }}>
         <div class="panel" transition:slide={{ duration: 200, axis: "x" }}>
-            <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
-            <textarea class="description" bind:value={localCard.description} placeholder="Card description..." use:autoSize></textarea>
+            <section>
+                <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
+                <textarea class="description" bind:value={localCard.description} placeholder="Card description..." use:autoSize></textarea>
+            </section>
             
-            <div class="horizontal-options">
+            <section class="options">
                 <div class="option">
                     <label for="section"><ChartColumnBig />Section</label>
                     <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
@@ -204,43 +207,68 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                         {/each}
                     </select>
                 </div>
+
+                {#if subprojects.length > 0}
+                    <div class="option">
+                        <label for="subproject"><Kanban />Subproject</label>
+                        <select id="subproject" name="subproject" bind:value={localCard.subproject}>
+                            <option value="">None</option>
+                            {#each subprojects as subproject}
+                                <option value={subproject.id}>{subproject.name}</option>
+                            {/each}
+                        </select>
+                    </div>
+                {/if}
+            </section>
+
+            <div class="option">
+                <label for="due_date"><Clock />Due Date</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    {@debug localCard}
+                    {#if localCard.due_by}
+                        <input id="due_date" type="datetime-local" bind:value={
+                            () => localCard ? zonedToLocal(localCard.due_by) : "",
+                            (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
+                        } />
+                        <button onclick={() => localCard && (localCard.due_by = "")}>Clear due date</button>
+                    {:else}
+                        <button onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
+                    {/if}
+                </div>
+                {#if localCard.due_by}
+                    <span class="timetip">
+                        ({new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))})
+                    </span>
+                {/if}
             </div>
 
-            {#if subprojects.length > 0}
-                <label for="subproject">Subproject</label>
-                <select id="subproject" name="subproject" bind:value={localCard.subproject}>
-                    <option value="">None</option>
-                    {#each subprojects as subproject}
-                        <option value={subproject.id}>{subproject.name}</option>
-                    {/each}
-                </select>
-            {/if}
+            <section>
+                <span class="label">Information</span>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="item">Created by:</td>
+                            <td>{localCard.created_by}</td>
+                        </tr>
+                        <tr>
+                            <td class="item">Created at:</td>
+                            <td>{new Date(localCard.created).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td class="item">Updated at:</td>
+                            <td>{new Date(localCard.updated).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td class="item">Moved sections at:</td>
+                            <td>{new Date(localCard.moved_at).toLocaleString()}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
 
-            <span class="label">Information</span>
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="item">Created by:</td>
-                        <td>{localCard.created_by}</td>
-                    </tr>
-                    <tr>
-                        <td class="item">Created at:</td>
-                        <td>{new Date(localCard.created).toLocaleString()}</td>
-                    </tr>
-                    <tr>
-                        <td class="item">Updated at:</td>
-                        <td>{new Date(localCard.updated).toLocaleString()}</td>
-                    </tr>
-                    <tr>
-                        <td class="item">Moved sections at:</td>
-                        <td>{new Date(localCard.moved_at).toLocaleString()}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="buttons">
+            <section class="buttons">
                 <button onclick={deleteCard} class="delete"><Trash />Delete</button>
-            </div>
+            </section>
         </div>
     </div>
 {/if}
@@ -269,7 +297,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1.5rem;
 }
 
 .title {
@@ -284,12 +312,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     font-size: var(--font-medium);
     padding: 0.25rem 0.75rem;
     border-left: 1px solid var(--border);
-    margin-bottom: 1rem;
     --bg-color: transparent;
     border-radius: 0 4px 4px 0;
 }
 label, .label {
-    margin-top: 0.5rem;
     font-weight: 500;
     color: var(--text-secondary);
 
@@ -298,16 +324,21 @@ label, .label {
     gap: 0.25rem;
 }
 
-.buttons {
+section {
     display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    flex-direction: row;
-    margin: 0.25rem 0;
-    font-size: var(--font-medium);
+    flex-direction: column;
+    gap: 0.25rem;
 
-    .delete {
-        color: var(--error);
+    &.buttons {
+        gap: 0.5rem;
+        justify-content: flex-end;
+        flex-direction: row;
+        margin: 0.25rem 0;
+        font-size: var(--font-medium);
+
+        .delete {
+            color: var(--error);
+        }
     }
 }
 
@@ -325,18 +356,27 @@ table {
     }
 }
 
-.horizontal-options {
-    display: flex;
-    gap: 1rem;
+.options {
+    display: grid;
+    gap: 0.5rem 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
 .option {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-}
-select {
-    --bg-color: var(--bg-primary);
+    gap: 0.15rem;
+
+    select, input {
+        // --bg-color: color-mix(in srgb, var(--bg-primary) 50%, var(--bg-secondary) 50%);
+        --bg-color: transparent;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .timetip {
+        font-size: var(--font-small);
+        color: var(--text-secondary);
+        margin-left: 0.5rem;
+    }
 }
 </style>

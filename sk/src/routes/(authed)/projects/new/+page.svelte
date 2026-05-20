@@ -11,7 +11,7 @@
 
     let name = $state("");
     let description = $state("");
-    let color = $state<string | null>(null);
+    let color = $state<string | undefined>(undefined);
     let partIdPrefix = $state(new Date().getFullYear().toString());
     let type = $state<ProjectsTypeOptions>("blank");
     
@@ -46,7 +46,7 @@
             description,
             part_id_prefix: partIdPrefix,
             current_part_id: 1,
-            color: color ?? undefined,
+            color: color ?? "",
             sections: sectionIds,
             subprojects: subprojectIds,
             custom_card_fields: {},

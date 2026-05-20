@@ -335,9 +335,8 @@ table {
     flex-direction: column;
     gap: 0.25rem;
     flex: 1;
-
-    select {
-        --bg-color: var(--bg-primary);
-    }
+}
+select {
+    --bg-color: var(--bg-primary);
 }
 </style>

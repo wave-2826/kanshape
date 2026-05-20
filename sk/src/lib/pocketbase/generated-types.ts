@@ -14,6 +14,7 @@ export const Collections = {
 	Cards: "cards",
 	Config: "config",
 	Files: "files",
+	Groups: "groups",
 	Leaderboard: "leaderboard",
 	Projects: "projects",
 	Sections: "sections",
@@ -107,13 +108,14 @@ export const CardsPriorityOptions = {
 	"critical": "critical",
 } as const
 export type CardsPriorityOptions = typeof CardsPriorityOptions[keyof typeof CardsPriorityOptions]
-export type CardsRecord<Tdata = unknown, Tdue_data = unknown> = {
+export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
+	assignment_data?: null | Tassignment_data
 	created: IsoAutoDateString
 	created_by?: RecordIdString
-	data?: null | Tdata
 	description?: string
-	due_data?: null | Tdue_data
+	due_by?: IsoDateString
 	id: string
+	metadata?: null | Tmetadata
 	moved_at?: IsoDateString
 	position?: number
 	priority: CardsPriorityOptions
@@ -135,6 +137,13 @@ export type FilesRecord = {
 	file: FileNameString
 	id: string
 	path: string
+}
+
+export type GroupsRecord = {
+	created: IsoAutoDateString
+	id: string
+	name?: string
+	updated: IsoAutoDateString
 }
 
 export type LeaderboardRecord = {
@@ -193,7 +202,9 @@ export type UsersRecord<Tmetadata = unknown> = {
 	created: IsoAutoDateString
 	email?: string
 	emailVisibility?: boolean
+	groups?: RecordIdString[]
 	id: string
+	is_admin?: boolean
 	metadata?: null | Tmetadata
 	name?: string
 	password: string
@@ -209,9 +220,10 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CardsResponse<Tdata = unknown, Tdue_data = unknown, Texpand = unknown> = Required<CardsRecord<Tdata, Tdue_data>> & BaseSystemFields<Texpand>
+export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
+export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tcustom_card_fields = unknown, Texpand = unknown> = Required<ProjectsRecord<Tcustom_card_fields>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
@@ -229,6 +241,7 @@ export type CollectionRecords = {
 	cards: CardsRecord
 	config: ConfigRecord
 	files: FilesRecord
+	groups: GroupsRecord
 	leaderboard: LeaderboardRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
@@ -245,6 +258,7 @@ export type CollectionResponses = {
 	cards: CardsResponse
 	config: ConfigResponse
 	files: FilesResponse
+	groups: GroupsResponse
 	leaderboard: LeaderboardResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse

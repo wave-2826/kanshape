@@ -1,5 +1,5 @@
-import type { LayoutLoad } from "../$types";
 import { loadConfig } from "$lib/config";
+import type { LayoutLoad } from "../(authed)/$types";
 
 // turn off SSR - we're JAMstack here
 export const ssr = false;

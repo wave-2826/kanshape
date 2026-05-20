@@ -8,7 +8,7 @@
 
     const projects = await watch(Collections.Projects, {
         expand: "subprojects"
-    }, 1, 500, true).catch((err) => {
+    }, 1, 500).catch((err) => {
         console.error("Failed to load projects:", err);
         return null;
     });

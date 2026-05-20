@@ -22,4 +22,4 @@
 </script>
 
 <!-- svelte-ignore a11y_missing_attribute -->
-<img {...rest} {src} rel="noreferrer" />
+<img {...rest} {src} />

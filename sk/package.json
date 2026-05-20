@@ -19,10 +19,12 @@
     "pnpm": ">=10.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@sveltejs/adapter-auto": "^6.1.1",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.59.1",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "playwright": "^1.60.0",
     "pocketbase-typegen": "^1.5.0",
     "sass": "^1.99.0",
     "svelte": "^5.55.5",

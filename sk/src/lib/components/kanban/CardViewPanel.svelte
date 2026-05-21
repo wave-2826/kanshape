@@ -9,7 +9,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { deleteRecord, save } from "$lib/pocketbase";
+    import { deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { deepEqual, unproxy } from "$lib/util";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash } from "lucide-svelte";
@@ -38,6 +38,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     // field -> last local edit timestamp (ms)
     const dirtyMap = new Map<keyof CardsResponse, number>();
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const creationUser = $derived(card?.created_by ? queryOne(Collections.Users, card.created_by) : null);
 
     let suppressDirty = 0;
     let prevCardId: string | null = null;
@@ -284,7 +286,19 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
             <footer>
                 <div class="metadata">
-                    <span>Created by {localCard.created_by} on {new Date(localCard.created).toLocaleString()}</span>
+                    <span>
+                        Created by
+                        {#if creationUser === null}
+                            Unknown User
+                        {:else}
+                            {#await creationUser}
+                                Loading user...
+                            {:then user}
+                                {user?.name ?? "Unknown User"}
+                            {/await}
+                        {/if}
+                        on {new Date(localCard.created).toLocaleString()}
+                    </span>
                     <span>Last updated {new Date(localCard.updated).toLocaleString()}</span>
                     <span>Moved sections at {new Date(localCard.moved_at).toLocaleString()}</span>
                 </div>

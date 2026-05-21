@@ -1,10 +1,9 @@
 <script lang="ts">
-    import type { CardsResponse, SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { type CardsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Kanban, TextInitial } from "lucide-svelte";
     import { getPriorityColor } from "./cards";
-    import { relativeTime } from "$lib/datetime";
     import RelativeTime from "../RelativeTime.svelte";
-
+    
     const {
         card,
         subprojects,

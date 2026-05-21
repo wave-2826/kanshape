@@ -152,7 +152,7 @@
     <CardViewPanel
         card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}
         onclose={() => openCardId = null}
-        {sections} {subprojects}
+        {sections} {subprojects} projectType={project.type}
     />
 
     {#if cards !== null && $cards !== null}

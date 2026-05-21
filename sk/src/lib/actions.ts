@@ -1,7 +1,9 @@
-export function autoSize(node: HTMLTextAreaElement) {
+export function autoSize(node: HTMLTextAreaElement, maxHeight: number = 300) {
     function resize() {
         node.style.height = "auto";
-        node.style.height = node.scrollHeight + "px";
+
+        const s = getComputedStyle(node);
+        node.style.height = Math.min(node.scrollHeight, maxHeight) + "px";
     }
 
     node.style.resize = "none";

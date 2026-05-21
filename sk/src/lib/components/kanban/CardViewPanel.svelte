@@ -10,10 +10,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import { deleteRecord, save } from "$lib/pocketbase";
-    import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { deepEqual, unproxy } from "$lib/util";
-    import { ChartColumnBig, Clock, Flag, Kanban, PencilLine, Trash } from "lucide-svelte";
-    import { fade, slide } from "svelte/transition";
+    import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash } from "lucide-svelte";
+    import { fade, fly } from "svelte/transition";
     import { getPriorityColor, priorities } from "./cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
 
@@ -21,11 +21,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         card = $bindable(),
         sections,
         subprojects,
+        projectType,
         onclose
     }: {
         card: CardsResponse | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
+        projectType: ProjectsTypeOptions,
         onclose: () => void
     } = $props();
 
@@ -110,7 +112,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             if(!deepEqual(prev, next)) {
                 prevValues.set(key, next);
                 dirtyMap.set(key, now);
-                console.log(`Field ${key} changed locally; marking dirty (prev: ${prev}, next: ${next})`);
                 anyChanged = true;
             }
         }
@@ -183,92 +184,113 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     <div class="backdrop" onclick={(e) => {
         if(e.target === e.currentTarget) onclose();
     }} transition:fade={{ duration: 200 }}>
-        <div class="panel" transition:slide={{ duration: 200, axis: "x" }}>
-            <section>
+        <div class="panel" transition:fly={{ duration: 200, x: 300, opacity: 0 }}>
+            <header>
                 <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
-                <textarea class="description" bind:value={localCard.description} placeholder="Card description..." use:autoSize></textarea>
-            </section>
-            
-            <section class="options">
-                <div class="option">
-                    <label for="section"><ChartColumnBig />Section</label>
-                    <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
-                        {#each sections as section}
-                            <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
-                        {/each}
-                    </select>
-                </div>
-    
-                <div class="option">
-                    <label for="priority"><Flag />Priority</label>
-                    <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
-                        {#each Object.entries(priorities) as [key, v]}
-                            <option value={key} style="color: {v.color}">{v.label}</option>
-                        {/each}
-                    </select>
-                </div>
+            </header>
 
-                {#if subprojects.length > 0}
-                    <div class="option">
-                        <label for="subproject"><Kanban />Subproject</label>
-                        <select id="subproject" name="subproject" bind:value={localCard.subproject}>
-                            <option value="">None</option>
-                            {#each subprojects as subproject}
-                                <option value={subproject.id}>{subproject.name}</option>
-                            {/each}
-                        </select>
+            <div class="card-content">
+                <div class="field-group">
+                    <!-- Screenreader only -->
+                    <label for="description" aria-hidden="false" style="display: none;">Description</label>
+                    <textarea id="description" class="description" bind:value={localCard.description} placeholder="Add a more detailed description..." use:autoSize></textarea>
+                </div>
+                
+                <h3><SquareKanban /> Task</h3>
+                <div class="properties">
+                    <div class="property">
+                        <span class="prop-label"><ChartColumnBig />Section</span>
+                        <div class="prop-value">
+                            <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
+                                {#each sections as section}
+                                    <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
+                                {/each}
+                            </select>
+                        </div>
                     </div>
-                {/if}
-            </section>
+        
+                    <div class="property">
+                        <span class="prop-label"><Flag />Priority</span>
+                        <div class="prop-value">
+                            <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
+                                {#each Object.entries(priorities) as [key, v]}
+                                    <option value={key} style="color: {v.color}">{v.label}</option>
+                                {/each}
+                            </select>
+                        </div>
+                    </div>
 
-            <div class="option">
-                <label for="due_date"><Clock />Due Date</label>
-                <div style="display: flex; gap: 0.5rem;">
-                    {@debug localCard}
-                    {#if localCard.due_by}
-                        <input id="due_date" type="datetime-local" bind:value={
-                            () => localCard ? zonedToLocal(localCard.due_by) : "",
-                            (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
-                        } />
-                        <button onclick={() => localCard && (localCard.due_by = "")}>Clear due date</button>
-                    {:else}
-                        <button onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
+                    {#if subprojects.length > 0}
+                        <div class="property">
+                            <span class="prop-label"><Kanban />Subproject</span>
+                            <div class="prop-value">
+                                <select id="subproject" name="subproject" bind:value={localCard.subproject}>
+                                    <option value="">None</option>
+                                    {#each subprojects as subproject}
+                                        <option value={subproject.id}>{subproject.name}</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        </div>
                     {/if}
+
+                    <div class="property due-date">
+                        <span class="prop-label">
+                            <Clock />
+                            Due date
+                            {#if localCard.due_by}
+                                <button class="clear" onclick={() => localCard && (localCard.due_by = "")} title="Clear due date">
+                                    <Trash />
+                                </button>
+                            {/if}
+                        </span>
+                        <div class="prop-value">
+                            {#if localCard.due_by}
+                                <input id="due_date" type="datetime-local" bind:value={
+                                    () => localCard ? zonedToLocal(localCard.due_by) : "",
+                                    (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
+                                } />
+                                <div class="timetip">
+                                    {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))}
+                                </div>
+                            {:else}
+                                <button class="add" onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
+                            {/if}
+                        </div>
+                    </div>
                 </div>
-                {#if localCard.due_by}
-                    <span class="timetip">
-                        ({new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))})
-                    </span>
+
+                {#if projectType === "manufacturing"}
+                    <h3><Factory /> Manufacturing</h3>
+                    <!-- TEMPORARY -->
+                    <div class="properties">
+                        <div class="property">
+                            <span class="prop-label"><Circle />Material</span>
+                            <div class="prop-value">
+                                <input type="text" placeholder="e.g. Aluminum" />
+                            </div>
+                        </div>
+                        <div class="property">
+                            <span class="prop-label"><Circle />Machine</span>
+                            <div class="prop-value">
+                                <input type="text" placeholder="e.g. Mill" />
+                            </div>
+                        </div>
+                    </div>
                 {/if}
             </div>
 
-            <section>
-                <span class="label">Information</span>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="item">Created by:</td>
-                            <td>{localCard.created_by}</td>
-                        </tr>
-                        <tr>
-                            <td class="item">Created at:</td>
-                            <td>{new Date(localCard.created).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td class="item">Updated at:</td>
-                            <td>{new Date(localCard.updated).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                            <td class="item">Moved sections at:</td>
-                            <td>{new Date(localCard.moved_at).toLocaleString()}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <hr />
 
-            <section class="buttons">
-                <button onclick={deleteCard} class="delete"><Trash />Delete</button>
-            </section>
+            <footer>
+                <div class="metadata">
+                    <span>Created by {localCard.created_by} on {new Date(localCard.created).toLocaleString()}</span>
+                    <span>Last updated {new Date(localCard.updated).toLocaleString()}</span>
+                    <span>Moved sections at {new Date(localCard.moved_at).toLocaleString()}</span>
+                </div>
+                
+                <button onclick={deleteCard} class="delete"><Trash /> Delete Card</button>
+            </footer>
         </div>
     </div>
 {/if}
@@ -286,97 +308,145 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     background-color: var(--bg-primary);
     border: 1px solid var(--border);
     border-right: none;
-    width: max(50%, 400px);
+    width: max(55%, 400px);
     right: 0;
     top: 0;
     bottom: 0;
     margin: 1rem 0 1rem 1rem;
     border-radius: 4px 0 0 4px;
-
-    padding: 1rem;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
 
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    padding: 1rem;
 }
 
-.title {
-    font-size: var(--font-large);
-    font-weight: 600;
-    margin: 0;
-    padding: 0.25rem 0.5rem;
-    --bg-color: transparent;
+header {
+    margin-bottom: 0.5rem;
+
+    .title {
+        font-size: var(--font-large);
+        font-weight: 600;
+        width: 100%;
+        margin: 0;
+        padding: 0.25rem 0.5rem;
+        --bg-color: transparent;
+    }
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .description {
-    font-size: var(--font-medium);
+    --bg-color: transparent;
     padding: 0.25rem 0.75rem;
     border-left: 1px solid var(--border);
-    --bg-color: transparent;
     border-radius: 0 4px 4px 0;
+    width: 100%;
 }
-label, .label {
-    font-weight: 500;
-    color: var(--text-secondary);
 
+h3 {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: var(--font-medium);
+    font-weight: 500;
 }
 
-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+.properties {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.5rem 1rem;
+    padding: 0 0.5rem;
 
-    &.buttons {
+    .property {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-top: 0.25rem;
+    }
+
+    .prop-label {
+        font-size: var(--font-small);
+        color: var(--text-secondary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        position: relative;
         gap: 0.5rem;
-        justify-content: flex-end;
-        flex-direction: row;
-        margin: 0.25rem 0;
-        font-size: var(--font-medium);
 
-        .delete {
-            color: var(--error);
+        button.clear {
+            --bg-color: transparent;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            position: absolute;
+            right: 0;
+        }
+    }
+    
+    .prop-value {
+        flex: 1;
+        
+        select, input {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
         }
     }
 }
 
-table {
+.due-date {
     font-size: var(--font-tiny);
-    border-collapse: collapse;
 
-    td {
-        color: var(--text-secondary);
-        padding: 0.25rem 0.5rem;
+    .prop-value {
+        padding-top: 0.25rem;
     }
-    .item {
-        color: var(--text-tertiary);
-        width: 150px;
+    input {
+        width: min-content;
     }
-}
-
-.options {
-    display: grid;
-    gap: 0.5rem 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-.option {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-
-    select, input {
-        // --bg-color: color-mix(in srgb, var(--bg-primary) 50%, var(--bg-secondary) 50%);
-        --bg-color: transparent;
-        padding: 0.25rem 0.5rem;
-    }
-
+    
     .timetip {
-        font-size: var(--font-small);
+        color: var(--text-tertiary);
+        padding-left: 0.5rem;
+        padding-top: 0.25rem;
+    }
+    
+    button.add {
+        --bg-color: transparent;
         color: var(--text-secondary);
-        margin-left: 0.5rem;
+        text-align: left;
+        width: 100%;
+    }
+}
+
+
+hr {
+    margin: 1rem 0;
+}
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-primary);
+    
+    .metadata {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: var(--font-tiny);
+        color: var(--text-tertiary);
+    }
+    button.delete {
+        color: var(--error);
+        --bg-color: transparent;
+        padding: 0.5rem 1rem;
     }
 }
 </style>

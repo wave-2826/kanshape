@@ -5,7 +5,7 @@
     import { moveCard, sortCards } from "./kanban";
     import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
     import NewCardModal from "./NewCardModal.svelte";
-    import CardViewPanel from "./CardViewPanel.svelte";
+    import CardViewPanel from "./cardView/CardViewPanel.svelte";
 
     const {
         project

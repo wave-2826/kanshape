@@ -16,7 +16,6 @@ services:
     volumes:
       - ${PWD}/pb:/app/pb
       - ${PWD}/sk:/app/sk
-      - ${HOME}/go/pkg:/go/pkg
   sk:
     image: node:22-alpine
     user: ${UID}:${GID}

@@ -12,10 +12,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { deepEqual, unproxy } from "$lib/util";
-    import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash } from "lucide-svelte";
+    import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { fade, fly } from "svelte/transition";
-    import { getPriorityColor, priorities } from "./cards";
+    import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
+    import CardAssignmentValue from "./CardAssignmentValue.svelte";
 
     let {
         card = $bindable(),
@@ -260,6 +261,19 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                             {/if}
                         </div>
                     </div>
+
+                    <div class="property assignment">
+                        <span class="prop-label">
+                            <Users />
+                            Assignment
+                            {#if localCard.assignment_data}
+                                <button class="clear" onclick={() => localCard && (localCard.assignment_data = null)} title="Clear assignment">
+                                    <Trash />
+                                </button>
+                            {/if}
+                        </span>
+                        <CardAssignmentValue bind:assignment_data={localCard.assignment_data as CardAssignmentData} />
+                    </div>
                 </div>
 
                 {#if projectType === "manufacturing"}
@@ -310,6 +324,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 {/if}
 
 <style lang="scss">
+@use "props.scss";
+
 .backdrop {
     position: absolute;
     inset: 0;
@@ -373,55 +389,9 @@ h3 {
     font-weight: 500;
 }
 
-.properties {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.5rem 1rem;
-    padding: 0 0.5rem;
-
-    .property {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        padding-top: 0.25rem;
-    }
-
-    .prop-label {
-        font-size: var(--font-small);
-        color: var(--text-secondary);
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        position: relative;
-        gap: 0.5rem;
-
-        button.clear {
-            --bg-color: transparent;
-            color: var(--text-secondary);
-            padding: 0.5rem;
-            width: 2rem;
-            height: 2rem;
-            position: absolute;
-            right: 0;
-        }
-    }
-    
-    .prop-value {
-        flex: 1;
-        
-        select, input {
-            width: 100%;
-            padding: 0.25rem 0.5rem;
-        }
-    }
-}
-
 .due-date {
     font-size: var(--font-tiny);
 
-    .prop-value {
-        padding-top: 0.25rem;
-    }
     input {
         width: min-content;
     }
@@ -431,15 +401,11 @@ h3 {
         padding-left: 0.5rem;
         padding-top: 0.25rem;
     }
-    
-    button.add {
-        --bg-color: transparent;
-        color: var(--text-secondary);
-        text-align: left;
-        width: 100%;
-    }
 }
 
+.assignment {
+    grid-column: span 2;
+}
 
 hr {
     margin: 1rem 0;

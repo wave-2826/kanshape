@@ -13,3 +13,16 @@ export const priorities: { [key in CardsPriorityOptions]: {
 export function getPriorityColor(priority: CardsPriorityOptions) {
     return priorities[priority]?.color ?? "inherit";
 }
+
+export type CardAssignmentData = {
+    type: "users",
+    ids: string[]
+} | {
+    type: "groups",
+    ids: string[]
+} | {
+    type: "anyone",
+    on_date: string
+} | {
+    type: "looking_for_assignment"
+} | null;

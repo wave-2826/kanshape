@@ -1,0 +1,54 @@
+.properties {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.5rem 1rem;
+    padding: 0 0.5rem;
+}
+
+.property {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: 1.25rem auto;
+    gap: 0.25rem;
+    padding-top: 0.25rem;
+}
+
+.prop-label {
+    grid-column: span 1;
+    grid-row: 1;
+
+    font-size: var(--font-small);
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 0.5rem;
+
+    button.clear {
+        --bg-color: transparent;
+        color: var(--text-secondary);
+        padding: 0.5rem;
+        width: 2rem;
+        height: 2rem;
+        position: absolute;
+        right: 0;
+    }
+}
+
+.prop-value {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    
+    select, input {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+button.add {
+    --bg-color: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-small);
+    text-align: left;
+    width: 100%;
+}

@@ -11,7 +11,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { autoSize } from "$lib/actions";
     import { deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { deepEqual, unproxy } from "$lib/util";
+    import { deepEqual } from "$lib/util";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { fade, fly } from "svelte/transition";
     import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
@@ -35,7 +35,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     const saveDebounce = 100;
 
     // Local editable copy so we don't clobber unsaved user edits when remote updates arrive
-    let localCard: CardsResponse | null = $state(null);
+    let localCard = $state<CardsResponse | null>(null);
+
     // field -> last local edit timestamp (ms)
     const dirtyMap = new Map<keyof CardsResponse, number>();
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -73,7 +74,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         } else if(localCard == null || card.id !== localCard.id) {
             // first time open
             withSuppressedDirty(() => {
-                localCard = structuredClone(unproxy(card));
+                localCard = structuredClone($state.snapshot(card));
             });
             dirtyMap.clear();
         } else {
@@ -93,16 +94,20 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     // Dirty tracking
     $effect(() => {
+        // This stringify actually does have side effects. It accesses all of
+        // the properties of localCard so the effect will re-run whenever any
+        // property, even deeply nested, changes.
+        JSON.stringify(localCard);
+
         if(!localCard) {
             prevValues.clear();
             prevCardId = null;
             return;
         }
 
-        const currentCardId = localCard.id;
-
         // If we're applying server changes or just opened/switched cards, treat current values as baseline
-        if(suppressDirty > 0 || prevCardId !== currentCardId) {
+        if(suppressDirty > 0 || prevCardId !== localCard.id) {
+            console.log("Early snapshot exit");
             snapshotValues();
             return;
         }
@@ -113,7 +118,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             const next = localCard[key];
             const prev = prevValues.get(key);
             if(!deepEqual(prev, next)) {
-                prevValues.set(key, next);
+                prevValues.set(key, $state.snapshot(next));
                 dirtyMap.set(key, now);
                 anyChanged = true;
             }
@@ -272,7 +277,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                                 </button>
                             {/if}
                         </span>
-                        <CardAssignmentValue bind:assignment_data={localCard.assignment_data as CardAssignmentData} />
+                        <CardAssignmentValue
+                            bind:assignmentData={localCard.assignment_data as CardAssignmentData}
+                            bind:userCache={localCard.user_assignment_cache}
+                            bind:groupCache={localCard.group_assignment_cache}
+                        />
                     </div>
                 </div>
 

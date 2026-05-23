@@ -11,7 +11,7 @@ import type {
 import { readable, type Readable, type Subscriber } from "svelte/store";
 import { browser } from "$app/environment";
 import { base } from "$app/paths";
-import { Collections, type BaseSystemFields, type CollectionRecords, type CollectionResponses, type IsoAutoDateString, type TypedPocketBase } from "./generated-types";
+import { Collections, type CollectionRecords, type CollectionResponses, type IsoAutoDateString, type TypedPocketBase } from "./generated-types";
 
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
@@ -21,26 +21,44 @@ export const client = new PocketBase(
  * Add a comma-separated expand list like `foo,bar` to the expand result of a returned query
  */
 export type ExpandResponse<T extends {
-	id: string
-	collectionId: string
+	id: string,
+	collectionId: string,
 	collectionName: Collections
-}, Expand extends string> = T & { expand: GetExpand<Expand> };
+}, Expand extends ExpandString> = T & { expand: GetExpand<Expand> };
 
 export type ExpandedRecord<K extends keyof CollectionRecords> = undefined | CollectionRecords[K] | CollectionRecords[K][];
 
-type GetExpand<Expand extends string> = Expand extends `${infer Key},${infer Rest}`
-    ? Key extends keyof CollectionRecords
-        ? { [K in Key]: ExpandedRecord<K> } & GetExpand<Rest>
-        : GetExpand<Rest>
-    : Expand extends keyof CollectionRecords
-        ? { [K in Expand]: ExpandedRecord<Expand> }
+// we can't properly (to my knowledge) represent this type, so we just do the first layer.
+type ExpandString = "" | `${string}:${keyof CollectionRecords}` | `${string}:${keyof CollectionRecords},${string}`;
+type GetExpand<Expand extends ExpandString> = Expand extends `${infer Key}:${infer Collection},${infer Rest}`
+    ? Collection extends keyof CollectionRecords
+        ? { [K in Key]: ExpandedRecord<Collection> } & GetExpand<Rest extends ExpandString ? Rest : never>
+        : {} & GetExpand<Rest extends ExpandString ? Rest : never>
+    : Expand extends `${infer Key}:${infer Collection}`
+        ? Collection extends keyof CollectionRecords
+            ? { [K in Key]: ExpandedRecord<Collection> }
+            : {}
         : {};
+
+/**
+ * The Pocketbase typegen doesn't store the record associations for expanded fields anywhere,
+ * so we add `:collection` suffixes to the expand keys and parse them here to get the correct
+ * types for expanded fields. For example, what in normal pocketbase would be `expand: "user_ids,group_ids"`
+ * becomes `expand: "user_ids:users,group_ids:groups"` (assuming `users` and `groups` are the
+ * correct collection names for those fields). This function simply removes the `:collection`
+ * suffixes so Pocketbase can interpret expand like normal.
+ */
+function stripExpandTypes<T extends RecordListOptions & { expand?: ExpandString }>(options: T): Omit<T, "expand"> & { expand?: string } {
+    if(!options.expand) return options;
+    const expand = options.expand.split(",").map((part) => part.split(":")[0]).join(",");
+    return { ...options, expand };
+}
 
 /**
  * The PocketBase SDK returns expanded records as either undefined, T, or T[], depending on the relation type and
  * whether there are any assigned. This function normalizes the result to always be an array of T.
  */
-export function cannonicalizeExpand<K extends keyof CollectionRecords>(expand: ExpandedRecord<K>): CollectionRecords[K][] {
+export function canonicalizeExpand<K extends keyof CollectionRecords>(expand: ExpandedRecord<K>): CollectionRecords[K][] {
     if(expand === undefined) return [];
     if(Array.isArray(expand)) return expand;
     return [expand];
@@ -163,22 +181,34 @@ function objectToFormData(obj: {}) {
     return fd;
 }
 
+export type PageItemType<T> = T extends Readable<ListResult<infer U>> ? U : never;
 export interface PageStore<T = any> extends Readable<ListResult<T>> {
     setPage(newpage: number): Promise<void>;
     next(): Promise<void>;
     prev(): Promise<void>;
 }
 
+/**
+ * Watch a single record.  
+ * 
+ * Note that `expand` in query params does NOT match the normal pocketbase expand.  
+ * It includes, for sole purposes of typing, the collection name. For example,
+ * instead of `expand: "user_ids"`, you would do `expand: "user_ids:users"`
+ * (assuming the collection name is `users`). This allows the return type to include
+ * the expanded fields with the correct types.
+ */
 export async function watchOne<
     C extends Collections | string,
-    Expand extends string = "",
+    Expand extends ExpandString = "",
     T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
 >(
     collectionName: C,
     recordId: string,
-    queryParams = {} as RecordListOptions & { expand?: Expand },
+    _queryParams = {} as RecordListOptions & { expand?: Expand },
     realtime = browser
 ): Promise<Readable<T>> {
+    const queryParams = stripExpandTypes(_queryParams);
+
     const collection = client.collection(collectionName);
     let result = await collection.getOne<T>(recordId, queryParams);
 
@@ -217,13 +247,24 @@ export async function watchOne<
     };
 }
 
+/**
+ * Watch a list of records with pagination.
+ * Returns a store with the list of records and pagination info, as well
+ * as helper methods for changing pages.  
+ * 
+ * Note that `expand` in query params does NOT match the normal pocketbase expand.  
+ * It includes, for sole purposes of typing, the collection name. For example,
+ * instead of `expand: "user_ids"`, you would do `expand: "user_ids:users"`
+ * (assuming the collection name is `users`). This allows the return type to include
+ * the expanded fields with the correct types.
+ */
 export async function watch<
     C extends Collections | string,
-    Expand extends string = "",
+    Expand extends ExpandString = "",
     T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
 >(
     collectionName: C,
-    queryParams = {} as RecordListOptions & { expand?: Expand },
+    _queryParams = {} as RecordListOptions & { expand?: Expand },
     page = 1,
     perPage = 20,
     {
@@ -232,6 +273,8 @@ export async function watch<
         waitForConnection = false
     } = {}
 ): Promise<PageStore<T>> {
+    const queryParams = stripExpandTypes(_queryParams);
+    
     const collection = client.collection(collectionName);
     let result = await collection.getList<T>(page, perPage, queryParams);
 
@@ -319,27 +362,48 @@ export async function watch<
     };
 }
 
+/**
+ * Query a list of records without subscribing to realtime updates.
+ * Returns a plain array of records instead of a store.  
+ * 
+ * Note that `expand` in query params does NOT match the normal pocketbase expand.  
+ * It includes, for sole purposes of typing, the collection name. For example,
+ * instead of `expand: "user_ids"`, you would do `expand: "user_ids:users"`
+ * (assuming the collection name is `users`). This allows the return type to include
+ * the expanded fields with the correct types.
+ */
 export async function query<
     C extends Collections | string,
-    Expand extends string = "",
+    Expand extends ExpandString = "",
     T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
 >(
     collectionName: C,
-    queryParams = {} as RecordFullListOptions & { expand?: Expand }
+    _queryParams = {} as RecordFullListOptions & { expand?: Expand }
 ): Promise<T[]> {
+    const queryParams = stripExpandTypes(_queryParams);
     const collection = client.collection(collectionName);
     return await collection.getFullList(queryParams);
 }
 
+/**
+ * Query a single record without subscribing to realtime updates.  
+ * 
+ * Note that `expand` in query params does NOT match the normal pocketbase expand.  
+ * It includes, for sole purposes of typing, the collection name. For example,
+ * instead of `expand: "user_ids"`, you would do `expand: "user_ids:users"`
+ * (assuming the collection name is `users`). This allows the return type to include
+ * the expanded fields with the correct types.
+ */
 export async function queryOne<
     C extends Collections | string,
-    Expand extends string = "",
+    Expand extends ExpandString = "",
     T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
 >(
     collectionName: C,
     recordId: string,
-    queryParams = {} as RecordListOptions & { expand?: Expand }
+    _queryParams = {} as RecordListOptions & { expand?: Expand }
 ): Promise<T> {
+    const queryParams = stripExpandTypes(_queryParams);
     const collection = client.collection(collectionName);
     return await collection.getOne(recordId, queryParams);
 }

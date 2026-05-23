@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { cannonicalizeExpand as cannonicalizeMultiExpand, type ExpandResponse } from "$lib/pocketbase";
+    import { canonicalizeExpand, type ExpandResponse } from "$lib/pocketbase";
     import type { ProjectsResponse } from "$lib/pocketbase/generated-types";
     import { grow } from "$lib/transitions";
     import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban } from "lucide-svelte";
@@ -11,7 +11,7 @@
     enum CollapsedState { Collapsed, Expanded, Auto };
     
     const { project }: {
-        project: ExpandResponse<ProjectsResponse, "subprojects">
+        project: ExpandResponse<ProjectsResponse, "subprojects:subprojects">
     } = $props();
 
     const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]" && page.params.id === project.id);
@@ -33,7 +33,7 @@
         if(treeSelected && untrack(() => collapsed !== CollapsedState.Expanded)) collapsed = CollapsedState.Auto;
     });
 
-    const subprojects = $derived(cannonicalizeMultiExpand(project.expand.subprojects));
+    const subprojects = $derived(canonicalizeExpand(project.expand.subprojects));
 </script>
 
 <div class="button project-button" class:selected={treeSelected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>

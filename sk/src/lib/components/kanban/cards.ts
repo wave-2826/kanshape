@@ -14,15 +14,18 @@ export function getPriorityColor(priority: CardsPriorityOptions) {
     return priorities[priority]?.color ?? "inherit";
 }
 
+export type AnyoneOnAssignmentData = {
+    type: "anyone_on";
+    // UTC ISO date string
+    on_date: string;
+}
+
 export type CardAssignmentData = {
     type: "users",
     ids: string[]
 } | {
     type: "groups",
     ids: string[]
-} | {
-    type: "anyone",
-    on_date: string
-} | {
+} | AnyoneOnAssignmentData | {
     type: "looking_for_assignment"
 } | null;

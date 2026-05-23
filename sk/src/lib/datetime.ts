@@ -1,3 +1,5 @@
+// Honestly I'm regretting not using the temporal polyfill...
+
 /**
  * Convert a zoned date string (e.g., "2024-06-16T12:00:00Z") to a local date string (e.g., "2024-06-16T08:00").  
  * Intended for use with datetime-local inputs, which require a local date string.
@@ -62,6 +64,17 @@ export function relativeTime(date: Date): string {
         }
     }
     return '';
+}
+
+export function dateOnly(date: Date): string {
+    return date.toISOString().slice(0, 10);
+}
+export function localDateFromDateOnly(dateOnly: string): Date {
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+        // Best effort
+        return new Date(dateOnly);
+    }
+    return new Date(dateOnly + "T00:00:00");
 }
 
 /** Get a Date object representing tomorrow at 00:00 local time. */

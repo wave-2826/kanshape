@@ -115,6 +115,7 @@ export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	created_by?: RecordIdString
 	description?: string
 	due_by?: IsoDateString
+	group_assignment_cache?: RecordIdString[]
 	id: string
 	metadata?: null | Tmetadata
 	moved_at?: IsoDateString
@@ -125,7 +126,7 @@ export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	subproject?: RecordIdString
 	title?: string
 	updated: IsoAutoDateString
-	user_assignments?: RecordIdString[]
+	user_assignment_cache?: RecordIdString[]
 }
 
 export type ConfigRecord = {

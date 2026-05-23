@@ -1,18 +1,22 @@
 <script lang="ts">
     import { type CardsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Clock, Flag, Kanban, TextInitial } from "lucide-svelte";
-    import { getPriorityColor } from "./cards";
+    import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
+    import { getPriorityColor, type CardAssignmentData } from "./cards";
     import RelativeTime from "../RelativeTime.svelte";
+    import { localDateFromDateOnly } from "$lib/datetime";
+    import { canonicalizeExpand, type ExpandResponse } from "$lib/pocketbase";
     
     const {
         card,
         subprojects,
         onclick
     }: {
-        card: CardsResponse;
+        card: ExpandResponse<CardsResponse, "user_assignment_cache:users,group_assignment_cache:groups">;
         subprojects: SubprojectsRecord[];
         onclick: () => void;
     } = $props();
+
+    const assignment = $derived(card.assignment_data as CardAssignmentData);
 </script>
 
 <button class="unstyled card" {onclick} class:critical={card.priority === "critical"}>
@@ -31,15 +35,44 @@
     {/if}
 
     {#if card.description}
-        <span class="description"><TextInitial /><span>{card.description}</span></span>
+        <span class="description item"><TextInitial /><span>{card.description}</span></span>
     {/if}
 
     {#if card.due_by}
-        <span class="due" style="{new Date(card.due_by) < new Date() ? 'color: var(--error)' : ""}" title={`Due ${
+        <span class="due item" style="{new Date(card.due_by) < new Date() ? 'color: var(--error)' : ""}" title={`Due ${
             new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(card.due_by))
         }`}>
             <Clock />
             <span>Due <RelativeTime date={new Date(card.due_by)} /></span>
+        </span>
+    {/if}
+
+    {#if assignment}
+        <span class="assignment item">
+            <Users />
+            {#snippet itemList(itemName: string, items: { name?: string }[])}
+                {#if items.length === 0}
+                    Assigned to no {itemName}s
+                {:else if items.length === 1}
+                    Assigned to {items[0].name}
+                {:else if items.length === 2}
+                    Assigned to {items[0].name} and {items[1].name}
+                {:else}
+                    Assigned to {items[0].name} and {items.length - 1} others
+                {/if}
+            {/snippet}
+            {#if assignment.type === "users"}
+                {@render itemList("user", canonicalizeExpand(card.expand.user_assignment_cache))}
+            {:else if assignment.type === "groups"}
+                {@render itemList("group", canonicalizeExpand(card.expand.group_assignment_cache))}
+            {:else if assignment.type === "anyone_on"}
+                Assigned to anyone on {
+                    new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
+                        .format(localDateFromDateOnly(assignment.on_date))
+                }
+            {:else if assignment.type === "looking_for_assignment"}
+                Looking for assignment
+            {/if}
         </span>
     {/if}
 </button>
@@ -84,11 +117,7 @@
 }
 
 .description {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
     color: var(--text-secondary);
-    font-size: var(--font-tiny);
 
     span {
         overflow: hidden;
@@ -97,7 +126,8 @@
         flex: 1;
     }
 }
-.due {
+
+.item {
     display: flex;
     align-items: center;
     gap: 0.25rem;

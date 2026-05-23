@@ -14,7 +14,7 @@
     const id = $derived(page.params.id);
 
     const project = $derived(id ? await watchOne(Collections.Projects, id, {
-        expand: "subprojects,sections"
+        expand: "subprojects:subprojects,sections:sections"
     }).catch((err) => {
         console.error("Failed to load project:", err);
         return null;

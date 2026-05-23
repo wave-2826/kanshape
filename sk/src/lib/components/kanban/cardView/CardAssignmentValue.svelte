@@ -1,31 +1,76 @@
 <script lang="ts">
-    import type { CardAssignmentData } from "../cards";
+    import { dateOnly, tomorrowDate } from "$lib/datetime";
+    import { client } from "$lib/pocketbase";
+    import { untrack } from "svelte";
+    import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
 
     let {
-        assignment_data = $bindable()
+        assignmentData = $bindable(),
+        userCache = $bindable(),
+        groupCache = $bindable()
     }: {
-        assignment_data: CardAssignmentData;
+        assignmentData: CardAssignmentData;
+        userCache: string[];
+        groupCache: string[];
     } = $props();
+
+    $effect(() => {
+        if(assignmentData?.type === "users") {
+            const ids = assignmentData.ids;
+            untrack(() => userCache = ids);
+        } else {
+            untrack(() => userCache = []);
+        }
+        
+        if(assignmentData?.type === "groups") {
+            const ids = assignmentData.ids;
+            untrack(() => groupCache = ids);
+        } else {
+            untrack(() => groupCache = []);
+        }
+    });
 </script>
 
 <!-- TODO: Card only saves once when changing this -->
 
 <div class="prop-value">
-    {#if assignment_data}
+    {#if assignmentData}
         <div class="assignment">
-            <select bind:value={assignment_data.type}>
+            <select bind:value={
+                () => assignmentData!.type, 
+                (value) => {
+                    if(value === "users" || value === "groups") {
+                        assignmentData = { type: value, ids: [] };
+                    } else if(value === "anyone_on") {
+                        assignmentData = { type: "anyone_on", on_date: dateOnly(tomorrowDate()) };
+                    } else if(value === "looking_for_assignment") {
+                        assignmentData = { type: "looking_for_assignment" };
+                    }
+                }
+            }>
                 <option value="users">Users</option>
                 <option value="groups">Groups</option>
-                <option value="anyone">Anyone on...</option>
+                <option value="anyone_on">Anyone on...</option>
                 <option value="looking_for_assignment">Looking for Assignment</option>
             </select>
 
-            {#if assignment_data.type === "users"}
-                todo: user selector
+            {#if assignmentData.type === "users"}
+                <!-- TODO: user selector -->
+            {:else if assignmentData.type === "groups"}
+                <!-- TODO: group selector -->
+            {:else if assignmentData.type === "anyone_on"}
+                <input type="date" bind:value={
+                    () => (assignmentData! as AnyoneOnAssignmentData).on_date.slice(0, 10), 
+                    (value) => assignmentData = { type: "anyone_on", on_date: dateOnly(new Date(value)) }
+                } />
+            {:else if assignmentData.type === "looking_for_assignment"}
+                <button onclick={() => {
+                    if(client.authStore.record) assignmentData = { type: "users", ids: [client.authStore.record?.id] };
+                }}>Assign yourself</button>
             {/if}
         </div>
     {:else}
-        <button class="add" onclick={() => assignment_data = { type: "users", ids: [] }}>+ Assign</button>
+        <button class="add" onclick={() => assignmentData = { type: "users", ids: [] }}>+ Assign</button>
     {/if}
 </div>
 
@@ -37,5 +82,13 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    gap: 0.5rem;
+
+    select {
+        flex: 1;
+    }
+    input {
+        flex: 1;
+    }
 }
 </style>

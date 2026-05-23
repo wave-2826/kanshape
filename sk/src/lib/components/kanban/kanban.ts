@@ -1,7 +1,7 @@
 import { save } from "$lib/pocketbase";
 import { Collections, type CardsResponse } from "$lib/pocketbase/generated-types";
 
-export function sortCards(list: CardsResponse[]) {
+export function sortCards<CardType extends CardsResponse>(list: CardType[]): CardType[] {
     return [...list].sort((left, right) => {
         const positionDelta = (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER);
         if(positionDelta !== 0) return positionDelta;
@@ -33,11 +33,11 @@ export function nextCardPosition(boardCards: CardsResponse[], sectionId: string)
     return (positions.length > 0 ? Math.max(...positions) : 0) + 1000;
 }
 
-export async function moveCard(
-    boardCards: CardsResponse[],
+export async function moveCard<CardType extends CardsResponse>(
+    boardCards: CardType[],
     cardId: string, sectionId: string,
     beforeCardId: string | "last" | "first" | null = "first"
-): Promise<CardsResponse[]> {
+): Promise<CardType[]> {
     const card = boardCards.find((entry) => entry.id === cardId);
     if(!card) return boardCards;
 
@@ -68,6 +68,10 @@ export async function moveCard(
     // Early local update
     card.section = sectionId;
     card.position = targetPosition;
-    boardCards = sortCards([...boardCards.filter((entry) => entry.id !== savedCard.id), savedCard]);
+    boardCards = sortCards([
+        ...boardCards.filter((entry) => entry.id !== savedCard.id),
+        // I'm sure this won't come back to bite me...
+        savedCard as CardType
+    ]);
     return boardCards;
 }

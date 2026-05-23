@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Collections, type CardsResponse, type ProjectsResponse } from "$lib/pocketbase/generated-types";
-    import { cannonicalizeExpand as canonicalizeExpand, watch, type ExpandResponse } from "$lib/pocketbase";
+    import { canonicalizeExpand, watch, type ExpandResponse, type PageItemType } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards } from "./kanban";
     import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
@@ -10,12 +10,13 @@
     const {
         project
     }: {
-        project: ExpandResponse<ProjectsResponse, "subprojects,sections">
+        project: ExpandResponse<ProjectsResponse, "subprojects:subprojects,sections:sections">
     } = $props();
 
     const cards = $derived(await watch(Collections.Cards, {
         filter: `project = "${project.id}"`,
-        sort: "position,created"
+        sort: "position,created",
+        expand: "user_assignment_cache:users,group_assignment_cache:groups",
     }, 1, 500, {
         waitForConnection: true
     }).catch((err) => {
@@ -34,7 +35,7 @@
     });
     const subprojects = $derived(canonicalizeExpand(project.expand.subprojects));
 
-    let boardCards = $state<CardsResponse[]>([]);
+    let boardCards = $state<PageItemType<typeof cards>[]>([]);
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
     let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);

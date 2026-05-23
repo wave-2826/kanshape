@@ -16,6 +16,7 @@ export const Collections = {
 	Files: "files",
 	Groups: "groups",
 	Leaderboard: "leaderboard",
+	OnshapeDocuments: "onshape_documents",
 	Projects: "projects",
 	Sections: "sections",
 	Subprojects: "subprojects",
@@ -157,6 +158,14 @@ export type LeaderboardRecord = {
 	user?: RecordIdString
 }
 
+export type OnshapeDocumentsRecord = {
+	created: IsoAutoDateString
+	id: string
+	project: RecordIdString
+	subprojects?: RecordIdString
+	updated: IsoAutoDateString
+}
+
 export const ProjectsTypeOptions = {
 	"blank": "blank",
 	"manufacturing": "manufacturing",
@@ -225,6 +234,7 @@ export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSys
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
+export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tcustom_card_fields = unknown, Texpand = unknown> = Required<ProjectsRecord<Tcustom_card_fields>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Texpand = unknown> = Required<SubprojectsRecord> & BaseSystemFields<Texpand>
@@ -243,6 +253,7 @@ export type CollectionRecords = {
 	files: FilesRecord
 	groups: GroupsRecord
 	leaderboard: LeaderboardRecord
+	onshape_documents: OnshapeDocumentsRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
 	subprojects: SubprojectsRecord
@@ -260,6 +271,7 @@ export type CollectionResponses = {
 	files: FilesResponse
 	groups: GroupsResponse
 	leaderboard: LeaderboardResponse
+	onshape_documents: OnshapeDocumentsResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse
 	subprojects: SubprojectsResponse

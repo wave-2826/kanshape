@@ -28,7 +28,7 @@
     });
 
     let navOpen = $state(true)
-    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/(onshape)") ?? false);
+    const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
     let showNav = $derived(!onOnshape && (navOpen || page.url.pathname === "/"));
 </script>
 

@@ -1,17 +1,23 @@
 <script lang="ts">
-    import { type CardsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "./cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { localDateFromDateOnly } from "$lib/datetime";
-    import { canonicalizeExpand, type ExpandResponse } from "$lib/pocketbase";
+    import { type ExpandResponse } from "$lib/pocketbase";
     
+    // TODO: Remove this silly assignment cache thing and manually
+    // query for the expanded user/group data when needed. This requires one
+    // more API call but saves a TON of redundant data. We wouldn't want to
+    // make a separate call per card, though, so we need to load everything and
+    // deduplicate first. 
+
     const {
         card,
         subprojects,
         onclick
     }: {
-        card: ExpandResponse<CardsResponse, "user_assignment_cache:users,group_assignment_cache:groups">;
+        card: ExpandResponse<"cards", "user_assignment_cache,group_assignment_cache">;
         subprojects: SubprojectsRecord[];
         onclick: () => void;
     } = $props();
@@ -54,17 +60,17 @@
                 {#if items.length === 0}
                     Assigned to no {itemName}s
                 {:else if items.length === 1}
-                    Assigned to {items[0].name}
+                    Assigned to <span class="item-name">{items[0].name}</span>
                 {:else if items.length === 2}
-                    Assigned to {items[0].name} and {items[1].name}
+                    Assigned to <span class="item-name">{items[0].name}</span> and <span class="item-name">{items[1].name}</span>
                 {:else}
-                    Assigned to {items[0].name} and {items.length - 1} others
+                    Assigned to <span class="item-name">{items[0].name}</span> and {items.length - 1} others
                 {/if}
             {/snippet}
             {#if assignment.type === "users"}
-                {@render itemList("user", canonicalizeExpand(card.expand.user_assignment_cache))}
+                {@render itemList("user", card.expand.user_assignment_cache ?? [])}
             {:else if assignment.type === "groups"}
-                {@render itemList("group", canonicalizeExpand(card.expand.group_assignment_cache))}
+                {@render itemList("group", card.expand.group_assignment_cache ?? [])}
             {:else if assignment.type === "anyone_on"}
                 Assigned to anyone on {
                     new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
@@ -116,6 +122,18 @@
     gap: 0.25rem;
 }
 
+.item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-primary);
+    font-size: var(--font-tiny);
+
+    .item-name {
+        color: var(--accent);
+    }
+}
+
 .description {
     color: var(--text-secondary);
 
@@ -125,13 +143,5 @@
         white-space: nowrap;
         flex: 1;
     }
-}
-
-.item {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--text-primary);
-    font-size: var(--font-tiny);
 }
 </style>

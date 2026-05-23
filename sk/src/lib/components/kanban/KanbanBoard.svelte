@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Collections, type CardsResponse, type ProjectsResponse } from "$lib/pocketbase/generated-types";
-    import { canonicalizeExpand, watch, type ExpandResponse, type PageItemType } from "$lib/pocketbase";
+    import { watch, type ExpandResponse, type PageItemType } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards } from "./kanban";
     import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
@@ -10,13 +10,13 @@
     const {
         project
     }: {
-        project: ExpandResponse<ProjectsResponse, "subprojects:subprojects,sections:sections">
+        project: ExpandResponse<"projects", "subprojects,sections">
     } = $props();
 
     const cards = $derived(await watch(Collections.Cards, {
         filter: `project = "${project.id}"`,
         sort: "position,created",
-        expand: "user_assignment_cache:users,group_assignment_cache:groups",
+        expand: "user_assignment_cache,group_assignment_cache",
     }, 1, 500, {
         waitForConnection: true
     }).catch((err) => {
@@ -25,7 +25,7 @@
     }));
 
     const sections = $derived.by(() => {
-        const expandedSections = canonicalizeExpand(project.expand.sections);
+        const expandedSections = project.expand.sections ?? [];
         const sectionsById = new Map(expandedSections.map((section) => [section.id, section]));
         const orderedSectionIds = project.sections ?? expandedSections.map((section) => section.id);
 
@@ -33,7 +33,7 @@
             .map((sectionId) => sectionsById.get(sectionId))
             .filter((section) => section !== undefined);
     });
-    const subprojects = $derived(canonicalizeExpand(project.expand.subprojects));
+    const subprojects = $derived(project.expand.subprojects ?? []);
 
     let boardCards = $state<PageItemType<typeof cards>[]>([]);
     let draggedCardId = $state<string | null>(null);

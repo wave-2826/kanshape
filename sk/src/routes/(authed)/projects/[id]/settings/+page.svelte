@@ -2,7 +2,7 @@
     import { page } from "$app/state";
     import { untrack } from "svelte";
     import ProjectDetails from "../../ProjectDetails.svelte";
-    import { canonicalizeExpand, deleteRecord, queryOne, save, watchOne } from "$lib/pocketbase";
+    import { deleteRecord, queryOne, save, watchOne } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
     import { ArrowLeft, Save } from "lucide-svelte";
@@ -15,14 +15,14 @@
     
     const id = $derived(page.params.id);
     let project = $derived(id ? await untrack(() => queryOne(Collections.Projects, id, {
-        expand: "subprojects:subprojects,sections:sections"
+        expand: "subprojects,sections"
     }).catch((err) => {
         console.error("Failed to load project:", err);
         return null;
     })) : null);
 
-    let originalSubprojects: SubprojectsRecord[] = $derived(project ? canonicalizeExpand(project.expand.subprojects) : []);
-    let originalSections: SectionsRecord[] = $derived(project ? canonicalizeExpand(project.expand.sections) : []);
+    let originalSubprojects: SubprojectsRecord[] = $derived(project?.expand.subprojects ?? []);
+    let originalSections: SectionsRecord[] = $derived(project?.expand.sections ?? []);
 
     let name: string = $state("");
     let description: string = $state("");
@@ -50,8 +50,8 @@
             color = project.color;
             partIdPrefix = project.part_id_prefix;
             type = project.type;
-            subprojects = canonicalizeExpand(project.expand.subprojects);
-            sections = canonicalizeExpand(project.expand.sections);
+            subprojects = project.expand.subprojects ?? [];
+            sections = project.expand.sections ?? [];
         }
     });
 
@@ -114,7 +114,7 @@
 
         // Reload the project to get the updated data
         project = await queryOne(Collections.Projects, project.id, {
-            expand: "subprojects:subprojects,sections:subprojects"
+            expand: "subprojects,sections"
         }).catch((err) => {
             console.error("Failed to reload project:", err);
             return null;

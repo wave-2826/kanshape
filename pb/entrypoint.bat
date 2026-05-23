@@ -8,7 +8,7 @@ REM And then proceeds to execute the main "command" for this container.
 cd /d "%~dp0"
 
 REM Set default values if environment variables are not defined
-if not defined PB_VERSION set "PB_VERSION=0.27.2"
+if not defined PB_VERSION set "PB_VERSION=0.38.2"
 if not defined PB_ARCH set "PB_ARCH=windows_amd64"
 
 REM Get command arguments

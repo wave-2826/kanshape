@@ -6,7 +6,7 @@ set -e # exit on any non-zero status (error)
 # And then proceeds to execute the main "command" for this container.
 DIR=$(dirname $0)
 cd $DIR
-PB_VERSION=${PB_VERSION:-"0.27.2"}
+PB_VERSION=${PB_VERSION:-"0.38.2"}
 PB_ARCH=${PB_ARCH:-"linux_amd64"}
 CMD=$@
 

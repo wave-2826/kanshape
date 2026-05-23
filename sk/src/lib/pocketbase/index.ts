@@ -137,8 +137,9 @@ export type CreateRecord<T extends { id: string }> = PartialByTypes<PartialBy<T,
  */
 export async function save<
     C extends Collections | string,
-    Response extends C extends Collections ? CollectionResponses[C] : RecordModel,
-    Create extends boolean = false
+    Create extends boolean = false,
+    Expand extends string = "",
+    Response = C extends Collections ? ExpandResponse<C, Expand> : RecordModel
 >(
     collectionName: C,
     record: Create extends true ?
@@ -148,7 +149,9 @@ export async function save<
         (Partial<C extends Collections ? CollectionRecords[C] : RecordModel>),
     options?: {
         create?: Create,
-        fetch?: typeof window.fetch
+        fetch?: typeof window.fetch,
+        /** Fields to expand on the response */
+        expand?: Expand
     }
 ): Promise<Response> {
     // convert obj to FormData in case one of the fields is instanceof FileList
@@ -158,12 +161,12 @@ export async function save<
         return await client.collection(collectionName).update<Response>(
             record.id,
             data,
-            { fetch: options?.fetch }
+            { fetch: options?.fetch, expand: options?.expand }
         );
     } else {
         return await client.collection(collectionName).create<Response>(
             data,
-            { fetch: options?.fetch }
+            { fetch: options?.fetch, expand: options?.expand }
         );
     }
 }

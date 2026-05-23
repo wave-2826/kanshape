@@ -1,4 +1,4 @@
-import { save } from "$lib/pocketbase";
+import { save, type ExpandResponse } from "$lib/pocketbase";
 import { Collections, type CardsResponse } from "$lib/pocketbase/generated-types";
 
 export function sortCards<CardType extends CardsResponse>(list: CardType[]): CardType[] {
@@ -33,10 +33,11 @@ export function nextCardPosition(boardCards: CardsResponse[], sectionId: string)
     return (positions.length > 0 ? Math.max(...positions) : 0) + 1000;
 }
 
-export async function moveCard<CardType extends CardsResponse>(
+export async function moveCard<Expand extends string = "", CardType extends CardsResponse = ExpandResponse<"cards", Expand>>(
     boardCards: CardType[],
     cardId: string, sectionId: string,
-    beforeCardId: string | "last" | "first" | null = "first"
+    beforeCardId: string | "last" | "first" | null = "first",
+    expand: Expand
 ): Promise<CardType[]> {
     const card = boardCards.find((entry) => entry.id === cardId);
     if(!card) return boardCards;
@@ -58,7 +59,7 @@ export async function moveCard<CardType extends CardsResponse>(
         section: sectionId,
         position: targetPosition,
         moved_at: changedSections ? new Date().toISOString() : undefined
-    }, { create: false }).catch((err) => {
+    }, { create: false, expand }).catch((err) => {
         console.error("Failed to move card:", err);
         return null;
     });
@@ -70,8 +71,7 @@ export async function moveCard<CardType extends CardsResponse>(
     card.position = targetPosition;
     boardCards = sortCards([
         ...boardCards.filter((entry) => entry.id !== savedCard.id),
-        // I'm sure this won't come back to bite me...
-        savedCard as CardType
-    ]);
+        savedCard
+    ]) as CardType[];
     return boardCards;
 }

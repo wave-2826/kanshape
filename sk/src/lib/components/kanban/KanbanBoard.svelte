@@ -13,10 +13,11 @@
         project: ExpandResponse<"projects", "subprojects,sections">
     } = $props();
 
+    const cardExpand = "user_assignment_cache,group_assignment_cache" as const;
     const cards = $derived(await watch(Collections.Cards, {
         filter: `project = "${project.id}"`,
         sort: "position,created",
-        expand: "user_assignment_cache,group_assignment_cache",
+        expand: cardExpand,
     }, 1, 500, {
         waitForConnection: true
     }).catch((err) => {
@@ -124,7 +125,7 @@
         if(!cardId) return;
 
         const beforeCardId = dropZone?.cardId ?? "first";
-        boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId);
+        boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId, cardExpand);
     }
 </script>
 

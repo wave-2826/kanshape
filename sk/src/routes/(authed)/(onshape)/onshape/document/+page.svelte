@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { getConfig } from "$lib/config";
     import { SquareKanban, Kanban } from "lucide-svelte";
     import { metadata } from "$lib/metadata";
     import { page } from "$app/state";
     import { queryOne, query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-
 
     $effect(() => {
         $metadata.title = "Onshape Tab";
@@ -14,14 +12,10 @@
     const documentId = page.url.searchParams.get("documentId");
 
     const record = await queryOne(Collections.OnshapeDocuments, documentId || "").catch(() => null);
-
-
-    const redirectUrl = record?.subprojects ? "/projects/" + record?.project + "/subprojects/" + record?.subprojects + "?onshape=true" : "/projects/" + record?.project + "?onshape=true";
-
-    console.log("Redirecting to project: " + redirectUrl);
-
     if(record?.project) {
-        window.location.href = redirectUrl;
+        window.location.href = record?.subprojects ?
+            `/projects/${record?.project}/subprojects/${record?.subprojects}?onshape=true` :
+            `/projects/${record?.project}?onshape=true`;
     }
 
     const projects = await query(Collections.Projects, {expand: "subprojects"});
@@ -43,6 +37,41 @@
     }
 </script>
 
+{#if record?.project}
+    <p>Redirecting to project...</p>
+{/if}
+{#if !record?.project && projects}
+    <div class="container">
+        <div class="center">
+            <h2>Select a project or subproject to link to this document:</h2>
+            <dl>
+                {#each projects as project}
+                    <dt>
+                        <button
+                            style="color: {project.color}"
+                            onclick={() => linkDocumentToProject(project.id)}
+                        >
+                            <SquareKanban /> Link to {project.title}
+                        </button>
+                    </dt>
+                    {#if project.subprojects}
+                        {#each project.expand.subprojects as subproject}
+                            <dd>
+                                <button
+                                    onclick={() => linkDocumentToProject(project.id, subproject.id)}
+                                >
+                                    <Kanban /> Link to {subproject.name}
+                                </button>
+                            </dd>
+                        {/each}
+                    {/if}
+                {/each}
+            </dl>
+        </div>
+    </div>
+{/if}
+
+
 <style lang="scss">
     dl {
         display: flex;
@@ -57,45 +86,17 @@
     h2 {
         margin-left: 0;
     }
-    .center {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 1em;
-    }
-    .vert-center {
+
+    .container {
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100%;
     }
+    .center {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1em;
+    }
 </style>
-
-
-
-{#if record?.project}
-    <p>Redirecting to project...</p>
-{/if}
-{#if !record?.project}
-    {#if projects}
-    <div class="vert-center">
-    <div class="center">
-    <div>
-        <h2>Select a project or subproject to link to this document:</h2>
-        <list>
-        <dl>
-        {#each projects as project}
-            <dt><button style="color: {project.color}" onclick={async () => await linkDocumentToProject(project.id)}><SquareKanban /> Link to {project.title}</button></dt>
-            {#if project.subprojects}
-                    {#each project.expand.subprojects as subproject}
-                            <dd><button onclick={async () => await linkDocumentToProject(project.id, subproject.id)}><Kanban /> Link to {subproject.name}</button></dd>
-                    {/each}
-            {/if}
-        {/each}
-        </dl>
-        </list>
-        </div>
-        </div>
-        </div>
-    {/if}
-{/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getConfig } from "$lib/config";
+    import { SquareKanban, Kanban } from "lucide-svelte";
     import { metadata } from "$lib/metadata";
     import { page } from "$app/state";
     import { queryOne, query, save } from "$lib/pocketbase";
@@ -42,21 +43,59 @@
     }
 </script>
 
+<style lang="scss">
+    dl {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.5em;
+    }
+    dt {
+        font-weight: bold;
+    }
+    h2 {
+        margin-left: 0;
+    }
+    .center {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1em;
+    }
+    .vert-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+</style>
+
+
+
 {#if record?.project}
     <p>Redirecting to project...</p>
 {/if}
 {#if !record?.project}
     {#if projects}
+    <div class="vert-center">
+    <div class="center">
+    <div>
+        <h2>Select a project or subproject to link to this document:</h2>
+        <list>
+        <dl>
         {#each projects as project}
-            <button onclick={async () => await linkDocumentToProject(project.id)}>Link to {project.title}</button>
-            <p>Subprojects:</p>
+            <dt><button style="color: {project.color}" onclick={async () => await linkDocumentToProject(project.id)}><SquareKanban /> Link to {project.title}</button></dt>
             {#if project.subprojects}
-                {#each projects as project}
                     {#each project.expand.subprojects as subproject}
-                        <button onclick={async () => await linkDocumentToProject(project.id, subproject.id)}>Link to {subproject.name}</button>
+                            <dd><button onclick={async () => await linkDocumentToProject(project.id, subproject.id)}><Kanban /> Link to {subproject.name}</button></dd>
                     {/each}
-                {/each}
             {/if}
         {/each}
+        </dl>
+        </list>
+        </div>
+        </div>
+        </div>
     {/if}
 {/if}

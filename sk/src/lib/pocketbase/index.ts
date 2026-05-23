@@ -319,10 +319,14 @@ export async function watch<
     };
 }
 
-export async function query<C extends Collections | string>(
+export async function query<
+    C extends Collections | string,
+    Expand extends string = "",
+    T extends { id: string } = C extends Collections ? ExpandResponse<CollectionResponses[C], Expand> : RecordModel
+>(
     collectionName: C,
-    queryParams = {} as RecordFullListOptions
-): Promise<(C extends Collections ? CollectionRecords[C] : any)[]> {
+    queryParams = {} as RecordFullListOptions & { expand?: Expand }
+): Promise<T[]> {
     const collection = client.collection(collectionName);
     return await collection.getFullList(queryParams);
 }

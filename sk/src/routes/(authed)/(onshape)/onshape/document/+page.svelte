@@ -2,7 +2,7 @@
     import { getConfig } from "$lib/config";
     import { metadata } from "$lib/metadata";
     import { page } from "$app/state";
-    import { queryOne, query, cannonicalizeExpand } from "$lib/pocketbase";
+    import { queryOne, query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
 
 
@@ -24,6 +24,22 @@
     }
 
     const projects = await query(Collections.Projects, {expand: "subprojects"});
+
+    async function linkDocumentToProject(projectId: string, subprojectId?: string) {
+        if(!documentId) return;
+
+        await save(Collections.OnshapeDocuments, {
+            id: documentId,
+            project: projectId,
+            subprojects: subprojectId || "",
+        }, {
+            create: true
+        }).catch((e) => {
+            console.error("Failed to save Onshape document record:", e);
+        });
+
+        window.location.reload();
+    }
 </script>
 
 {#if record?.project}
@@ -32,13 +48,12 @@
 {#if !record?.project}
     {#if projects}
         {#each projects as project}
-            <p>Project: {project.title} (ID: {project.id})</p>
+            <button onclick={async () => await linkDocumentToProject(project.id)}>Link to {project.title}</button>
             <p>Subprojects:</p>
             {#if project.subprojects}
                 {#each projects as project}
                     {#each project.expand.subprojects as subproject}
-                        <p> - {subproject.name} (ID: {subproject.id})</p>
-                    
+                        <button onclick={async () => await linkDocumentToProject(project.id, subproject.id)}>Link to {subproject.name}</button>
                     {/each}
                 {/each}
             {/if}

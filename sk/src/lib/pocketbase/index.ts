@@ -353,6 +353,7 @@ export async function watch<
             const unsubStore = store.subscribe(run, invalidate);
             return async () => {
                 unsubStore();
+                console.log("Unsubscribing realtime from collection", collectionName);
                 // ISSUE: Technically, we should AWAIT here, but that will slow down navigation UX.
                 if(unsubRealtime) /* await */ unsubRealtime();
             };

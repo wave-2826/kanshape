@@ -17,6 +17,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
+    import ModalPanel from "$lib/components/ModalPanel.svelte";
 
     let {
         card = $bindable(),
@@ -178,187 +179,149 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     }
 </script>
 
-<svelte:document onkeydown={(e) => {
-    if(e.key === "Escape" && localCard !== null) {
-        onclose();
-        e.preventDefault();
-        e.stopImmediatePropagation();
-    }
-}} />
 
-{#if localCard !== null}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="backdrop" onclick={(e) => {
-        if(e.target === e.currentTarget) onclose();
-    }} transition:fade={{ duration: 200 }}>
-        <div class="panel" transition:fly={{ duration: 200, x: 300, opacity: 0 }}>
-            <header>
-                <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
-            </header>
+<ModalPanel open={localCard !== null} {onclose}>
+{#if localCard} <!-- just for typing to recognize localCard !== null -->
+    <header>
+        <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
+    </header>
 
-            <div class="card-content">
-                <div class="field-group">
-                    <!-- Screenreader only -->
-                    <label for="description" aria-hidden="false" style="display: none;">Description</label>
-                    <textarea id="description" class="description" bind:value={localCard.description} placeholder="Add a more detailed description..." use:autoSize></textarea>
-                </div>
-                
-                <h3><SquareKanban /> Task</h3>
-                <div class="properties">
-                    <div class="property">
-                        <span class="prop-label"><ChartColumnBig />Section</span>
-                        <div class="prop-value">
-                            <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
-                                {#each sections as section}
-                                    <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
-                                {/each}
-                            </select>
-                        </div>
-                    </div>
+    <div class="card-content">
+        <div class="field-group">
+            <!-- Screenreader only -->
+            <label for="description" aria-hidden="false" style="display: none;">Description</label>
+            <textarea id="description" class="description" bind:value={localCard.description} placeholder="Add a more detailed description..." use:autoSize></textarea>
+        </div>
         
-                    <div class="property">
-                        <span class="prop-label"><Flag />Priority</span>
-                        <div class="prop-value">
-                            <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
-                                {#each Object.entries(priorities) as [key, v]}
-                                    <option value={key} style="color: {v.color}">{v.label}</option>
-                                {/each}
-                            </select>
-                        </div>
-                    </div>
-
-                    {#if subprojects.length > 0}
-                        <div class="property">
-                            <span class="prop-label"><Kanban />Subproject</span>
-                            <div class="prop-value">
-                                <select id="subproject" name="subproject" bind:value={localCard.subproject}>
-                                    <option value="">None</option>
-                                    {#each subprojects as subproject}
-                                        <option value={subproject.id}>{subproject.name}</option>
-                                    {/each}
-                                </select>
-                            </div>
-                        </div>
-                    {/if}
-
-                    <div class="property due-date">
-                        <span class="prop-label">
-                            <Clock />
-                            Due date
-                            {#if localCard.due_by}
-                                <button class="clear" onclick={() => localCard && (localCard.due_by = "")} title="Clear due date">
-                                    <Trash />
-                                </button>
-                            {/if}
-                        </span>
-                        <div class="prop-value">
-                            {#if localCard.due_by}
-                                <input id="due_date" type="datetime-local" bind:value={
-                                    () => localCard ? zonedToLocal(localCard.due_by) : "",
-                                    (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
-                                } />
-                                <div class="timetip">
-                                    {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))}
-                                </div>
-                            {:else}
-                                <button class="add" onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
-                            {/if}
-                        </div>
-                    </div>
-
-                    <div class="property assignment">
-                        <span class="prop-label">
-                            <Users />
-                            Assignment
-                            {#if localCard.assignment_data}
-                                <button class="clear" onclick={() => localCard && (localCard.assignment_data = null)} title="Clear assignment">
-                                    <Trash />
-                                </button>
-                            {/if}
-                        </span>
-                        <CardAssignmentValue
-                            bind:assignmentData={localCard.assignment_data as CardAssignmentData}
-                            bind:userCache={localCard.user_assignment_cache}
-                            bind:groupCache={localCard.group_assignment_cache}
-                        />
-                    </div>
+        <h3><SquareKanban /> Task</h3>
+        <div class="properties">
+            <div class="property">
+                <span class="prop-label"><ChartColumnBig />Section</span>
+                <div class="prop-value">
+                    <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
+                        {#each sections as section}
+                            <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
+                        {/each}
+                    </select>
                 </div>
-
-                {#if projectType === "manufacturing"}
-                    <h3><Factory /> Manufacturing</h3>
-                    <!-- TEMPORARY -->
-                    <div class="properties">
-                        <div class="property">
-                            <span class="prop-label"><Circle />Material</span>
-                            <div class="prop-value">
-                                <input type="text" placeholder="e.g. Aluminum" />
-                            </div>
-                        </div>
-                        <div class="property">
-                            <span class="prop-label"><Circle />Machine</span>
-                            <div class="prop-value">
-                                <input type="text" placeholder="e.g. Mill" />
-                            </div>
-                        </div>
-                    </div>
-                {/if}
             </div>
 
-            <hr />
-
-            <footer>
-                <div class="metadata">
-                    <span>
-                        Created by
-                        {#if creationUser === null}
-                            Unknown User
-                        {:else}
-                            {#await creationUser}
-                                Loading user...
-                            {:then user}
-                                {user?.name ?? "Unknown User"}
-                            {/await}
-                        {/if}
-                        on {new Date(localCard.created).toLocaleString()}
-                    </span>
-                    <span>Last updated {new Date(localCard.updated).toLocaleString()}</span>
-                    <span>Moved sections at {new Date(localCard.moved_at).toLocaleString()}</span>
+            <div class="property">
+                <span class="prop-label"><Flag />Priority</span>
+                <div class="prop-value">
+                    <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
+                        {#each Object.entries(priorities) as [key, v]}
+                            <option value={key} style="color: {v.color}">{v.label}</option>
+                        {/each}
+                    </select>
                 </div>
-                
-                <button onclick={deleteCard} class="delete"><Trash /> Delete Card</button>
-            </footer>
+            </div>
+
+            {#if subprojects.length > 0}
+                <div class="property">
+                    <span class="prop-label"><Kanban />Subproject</span>
+                    <div class="prop-value">
+                        <select id="subproject" name="subproject" bind:value={localCard.subproject}>
+                            <option value="">None</option>
+                            {#each subprojects as subproject}
+                                <option value={subproject.id}>{subproject.name}</option>
+                            {/each}
+                        </select>
+                    </div>
+                </div>
+            {/if}
+
+            <div class="property due-date">
+                <span class="prop-label">
+                    <Clock />
+                    Due date
+                    {#if localCard.due_by}
+                        <button class="clear" onclick={() => localCard && (localCard.due_by = "")} title="Clear due date">
+                            <Trash />
+                        </button>
+                    {/if}
+                </span>
+                <div class="prop-value">
+                    {#if localCard.due_by}
+                        <input id="due_date" type="datetime-local" bind:value={
+                            () => localCard ? zonedToLocal(localCard.due_by) : "",
+                            (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
+                        } />
+                        <div class="timetip">
+                            {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))}
+                        </div>
+                    {:else}
+                        <button class="add" onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="property assignment">
+                <span class="prop-label">
+                    <Users />
+                    Assignment
+                    {#if localCard.assignment_data}
+                        <button class="clear" onclick={() => localCard && (localCard.assignment_data = null)} title="Clear assignment">
+                            <Trash />
+                        </button>
+                    {/if}
+                </span>
+                <CardAssignmentValue
+                    bind:assignmentData={localCard.assignment_data as CardAssignmentData}
+                    bind:userCache={localCard.user_assignment_cache}
+                    bind:groupCache={localCard.group_assignment_cache}
+                />
+            </div>
         </div>
+
+        {#if projectType === "manufacturing"}
+            <h3><Factory /> Manufacturing</h3>
+            <!-- TEMPORARY -->
+            <div class="properties">
+                <div class="property">
+                    <span class="prop-label"><Circle />Material</span>
+                    <div class="prop-value">
+                        <input type="text" placeholder="e.g. Aluminum" />
+                    </div>
+                </div>
+                <div class="property">
+                    <span class="prop-label"><Circle />Machine</span>
+                    <div class="prop-value">
+                        <input type="text" placeholder="e.g. Mill" />
+                    </div>
+                </div>
+            </div>
+        {/if}
     </div>
+
+    <hr />
+
+    <footer>
+        <div class="metadata">
+            <span>
+                Created by
+                {#if creationUser === null}
+                    Unknown User
+                {:else}
+                    {#await creationUser}
+                        Loading user...
+                    {:then user}
+                        {user?.name ?? "Unknown User"}
+                    {/await}
+                {/if}
+                on {new Date(localCard.created).toLocaleString()}
+            </span>
+            <span>Last updated {new Date(localCard.updated).toLocaleString()}</span>
+            <span>Moved sections at {new Date(localCard.moved_at).toLocaleString()}</span>
+        </div>
+        
+        <button onclick={deleteCard} class="delete"><Trash /> Delete Card</button>
+    </footer>
 {/if}
+</ModalPanel>
 
 <style lang="scss">
 @use "props.scss";
-
-.backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(0.5px);
-    z-index: 100;
-}
-.panel {
-    position: absolute;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-right: none;
-    width: max(55%, 400px);
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: 1rem 0 1rem 1rem;
-    border-radius: 4px 0 0 4px;
-    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
-
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-}
 
 header {
     margin-bottom: 0.5rem;

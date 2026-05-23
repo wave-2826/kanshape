@@ -5,44 +5,55 @@
     import UsersView from "./UsersView.svelte";
 
     const groups = watch(Collections.Groups, {}, 0, 100);
-    const users = watch(Collections.Users, {}, 0, 100);
+    const users = watch(Collections.Users, {
+        expand: "groups"
+    }, 0, 100);
 </script>
 
-<div class="page">
-    <section style="flex: 1;">
-        <h2>Groups</h2>
-        <div class="content">
-            {#await groups}
-                <p>Loading groups...</p>
-            {:then groups}
-                <GroupsView {groups} />
-            {/await}
-        </div>
-    </section>
-    <section style="flex: 2;">
-        <h2>Users</h2>
-        <div class="content">
-            {#await users}
-                <p>Loading users...</p>
-            {:then users}
-                <UsersView {users} />
-            {/await}
-        </div>
-    </section>
+<div class="page-container">
+    <div class="page">
+        <section>
+            <h2>Groups</h2>
+            <div class="content">
+                {#await groups}
+                    <p>Loading groups...</p>
+                {:then groups}
+                    <GroupsView {groups} />
+                {/await}
+            </div>
+        </section>
+        <section>
+            <h2>Users</h2>
+            <div class="content">
+                {#await users}
+                    <p>Loading users...</p>
+                {:then users}
+                    <UsersView {users} />
+                {/await}
+            </div>
+        </section>
+    </div>
 </div>
 
 <style lang="scss">
+.page-container {
+    container: page / inline-size;
+    height: 100%;
+}
 .page {
+    height: 100%;
     padding: 1rem;
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
     gap: 1rem;
 
-    container: page / inline-size;
+    position: relative;
 }
-@container page (width < 800px) {
+
+@container page (max-width: 50rem) {
     .page {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
     }
 }
 
@@ -50,14 +61,16 @@ section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-height: 0;
 
     .content {
         display: flex;
         flex-direction: column;
+        min-height: 0;
         
         background: var(--bg-primary);
         border-radius: 4px;
-        padding: 0.5rem 0.75rem;
+        padding: 0.5rem;
 
         gap: 0.5rem;
     }

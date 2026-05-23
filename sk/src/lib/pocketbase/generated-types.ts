@@ -143,6 +143,7 @@ export type FilesRecord = {
 
 export type GroupsRecord = {
 	created: IsoAutoDateString
+	description?: string
 	id: string
 	name?: string
 	updated: IsoAutoDateString

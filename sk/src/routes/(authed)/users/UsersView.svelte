@@ -7,6 +7,13 @@
     const { users }: {
         users: PageStore<UsersResponse>
     } = $props();
+
+    const fakeUserData = new Array(35).fill(0).map((_, i) => ({
+        username: `user${i + 1}`,
+        name: `User ${i + 1}`,
+        groups: Math.random() > 0.5 ? [`Group ${Math.floor(Math.random() * 3) + 1}`] : undefined,
+        is_admin: Math.random() > 0.8
+    }));
 </script>
 
 {#if $users.items.length === 0}
@@ -15,24 +22,33 @@
     <table>
         <thead>
             <tr>
+                <th>Username</th>
                 <th>Name</th>
-                <th>Email</th>
                 <th>Groups</th>
                 <th>Admin</th>
             </tr>
         </thead>
         <tbody>
-            {#each $users.items as user}
+            <!-- {#each $users.items as user} -->
+            {#each fakeUserData as user}
                 <tr>
-                    <td>{user.name}</td>
-                    <td>{user.emailVisibility ? user.email : "Email hidden"}</td>
-                    <td>{user.groups?.join(", ") || "No groups"}</td>
-                    <td>{user.is_admin ? "Yes" : "No"}</td>
+                    <td class="button-row">
+                        <button>
+                            <span>{user.username}</span>
+                            <span>{user.name}</span>
+                            <span class:empty={user.groups?.length === 0}>
+                                {user.groups?.join(", ") || "No groups"}
+                            </span>
+                            <span class="admin" class:active={user.is_admin}>
+                                {user.is_admin ? "Yes" : "No"}
+                            </span>
+                        </button>
+                    </td>
                     <td class="actions">
                         <button onclick={() => alert("Not implemented yet")} title="Edit user">
                             <Pencil />
                         </button>
-                        <button onclick={() => alert("Not implemented yet")} title="Delete user">
+                        <button class="delete" onclick={() => alert("Not implemented yet")} title="Delete user">
                             <Trash />
                         </button>
                     </td>
@@ -45,25 +61,19 @@
 <Paginator store={users} />
 
 <style lang="scss">
+@use "./users.scss";
+
 table {
-    overflow-y: auto;
+    grid-template-columns: repeat(3, 1fr) 4rem min-content;
 }
-th {
-    text-align: left;
-}
-p {
-    padding: 1rem;
-    text-align: center;
+
+.empty {
     color: var(--text-secondary);
 }
-
-.actions {
-    display: flex;
-    gap: 0.25rem;
-
-    button {
-        --bg-color: transparent;
-        padding: 0.25rem;
+.admin {
+    color: var(--text-secondary);
+    &.active {
+        color: var(--accent);
     }
 }
 </style>

@@ -8,6 +8,7 @@
     import { ExternalLink, LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/NavContent.svelte";
     import { setConfig } from "$lib/config";
+    import NavProfile from "$lib/components/NavProfile.svelte";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -59,6 +60,7 @@
             <h1>{config.site?.name}</h1>
         </a>
         <div style="flex-grow: 1;"></div>
+        <NavProfile />
         <button onclick={() => {
             client.authStore.clear();
             goto("/login");

@@ -48,7 +48,7 @@ export async function providerLogin(
         provider: provider.name,
         scopes: ["openid", "email", "profile", "groups"],
         createData: {
-            emailVisibility: true,
+            emailVisibility: false
         },
     });
 

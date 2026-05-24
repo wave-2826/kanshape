@@ -5,6 +5,7 @@
     import { Pencil, Trash } from "lucide-svelte";
     import UsersEditView from "./UsersEditView.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const { users }: {
         users: PageStore<ExpandResponse<"users", "groups">>
@@ -43,7 +44,7 @@
                 <tr ondblclick={() => showingUser = user.id}>
                     <td class="button-row">
                         <button onclick={() => showingUser = user.id}>
-                            <span>{user.username}</span>
+                            <span class:active={user.id === $authModel?.id}>{user.username}</span>
                             <span>{user.name}</span>
                             <span class:empty={user.groups?.length === 0}>
                                 {#if !user.expand.groups || user.expand.groups?.length === 0}
@@ -85,6 +86,10 @@ span {
     min-width: 0;
     text-overflow: ellipsis;
     overflow: hidden;
+    
+    &.active {
+        color: var(--accent);
+    }
 }
 
 .empty {
@@ -92,8 +97,5 @@ span {
 }
 .admin {
     color: var(--text-secondary);
-    &.active {
-        color: var(--accent);
-    }
 }
 </style>

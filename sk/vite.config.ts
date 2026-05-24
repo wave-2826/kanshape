@@ -1,5 +1,6 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import type { UserConfig } from "vite";
+// @ts-ignore
 import fs from "fs";
 
 // detect if we're running inside docker and set the backend accordingly

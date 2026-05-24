@@ -1,19 +1,11 @@
 <script lang="ts">
-    import type { PageStore } from "$lib/pocketbase";
-    import type { UsersResponse } from "$lib/pocketbase/generated-types";
+    import type { ExpandResponse, PageStore } from "$lib/pocketbase";
     import Paginator from "$lib/pocketbase/Paginator.svelte";
     import { Pencil, Trash } from "lucide-svelte";
 
     const { users }: {
-        users: PageStore<UsersResponse>
+        users: PageStore<ExpandResponse<"users", "groups">>
     } = $props();
-
-    const fakeUserData = new Array(35).fill(0).map((_, i) => ({
-        username: `user${i + 1}`,
-        name: `User ${i + 1}`,
-        groups: Math.random() > 0.5 ? [`Group ${Math.floor(Math.random() * 3) + 1}`] : undefined,
-        is_admin: Math.random() > 0.8
-    }));
 </script>
 
 {#if $users.items.length === 0}
@@ -29,15 +21,14 @@
             </tr>
         </thead>
         <tbody>
-            <!-- {#each $users.items as user} -->
-            {#each fakeUserData as user}
+            {#each $users.items as user}
                 <tr>
                     <td class="button-row">
                         <button>
                             <span>{user.username}</span>
                             <span>{user.name}</span>
                             <span class:empty={user.groups?.length === 0}>
-                                {user.groups?.join(", ") || "No groups"}
+                                {user.expand.groups?.map((g) => g.name).join(", ") || "No groups"}
                             </span>
                             <span class="admin" class:active={user.is_admin}>
                                 {user.is_admin ? "Yes" : "No"}
@@ -64,7 +55,7 @@
 @use "./users.scss";
 
 table {
-    grid-template-columns: repeat(3, 1fr) 4rem min-content;
+    grid-template-columns: 1fr 1.5fr 1fr 4rem min-content;
 }
 
 .empty {

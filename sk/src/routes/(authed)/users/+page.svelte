@@ -4,7 +4,9 @@
     import GroupsView from "./GroupsView.svelte";
     import UsersView from "./UsersView.svelte";
 
-    const groups = watch(Collections.Groups, {}, 0, 100);
+    const groups = watch(Collections.GroupOverview, {}, 0, 100, {
+        pollOnChange: [Collections.Groups, Collections.Users]
+    });
     const users = watch(Collections.Users, {
         expand: "groups"
     }, 0, 100);
@@ -44,13 +46,13 @@
     height: 100%;
     padding: 1rem;
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1.8fr;
     gap: 1rem;
 
     position: relative;
 }
 
-@container page (max-width: 50rem) {
+@container page (max-width: 58rem) {
     .page {
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 1fr;

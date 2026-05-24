@@ -14,6 +14,7 @@ export const Collections = {
 	Cards: "cards",
 	Config: "config",
 	Files: "files",
+	GroupOverview: "group_overview",
 	Groups: "groups",
 	Leaderboard: "leaderboard",
 	OnshapeDocuments: "onshape_documents",
@@ -141,6 +142,16 @@ export type FilesRecord = {
 	path: string
 }
 
+export type GroupOverviewRecord<Tcard_count = unknown, Tmember_count = unknown> = {
+	card_count?: null | Tcard_count
+	created: IsoAutoDateString
+	description?: string
+	id: string
+	member_count?: null | Tmember_count
+	name?: string
+	updated: IsoAutoDateString
+}
+
 export type GroupsRecord = {
 	created: IsoAutoDateString
 	description?: string
@@ -234,6 +245,7 @@ export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> &
 export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
+export type GroupOverviewResponse<Tcard_count = unknown, Tmember_count = unknown, Texpand = unknown> = Required<GroupOverviewRecord<Tcard_count, Tmember_count>> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
@@ -253,6 +265,7 @@ export type CollectionRecords = {
 	cards: CardsRecord
 	config: ConfigRecord
 	files: FilesRecord
+	group_overview: GroupOverviewRecord
 	groups: GroupsRecord
 	leaderboard: LeaderboardRecord
 	onshape_documents: OnshapeDocumentsRecord
@@ -271,6 +284,7 @@ export type CollectionResponses = {
 	cards: CardsResponse
 	config: ConfigResponse
 	files: FilesResponse
+	group_overview: GroupOverviewResponse
 	groups: GroupsResponse
 	leaderboard: LeaderboardResponse
 	onshape_documents: OnshapeDocumentsResponse

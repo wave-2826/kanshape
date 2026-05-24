@@ -1,8 +1,7 @@
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { createPartIDString } from "$lib/parts";
-    import type { CreateRecord } from "$lib/pocketbase";
-    import { ProjectsTypeOptions, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
 
     let {
         color = $bindable(),
@@ -18,8 +17,8 @@
         description: string;
         partIdPrefix: string;
         type: ProjectsTypeOptions;
-        sections: CreateRecord<SectionsRecord>[];
-        subprojects: CreateRecord<SubprojectsRecord>[];
+        sections: Create<"sections">[];
+        subprojects: Create<"subprojects">[];
     } = $props();
 
     const projectTypes: {

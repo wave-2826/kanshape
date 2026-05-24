@@ -13,7 +13,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { deepEqual } from "$lib/util";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
-    import { fade, fly } from "svelte/transition";
     import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -386,7 +385,6 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-primary);
     
     .metadata {
         display: flex;

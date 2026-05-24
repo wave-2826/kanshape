@@ -1,7 +1,7 @@
 <script lang="ts">
     import { metadata } from "$lib/metadata";
-    import { batch, save, saveBatch, type CreateRecord } from "$lib/pocketbase";
-    import { Collections, ProjectsTypeOptions, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { batch, save } from "$lib/pocketbase";
+    import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import ProjectDetails from "../ProjectDetails.svelte";
 
@@ -15,8 +15,8 @@
     let partIdPrefix = $state(new Date().getFullYear().toString());
     let type = $state<ProjectsTypeOptions>("blank");
     
-    let subprojects = $state<CreateRecord<SubprojectsRecord>[]>([]);
-    let sections = $state<CreateRecord<SectionsRecord>[]>([
+    let subprojects = $state<Create<"subprojects">[]>([]);
+    let sections = $state<Create<"sections">[]>([
         { title: "To Design", description: "Items that still need to be designed in CAD", color: undefined, is_completed: false },
         { title: "Being Designed", description: "Items currently being worked on in CAD", color: "#fdcb6e", is_completed: false },
         { title: "To Manufacture", description: "Items ready for manufacturing", color: "#00b894", is_completed: false },
@@ -26,14 +26,14 @@
     async function createProject() {
         const result = await batch(async (batch) => {
             for(const [i, section] of sections.entries()) {
-                saveBatch(Collections.Sections, {
+                save(Collections.Sections, {
                     ...section,
                     position: i * 10000 + Math.random() * 1000
-                }, batch);
+                }, { batch, create: true });
             }
             
             for(const subproject of subprojects) {
-                saveBatch(Collections.Subprojects, subproject, batch);
+                save(Collections.Subprojects, subproject, { batch, create: true });
             }
         });
 

@@ -1,28 +1,49 @@
 <script lang="ts">
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-    import { save, type PageStore } from "$lib/pocketbase";
-    import { Collections, type GroupsRecord, type GroupsResponse } from "$lib/pocketbase/generated-types";
+    import { deleteRecord, save, type PageStore } from "$lib/pocketbase";
+    import { Collections, type GroupOverviewRecord } from "$lib/pocketbase/generated-types";
     import Paginator from "$lib/pocketbase/Paginator.svelte";
     import { Pencil, Plus, Trash } from "lucide-svelte";
     import GroupEditView from "./GroupEditView.svelte";
 
     const { groups }: {
-        groups: PageStore<GroupsResponse>
+        groups: PageStore<GroupOverviewRecord>
     } = $props();
 
-    const fakeGroupsData = new Array(40).fill(0).map((_, i) => ({
-        id: `group${i + 1}`,
-        name: `Group ${i + 1}`,
-        description: `This is group ${i + 1}`
-    } as GroupsRecord));
-
     let showingGroup: string | null = $state(null);
+
+    async function deleteGroup(group: GroupOverviewRecord) {
+        // First, check if any users are assigned to this group
+        if(group.member_count as number > 0) {
+            if(!confirm(`There are ${group.member_count} users assigned to this group. Are you sure you want to delete it?`)) {
+                return;
+            }
+        }
+
+        // Check if there are any cards assigned to this group
+        if(group.card_count as number > 0) {
+            if(!confirm(`There are ${group.card_count} cards assigned to this group. Are you sure you want to delete it?`)) {
+                return;
+            }
+        }
+
+        // if(confirm(`Are you sure you want to delete the group "${group.name}"? This action cannot be undone.`)) {
+        //     groups.delete(group.id).catch(e => console.error("Failed to delete group:", e));
+        // }
+
+        try {
+            await deleteRecord(Collections.Groups, group.id);
+            if(showingGroup === group.id) showingGroup = null;
+        } catch(e) {
+            console.error("Failed to delete group:", e);
+        }
+    }
 </script>
 
 <ModalPanel open={showingGroup !== null} onclose={() => showingGroup = null}>
-    {@const group = fakeGroupsData.find(g => g.id === showingGroup)}
+    {@const group = $groups.items.find(g => g.id === showingGroup)}
     {#if group}
-        <GroupEditView {group} />
+        <GroupEditView {group} ondelete={() => deleteGroup(group)} />
     {/if}
 </ModalPanel>
 
@@ -33,25 +54,24 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Members</th>
+                <th class="stats-title">Users / cards</th>
             </tr>
         </thead>
         <tbody>
-            <!-- {#each $groups.items as group} -->
-            {#each fakeGroupsData as group}
+            {#each $groups.items as group}
                 {@const onclick = () => showingGroup = group.id}
                 <tr ondblclick={onclick}>
                     <td class="button-row">
                         <button {onclick}>
                             <span>{group.name}</span>
-                            <span>todo</span>
+                            <span class="stats">{group.member_count} / {group.card_count}</span>
                         </button>
                     </td>
                     <td class="actions">
                         <button {onclick} title="Edit group">
                             <Pencil />
                         </button>
-                        <button class="delete" onclick={() => alert("Not implemented yet")} title="Delete group">
+                        <button class="delete" onclick={() => deleteGroup(group)} title="Delete group">
                             <Trash />
                         </button>
                     </td>
@@ -72,23 +92,14 @@
 <style lang="scss">
 @use "./users.scss";
 
-table {
-    grid-template-columns: 1fr 1fr min-content;
+.stats {
+    font-size: var(--font-tiny);
+    color: var(--text-secondary);
 }
-
-.group {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    .group-name {
-        font-size: var(--font-large);
-        padding: 0.5rem 0.75rem;
-    }
-
-    h3 {
-        margin-top: 0.5rem;
-        font-size: var(--font-medium);
-    }
+.stats-title {
+    grid-column: span 2;
+}
+table {
+    grid-template-columns: 1fr 4rem min-content;
 }
 </style>

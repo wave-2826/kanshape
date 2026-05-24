@@ -11,7 +11,7 @@ import type {
 import { readable, type Readable, type Subscriber } from "svelte/store";
 import { browser } from "$app/environment";
 import { base } from "$app/paths";
-import { Collections, type CollectionRecords, type CollectionResponses, type IsoAutoDateString, type RecordIdString, type TypedPocketBase } from "./generated-types";
+import { Collections, type CollectionRecords, type CollectionResponses, type RecordIdString, type TypedPocketBase, type Update, type Create as CreateRecord } from "./generated-types";
 
 type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
 /**
@@ -37,6 +37,9 @@ const expandCollections = {
     onshape_documents: {
         project: "projects",
         subprojects: "subprojects"
+    },
+    users: {
+        groups: "groups"
     }
 } as const satisfies {
     [K in Collections]?: {
@@ -89,43 +92,15 @@ export async function batch(run: (batch: BatchService) => Promise<void>): Promis
 }
 
 /**
- * Save (create/update) a record (a plain object) in a batch. Automatically converts to
- * FormData if needed.
- * @param collectionName The name of the collection to save the record in.
- * @param record The record to save (create/update).
- * @param batch The batch to add the save operation to.
- * @param options Options for the save operation.
+ * For relation and multi-select (string) fields in pocketbase, we can use "+fieldname",
+ * "fieldname+", or "fieldname-" to prepend, append, or remove values from the array instead
+ * of replacing it. This type adds those variants as optional properties.
  */
-export async function saveBatch<C extends Collections | string>(
-    collectionName: C,
-    record: Partial<C extends Collections ? CollectionRecords[C] : RecordModel>,
-    batch: BatchService,
-    options?: {
-        create?: boolean,
-        fetch?: typeof window.fetch
-    }
-) {
-    // convert obj to FormData in case one of the fields is instanceof FileList
-    const data = objectToFormData(record);
-    if(!options?.create && record["id"]) {
-        // "create" flag overrides update
-        batch.collection(collectionName).update(record.id, data, { fetch: options?.fetch });
-    } else {
-        batch.collection(collectionName).create(data, { fetch: options?.fetch });
-    }
+type AddTagOperations<T extends { [key: string]: unknown }> = {
+    [K in keyof T as (K extends string ?
+        T[K] extends (RecordIdString[] | RecordIdString | undefined) ? K | `+${K}` | `${K}+` | `${K}-` : K
+    : never)]?: T[K]
 }
-
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-/** Make all properties K in T optional */
-type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-/** Make all fields of the given types K optional in T */
-type PartialByTypes<T, K> = Omit<T, {
-    [P in keyof T]: T[P] extends K ? P : never
-}[keyof T]> & Partial<Pick<T, {
-    [P in keyof T]: T[P] extends K ? P : never
-}[keyof T]>>;
-
-export type CreateRecord<T extends { id: string }> = PartialByTypes<PartialBy<T, "id">, IsoAutoDateString>;
 
 /**
  * Save (create/update) a record (a plain object). Automatically converts to
@@ -139,28 +114,43 @@ export async function save<
     C extends Collections | string,
     Create extends boolean = false,
     Expand extends string = "",
-    Response = C extends Collections ? ExpandResponse<C, Expand> : RecordModel
+    Batch extends BatchService | undefined = undefined,
+    Response = Batch extends BatchService ? null :
+        C extends Collections ? ExpandResponse<C, Expand> : RecordModel
 >(
     collectionName: C,
     record: Create extends true ?
-        // Make ID and auto dates optional when creating records, since they're not in the generated schema for some reason
-        (C extends Collections ? CreateRecord<CollectionRecords[C]> : RecordModel) :
-        // Make all fields optional when updating records. If id isn't included, a new record is created anyway.
-        (Partial<C extends Collections ? CollectionRecords[C] : RecordModel>),
+        (C extends Collections ? CreateRecord<C> : RecordModel) :
+        (C extends Collections ? AddTagOperations<Update<C>> : Partial<RecordModel>) & { id: string },
     options?: {
         create?: Create,
         fetch?: typeof window.fetch,
         /** Fields to expand on the response */
-        expand?: Expand
+        expand?: Expand,
+        batch?: Batch
     }
 ): Promise<Response> {
     // convert obj to FormData in case one of the fields is instanceof FileList
     const data = objectToFormData(record);
+    if(options?.batch) {
+        if(!options.create && record["id"]) {
+            options.batch.collection(collectionName).update(
+                record.id, data,
+                { fetch: options.fetch, expand: options.expand }
+            );
+        } else {
+            options.batch.collection(collectionName).create(
+                data,
+                { fetch: options.fetch, expand: options.expand }
+            );
+        }
+        return null as any;
+    }
+
     if(!options?.create && record["id"]) {
         // "create" flag overrides update
         return await client.collection(collectionName).update<Response>(
-            record.id,
-            data,
+            record.id, data,
             { fetch: options?.fetch, expand: options?.expand }
         );
     } else {
@@ -271,20 +261,33 @@ export async function watch<
     T extends { id: string } = C extends Collections ? ExpandResponse<C, Expand> : RecordModel
 >(
     collectionName: C,
-    queryParams = {} as RecordListOptions & { expand?: Expand },
+    queryParams: RecordListOptions & { expand?: Expand } = {},
     page = 1,
     perPage = 20,
     {
         realtime = browser,
         /** Workaround for pocketbase weirdness; TODO: try to make this work without this hack */
-        waitForConnection = false
+        waitForConnection = false,
+        /**
+         * A set of collections to also watch and re-poll the main list on change of. This is an
+         * unfortunate workaround for the fact that pocketbase doesn't (and kind of can't) trigger
+         * realtime events when a view table changes its results, especially in the case of arbitrary
+         * queries that reference other tables.  
+         * This has nearly zero overhead if the collection is already subscribed to, but will
+         * unnecessarily changed records otherwise.
+         */
+        pollOnChange = []
+    }: {
+        realtime?: boolean,
+        waitForConnection?: boolean,
+        pollOnChange?: Collections[]
     } = {}
 ): Promise<PageStore<T>> {
     const collection = client.collection(collectionName);
     let result = await collection.getList<T>(page, perPage, queryParams);
 
     let set: Subscriber<ListResult<T>>;
-    let unsubRealtime: UnsubscribeFunc | undefined;
+    let unsubRealtime: UnsubscribeFunc[] = [];
 
     // Wait for client.realtime.isConnected to be true. I don't really understand why this needs to happen, and it's
     // not documented, but watching _some_ collections before isConnected becomes true (which only happens once subscribing
@@ -300,44 +303,57 @@ export async function watch<
     const store = readable<ListResult<T>>(result, (_set) => {
         set = _set;
 
-        console.log(client.realtime.isConnected);
-        console.log("Subscribing realtime to collection", collectionName, "with params", queryParams);
+        console.info("Subscribing realtime to collection", collectionName, "with params", queryParams);
 
         // watch for changes (only if in the browser)
-        if(realtime) collection.subscribe<T>(
-            "*",
-            ({ action, record }) => {
-                // console.log("Realtime event:", action, record);
+        if(realtime) {
+            collection.subscribe<T>(
+                "*",
+                ({ action, record }) => {
+                    console.info("Realtime event:", action, record);
 
-                let items = result.items;
+                    let items = result.items;
 
-                // see https://github.com/pocketbase/pocketbase/discussions/505
-                switch(action) {
-                    // ISSUE: no subscribe event when a record is modified and no longer fits the "filter"
-                    // @see https://github.com/pocketbase/pocketbase/issues/4717
-                    case "update":
-                    case "create":
-                        // record = await expand(queryParams.expand, record);
-                        const index = result.items.findIndex( (r) => r.id === record.id);
-                        // replace existing if found, otherwise append
-                        if(index >= 0) {
-                            result.items[index] = record;
-                            items = result.items;
-                        } else {
-                            items = [...result.items, record];
-                        }
-                        break;
-                    case "delete":
-                        items = result.items.filter((item) => item.id !== record.id);
-                        break;
-                }
+                    // see https://github.com/pocketbase/pocketbase/discussions/505
+                    switch(action) {
+                        // ISSUE: no subscribe event when a record is modified and no longer fits the "filter"
+                        // @see https://github.com/pocketbase/pocketbase/issues/4717
+                        case "update":
+                        case "create":
+                            // record = await expand(queryParams.expand, record);
+                            const index = result.items.findIndex( (r) => r.id === record.id);
+                            // replace existing if found, otherwise append
+                            if(index >= 0) {
+                                result.items[index] = record;
+                                items = result.items;
+                            } else {
+                                items = [...result.items, record];
+                            }
+                            break;
+                        case "delete":
+                            items = result.items.filter((item) => item.id !== record.id);
+                            break;
+                    }
 
-                set((result = { ...result, items }));
-            },
-            queryParams
-        )
-        // remember for later
-        .then((unsub) => (unsubRealtime = unsub));
+                    set((result = { ...result, items }));
+                },
+                queryParams
+            ).then((unsub) => unsubRealtime.push(unsub)); // remember for later
+            
+            for(const coll of pollOnChange) {
+                client.collection(coll).subscribe(
+                    "*",
+                    () => {
+                        console.info("Change detected in collection", coll, "- refreshing list for", collectionName);
+                        setPage(result.page);
+                    },
+                    queryParams
+                ).then((unsub) => {
+                    // Add to unsubRealtime so that we can unsubscribe from all on cleanup
+                    unsubRealtime.push(unsub);
+                });
+            }
+        }
     });
 
     async function setPage(newpage: number) {
@@ -353,9 +369,11 @@ export async function watch<
             const unsubStore = store.subscribe(run, invalidate);
             return async () => {
                 unsubStore();
-                console.log("Unsubscribing realtime from collection", collectionName);
-                // ISSUE: Technically, we should AWAIT here, but that will slow down navigation UX.
-                if(unsubRealtime) /* await */ unsubRealtime();
+                console.info("Unsubscribing realtime from collection", collectionName);
+                if(unsubRealtime) {
+                    // Technically, we should await here, but that will slow down navigation UX.
+                    unsubRealtime.forEach((unsub) => /* await */ unsub());
+                }
             };
         },
         setPage,

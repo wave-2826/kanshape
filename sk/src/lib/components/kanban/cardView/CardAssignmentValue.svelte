@@ -4,16 +4,20 @@
     import { untrack } from "svelte";
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
     import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
-    import { Collections } from "$lib/pocketbase/generated-types";
+    import { Collections, type GroupsRecord, type UsersRecord } from "$lib/pocketbase/generated-types";
 
     let {
         assignmentData = $bindable(),
         userCache = $bindable(),
-        groupCache = $bindable()
+        groupCache = $bindable(),
+        usersExpanded,
+        groupsExpanded
     }: {
         assignmentData: CardAssignmentData;
         userCache: string[];
         groupCache: string[];
+        usersExpanded: UsersRecord[],
+        groupsExpanded: GroupsRecord[]
     } = $props();
 
     $effect(() => {
@@ -61,7 +65,7 @@
                 <InlineSelector
                     collection={Collections.Users}
                     searchField="name"
-                    values={userCache.map(id => ({ id, name: id }))}
+                    values={userCache.map(id => ({ id, name: usersExpanded.find(u => u.id === id)?.name ?? "Unknown User" }))}
                     onchange={(ids) => assignmentData = { type: "users", ids }}
                     itemName="users"
                 />
@@ -69,7 +73,7 @@
                 <InlineSelector
                     collection={Collections.Groups}
                     searchField="name"
-                    values={groupCache.map(id => ({ id, name: id }))}
+                    values={groupCache.map(id => ({ id, name: groupsExpanded.find(g => g.id === id)?.name ?? "Unknown Group" }))}
                     onchange={(ids) => assignmentData = { type: "groups", ids }}
                     itemName="groups"
                 />

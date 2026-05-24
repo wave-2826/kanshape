@@ -9,7 +9,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { deleteRecord, queryOne, save } from "$lib/pocketbase";
+    import { deleteRecord, queryOne, save, type ExpandResponse, stripExpand } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { deepEqual } from "$lib/util";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
@@ -18,6 +18,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
 
+    type CardType = ExpandResponse<"cards", "user_assignment_cache,group_assignment_cache">;
+
     let {
         card = $bindable(),
         sections,
@@ -25,7 +27,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         projectType,
         onclose
     }: {
-        card: CardsResponse | null,
+        card: CardType | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
         projectType: ProjectsTypeOptions,
@@ -35,7 +37,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     const saveDebounce = 100;
 
     // Local editable copy so we don't clobber unsaved user edits when remote updates arrive
-    let localCard = $state<CardsResponse | null>(null);
+    let localCard = $state<CardType | null>(null);
 
     // field -> last local edit timestamp (ms)
     const dirtyMap = new Map<keyof CardsResponse, number>();
@@ -87,7 +89,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(!localCard) return;
         prevCardId = localCard.id;
         prevValues.clear();
-        for(const key of Object.keys(localCard) as (keyof CardsResponse)[]) {
+        for(const key of Object.keys(localCard) as (keyof CardType)[]) {
             prevValues.set(key, localCard[key]);
         }
     }
@@ -114,7 +116,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
         const now = Date.now();
         let anyChanged = false;
-        for(const key of Object.keys(localCard) as (keyof CardsResponse)[]) {
+        for(const key of Object.keys(localCard) as (keyof CardType)[]) {
             const next = localCard[key];
             const prev = prevValues.get(key);
             if(!deepEqual(prev, next)) {
@@ -135,7 +137,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(!localCard) return;
 
         try {
-            await save(Collections.Cards, localCard, { create: false });
+            // Only set expand to avoid overwriting local changes (and save looping)
+            localCard.expand = (await save(Collections.Cards, stripExpand(localCard), {
+                create: false,
+                expand: "user_assignment_cache,group_assignment_cache"
+            })).expand;
         } finally {
             if(saveTimer) {
                 clearTimeout(saveTimer);
@@ -149,7 +155,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
      * after the given request timestamp. This allows us to keep the local unsaved edits while still updating any
      * fields that were changed remotely or locally before the last save.
      */
-    function mergeServerRecord(serverRec: CardsResponse) {
+    function mergeServerRecord(serverRec: CardType) {
         if(!localCard) {
             withSuppressedDirty(() => {
                 localCard = structuredClone(serverRec);
@@ -160,7 +166,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
         // For each field in serverRec, update local value unless user has a more recent local edit
         withSuppressedDirty(() => {
-            for(const key of Object.keys(serverRec) as (keyof CardsResponse)[]) {
+            for(const key of Object.keys(serverRec) as (keyof CardType)[]) {
                 const localDirtyTs = dirtyMap.get(key) ?? 0;
                 // If the user has edited this field locally after the last save, skip applying the server update for this field
                 if(localDirtyTs > 0) continue;
@@ -269,6 +275,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     bind:assignmentData={localCard.assignment_data as CardAssignmentData}
                     bind:userCache={localCard.user_assignment_cache}
                     bind:groupCache={localCard.group_assignment_cache}
+                    usersExpanded={localCard.expand.user_assignment_cache ?? []}
+                    groupsExpanded={localCard.expand.group_assignment_cache ?? []}
                 />
             </div>
         </div>

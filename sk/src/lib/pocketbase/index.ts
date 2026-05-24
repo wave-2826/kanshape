@@ -85,6 +85,11 @@ export type ExpandRecord<Collection extends Collections, Expand extends string> 
  */
 export type ExpandResponse<Collection extends Collections, Expand extends string> = CollectionResponses[Collection] & { expand: ExpandResult<Collection, Expand> };
 
+export function stripExpand<Record extends { expand?: any }>(record: Record): Omit<Record, "expand"> {
+    const { expand, ...rest } = record;
+    return rest;
+}
+
 export async function batch(run: (batch: BatchService) => Promise<void>): Promise<BatchRequestResult[]> {
     const batch = client.createBatch();
     await run(batch);

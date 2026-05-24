@@ -66,6 +66,23 @@ export function relativeTime(date: Date): string {
     return '';
 }
 
+/**
+ * Convert a date to a "close" date string for display (e.g., "Today", "Tomorrow", "on Friday", "on February 16").
+ * Dates show "today" or "tomorrow" if within 1 day, "on [weekday]" if within 1 week, and "on [month] [day]" otherwise.
+ */
+export function formatCloseDate(date: Date): string {
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    const dayDiff = Math.round(diff / (1000 * 60 * 60 * 24));
+
+    if(dayDiff === 0) return "Today";
+    if(dayDiff === 1) return "Tomorrow";
+    if(dayDiff > 1 && dayDiff < 7) {
+        return `on ${date.toLocaleDateString(undefined, { weekday: 'long' })}`;
+    }
+    return `on ${date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}`;
+}
+
 export function dateOnly(date: Date): string {
     return date.toISOString().slice(0, 10);
 }

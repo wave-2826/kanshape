@@ -3,7 +3,7 @@
     import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "./cards";
     import RelativeTime from "../RelativeTime.svelte";
-    import { localDateFromDateOnly } from "$lib/datetime";
+    import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
     import { type ExpandResponse } from "$lib/pocketbase";
     
     // TODO: Remove this silly assignment cache thing and manually
@@ -72,10 +72,7 @@
                 {:else if assignment.type === "groups"}
                     {@render itemList("group", card.expand.group_assignment_cache ?? [])}
                 {:else if assignment.type === "anyone_on"}
-                    Assigned to anyone on {
-                        new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
-                            .format(localDateFromDateOnly(assignment.on_date))
-                    }
+                    Assigned to anyone {formatCloseDate(localDateFromDateOnly(assignment.on_date))}
                 {:else if assignment.type === "looking_for_assignment"}
                     Looking for assignment
                 {/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import GroupsView from "./GroupsView.svelte";
-    import UsersView from "./UsersView.svelte";
+    import GroupsTable from "./GroupsTable.svelte";
+    import UsersTable from "./UsersTable.svelte";
 
     const groups = watch(Collections.GroupOverview, {}, 0, 100, {
         pollOnChange: [Collections.Groups, Collections.Users]
@@ -20,7 +20,7 @@
                 {#await groups}
                     <p>Loading groups...</p>
                 {:then groups}
-                    <GroupsView {groups} />
+                    <GroupsTable {groups} />
                 {/await}
             </div>
         </section>
@@ -30,7 +30,7 @@
                 {#await users}
                     <p>Loading users...</p>
                 {:then users}
-                    <UsersView {users} />
+                    <UsersTable {users} />
                 {/await}
             </div>
         </section>

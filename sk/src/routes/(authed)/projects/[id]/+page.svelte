@@ -19,6 +19,8 @@
         console.error("Failed to load project:", err);
         return null;
     }) : null);
+
+    const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
 </script>
 
 <div class="page">
@@ -31,10 +33,12 @@
 
             <header>
                 <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
+                {#if !onOnshape}
                 <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
                     <Settings />
                     Settings
                 </button>
+                {/if}
             </header>
             <KanbanBoard project={$project} />
         </svelte:boundary>

@@ -7,7 +7,7 @@
     import { debounce } from "$lib/util";
     import { X } from "lucide-svelte";
     import { fly } from "svelte/transition";
-    import type { CollectionRecords, Collections } from "./generated-types";
+    import type { CollectionRecords, Collections } from "../generated-types";
 
     const {
         values,
@@ -19,6 +19,16 @@
         values: { id: string, name: string }[],
         onchange: (ids: string[]) => void,
         collection: Collection,
+        /**
+         * If set, this acts as a back-relation selector and will automatically save changes to
+         * the given field on the records from the collection with the given record id. The field
+         * must be a relation to this collection.
+         * 
+         * For example, a use case for this would be selecting users for a group, where collection
+         * is users and saveToRelation is ["groups", groupId]. Do not use this in the case where
+         * a multi-relation exists on a separate record referencing the collection this selector
+         * is for. In that case, save to the record separately in onchange.
+         */
         saveToRelation?: [field: keyof CollectionRecords[Collection] & string, record_id: string],
         searchField: keyof CollectionRecords[Collection] & string
     } = $props();
@@ -99,7 +109,7 @@
     }
 </script>
 
-<div class="block-selector">
+<div class="selector block-selector">
     {#if values.length > 0}
         <div class="selected-values">
             {#each values as value}
@@ -124,7 +134,7 @@
         
         {#if isFocused && clientFilteredResults.length > 0}
             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-            <ul class="dropdown" transition:fly={{ y: -5, duration: 100 }} onmousedown={(e) => e.preventDefault()}>
+            <ul class="dropdown" transition:fly={{ y: -10, duration: 100 }} onmousedown={(e) => e.preventDefault()}>
                 {#each clientFilteredResults as result}
                     <li>
                         <button type="button" class="dropdown-item" onclick={() => add(result)}>
@@ -137,80 +147,8 @@
     </div>
 </div>
 
+<!-- svelte-ignore css_unused_selector - shared styles -->
 <style lang="scss">
-.block-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    position: relative;
-}
-
-.selected-values {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.15rem 0.5rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 9999px;
-    font-size: var(--font-small);
-}
-
-.remove-btn {
-    color: var(--text-tertiary);
-    margin-left: 0.25rem;
-    width: 1rem;
-    height: 1rem;
-    padding: 0.25rem;
-    font-weight: bold;
-    
-    &:hover, &:focus-visible {
-        color: var(--error);
-    }
-}
-
-.search-container {
-    position: relative;
-}
-
-.search-input {
-    width: 100%;
-}
-
-.dropdown {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-    overflow-y: auto;
-    margin-top: 0.25rem;
-    padding: 0.25rem;
-
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 10;
-
-    list-style: none;
-    max-height: 15rem;
-}
-
-.dropdown-item {
-    width: 100%;
-    text-align: left;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    --bg-color: transparent;
-}
+@use "./selectors.scss";
 </style>
 

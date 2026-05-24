@@ -34,10 +34,10 @@
             <header>
                 <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
                 {#if !onOnshape}
-                <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
-                    <Settings />
-                    Settings
-                </button>
+                    <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
+                        <Settings />
+                        Settings
+                    </button>
                 {/if}
             </header>
             <KanbanBoard project={$project} />

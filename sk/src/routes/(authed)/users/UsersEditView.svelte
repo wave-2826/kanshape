@@ -1,6 +1,6 @@
 <script lang="ts">
     import { queryOne, save } from "$lib/pocketbase";
-    import BlockSelector from "$lib/pocketbase/BlockSelector.svelte";
+    import BlockSelector from "$lib/pocketbase/selector/BlockSelector.svelte";
     import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
     import { Info, Trash } from "lucide-svelte";
 

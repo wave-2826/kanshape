@@ -3,6 +3,8 @@
     import { client } from "$lib/pocketbase";
     import { untrack } from "svelte";
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
+    import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
+    import { Collections } from "$lib/pocketbase/generated-types";
 
     let {
         assignmentData = $bindable(),
@@ -56,8 +58,21 @@
 
             {#if assignmentData.type === "users"}
                 <!-- TODO: user selector -->
+                <InlineSelector
+                    collection={Collections.Users}
+                    searchField="name"
+                    values={userCache.map(id => ({ id, name: id }))}
+                    onchange={(ids) => assignmentData = { type: "users", ids }}
+                    itemName="users"
+                />
             {:else if assignmentData.type === "groups"}
-                <!-- TODO: group selector -->
+                <InlineSelector
+                    collection={Collections.Groups}
+                    searchField="name"
+                    values={groupCache.map(id => ({ id, name: id }))}
+                    onchange={(ids) => assignmentData = { type: "groups", ids }}
+                    itemName="groups"
+                />
             {:else if assignmentData.type === "anyone_on"}
                 <input type="date" bind:value={
                     () => (assignmentData! as AnyoneOnAssignmentData).on_date.slice(0, 10), 

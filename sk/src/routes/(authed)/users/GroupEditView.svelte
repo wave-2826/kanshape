@@ -1,6 +1,6 @@
 <script lang="ts">
     import { query, save } from "$lib/pocketbase";
-    import BlockSelector from "$lib/pocketbase/BlockSelector.svelte";
+    import BlockSelector from "$lib/pocketbase/selector/BlockSelector.svelte";
     import { Collections, type GroupOverviewRecord, type UsersRecord } from "$lib/pocketbase/generated-types";
     import { debounce } from "$lib/util";
     import { Trash } from "lucide-svelte";

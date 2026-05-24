@@ -43,7 +43,7 @@ body {
 
 // Basic styles for form elements
 // The --bg-color variable can be used from component code to set background colors
-button, input, select, textarea, .button {
+button, input, select, textarea, .button, .input {
     font-family: inherit;
     font-size: inherit;
     color: inherit;
@@ -95,6 +95,7 @@ input {
 .lucide-icon {
     width: 1.25em;
     height: 1.25em;
+    flex-shrink: 0;
 }
 textarea {
     resize: vertical;

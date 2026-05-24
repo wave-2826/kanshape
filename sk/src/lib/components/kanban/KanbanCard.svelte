@@ -10,7 +10,9 @@
     // query for the expanded user/group data when needed. This requires one
     // more API call but saves a TON of redundant data. We wouldn't want to
     // make a separate call per card, though, so we need to load everything and
-    // deduplicate first. 
+    // deduplicate first.
+    // Alternatively, make a suitable view in the backend that already does this
+    // joining and caching properly.
 
     const {
         card,
@@ -25,7 +27,7 @@
     const assignment = $derived(card.assignment_data as CardAssignmentData);
 </script>
 
-<button class="unstyled card" {onclick} class:critical={card.priority === "critical"}>
+<button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="header">
         <h3>{card.title}</h3>
         {#if card.subproject !== ""}
@@ -34,10 +36,7 @@
     </div>
 
     {#if card.priority !== "low"}
-        <span class="priority" style="color: {getPriorityColor(card.priority)}">
-            <Flag />
-            {card.priority}
-        </span>
+        <span class="priority item" style="color: {getPriorityColor(card.priority)}"><Flag /> {card.priority}</span>
     {/if}
 
     {#if card.description}
@@ -54,45 +53,48 @@
     {/if}
 
     {#if assignment}
-        <span class="assignment item">
+        <span class="assignment item" class:looking-for-assignment={assignment.type === "looking_for_assignment"}>
             <Users />
-            {#snippet itemList(itemName: string, items: { name?: string }[])}
-                {#if items.length === 0}
-                    Assigned to no {itemName}s
-                {:else if items.length === 1}
-                    Assigned to <span class="item-name">{items[0].name}</span>
-                {:else if items.length === 2}
-                    Assigned to <span class="item-name">{items[0].name}</span> and <span class="item-name">{items[1].name}</span>
-                {:else}
-                    Assigned to <span class="item-name">{items[0].name}</span> and {items.length - 1} others
+            <span>
+                {#snippet itemList(itemName: string, items: { name?: string }[])}
+                    {#if items.length === 0}
+                        Assigned to no {itemName}s
+                    {:else if items.length === 1}
+                        Assigned to <span class="item-name">{items[0].name}</span>
+                    {:else if items.length === 2}
+                        Assigned to <span class="item-name">{items[0].name}</span> and <span class="item-name">{items[1].name}</span>
+                    {:else}
+                        Assigned to <span class="item-name">{items[0].name}</span> and {items.length - 1} others
+                    {/if}
+                {/snippet}
+                {#if assignment.type === "users"}
+                    {@render itemList("user", card.expand.user_assignment_cache ?? [])}
+                {:else if assignment.type === "groups"}
+                    {@render itemList("group", card.expand.group_assignment_cache ?? [])}
+                {:else if assignment.type === "anyone_on"}
+                    Assigned to anyone on {
+                        new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
+                            .format(localDateFromDateOnly(assignment.on_date))
+                    }
+                {:else if assignment.type === "looking_for_assignment"}
+                    Looking for assignment
                 {/if}
-            {/snippet}
-            {#if assignment.type === "users"}
-                {@render itemList("user", card.expand.user_assignment_cache ?? [])}
-            {:else if assignment.type === "groups"}
-                {@render itemList("group", card.expand.group_assignment_cache ?? [])}
-            {:else if assignment.type === "anyone_on"}
-                Assigned to anyone on {
-                    new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
-                        .format(localDateFromDateOnly(assignment.on_date))
-                }
-            {:else if assignment.type === "looking_for_assignment"}
-                Looking for assignment
-            {/if}
+            </span>
         </span>
     {/if}
 </button>
 
 <style lang="scss">
 .card {
-    all: unset;
+    --bg-color: var(--bg-secondary);
+
+    text-align: left;
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 
     padding: 0.4rem 0.7rem;
-    border-radius: 4px;
-    background: var(--bg-secondary);
     font-size: var(--font-tiny);
 
     &.critical {
@@ -128,9 +130,17 @@
     gap: 0.25rem;
     color: var(--text-primary);
     font-size: var(--font-tiny);
+    max-width: 100%;
 
     .item-name {
         color: var(--accent);
+    }
+
+    > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
     }
 }
 
@@ -138,10 +148,13 @@
     color: var(--text-secondary);
 
     span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
         flex: 1;
+    }
+}
+
+.assignment {
+    &.looking-for-assignment {
+        color: var(--error);
     }
 }
 </style>

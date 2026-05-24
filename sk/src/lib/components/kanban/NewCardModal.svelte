@@ -32,6 +32,7 @@
             position: nextCardPosition(boardCards, sectionId),
             moved_at: new Date().toISOString(),
             created_by: client.authStore.record?.id,
+            description,
             priority
         }, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);

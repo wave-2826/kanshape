@@ -11,6 +11,8 @@
         onclose: () => void,
         children: Snippet
     } = $props();
+
+    // TODO: shallow routing for this
 </script>
 
 <svelte:document onkeydown={(e) => {

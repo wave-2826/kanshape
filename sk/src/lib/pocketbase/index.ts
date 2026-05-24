@@ -24,8 +24,6 @@ const expandCollections = {
     },
     cards: {
         created_by: "users",
-        user_assignment_cache: "users",
-        group_assignment_cache: "groups",
         subproject: "subprojects",
         project: "projects",
         section: "sections"

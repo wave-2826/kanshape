@@ -1,40 +1,17 @@
 <script lang="ts">
     import { dateOnly, tomorrowDate } from "$lib/datetime";
     import { client } from "$lib/pocketbase";
-    import { untrack } from "svelte";
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
     import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
-    import { Collections, type GroupsRecord, type UsersRecord } from "$lib/pocketbase/generated-types";
+    import { Collections } from "$lib/pocketbase/generated-types";
 
     let {
         assignmentData = $bindable(),
-        userCache = $bindable(),
-        groupCache = $bindable(),
-        usersExpanded,
-        groupsExpanded
+        nameCache
     }: {
         assignmentData: CardAssignmentData;
-        userCache: string[];
-        groupCache: string[];
-        usersExpanded: UsersRecord[],
-        groupsExpanded: GroupsRecord[]
+        nameCache: string[]
     } = $props();
-
-    $effect(() => {
-        if(assignmentData?.type === "users") {
-            const ids = assignmentData.ids;
-            untrack(() => userCache = ids);
-        } else {
-            untrack(() => userCache = []);
-        }
-        
-        if(assignmentData?.type === "groups") {
-            const ids = assignmentData.ids;
-            untrack(() => groupCache = ids);
-        } else {
-            untrack(() => groupCache = []);
-        }
-    });
 </script>
 
 <!-- TODO: Card only saves once when changing this -->
@@ -65,7 +42,7 @@
                 <InlineSelector
                     collection={Collections.Users}
                     searchField="name"
-                    values={userCache.map(id => ({ id, name: usersExpanded.find(u => u.id === id)?.name ?? "Unknown User" }))}
+                    values={assignmentData.ids.map((id, i) => ({ id, name: nameCache[i] ?? "Unknown User" }))}
                     onchange={(ids) => assignmentData = { type: "users", ids }}
                     itemName="users"
                 />
@@ -73,7 +50,7 @@
                 <InlineSelector
                     collection={Collections.Groups}
                     searchField="name"
-                    values={groupCache.map(id => ({ id, name: groupsExpanded.find(g => g.id === id)?.name ?? "Unknown Group" }))}
+                    values={assignmentData.ids.map((id, i) => ({ id, name: nameCache[i] ?? "Unknown Group" }))}
                     onchange={(ids) => assignmentData = { type: "groups", ids }}
                     itemName="groups"
                 />

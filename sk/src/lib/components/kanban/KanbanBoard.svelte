@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Collections, type CardsResponse, type ProjectsResponse } from "$lib/pocketbase/generated-types";
-    import { watch, type ExpandResponse, type PageItemType } from "$lib/pocketbase";
+    import { Collections } from "$lib/pocketbase/generated-types";
+    import { watch, type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
-    import { moveCard, sortCards } from "./kanban";
+    import { moveCard, sortCards, type TypedCardPreviewResponse } from "./kanban";
     import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
     import NewCardModal from "./NewCardModal.svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
@@ -13,17 +13,18 @@
         project: ExpandResponse<"projects", "subprojects,sections">
     } = $props();
 
-    const cardExpand = "user_assignment_cache,group_assignment_cache" as const;
-    const cards = $derived(await watch(Collections.Cards, {
+    const cardExpand = "" as const;
+    const cards = $derived(await watch(Collections.CardPreview, {
         filter: `project = "${project.id}"`,
         sort: "position,created",
         expand: cardExpand,
     }, 1, 500, {
-        waitForConnection: true
+        waitForConnection: true,
+        pollOnChange: [Collections.Cards]
     }).catch((err) => {
         console.error("Failed to load cards:", err);
         return null;
-    }));
+    })) as PageStore<TypedCardPreviewResponse> | null;
 
     const sections = $derived.by(() => {
         const expandedSections = project.expand.sections ?? [];
@@ -54,7 +55,7 @@
 
     let newCardModal: NewCardModal | null = $state(null);
 
-    function onDragStart(card: CardsResponse, event: DragEvent) {
+    function onDragStart(card: TypedCardPreviewResponse, event: DragEvent) {
         draggedCardId = card.id;
         event.dataTransfer?.setData("text/plain", card.id);
         if(event.dataTransfer) event.dataTransfer.effectAllowed = "move";

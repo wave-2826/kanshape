@@ -4,7 +4,7 @@
     import { getPriorityColor, type CardAssignmentData } from "./cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
-    import { type ExpandResponse } from "$lib/pocketbase";
+    import type { TypedCardPreviewResponse } from "./kanban";
     
     // TODO: Remove this silly assignment cache thing and manually
     // query for the expanded user/group data when needed. This requires one
@@ -19,7 +19,7 @@
         subprojects,
         onclick
     }: {
-        card: ExpandResponse<"cards", "user_assignment_cache,group_assignment_cache">;
+        card: TypedCardPreviewResponse;
         subprojects: SubprojectsRecord[];
         onclick: () => void;
     } = $props();
@@ -35,12 +35,12 @@
         {/if}
     </div>
 
-    {#if card.priority !== "low"}
-        <span class="priority item" style="color: {getPriorityColor(card.priority)}"><Flag /> {card.priority}</span>
-    {/if}
-
     {#if card.description}
         <span class="description item"><TextInitial /><span>{card.description}</span></span>
+    {/if}
+
+    {#if card.priority !== "low"}
+        <span class="priority item" style="color: {getPriorityColor(card.priority)}"><Flag /> {card.priority}</span>
     {/if}
 
     {#if card.due_by}
@@ -56,21 +56,21 @@
         <span class="assignment item" class:looking-for-assignment={assignment.type === "looking_for_assignment"}>
             <Users />
             <span>
-                {#snippet itemList(itemName: string, items: { name?: string }[])}
+                {#snippet itemList(itemName: string, items: string[])}
                     {#if items.length === 0}
                         Assigned to no {itemName}s
                     {:else if items.length === 1}
-                        Assigned to <span class="item-name">{items[0].name}</span>
+                        Assigned to <span class="item-name">{items[0]}</span>
                     {:else if items.length === 2}
-                        Assigned to <span class="item-name">{items[0].name}</span> and <span class="item-name">{items[1].name}</span>
+                        Assigned to <span class="item-name">{items[0]}</span> and <span class="item-name">{items[1]}</span>
                     {:else}
-                        Assigned to <span class="item-name">{items[0].name}</span> and {items.length - 1} others
+                        Assigned to <span class="item-name">{items[0]}</span> and {items.length - 1} others
                     {/if}
                 {/snippet}
                 {#if assignment.type === "users"}
-                    {@render itemList("user", card.expand.user_assignment_cache ?? [])}
+                    {@render itemList("user", card.assignment_name_cache ?? [])}
                 {:else if assignment.type === "groups"}
-                    {@render itemList("group", card.expand.group_assignment_cache ?? [])}
+                    {@render itemList("group", card.assignment_name_cache ?? [])}
                 {:else if assignment.type === "anyone_on"}
                     Assigned to anyone {formatCloseDate(localDateFromDateOnly(assignment.on_date))}
                 {:else if assignment.type === "looking_for_assignment"}

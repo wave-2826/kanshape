@@ -35,9 +35,7 @@
     const clientFilteredResults = $derived(results.filter(r => (r[searchField] as string).toLowerCase().includes(searchTerm.toLowerCase())));
     let isOpen = $state(false);
 
-    async function searchRaw(searchTerm: string, _isOpen: boolean) {
-        if(!_isOpen && !searchTerm) return;
-        
+    async function searchRaw(searchTerm: string, _isOpen: boolean) {        
         try {
             const filter = searchTerm ? `${searchField} ~ "${searchTerm.replace(/"/g, '\\"')}"` : "";
             const list = await client.collection(collection).getList(1, 10, {

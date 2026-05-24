@@ -1,9 +1,9 @@
 <script lang="ts">
     import { client, save } from "$lib/pocketbase";
-    import { CardsPriorityOptions, Collections, type CardsResponse, type SectionsRecord } from "$lib/pocketbase/generated-types";
+    import { CardsPriorityOptions, Collections, type SectionsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
     import { priorities } from "./cards";
-    import { nextCardPosition } from "./kanban";
+    import { nextCardPosition, type TypedCardPreviewResponse } from "./kanban";
 
     let {
         projectId,
@@ -12,7 +12,7 @@
     }: {
         projectId: string,
         sections: SectionsRecord[],
-        boardCards: CardsResponse[]
+        boardCards: TypedCardPreviewResponse[]
     } = $props();
 
     let title = $state("");

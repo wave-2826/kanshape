@@ -9,16 +9,16 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { deleteRecord, queryOne, save, type ExpandResponse, stripExpand } from "$lib/pocketbase";
+    import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { deepEqual } from "$lib/util";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-
-    type CardType = ExpandResponse<"cards", "user_assignment_cache,group_assignment_cache">;
+    import type { TypedCardPreviewResponse } from "../kanban";
+    import { DirtyTracker, DirtyTrackerState } from "./dirtyTracker.svelte";
+    import { onDestroy, untrack } from "svelte";
 
     let {
         card = $bindable(),
@@ -27,121 +27,111 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         projectType,
         onclose
     }: {
-        card: CardType | null,
+        card: TypedCardPreviewResponse | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
         projectType: ProjectsTypeOptions,
         onclose: () => void
     } = $props();
 
-    const saveDebounce = 100;
+    /**
+     * This panel shows a full card, but the card we get is a preview (with limited fields so we
+     * don't send unnecessary data for the full board). This constructs a partial full card from
+     * the preview data to use as our local editable state.
+     */
+    function constructPartialFullCard(preview: TypedCardPreviewResponse): CardsResponse {
+        return {
+            collectionId: Collections.Cards,
+            collectionName: Collections.Cards,
 
-    // Local editable copy so we don't clobber unsaved user edits when remote updates arrive
-    let localCard = $state<CardType | null>(null);
+            id: preview.id,
+            title: preview.title,
+            description: "Loading...", // don't show a truncated description while loading the full one
+            priority: preview.priority,
+            due_by: preview.due_by,
+            section: preview.section,
+            subproject: preview.subproject,
+            created: preview.created,
+            updated: preview.updated,
+            moved_at: preview.moved_at,
+            created_by: preview.created_by,
+            assignment_data: preview.assignment_data,
+            position: preview.position,
+            project: preview.project,
+            metadata: {}
+        };
+    }
 
-    // field -> last local edit timestamp (ms)
-    const dirtyMap = new Map<keyof CardsResponse, number>();
+    const saveDebounce = 200;
+
+    let tracker = $state<DirtyTracker<CardsResponse, TypedCardPreviewResponse> | null>(null);
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
     const creationUser = $derived(card?.created_by ? queryOne(Collections.Users, card.created_by) : null);
 
-    let suppressDirty = 0;
-    let prevCardId: string | null = null;
-    const prevValues = new Map<keyof CardsResponse, unknown>();
-
-    /**
-     * Run a function while temporarily suppressing dirty tracking;
-     * used when applying incoming prop changes or server updates to avoid marking those fields as dirty.
-     */
-    function withSuppressedDirty<T>(fn: () => T): T {
-        suppressDirty += 1;
-        try {
-            return fn();
-        } finally {
-            suppressDirty -= 1;
-        }
-    }
-
-    // Initialize or merge incoming `card` prop changes without overwriting local unsaved edits
+    // Initialize or merge incoming `card` prop changes
     $effect(() => {
         if(card == null) {
-            withSuppressedDirty(() => {
-                localCard = null;
-            });
-            dirtyMap.clear();
+            console.log("No card selected, closing panel");
+            if(tracker) {
+                tracker.destroy();
+                tracker = null;
+            }
             if(saveTimer) {
                 clearTimeout(saveTimer);
                 saveTimer = null;
             }
-        } else if(localCard == null || card.id !== localCard.id) {
-            // first time open
-            withSuppressedDirty(() => {
-                localCard = structuredClone($state.snapshot(card));
+        } else if(!tracker) {
+            console.log("Card selected, initializing tracker");
+            untrack(() => {
+                tracker = new DirtyTracker<CardsResponse, TypedCardPreviewResponse>(
+                    $state.snapshot(card),
+                    {
+                        transformExternal: (ext) => constructPartialFullCard($state.snapshot(ext)),
+                        fetchFull: async (id) => {
+                            return await queryOne(Collections.Cards, id) as CardsResponse;
+                        }
+                    }
+                );
             });
-            dirtyMap.clear();
         } else {
-            mergeServerRecord(card);
+            console.log("Card updated externally, merging changes");
+            tracker.updateExternal($state.snapshot(card));
         }
     });
 
-    /** Snapshot the current values of the local card */
-    function snapshotValues() {
-        if(!localCard) return;
-        prevCardId = localCard.id;
-        prevValues.clear();
-        for(const key of Object.keys(localCard) as (keyof CardType)[]) {
-            prevValues.set(key, localCard[key]);
-        }
-    }
+    onDestroy(() => {
+        if(tracker) tracker.destroy();
+        if(saveTimer) clearTimeout(saveTimer);
+    });
 
-    // Dirty tracking
+    // Auto-save when dirty
     $effect(() => {
-        // This stringify actually does have side effects. It accesses all of
-        // the properties of localCard so the effect will re-run whenever any
-        // property, even deeply nested, changes.
-        JSON.stringify(localCard);
+        $inspect.trace();
+        if(!tracker) return;
 
-        if(!localCard) {
-            prevValues.clear();
-            prevCardId = null;
-            return;
+        // Trigger reactivity on deeply nested properties
+        JSON.stringify(tracker.current);
+
+        if(tracker.shouldSave) {
+            debounceSave();
         }
-
-        // If we're applying server changes or just opened/switched cards, treat current values as baseline
-        if(suppressDirty > 0 || prevCardId !== localCard.id) {
-            console.log("Early snapshot exit");
-            snapshotValues();
-            return;
-        }
-
-        const now = Date.now();
-        let anyChanged = false;
-        for(const key of Object.keys(localCard) as (keyof CardType)[]) {
-            const next = localCard[key];
-            const prev = prevValues.get(key);
-            if(!deepEqual(prev, next)) {
-                prevValues.set(key, $state.snapshot(next));
-                dirtyMap.set(key, now);
-                anyChanged = true;
-            }
-        }
-
-        if(anyChanged) debounceSave();
     });
 
     function debounceSave() {
         if(saveTimer) clearTimeout(saveTimer);
         saveTimer = setTimeout(() => performSave(), saveDebounce);
     }
+    
     async function performSave() {
-        if(!localCard) return;
+        if(!tracker) return;
 
         try {
-            // Only set expand to avoid overwriting local changes (and save looping)
-            localCard.expand = (await save(Collections.Cards, stripExpand(localCard), {
+            await save(Collections.Cards, stripExpand(tracker.current), {
                 create: false,
-                expand: "user_assignment_cache,group_assignment_cache"
-            })).expand;
+                expand: ""
+            });
+            tracker?.clearDirty();
         } finally {
             if(saveTimer) {
                 clearTimeout(saveTimer);
@@ -150,52 +140,33 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         }
     }
 
-    /**
-     * Merge an updated server record into localCard, but do not overwrite fields that the user has edited locally
-     * after the given request timestamp. This allows us to keep the local unsaved edits while still updating any
-     * fields that were changed remotely or locally before the last save.
-     */
-    function mergeServerRecord(serverRec: CardType) {
-        if(!localCard) {
-            withSuppressedDirty(() => {
-                localCard = structuredClone(serverRec);
-            });
-            dirtyMap.clear();
-            return;
-        }
-
-        // For each field in serverRec, update local value unless user has a more recent local edit
-        withSuppressedDirty(() => {
-            for(const key of Object.keys(serverRec) as (keyof CardType)[]) {
-                const localDirtyTs = dirtyMap.get(key) ?? 0;
-                // If the user has edited this field locally after the last save, skip applying the server update for this field
-                if(localDirtyTs > 0) continue;
-                
-                // Apply server value
-                (localCard as any)[key] = serverRec[key];
-            }
-        });
-    }
-
     function deleteCard() {
-        const id = localCard?.id ?? card?.id;
+        const id = tracker?.current?.id ?? card?.id;
         if(!id) return;
         deleteRecord(Collections.Cards, id);
     }
 </script>
 
 
-<ModalPanel open={localCard !== null} {onclose}>
-{#if localCard} <!-- just for typing to recognize localCard !== null -->
+<ModalPanel open={tracker !== null} {onclose}>
+{#if tracker}
+    {@const localCard = tracker.current}
     <header>
-        <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" />
+        <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" disabled={tracker.loadingFull} />
     </header>
 
     <div class="card-content">
         <div class="field-group">
             <!-- Screenreader only -->
             <label for="description" aria-hidden="false" style="display: none;">Description</label>
-            <textarea id="description" class="description" bind:value={localCard.description} placeholder="Add a more detailed description..." use:autoSize></textarea>
+            <textarea
+                id="description"
+                class="description"
+                bind:value={localCard.description}
+                placeholder="Add a more detailed description..."
+                use:autoSize={localCard.description}
+                disabled={tracker.loadingFull}
+            ></textarea>
         </div>
         
         <h3><SquareKanban /> Task</h3>
@@ -203,7 +174,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             <div class="property">
                 <span class="prop-label"><ChartColumnBig />Section</span>
                 <div class="prop-value">
-                    <select id="section" name="section" bind:value={localCard.section} style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}">
+                    <select
+                        id="section"
+                        name="section"
+                        bind:value={localCard.section}
+                        style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}"
+                        disabled={tracker.loadingFull}
+                    >
                         {#each sections as section}
                             <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
                         {/each}
@@ -214,7 +191,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             <div class="property">
                 <span class="prop-label"><Flag />Priority</span>
                 <div class="prop-value">
-                    <select id="priority" name="priority" bind:value={localCard.priority} style="color: {getPriorityColor(localCard.priority)}">
+                    <select
+                        id="priority"
+                        name="priority"
+                        bind:value={localCard.priority}
+                        style="color: {getPriorityColor(localCard.priority)}"
+                        disabled={tracker.loadingFull}
+                    >
                         {#each Object.entries(priorities) as [key, v]}
                             <option value={key} style="color: {v.color}">{v.label}</option>
                         {/each}
@@ -226,7 +209,12 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 <div class="property">
                     <span class="prop-label"><Kanban />Subproject</span>
                     <div class="prop-value">
-                        <select id="subproject" name="subproject" bind:value={localCard.subproject}>
+                        <select
+                            id="subproject"
+                            name="subproject"
+                            bind:value={localCard.subproject}
+                            disabled={tracker.loadingFull}
+                        >
                             <option value="">None</option>
                             {#each subprojects as subproject}
                                 <option value={subproject.id}>{subproject.name}</option>
@@ -241,7 +229,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     <Clock />
                     Due date
                     {#if localCard.due_by}
-                        <button class="clear" onclick={() => localCard && (localCard.due_by = "")} title="Clear due date">
+                        <button class="clear" onclick={() => localCard.due_by = ""} title="Clear due date">
                             <Trash />
                         </button>
                     {/if}
@@ -249,14 +237,14 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 <div class="prop-value">
                     {#if localCard.due_by}
                         <input id="due_date" type="datetime-local" bind:value={
-                            () => localCard ? zonedToLocal(localCard.due_by) : "",
-                            (v) => localCard && (localCard.due_by = localToZoned(v) ?? "")
+                            () => zonedToLocal(localCard.due_by),
+                            (v) => localCard.due_by = localToZoned(v) ?? ""
                         } />
                         <div class="timetip">
                             {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))}
                         </div>
                     {:else}
-                        <button class="add" onclick={() => localCard && (localCard.due_by = tomorrowDate().toISOString())}>+ Assign Due Date</button>
+                        <button class="add" onclick={() => localCard.due_by = tomorrowDate().toISOString()}>+ Assign Due Date</button>
                     {/if}
                 </div>
             </div>
@@ -266,17 +254,14 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     <Users />
                     Assignment
                     {#if localCard.assignment_data}
-                        <button class="clear" onclick={() => localCard && (localCard.assignment_data = null)} title="Clear assignment">
+                        <button class="clear" onclick={() => localCard.assignment_data = null} title="Clear assignment">
                             <Trash />
                         </button>
                     {/if}
                 </span>
                 <CardAssignmentValue
                     bind:assignmentData={localCard.assignment_data as CardAssignmentData}
-                    bind:userCache={localCard.user_assignment_cache}
-                    bind:groupCache={localCard.group_assignment_cache}
-                    usersExpanded={localCard.expand.user_assignment_cache ?? []}
-                    groupsExpanded={localCard.expand.group_assignment_cache ?? []}
+                    nameCache={card?.assignment_name_cache ?? []}
                 />
             </div>
         </div>
@@ -288,13 +273,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 <div class="property">
                     <span class="prop-label"><Circle />Material</span>
                     <div class="prop-value">
-                        <input type="text" placeholder="e.g. Aluminum" />
+                        <input type="text" placeholder="e.g. Aluminum" disabled={tracker.loadingFull} />
                     </div>
                 </div>
                 <div class="property">
                     <span class="prop-label"><Circle />Machine</span>
                     <div class="prop-value">
-                        <input type="text" placeholder="e.g. Mill" />
+                        <input type="text" placeholder="e.g. Mill" disabled={tracker.loadingFull} />
                     </div>
                 </div>
             </div>

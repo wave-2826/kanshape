@@ -5,6 +5,9 @@
     import { Kanban, List, Settings } from "lucide-svelte";
     import type { Snippet } from "svelte";
     import { setProjectContext, watchCards, watchProject, type ProjectContext } from "./projectContext";
+    import OnshapeLinks from "./OnshapeLinks.svelte";
+    import SiteLinks from "./SiteLinks.svelte";
+    import type { ProjectLinkedSite } from "$lib/project";
 
     const {
         children
@@ -46,6 +49,11 @@
 
             <header>
                 <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
+                {#if !onOnshape}
+                    <OnshapeLinks project={$project} />
+                {/if}
+                <SiteLinks links={$project.linked_sites as ProjectLinkedSite[]} />
+                <div style="flex: 1"></div>
                 <div class="multi-button">
                     <button onclick={() => goto(`/projects/${$project.id}/list`)} class:active={page.route.id?.endsWith("/list")}>
                         <List />
@@ -75,10 +83,12 @@ header {
     align-items: center;
     padding: 0.5rem;
     gap: 0.5rem;
+
+    white-space: nowrap;
+    overflow-x: auto;
 }
 h1 {
-    flex: 1;
-    margin-left: 0.5rem;
+    margin: 0 0.5rem;
 }
 .page {
     display: flex;

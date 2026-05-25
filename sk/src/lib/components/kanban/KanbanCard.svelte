@@ -91,7 +91,7 @@
     flex-direction: column;
     gap: 0.25rem;
 
-    padding: 0.4rem 0.7rem;
+    padding: 0.4rem 0.5rem;
     font-size: var(--font-tiny);
 
     &.critical {

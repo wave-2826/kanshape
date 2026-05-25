@@ -12,14 +12,18 @@
         pane,
         oncreate,
         ondelete,
-        onreorder
+        onreorder,
+        compact = false,
+        background
     }: {
         options: OptionData[],
         ordered?: boolean,
         pane: Snippet<[number]>,
         oncreate?: () => void,
         ondelete?: (option: number) => void,
-        onreorder?: (from: number, to: number) => void
+        onreorder?: (from: number, to: number) => void,
+        compact?: boolean,
+        background?: string
     } = $props();
 
     let dragState: {
@@ -127,7 +131,7 @@
     class: classname = ""
 })}
     <li
-        data-index={i} class={`button ${classname}`} {style}
+        data-index={i} class={`list-item button ${classname}`} {style}
         class:selected={selected === i} class:dragging={dragState !== null}
     >
         {#if ordered}
@@ -156,7 +160,7 @@
     </li>
 {/snippet}
 
-<div class="chooser">
+<div class="chooser" class:compact={compact} style={background ? `--bg: ${background};` : undefined}>
     <ul bind:this={listEl}>
         {#each options as option, i (i)}
             {#if dragState !== null && dragState.placeholderIndex === i}
@@ -191,7 +195,7 @@
             </li>
         {/if}
     </ul>
-    <div class="pane">
+    <div class="pane" class:selected={selected !== null}>
         {#if selected !== null}
             {@render pane(selected)}
         {:else}
@@ -220,6 +224,10 @@ ul {
     max-height: 400px;
     width: max(200px, 25%);
 
+    .compact & {
+        min-height: 0;
+    }
+
     overflow: auto;
 
     position: relative;
@@ -228,6 +236,10 @@ ul {
         display: flex;
         padding: 0;
         gap: 0;
+
+        &.list-item {
+            padding: 0 0.25rem;
+        }
     }
     .label {
         flex: 1;
@@ -237,7 +249,8 @@ ul {
     .action {
         width: 2rem;
         transition: color 0.2s;
-        padding: 0.25rem 0.5em;
+        padding: 0.25rem;
+        flex: 0;
 
         &.delete {
             color: var(--error);
@@ -269,18 +282,24 @@ ul {
         .action { opacity: 0.2; }
     }
 }
+
 ul, .pane {
-    background-color: var(--bg-primary);
+    background-color: var(--bg, var(--bg-primary));
     border-radius: 4px;
     padding: 0.5rem;
 }
 .pane {
     flex: 1;
+    transition: opacity 150ms;
+
+    &:not(.selected) {
+        opacity: 0.5;
+    }
 }
 
 .select-option {
     color: var(--text-secondary);
     font-style: italic;
-    margin: 0.5rem;
+    margin: 0.25rem;
 }
 </style>

@@ -1,7 +1,10 @@
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { createPartIDString } from "$lib/parts";
-    import { ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
+    import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
+    import type { ProjectLinkedSite } from "$lib/project";
+    import OnshapeLinks from "./[id]/(kanban)/OnshapeLinks.svelte";
+    import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
 
     let {
         color = $bindable(),
@@ -10,7 +13,9 @@
         partIdPrefix = $bindable(),
         type = $bindable(),
         sections = $bindable(),
-        subprojects = $bindable()
+        subprojects = $bindable(),
+        linkedSites = $bindable(),
+        editedProject = null
     }: {
         color?: string;
         name: string;
@@ -19,6 +24,8 @@
         type: ProjectsTypeOptions;
         sections: Create<"sections">[];
         subprojects: Create<"subprojects">[];
+        linkedSites: ProjectLinkedSite[];
+        editedProject?: ProjectsResponse | null;
     } = $props();
 
     const projectTypes: {
@@ -70,6 +77,17 @@
         <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, 0, 1, 1)}</span>
     </div>
 {/if}
+
+<h2>Linked pages</h2>
+{#if editedProject && type === "manufacturing"}
+    <p>Linked Onshape documents</p>
+    <div class="linked-sites">
+        <!-- Technically, this doesn't have the same saving behavior as the rest of the settings, but... whatever -->
+        <OnshapeLinks project={editedProject} fullPreview />
+    </div>
+{/if}
+<p>Linked sites</p>
+<LinkedSiteDetails bind:linkedSites />
 
 <h2>Sections</h2>
 <LeftPaneChooser
@@ -134,6 +152,10 @@
                     <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, subproject.part_id_offset || 0, 1, 1)}</span>
                 </div>
             {/if}
+
+            <p>Linked sites</p>
+            <!-- TODO: this UI is stupid -->
+            <LinkedSiteDetails bind:linkedSites={subproject.linked_sites as ProjectLinkedSite[]} background="var(--bg-site)" />
         </div>
     {/snippet}
 </LeftPaneChooser>
@@ -148,16 +170,27 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-left: 0.5rem;
 }
 .subproject, .section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
+.subproject label, .subproject p, .section label {
+    font-size: var(--font-small);
+    margin-left: 0.5rem;
+}
+
 .part-id-preview {
     font-size: var(--font-small);
     color: var(--text-secondary);
     margin-left: 1rem;
+}
+
+.linked-sites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
 }
 </style>

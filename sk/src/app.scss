@@ -1,5 +1,6 @@
 *, *::before, *::after {
     box-sizing: border-box;
+    scrollbar-color: var(--border) transparent;
 }
 
 :root {
@@ -82,7 +83,7 @@ button, input, select, textarea, .button, .input {
         cursor: not-allowed;
     }
 }
-button {
+button, .button {
     cursor: pointer;
 }
 input {

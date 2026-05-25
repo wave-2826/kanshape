@@ -2,12 +2,13 @@
     import { page } from "$app/state";
     import { untrack } from "svelte";
     import ProjectDetails from "../../ProjectDetails.svelte";
-    import { deleteRecord, queryOne, save, watchOne } from "$lib/pocketbase";
+    import { deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
     import { ArrowLeft, Save } from "lucide-svelte";
     import { goto } from "$app/navigation";
     import { deepEqual } from "$lib/util";
+    import type { ProjectLinkedSite, TypedProjectsResponse } from "$lib/project";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";
@@ -29,6 +30,8 @@
     let color: string | undefined = $state(undefined);
     let partIdPrefix: string = $state("");
     let type: ProjectsTypeOptions = $state("blank");
+    let linkedSites: ProjectLinkedSite[] = $state([]);
+    
     let subprojects: SubprojectsRecord[] = $state([]);
     let sections: SectionsRecord[] = $state([]);
 
@@ -40,16 +43,19 @@
             partIdPrefix !== project.part_id_prefix ||
             type !== project.type ||
             !deepEqual(subprojects, originalSubprojects) ||
-            !deepEqual(sections, originalSections);
+            !deepEqual(sections, originalSections) ||
+            !deepEqual(linkedSites, project.linked_sites ?? []);
     });
 
     $effect(() => {
         if(project) {
-            name = project.title;
-            description = project.description;
-            color = project.color;
-            partIdPrefix = project.part_id_prefix;
-            type = project.type;
+            const p = project as TypedProjectsResponse;
+            name = p.title;
+            description = p.description;
+            color = p.color;
+            partIdPrefix = p.part_id_prefix;
+            type = p.type;
+            linkedSites = p.linked_sites ?? [];
             subprojects = project.expand.subprojects ?? [];
             sections = project.expand.sections ?? [];
         }
@@ -107,6 +113,7 @@
             part_id_prefix: partIdPrefix,
             sections: sections.map(s => s.id),
             subprojects: subprojects.map(s => s.id),
+            linked_sites: linkedSites,
             type
         }, {
             create: false
@@ -135,7 +142,10 @@
             <span class="unsaved-warning">Unsaved changes</span>
         {/if}
     </button>
-    <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:sections />
+    <ProjectDetails
+        bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:sections bind:linkedSites
+        editedProject={project}
+    />
     <button onclick={saveChanges} class="save" disabled={!changed}>
         <Save />
         Save Changes

@@ -4,6 +4,7 @@
     import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import ProjectDetails from "../ProjectDetails.svelte";
+    import type { ProjectLinkedSite } from "$lib/project";
 
     $effect(() => {
         $metadata.title = "New project";
@@ -14,6 +15,7 @@
     let color = $state<string | undefined>(undefined);
     let partIdPrefix = $state(new Date().getFullYear().toString());
     let type = $state<ProjectsTypeOptions>("blank");
+    let linkedSites = $state<ProjectLinkedSite[]>([]);
     
     let subprojects = $state<Create<"subprojects">[]>([]);
     let sections = $state<Create<"sections">[]>([
@@ -50,6 +52,7 @@
             sections: sectionIds,
             subprojects: subprojectIds,
             custom_card_fields: {},
+            linked_sites: linkedSites,
             type: "blank"
         }, {
             create: true
@@ -64,7 +67,7 @@
     <h1>New project</h1>
 
     <div class="options">
-        <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:sections />
+        <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:sections bind:linkedSites />
 
         <button onclick={createProject} disabled={name.trim().length === 0 || partIdPrefix.trim().length === 0} class="create">
             <Plus />Create {name}

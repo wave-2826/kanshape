@@ -1,0 +1,17 @@
+.link-badge {
+    background-color: var(--bg-primary);
+    padding: 0 0.5rem;
+    border-radius: 4px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    font-size: var(--font-small);
+    min-height: 1.5rem;
+
+    a {
+        display: contents;
+        color: var(--text-primary);
+    }
+}

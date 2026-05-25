@@ -193,6 +193,7 @@ export type OnshapeDocumentsRecord = {
 	id: string
 	project: RecordIdString
 	subprojects?: RecordIdString
+	title?: string
 	updated: IsoAutoDateString
 }
 
@@ -201,13 +202,14 @@ export const ProjectsTypeOptions = {
 	"manufacturing": "manufacturing",
 } as const
 export type ProjectsTypeOptions = typeof ProjectsTypeOptions[keyof typeof ProjectsTypeOptions]
-export type ProjectsRecord<Tcustom_card_fields = unknown> = {
+export type ProjectsRecord<Tcustom_card_fields = unknown, Tlinked_sites = unknown> = {
 	color?: string
 	created: IsoAutoDateString
 	current_part_id?: number
 	custom_card_fields?: null | Tcustom_card_fields
 	description?: string
 	id: string
+	linked_sites?: null | Tlinked_sites
 	part_id_prefix?: string
 	sections?: RecordIdString[]
 	subprojects?: RecordIdString[]
@@ -227,10 +229,11 @@ export type SectionsRecord = {
 	updated: IsoAutoDateString
 }
 
-export type SubprojectsRecord = {
+export type SubprojectsRecord<Tlinked_sites = unknown> = {
 	created: IsoAutoDateString
 	description?: string
 	id: string
+	linked_sites?: null | Tlinked_sites
 	name?: string
 	part_id_offset?: number
 	updated: IsoAutoDateString
@@ -267,9 +270,9 @@ export type GroupOverviewResponse<Tcard_count = unknown, Tmember_count = unknown
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
-export type ProjectsResponse<Tcustom_card_fields = unknown, Texpand = unknown> = Required<ProjectsRecord<Tcustom_card_fields>> & BaseSystemFields<Texpand>
+export type ProjectsResponse<Tcustom_card_fields = unknown, Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tcustom_card_fields, Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
-export type SubprojectsResponse<Texpand = unknown> = Required<SubprojectsRecord> & BaseSystemFields<Texpand>
+export type SubprojectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<SubprojectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type UsersResponse<Tmetadata = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata>> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions

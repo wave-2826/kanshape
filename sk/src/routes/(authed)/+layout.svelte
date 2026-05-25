@@ -9,6 +9,7 @@
     import NavContent from "$lib/components/NavContent.svelte";
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/NavProfile.svelte";
+    import { dev } from "$app/environment";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -59,6 +60,10 @@
         <a href="/">
             <h1>{config.site?.name}</h1>
         </a>
+        <!-- Dev build warning -->
+        {#if dev}
+            <span class="dev-build-warning" title="This instance is running a development build">[DEV]</span>
+        {/if}
         <div style="flex-grow: 1;"></div>
         <NavProfile />
         <button onclick={() => {
@@ -118,6 +123,12 @@ header {
     a, h1 {
         color: var(--text-primary);
         text-decoration: none;
+    }
+    .dev-build-warning {
+        color: var(--error);
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-left: 0.5rem;
     }
     button {
         --bg-color: transparent;

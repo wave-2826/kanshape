@@ -85,7 +85,7 @@
     <hr />
 
     <footer>
-        <button onclick={ondelete} class="delete"><Trash /> Delete Group</button>
+        <button onclick={ondelete} class="delete"><Trash /> Delete User</button>
     </footer>
 </div>
 

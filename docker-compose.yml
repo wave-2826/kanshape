@@ -1,6 +1,9 @@
 services:
   pb:
     image: alpine:latest
+    depends_on:
+      sk:
+        condition: service_completed_successfully
     entrypoint: /app/pb/entrypoint.sh
     command: "/app/pb/pocketbase serve --http 0.0.0.0:8090 --publicDir ../sk/build"
     user: ${UID}:${GID}

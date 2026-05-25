@@ -3,6 +3,8 @@
     Based on https://github.com/janzheng/svelte-masonry/, which was originally
     based on: https://css-tricks.com/a-lightweight-masonry-solution
 
+    Updated for Svelte 5, better update handling, and cleaner code.
+
     For async content (like images), you MUST bind and trigger refreshLayout:
     <Masonry bind:refreshLayout={refreshLayout}>
       <img on:load={refreshLayout} src="..." />
@@ -39,7 +41,7 @@
 -->
 
 <script lang="ts">
-import { onMount, onDestroy, tick, type Snippet, untrack } from 'svelte'
+import { type Snippet, untrack } from 'svelte'
 
 const {
     children,
@@ -102,7 +104,6 @@ export const refreshLayout = async () => {
 }
 
 async function calcGrid(masonryArray: HTMLDivElement[]): Promise<void> {
-    await tick()
     if(masonryArray.length && getComputedStyle(masonryArray[0]).gridTemplateRows !== 'masonry') {
         grids = masonryArray.map(grid => {
             return {
@@ -114,27 +115,27 @@ async function calcGrid(masonryArray: HTMLDivElement[]): Promise<void> {
                 columnCount: 0, 
                 mod: 0
             }
-        })
+        });
         refreshLayout(); // initial load
     }
 };
 
+let size: ResizeObserverSize[] | null = $state(null);
+let width = $derived.by(() => size ? size[0].inlineSize : 0);
+
+// Refresh if items or width changes
 $effect(() => {
-    if(masonryElement) { 
+    void masonryElement;
+    void items;
+    void width;
+    if(masonryElement && items && width) { 
         untrack(() => calcGrid([masonryElement!]))
-    }
-});
-// Refresh if items change
-$effect(() => {
-    if(untrack(() => masonryElement) && items) { 
-        calcGrid([masonryElement!])
     }
 });
 </script>
 
-<svelte:window onresize={refreshLayout} />
-
-<div bind:this={masonryElement} 
+<div
+    bind:this={masonryElement} 
     class="grid-masonry"
     class:stretch-first={stretchFirst}
     style={`
@@ -142,6 +143,7 @@ $effect(() => {
         --masonry-padding: ${padding};
         --masonry-col-width: ${colWidth};
     `}
+    bind:contentBoxSize={size}
 >
     {@render children()}
 </div>
@@ -150,16 +152,15 @@ $effect(() => {
 .grid-masonry {
     display: grid;
     grid-template-columns: repeat(auto-fit, var(--masonry-col-width));
-    /* grid-template-rows: masonry; */
+    // grid-template-rows: masonry;
     justify-content: center;
     grid-gap: var(--masonry-grid-gap);
     padding: var(--masonry-padding);
-
 }
 :global(.grid-masonry > *) { 
-    align-self: start 
+    align-self: start;
 }
 :global(.grid-masonry.stretch-first > *:first-child) { 
-    grid-column: 1/ -1;
+    grid-column: 1 / -1;
 }
 </style>

@@ -107,7 +107,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     // Auto-save when dirty
     $effect(() => {
-        $inspect.trace();
         if(!tracker) return;
 
         // Trigger reactivity on deeply nested properties

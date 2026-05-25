@@ -40,15 +40,5 @@
     "lucide-svelte": "^1.0.1",
     "pocketbase": "^0.26.9",
     "zod": "^3.25.76"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "better-sqlite3",
-      "esbuild",
-      "sqlite3",
-      "svelte-preprocess",
-      "workerd"
-    ]
   }
 }

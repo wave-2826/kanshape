@@ -8,7 +8,7 @@ services:
     command: "/app/pb/pocketbase serve --http 0.0.0.0:8090 --publicDir ../sk/build"
     user: ${UID}:${GID}
     ports:
-      - 8090:8090
+      - ${PORT:-8090}:8090
     working_dir: /app/pb
     environment:
       - RELEASE=${RELEASE:-standard} # use "custom" for main.go build, "standard" for downloaded binary

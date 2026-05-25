@@ -72,7 +72,7 @@
                 {:else if assignment.type === "groups"}
                     {@render itemList("group", card.assignment_name_cache ?? [])}
                 {:else if assignment.type === "anyone_on"}
-                    Assigned to anyone {formatCloseDate(localDateFromDateOnly(assignment.on_date))}
+                    Assigned to <span class="item-name">anyone</span> {formatCloseDate(localDateFromDateOnly(assignment.on_date))}
                 {:else if assignment.type === "looking_for_assignment"}
                     Looking for assignment
                 {/if}

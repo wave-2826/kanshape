@@ -20,27 +20,6 @@
 
     const assignment = $derived(card.assignment_data as CardAssignmentData | null);
 
-    function assignmentSummary(): string {
-        if(!assignment) return "";
-
-        if(assignment.type === "users" || assignment.type === "groups") {
-            const names = card.assignment_name_cache ?? [];
-            if(names.length === 0) return "Unassigned";
-            if(names.length === 1) return names[0];
-            return `${names[0]} +${names.length - 1}`;
-        }
-
-        if(assignment.type === "anyone_on") {
-            return `Anyone ${formatCloseDate(localDateFromDateOnly(assignment.on_date))}`;
-        }
-
-        if(assignment.type === "looking_for_assignment") {
-            return "Looking for assignment";
-        }
-
-        return "";
-    }
-
     const section = $derived(sections.find(s => s.id === card.section) ?? null);
 </script>
 
@@ -67,7 +46,23 @@
         {#if assignment}
             <span class="meta-pill assignment" class:looking-for-assignment={assignment.type === "looking_for_assignment"}>
                 <Users />
-                <span>{assignmentSummary()}</span>
+                <span>
+                    {#if assignment.type === "users" || assignment.type === "groups"}
+                        {#if card.assignment_name_cache?.length === 0}
+                            Unassigned
+                        {:else if card.assignment_name_cache?.length === 1}
+                            <span class="item-name">{card.assignment_name_cache[0]}</span>
+                        {:else if card.assignment_name_cache}
+                            <span class="item-name">{card.assignment_name_cache[0]}</span> +{card.assignment_name_cache.length - 1}
+                        {:else}
+                            Assigned
+                        {/if}
+                    {:else if assignment.type === "anyone_on"}
+                        <span class="item-name">Anyone</span> {formatCloseDate(localDateFromDateOnly(assignment.on_date))}
+                    {:else if assignment.type === "looking_for_assignment"}
+                        Looking for assignment
+                    {/if}
+                </span>
             </span>
         {/if}
     </div>
@@ -125,9 +120,7 @@
     align-items: center;
     gap: 0.35rem;
     color: var(--text-tertiary);
-    margin-left: 0.5rem;
     font-style: italic;
-    min-width: 0;
 
     > span {
         overflow: hidden;
@@ -157,9 +150,12 @@
     }
 }
 
-@media (max-width: 1100px) {
-    .card {
-        grid-template-columns: minmax(10rem, 1.25fr) minmax(10rem, 1.5fr) minmax(10rem, 1.5fr);
-    }
+.assignment {
+    &.looking-for-assignment { color: var(--error); }
+    .item-name { color: var(--accent); }
+}
+
+.main, .description {
+    max-width: 100%;
 }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
-    import { sortCards, type TypedCardPreviewResponse } from "./kanban";
+    import { sortListCards, type TypedCardPreviewResponse } from "./kanban";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
     import KanbanMenu from "./KanbanMenu.svelte";
     import KanbanListEntry from "./KanbanListEntry.svelte";
@@ -30,7 +30,7 @@
 
     $effect(() => {
         if($cards === null) return;
-        listCards = sortCards($cards.items);
+        listCards = sortListCards($cards.items, sections);
     });
 </script>
 

@@ -1,5 +1,5 @@
 import { save, type ExpandResponse } from "$lib/pocketbase";
-import { CardsPriorityOptions, Collections, type CardPreviewResponse, type CardsResponse, type IsoAutoDateString } from "$lib/pocketbase/generated-types";
+import { CardsPriorityOptions, Collections, type CardPreviewResponse, type CardsResponse, type IsoAutoDateString, type SectionsRecord } from "$lib/pocketbase/generated-types";
 import type { CardAssignmentData } from "./cards";
 
 type NonNullValuesExcept<T, K extends keyof T> = {
@@ -27,6 +27,50 @@ export function sortCards<CardType extends TypedCardPreviewResponse>(list: CardT
     return [...list].sort((left, right) => {
         const positionDelta = (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER);
         if(positionDelta !== 0) return positionDelta;
+        return left.created.localeCompare(right.created);
+    });
+}
+
+function priorityInteger(priority: CardsPriorityOptions): number {
+    switch(priority) {
+        case "low": return 1;
+        case "medium": return 2;
+        case "high": return 3;
+        case "critical": return 4;
+        default: return 0;
+    }
+}
+
+/**
+ * Sort cards for the list view. This is different from normal sort; the categories we sort by, in order, are:
+ * - priority (highest to lowest)
+ * - section (first to last)
+ * - due date (earliest to latest)
+ * - position (lowest to highest)
+ */
+export function sortListCards<CardType extends TypedCardPreviewResponse>(list: CardType[], sections: SectionsRecord[]): CardType[] {
+    const sectionOrder = sections.reduce((acc, section, index) => {
+        acc[section.id] = index;
+        return acc;
+    }, {} as Record<string, number>);
+
+    return [...list].sort((left, right) => {
+        const priorityDelta = priorityInteger(right.priority) - priorityInteger(left.priority);
+        if(priorityDelta !== 0) return priorityDelta;
+
+        const leftSectionOrder = sectionOrder[left.section] ?? Number.MAX_SAFE_INTEGER;
+        const rightSectionOrder = sectionOrder[right.section] ?? Number.MAX_SAFE_INTEGER;
+        const sectionDelta = leftSectionOrder - rightSectionOrder;
+        if(sectionDelta !== 0) return sectionDelta;
+
+        const leftDue = left.due_by ? new Date(left.due_by).getTime() : Number.MAX_SAFE_INTEGER;
+        const rightDue = right.due_by ? new Date(right.due_by).getTime() : Number.MAX_SAFE_INTEGER;
+        const dueDelta = leftDue - rightDue;
+        if(dueDelta !== 0) return dueDelta;
+
+        const positionDelta = (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER);
+        if(positionDelta !== 0) return positionDelta;
+
         return left.created.localeCompare(right.created);
     });
 }

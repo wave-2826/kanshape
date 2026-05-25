@@ -214,7 +214,7 @@
 }
 
 section {
-    min-width: 18rem;
+    min-width: 17rem;
     max-width: 25rem;
     flex: 1;
 
@@ -254,6 +254,7 @@ section {
     h2 {
         margin: 0;
         flex: 1;
+        padding: 0 0.25rem;
     }
     button {
         --bg-color: transparent;

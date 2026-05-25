@@ -46,7 +46,7 @@
     {#if cards !== null && $cards !== null}
         <div class="content">
             {#if listCards.length > 0}
-                <Masonry gridGap="0.5rem" colWidth="minmax(min(15rem, 100%), 1fr)" items={listCards}>
+                <Masonry gridGap="0.5rem" colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards}>
                     {#each listCards as card (card.id)}
                         <KanbanListEntry {card} {subprojects} {sections} onclick={() => openCardId = card.id} />
                     {/each}

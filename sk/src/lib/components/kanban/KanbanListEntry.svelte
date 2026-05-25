@@ -86,7 +86,7 @@
     font-size: var(--font-tiny);
 
     &.critical {
-        border-left: 2px solid var(--error);
+        border-left: 1px solid var(--error);
     }
 }
 

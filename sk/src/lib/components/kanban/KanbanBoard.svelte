@@ -229,7 +229,7 @@ section {
         gap: 0.75rem;
         transition: border-color 0.1s ease;
         
-        padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+        padding: 0.25rem;
         border: 1px solid transparent;
         border-radius: 4px;
         background: var(--bg-primary);
@@ -278,7 +278,6 @@ section {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: 0.5rem;
 }
 
 .card-wrapper {
@@ -312,12 +311,14 @@ section {
         left: 0;
         right: 0;
 
+        z-index: 1;
+
         &.zone-active {
             opacity: 0.1;
         }
         &.top { bottom: calc(100% + var(--shrink)); }
         &.topmost { top: var(--shrink); }
-        &.bottom { top: calc(100% + var(--shrink)); min-height: 0.5rem; }
+        &.bottom { bottom: 0; min-height: 0.5rem; }
     }
 }
 

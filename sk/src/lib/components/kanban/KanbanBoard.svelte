@@ -3,9 +3,9 @@
     import { watch, type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards, type TypedCardPreviewResponse } from "./kanban";
-    import { Funnel, Plus, SquarePlus, View } from "lucide-svelte";
-    import NewCardModal from "./NewCardModal.svelte";
+    import { Plus } from "lucide-svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
+    import KanbanMenu from "./KanbanMenu.svelte";
 
     const {
         project
@@ -52,8 +52,6 @@
         if($cards === null || draggedCardId !== null) return;
         boardCards = sortCards($cards.items);
     });
-
-    let newCardModal: NewCardModal | null = $state(null);
 
     function onDragStart(card: TypedCardPreviewResponse, event: DragEvent) {
         draggedCardId = card.id;
@@ -128,30 +126,13 @@
         const beforeCardId = dropZone?.cardId ?? "first";
         boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId, cardExpand);
     }
+
+    let kanbanMenu: KanbanMenu | null = $state(null);
 </script>
 
 <div class="kanban">
-    <menu>
-        <button onclick={() => newCardModal?.open()} disabled={sections.length === 0} class="new">
-            <SquarePlus />
-            New Card
-        </button>
-        <button disabled onclick={() => {
-            // todo
-        }}>
-            <Funnel />
-            Filter
-        </button>
-        <button disabled onclick={() => {
-            // todo
-        }}>
-            <View />
-            View
-        </button>
-        <input type="text" placeholder="Search cards..." disabled />
-    </menu>
+    <KanbanMenu {project} {sections} {boardCards} bind:this={kanbanMenu} />
 
-    <NewCardModal bind:this={newCardModal} {sections} {boardCards} projectId={project.id} />
     <CardViewPanel
         card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}
         onclose={() => openCardId = null}
@@ -176,7 +157,7 @@
                             <div class="column-header">
                                 <h2>{section.title}</h2>
                                 <span>{cards.length}</span>
-                                <button onclick={() => newCardModal?.open(section.id)} title="Add new card to this section">
+                                <button onclick={() => kanbanMenu?.openNewCardModal(section.id)} title="Add new card to this section">
                                     <Plus />
                                 </button>
                             </div>
@@ -229,21 +210,6 @@
     flex: 1;
 
     overflow: hidden;
-}
-menu {
-    background-color: var(--bg-primary);
-    padding: 0.25rem;
-    border-radius: 4px;
-    margin: 0 0.5rem;
-
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-
-    input {
-        padding: 0 0.5rem;
-        width: 200px;
-    }
 }
 .board {
     flex: 1;

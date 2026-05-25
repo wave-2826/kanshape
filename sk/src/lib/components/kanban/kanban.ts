@@ -55,11 +55,10 @@ export function nextCardPosition(boardCards: TypedCardPreviewResponse[], section
     return (positions.length > 0 ? Math.max(...positions) : 0) + 1000;
 }
 
-export async function moveCard<Expand extends string>(
+export async function moveCard(
     boardCards: TypedCardPreviewResponse[],
     cardId: string, sectionId: string,
-    beforeCardId: string | "last" | "first" | null = "first",
-    expand: Expand
+    beforeCardId: string | "last" | "first" | null = "first"
 ): Promise<TypedCardPreviewResponse[]> {
     const card = boardCards.find((entry) => entry.id === cardId);
     if(!card) return boardCards;
@@ -93,7 +92,7 @@ export async function moveCard<Expand extends string>(
         section: sectionId,
         position: targetPosition,
         moved_at: changedSections ? new Date().toISOString() : undefined
-    }, { create: false, expand }).catch((err) => {
+    }, { create: false }).catch((err) => {
         console.error("Failed to move card:", err);
         return null;
     });

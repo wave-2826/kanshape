@@ -8,11 +8,11 @@
     const {
         project,
         sections,
-        boardCards
+        cards
     }: {
         project: ExpandResponse<"projects", "subprojects,sections"> | null,
         sections: SectionsRecord[],
-        boardCards: TypedCardPreviewResponse[]
+        cards: TypedCardPreviewResponse[]
     } = $props();
 
     let newCardModal: NewCardModal | null = $state(null);
@@ -43,7 +43,7 @@
         <input type="text" placeholder="Search cards..." disabled />
     </menu>
 
-    <NewCardModal bind:this={newCardModal} {sections} {boardCards} projectId={project.id} />
+    <NewCardModal bind:this={newCardModal} {sections} boardCards={cards} projectId={project.id} />
 {/if}
 
 <style lang="scss">

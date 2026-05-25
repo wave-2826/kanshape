@@ -2,9 +2,9 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
-    import { Settings } from "lucide-svelte";
+    import { Kanban, List, Settings } from "lucide-svelte";
     import type { Snippet } from "svelte";
-    import { setProjectContext, watchProject, type ProjectContext } from "./projectContext";
+    import { setProjectContext, watchCards, watchProject, type ProjectContext } from "./projectContext";
 
     const {
         children
@@ -18,7 +18,7 @@
 
     const id = $derived(page.params.id);
 
-    let projectContext = $state<ProjectContext>({ project: null });
+    let projectContext = $state<ProjectContext>({ project: null, cards: null });
     setProjectContext(projectContext);
 
     const project = $derived(id ? await watchProject(id).catch((err) => {
@@ -26,8 +26,11 @@
         return null;
     }) : null);
 
+    const cards = $derived($project ? await watchCards($project.id) : null);
+
     $effect(() => {
         projectContext.project = project;
+        projectContext.cards = cards;
     });
     
     const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
@@ -44,7 +47,14 @@
             <header>
                 <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
                 <div class="multi-button">
-                    
+                    <button onclick={() => goto(`/projects/${$project.id}/list`)} class:active={page.route.id?.endsWith("/list")}>
+                        <List />
+                        List
+                    </button>
+                    <button onclick={() => goto(`/projects/${$project.id}/`)} class:active={!page.route.id?.endsWith("/list")}>
+                        <Kanban />
+                        Board
+                    </button>
                 </div>
                 {#if !onOnshape}
                     <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
@@ -64,6 +74,7 @@ header {
     flex-direction: row;
     align-items: center;
     padding: 0.5rem;
+    gap: 0.5rem;
 }
 h1 {
     flex: 1;

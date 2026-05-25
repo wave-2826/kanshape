@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { Collections } from "$lib/pocketbase/generated-types";
-    import { watch, type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
+    import { type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { moveCard, sortCards, type TypedCardPreviewResponse } from "./kanban";
     import { Plus } from "lucide-svelte";
@@ -8,23 +7,12 @@
     import KanbanMenu from "./KanbanMenu.svelte";
 
     const {
-        project
+        project,
+        cards
     }: {
         project: ExpandResponse<"projects", "subprojects,sections">
+        cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
-
-    const cardExpand = "" as const;
-    const cards = $derived(await watch(Collections.CardPreview, {
-        filter: `project = "${project.id}"`,
-        sort: "position,created",
-        expand: cardExpand,
-    }, 1, 500, {
-        waitForConnection: true,
-        pollOnChange: [Collections.Cards]
-    }).catch((err) => {
-        console.error("Failed to load cards:", err);
-        return null;
-    })) as PageStore<TypedCardPreviewResponse> | null;
 
     const sections = $derived.by(() => {
         const expandedSections = project.expand.sections ?? [];
@@ -124,14 +112,14 @@
         if(!cardId) return;
 
         const beforeCardId = dropZone?.cardId ?? "first";
-        boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId, cardExpand);
+        boardCards = await moveCard(boardCards, cardId, sectionId, beforeCardId);
     }
 
     let kanbanMenu: KanbanMenu | null = $state(null);
 </script>
 
 <div class="kanban">
-    <KanbanMenu {project} {sections} {boardCards} bind:this={kanbanMenu} />
+    <KanbanMenu {project} {sections} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel
         card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}

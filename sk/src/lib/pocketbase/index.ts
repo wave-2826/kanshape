@@ -240,12 +240,18 @@ export async function watchOne<
         .then((unsub) => (unsubRealtime = unsub));
     });
 
+    let subscriptions = 0;
     return {
         ...store,
         subscribe(run, invalidate) {
             const unsubStore = store.subscribe(run, invalidate);
+            subscriptions++;
+
             return async () => {
                 unsubStore();
+                subscriptions--;
+                if(subscriptions > 0) return; // don't unsubscribe from realtime if there are still subscribers
+
                 // ISSUE: Technically, we should AWAIT here, but that will slow down navigation UX.
                 if(unsubRealtime) /* await */ unsubRealtime();
             };
@@ -366,12 +372,18 @@ export async function watch<
         }
     }
 
+    let subscriptions = 0;
     return {
         ...store,
         subscribe(run, invalidate) {
             const unsubStore = store.subscribe(run, invalidate);
+            subscriptions++;
+            
             return async () => {
                 unsubStore();
+                subscriptions--;
+                if(subscriptions > 0) return; // don't unsubscribe from realtime if there are still subscribers
+
                 console.info("Unsubscribing realtime from collection", collectionName);
                 if(unsubRealtime) {
                     // Technically, we should await here, but that will slow down navigation UX.

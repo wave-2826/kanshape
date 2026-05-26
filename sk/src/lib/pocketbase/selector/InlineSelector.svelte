@@ -69,6 +69,9 @@
             isOpen = false;
         }
     }
+
+    // TODO: Make search pop up in the direction that makes most sense based on available space
+    // and escape parent containers with overflow:hidden by using a portal or sm
 </script>
 
 <svelte:window onclick={handleWindowClick} />

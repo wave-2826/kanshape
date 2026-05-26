@@ -96,6 +96,7 @@
         ></button>
     {/if}
     {#if showNav}
+        <!-- TODO: layout shift while this transitions looks goofy -->
         <nav transition:slide={{ duration: 200, axis: isMobile ? "y" : "x" }}>
             <NavContent />
         </nav>

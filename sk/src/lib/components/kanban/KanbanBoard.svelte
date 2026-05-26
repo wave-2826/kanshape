@@ -196,8 +196,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-
-    overflow: hidden;
+    min-height: 0;
 }
 .board {
     flex: 1;

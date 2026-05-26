@@ -128,7 +128,7 @@ button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.un
 }
 
 .backdrop {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, var(--intensity, 0.05));
     backdrop-filter: blur(0.5px);
 }
 

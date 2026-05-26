@@ -332,6 +332,7 @@ header {
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
@@ -384,6 +385,9 @@ footer {
         gap: 0.25rem;
         font-size: var(--font-tiny);
         color: var(--text-tertiary);
+        white-space: nowrap;
+        // yeah, this just overflows. we go with it.
+        max-width: 50%;
     }
     button.delete {
         color: var(--error);

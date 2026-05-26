@@ -38,8 +38,6 @@ The scope extends a bit beyond Kanban:
 
 ## Early development preview
 
-<img src="images/card.png" alt="A card preview in front of a demo board" width="60%" />
-<br />
-<img src="images/users.png" alt="The users and groups preview page" width="60%" />
-<br />
-<img src="images/mobile.png" alt="An alternative list view in a mobile preview" width="25%" />
+![A card preview in front of a demo board](images/card.png)
+![The users and groups preview page](images/users.png)
+<img src="images/mobile.png" alt="An alternative list view in a mobile preview" width="30%" />

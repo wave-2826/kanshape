@@ -127,6 +127,11 @@ button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.un
     }
 }
 
+.backdrop {
+    background-color: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(0.5px);
+}
+
 label {
     display: inline;
     margin: 0;

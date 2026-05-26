@@ -16,7 +16,7 @@
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/NavProfile.svelte";
     import { dev } from "$app/environment";
-    import { slide } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -41,7 +41,8 @@
     let navOpen = $state(!isMobile);
     
     const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
-    let showNav = $derived(!onOnshape && (navOpen || page.url.pathname === "/"));
+    const forceNavOpen = $derived(page.url.pathname === "/" && !isMobile);
+    let showNav = $derived(!onOnshape && (navOpen || forceNavOpen));
 </script>
 
 <svelte:head>
@@ -85,11 +86,18 @@
             <LogOut />
         </button>
     </header>
-    {#if !onOnshape && showNav}
+    {#if isMobile && showNav}
+        <button
+            class="unstyled backdrop nav-backdrop"
+            type="button"
+            aria-label="Close navigation"
+            onclick={() => navOpen = false}
+            transition:fade={{ duration: 200 }}
+        ></button>
+    {/if}
+    {#if showNav}
         <nav transition:slide={{ duration: 200, axis: isMobile ? "y" : "x" }}>
-            <div class="nav-content">
-                <NavContent />
-            </div>
+            <NavContent />
         </nav>
     {/if}
     <main>
@@ -144,17 +152,18 @@ header {
         margin-left: 0.5rem;
     }
     button {
-        --bg-color: transparent;
         padding: 0.25rem;
         width: 1.75rem;
+        -webkit-appearance: none;
+        appearance: none;
+        -webkit-tap-highlight-color: transparent;
     }
 }
 nav {
     grid-area: nav;
     background-color: var(--bg-primary);
-    overflow: hidden;
-}
-.nav-content {
+    overflow: hidden; // Internal areas scroll, but not the whole nav
+
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -162,8 +171,19 @@ nav {
     font-size: var(--font-text);
 
     width: var(--open-nav-width);
-    height: 100%;
 }
+.nav-backdrop {
+    position: fixed;
+    inset: var(--header-height) 0 0 0;
+    z-index: 999;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 main {
     grid-area: main;
     flex-grow: 1;
@@ -190,11 +210,6 @@ main {
         position: absolute;
         z-index: 1000;
         top: var(--header-height);
-    }
-
-    .nav-content {
-        width: 100%;
-        padding: 0.5rem;
     }
 }
 

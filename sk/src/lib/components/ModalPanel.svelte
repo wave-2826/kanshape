@@ -39,8 +39,6 @@
 .backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(0.5px);
     z-index: 100;
 }
 .panel {

@@ -64,17 +64,17 @@ button.selected {
 h2 {
     margin-top: 1rem;
 }
-p {
+p { 
     font-size: var(--font-small);
     color: var(--text-secondary);
     margin: 0.5rem 0 1rem 0.5rem;
 }
 
 .projects {
-    max-height: 80%;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    flex-shrink: 1;
 }
 </style>

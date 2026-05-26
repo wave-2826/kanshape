@@ -8,6 +8,7 @@
     import OnshapeLinks from "./OnshapeLinks.svelte";
     import SiteLinks from "./SiteLinks.svelte";
     import type { ProjectLinkedSite } from "$lib/project";
+    import { getIsMobile } from "../../../+layout.svelte";
 
     const {
         children
@@ -49,7 +50,7 @@
 
             <header>
                 <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
-                {#if !onOnshape}
+                {#if !onOnshape && !getIsMobile().current}
                     <OnshapeLinks project={$project} />
                 {/if}
                 <SiteLinks links={$project.linked_sites as ProjectLinkedSite[]} />

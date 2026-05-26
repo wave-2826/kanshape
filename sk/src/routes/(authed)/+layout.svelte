@@ -1,3 +1,9 @@
+<script module lang="ts">
+    import { createContext } from "svelte";
+    import { MediaQuery } from "svelte/reactivity";
+    export const [getIsMobile, setIsMobile] = createContext<MediaQuery>();
+</script>
+
 <script lang="ts">
     import "../../app.scss";
     import { page } from "$app/state";
@@ -10,6 +16,7 @@
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/NavProfile.svelte";
     import { dev } from "$app/environment";
+    import { slide } from "svelte/transition";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -22,14 +29,17 @@
 
     // Client-side redirect to /login if not authenticated
     onMount(() => {
-        if(typeof window !== "undefined") {
-            const isLoginPage = page.url.pathname.startsWith("/login");
-            const followPath = page.url.pathname;
-            if(!client.authStore.isValid && !isLoginPage) goto("/login?r=" + encodeURIComponent(followPath));
-        }
+        const isLoginPage = page.url.pathname.startsWith("/login");
+        const followPath = page.url.pathname;
+        if(!client.authStore.isValid && !isLoginPage) goto("/login?r=" + encodeURIComponent(followPath));
     });
 
-    let navOpen = $state(true)
+    setIsMobile(new MediaQuery("screen and (max-width: 640px)"));
+    const isMobile = $derived(getIsMobile().current);
+
+    // svelte-ignore state_referenced_locally
+    let navOpen = $state(!isMobile);
+    
     const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
     let showNav = $derived(!onOnshape && (navOpen || page.url.pathname === "/"));
 </script>
@@ -39,7 +49,7 @@
 <title>{$metadata.title} - {config.site.name}</title>
 </svelte:head>
 
-<div class="layout" class:showNav={showNav}>
+<div class="layout" class:isMobile={isMobile}>
     <header class="container">
         {#if onOnshape}
             <button onclick={() => window.open(window.location.origin, "_blank")}>
@@ -57,9 +67,11 @@
         {#if config.site.logoUrl}
             <img src={config.site.logoUrl} alt={config.site.name} />
         {/if}
-        <a href="/">
-            <h1>{config.site?.name}</h1>
-        </a>
+        {#if !isMobile}
+            <a href="/">
+                <h1>{config.site?.name}</h1>
+            </a>
+        {/if}
         <!-- Dev build warning -->
         {#if dev}
             <span class="dev-build-warning" title="This instance is running a development build">[DEV]</span>
@@ -73,8 +85,8 @@
             <LogOut />
         </button>
     </header>
-    {#if !onOnshape}
-        <nav>
+    {#if !onOnshape && showNav}
+        <nav transition:slide={{ duration: 200, axis: isMobile ? "y" : "x" }}>
             <div class="nav-content">
                 <NavContent />
             </div>
@@ -88,19 +100,20 @@
 <style lang="scss">
 .layout {
     --open-nav-width: 250px;
+    --header-height: 2.25rem;
 
     display: grid;
     grid-template-areas:
         "header header"
         "nav main";
-    grid-template-columns: 0px 1fr;
+    grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr;
-    height: 100vh;
-    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
 
-    transition: grid-template-columns 0.1s ease;
-    &.showNav {
-        grid-template-columns: var(--open-nav-width) 1fr;
+    > * {
+        min-width: 0;
+        overflow: hidden;
     }
 }
 header {
@@ -112,7 +125,7 @@ header {
     padding: 0 0.5rem;
     gap: 0.5rem;
 
-    height: 2.25rem;
+    height: var(--header-height);
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border);
 
@@ -158,4 +171,31 @@ main {
     
     overflow: hidden;
 }
+
+@media (max-width: 640px) {
+    .layout {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "header"
+            "nav"
+            "main";
+        grid-template-rows: auto 0 1fr;
+    }
+
+    nav {
+        width: 100%;
+        overflow: auto;
+        max-height: 70dvh;
+
+        position: absolute;
+        z-index: 1000;
+        top: var(--header-height);
+    }
+
+    .nav-content {
+        width: 100%;
+        padding: 0.5rem;
+    }
+}
+
 </style>

@@ -14,7 +14,7 @@
         project: ExpandResponse<"projects", "subprojects">
     } = $props();
 
-    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]" && page.params.id === project.id);
+    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]/(kanban)" && page.params.id === project.id);
     const treeSelected = $derived(page.route.id?.startsWith("/(authed)/projects/[id]") && page.params.id === project.id);
     
     let collapsed = $state<CollapsedState>(CollapsedState.Auto);
@@ -59,7 +59,7 @@
 </div>
 
 {#if showOpen && subprojects.length > 0}
-    <div class="sublist" transition:grow style="--color: {project.color ?? 'var(--bg-secondary)'}">
+    <div class="sublist" transition:grow={{ duration: 100 }} style="--color: {project.color ?? 'var(--bg-secondary)'}">
         <!-- Only show the settings button when on that page; it makes the UI cleaner and there are other navigation options -->
         {#if page.route.id === "/(authed)/projects/[id]/settings"}
             <button class="selected"><Settings />Settings</button>

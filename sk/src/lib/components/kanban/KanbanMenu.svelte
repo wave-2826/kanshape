@@ -57,6 +57,10 @@ menu {
     flex-direction: row;
     gap: 0.5rem;
 
+    white-space: nowrap;
+    overflow-x: auto;
+    flex-shrink: 0;
+
     input {
         padding: 0 0.5rem;
         width: 200px;

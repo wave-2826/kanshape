@@ -4,6 +4,7 @@
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
     import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { includes } from "zod/v4";
 
     let {
         assignmentData = $bindable(),
@@ -38,7 +39,6 @@
             </select>
 
             {#if assignmentData.type === "users"}
-                <!-- TODO: user selector -->
                 <InlineSelector
                     collection={Collections.Users}
                     searchField="name"
@@ -54,6 +54,11 @@
                     onchange={(ids) => assignmentData = { type: "groups", ids }}
                     itemName="groups"
                 />
+                {#if client.authStore.record?.id && assignmentData.ids.includes(client.authStore.record?.id)}
+                    <button onclick={() => {
+                        if(client.authStore.record) assignmentData = { type: "users", ids: [client.authStore.record?.id] };
+                    }}>Claim</button>
+                {/if}
             {:else if assignmentData.type === "anyone_on"}
                 <input type="date" bind:value={
                     () => (assignmentData! as AnyoneOnAssignmentData).on_date.slice(0, 10), 

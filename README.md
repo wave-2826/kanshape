@@ -34,7 +34,7 @@ The scope extends a bit beyond Kanban:
 
 > [!NOTE]
 > **AI disclosure**  
-> We care about the quality of this application! It is very intentionally **not** "vibe-coded". Though we're comfortable utilizing AI assistance as a tool, we've put a lot of care into making this application maintainable, performant, and user-friendly :)
+> We care a lot about the quality of Kanshape! It's intentionally *not* "vibe-coded". Though we're comfortable utilizing AI assistance as a tool, we've put a lot of care into making it maintainable, performant, and user-friendly :)
 
 ## Early development preview
 

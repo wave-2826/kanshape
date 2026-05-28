@@ -12,13 +12,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
-    import { getPriorityColor, priorities, type CardAssignmentData } from "../cards";
+    import { getPriorityColor, priorities, type CardAssignmentData } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-    import type { TypedCardPreviewResponse } from "../kanban";
-    import { DirtyTracker, DirtyTrackerState } from "./dirtyTracker.svelte";
+    import { DirtyTracker } from "./dirtyTracker.svelte";
     import { onDestroy, untrack } from "svelte";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
 
     let {
         card = $bindable(),
@@ -49,15 +49,18 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             description: "Loading...", // don't show a truncated description while loading the full one
             priority: preview.priority,
             due_by: preview.due_by,
-            section: preview.section,
-            subproject: preview.subproject,
             created: preview.created,
             updated: preview.updated,
             moved_at: preview.moved_at,
             created_by: preview.created_by,
             assignment_data: preview.assignment_data,
             position: preview.position,
+
             project: preview.project,
+            board: preview.board,
+            section: preview.section,
+            subprojects: preview.subprojects,
+            
             metadata: {}
         };
     }
@@ -72,7 +75,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     // Initialize or merge incoming `card` prop changes
     $effect(() => {
         if(card == null) {
-            console.log("No card selected, closing panel");
             if(tracker) {
                 tracker.destroy();
                 tracker = null;
@@ -211,7 +213,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                         <select
                             id="subproject"
                             name="subproject"
-                            bind:value={localCard.subproject}
+                            bind:value={
+                                () => localCard.subprojects?.[0] ?? "",
+                                (v) => localCard.subprojects = v ? [v] : []
+                            } // TODO: Support multiple subprojects
                             disabled={tracker.loadingFull}
                         >
                             <option value="">None</option>

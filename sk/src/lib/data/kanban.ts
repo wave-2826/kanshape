@@ -1,6 +1,6 @@
 import { save, type ExpandResponse } from "$lib/pocketbase";
 import { CardsPriorityOptions, Collections, type CardPreviewResponse, type CardsResponse, type IsoAutoDateString, type SectionsRecord } from "$lib/pocketbase/generated-types";
-import type { CardAssignmentData } from "./cards";
+import type { CardAssignmentData } from "../components/kanban/cards";
 
 type NonNullValuesExcept<T, K extends keyof T> = {
     [P in keyof T]: P extends K ? T[P] : NonNullable<T[P]>;
@@ -8,6 +8,7 @@ type NonNullValuesExcept<T, K extends keyof T> = {
 export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     CardAssignmentData, // assignment_data
     string[], // assignment_name_cache
+    string, // board
     IsoAutoDateString, // created
     string, // created_by
     string, // description (truncated)
@@ -17,7 +18,7 @@ export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     CardsPriorityOptions, // priority
     string, // project
     string, // section
-    string, // subproject
+    string[], // subprojects
     string, // title
     IsoAutoDateString, // updated
     {} // expand

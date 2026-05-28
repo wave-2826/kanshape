@@ -1,10 +1,9 @@
 <script lang="ts">
     import { dateOnly, tomorrowDate } from "$lib/datetime";
     import { client } from "$lib/pocketbase";
-    import type { AnyoneOnAssignmentData, CardAssignmentData } from "../cards";
+    import type { AnyoneOnAssignmentData, CardAssignmentData } from "../../../data/cards";
     import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { includes } from "zod/v4";
 
     let {
         assignmentData = $bindable(),

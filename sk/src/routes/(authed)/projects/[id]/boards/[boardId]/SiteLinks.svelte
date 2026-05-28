@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getConfig } from "$lib/config";
-    import type { ProjectLinkedSite } from "$lib/project";
+    import type { ProjectLinkedSite } from "$lib/data/project";
 
     const {
         links

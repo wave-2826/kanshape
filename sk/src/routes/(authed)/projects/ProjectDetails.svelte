@@ -2,9 +2,9 @@
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { createPartIDString } from "$lib/parts";
     import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
-    import type { ProjectLinkedSite } from "$lib/project";
-    import OnshapeLinks from "./[id]/(kanban)/OnshapeLinks.svelte";
+    import type { ProjectLinkedSite } from "$lib/data/project";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
+    import OnshapeLinks from "./[id]/boards/[boardId]/OnshapeLinks.svelte";
 
     let {
         color = $bindable(),

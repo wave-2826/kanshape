@@ -1,4 +1,4 @@
-import type { ProjectsResponse } from "./pocketbase/generated-types";
+import type { ProjectsResponse } from "../pocketbase/generated-types";
 
 export type TypedProjectsResponse<Expand = {}> = ProjectsResponse<CustomCardFields, ProjectLinkedSite[], Expand>;
 

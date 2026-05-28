@@ -11,6 +11,7 @@ export const Collections = {
 	Mfas: "_mfas",
 	Otps: "_otps",
 	Superusers: "_superusers",
+	Boards: "boards",
 	CardPreview: "card_preview",
 	Cards: "cards",
 	Config: "config",
@@ -104,9 +105,28 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubproject = unknown, Ttitle = unknown, Tupdated = unknown> = {
+export const BoardsTypeOptions = {
+	"blank": "blank",
+	"parts": "parts",
+	"software": "software",
+} as const
+export type BoardsTypeOptions = typeof BoardsTypeOptions[keyof typeof BoardsTypeOptions]
+export type BoardsRecord<Tcustom_card_fields = unknown, Tlinked_sites = unknown> = {
+	created: IsoAutoDateString
+	custom_card_fields?: null | Tcustom_card_fields
+	description?: string
+	id: string
+	linked_sites?: null | Tlinked_sites
+	sections?: RecordIdString[]
+	title?: string
+	type: BoardsTypeOptions
+	updated: IsoAutoDateString
+}
+
+export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown> = {
 	assignment_data?: null | Tassignment_data
 	assignment_name_cache?: null | Tassignment_name_cache
+	board?: null | Tboard
 	created?: null | Tcreated
 	created_by?: null | Tcreated_by
 	description?: null | Tdescription
@@ -117,7 +137,7 @@ export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache
 	priority?: null | Tpriority
 	project?: null | Tproject
 	section?: null | Tsection
-	subproject?: null | Tsubproject
+	subprojects?: null | Tsubprojects
 	title?: null | Ttitle
 	updated?: null | Tupdated
 }
@@ -131,6 +151,7 @@ export const CardsPriorityOptions = {
 export type CardsPriorityOptions = typeof CardsPriorityOptions[keyof typeof CardsPriorityOptions]
 export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	assignment_data?: null | Tassignment_data
+	board: RecordIdString
 	created: IsoAutoDateString
 	created_by?: RecordIdString
 	description?: string
@@ -142,7 +163,7 @@ export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	priority: CardsPriorityOptions
 	project: RecordIdString
 	section: RecordIdString
-	subproject?: RecordIdString
+	subprojects?: RecordIdString[]
 	title?: string
 	updated: IsoAutoDateString
 }
@@ -203,6 +224,7 @@ export const ProjectsTypeOptions = {
 } as const
 export type ProjectsTypeOptions = typeof ProjectsTypeOptions[keyof typeof ProjectsTypeOptions]
 export type ProjectsRecord<Tcustom_card_fields = unknown, Tlinked_sites = unknown> = {
+	boards?: RecordIdString[]
 	color?: string
 	created: IsoAutoDateString
 	current_part_id?: number
@@ -262,7 +284,8 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubproject = unknown, Ttitle = unknown, Tupdated = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tcreated, Tcreated_by, Tdescription, Tdue_by, Tmoved_at, Tposition, Tpriority, Tproject, Tsection, Tsubproject, Ttitle, Tupdated>> & BaseSystemFields<Texpand>
+export type BoardsResponse<Tcustom_card_fields = unknown, Tlinked_sites = unknown, Texpand = unknown> = Required<BoardsRecord<Tcustom_card_fields, Tlinked_sites>> & BaseSystemFields<Texpand>
+export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tboard, Tcreated, Tcreated_by, Tdescription, Tdue_by, Tmoved_at, Tposition, Tpriority, Tproject, Tsection, Tsubprojects, Ttitle, Tupdated>> & BaseSystemFields<Texpand>
 export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
@@ -283,6 +306,7 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	boards: BoardsRecord
 	card_preview: CardPreviewRecord
 	cards: CardsRecord
 	config: ConfigRecord
@@ -303,6 +327,7 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	boards: BoardsResponse
 	card_preview: CardPreviewResponse
 	cards: CardsResponse
 	config: ConfigResponse

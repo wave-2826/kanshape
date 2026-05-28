@@ -4,7 +4,7 @@
     import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import ProjectDetails from "../ProjectDetails.svelte";
-    import type { ProjectLinkedSite } from "$lib/project";
+    import type { ProjectLinkedSite } from "$lib/data/project";
 
     $effect(() => {
         $metadata.title = "New project";

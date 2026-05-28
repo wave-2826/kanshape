@@ -2,15 +2,17 @@
     import { client, save } from "$lib/pocketbase";
     import { CardsPriorityOptions, Collections, type SectionsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
-    import { priorities } from "./cards";
-    import { nextCardPosition, type TypedCardPreviewResponse } from "./kanban";
+    import { priorities } from "../../data/cards";
+    import { nextCardPosition, type TypedCardPreviewResponse } from "$lib/data/kanban";
 
     let {
         projectId,
+        boardId,
         sections,
         boardCards
     }: {
         projectId: string,
+        boardId: string,
         sections: SectionsRecord[],
         boardCards: TypedCardPreviewResponse[]
     } = $props();
@@ -28,6 +30,7 @@
         await save(Collections.Cards, {
             title,
             project: projectId,
+            board: boardId,
             section: sectionId,
             position: nextCardPosition(boardCards, sectionId),
             moved_at: new Date().toISOString(),

@@ -1,14 +1,13 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { metadata } from "$lib/metadata";
     import { Kanban, List, Settings } from "lucide-svelte";
     import type { Snippet } from "svelte";
-    import { setProjectContext, watchCards, watchProject, type ProjectContext } from "./projectContext";
-    import OnshapeLinks from "./OnshapeLinks.svelte";
+    import { getProjectContext, setBoardContext, watchBoard, watchCards, type BoardContext } from "../../context";
     import SiteLinks from "./SiteLinks.svelte";
-    import type { ProjectLinkedSite } from "$lib/project";
-    import { getIsMobile } from "../../../+layout.svelte";
+    import type { ProjectLinkedSite } from "$lib/data/project";
+    import OnshapeLinks from "./OnshapeLinks.svelte";
+    import { getIsMobile } from "../../../../+layout.svelte";
 
     const {
         children
@@ -16,35 +15,37 @@
         children: Snippet
     } = $props();
 
-    $effect(() => {
-        $metadata.title = $project ? `${$project.title}` : "Project";
-    });
+    const boardId = $derived(page.params.boardId);
 
-    const id = $derived(page.params.id);
+    let boardContext = $state<BoardContext>({ board: null, cards: null });
+    setBoardContext(boardContext);
 
-    let projectContext = $state<ProjectContext>({ project: null, cards: null });
-    setProjectContext(projectContext);
-
-    const project = $derived(id ? await watchProject(id).catch((err) => {
-        console.error("Failed to load project:", err);
+    const board = $derived(boardId ? await watchBoard(boardId).catch((err) => {
+        console.error("Failed to load board:", err);
         return null;
     }) : null);
 
-    const cards = $derived($project ? await watchCards($project.id) : null);
+    const cards = $derived($board ? await watchCards($board.id).catch((err) => {
+        console.error("Failed to load cards:", err);
+        return null;
+    }) : null);
 
     $effect(() => {
-        projectContext.project = project;
-        projectContext.cards = cards;
+        boardContext.board = board;
+        boardContext.cards = cards;
     });
-    
+
     const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
+
+    const project = $derived(getProjectContext().project);
 </script>
 
 <div class="page">
-    {#if project && $project !== null}
+    {#if project && $project !== null && board && $board !== null}
         <svelte:boundary>
             {#snippet failed(error)}
-                <p>Failed to load project.</p>
+                {@debug error}
+                <p>Failed to load board.</p>
                 <span class="error">{(error as any)["message"]}</span>
             {/snippet}
 
@@ -56,11 +57,11 @@
                 <SiteLinks links={$project.linked_sites as ProjectLinkedSite[]} />
                 <div style="flex: 1"></div>
                 <div class="multi-button">
-                    <button onclick={() => goto(`/projects/${$project.id}/list`)} class:active={page.route.id?.endsWith("/list")}>
+                    <button onclick={() => goto(`/projects/${$project.id}/boards/${$board.id}/list`)} class:active={page.route.id?.endsWith("/list")}>
                         <List />
                         List
                     </button>
-                    <button onclick={() => goto(`/projects/${$project.id}/`)} class:active={!page.route.id?.endsWith("/list")}>
+                    <button onclick={() => goto(`/projects/${$project.id}/boards/${$board.id}`)} class:active={!page.route.id?.endsWith("/list")}>
                         <Kanban />
                         Board
                     </button>

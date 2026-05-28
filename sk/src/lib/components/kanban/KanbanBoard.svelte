@@ -1,23 +1,25 @@
 <script lang="ts">
     import { type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
-    import { moveCard, sortCards, type TypedCardPreviewResponse } from "./kanban";
     import { Plus } from "lucide-svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
     import KanbanMenu from "./KanbanMenu.svelte";
+    import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";
 
     const {
         project,
+        board,
         cards
     }: {
-        project: ExpandResponse<"projects", "subprojects,sections">
+        project: ExpandResponse<"projects", "subprojects">,
+        board: ExpandResponse<"boards", "sections">,
         cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
 
     const sections = $derived.by(() => {
-        const expandedSections = project.expand.sections ?? [];
+        const expandedSections = board.expand.sections ?? [];
         const sectionsById = new Map(expandedSections.map((section) => [section.id, section]));
-        const orderedSectionIds = project.sections ?? expandedSections.map((section) => section.id);
+        const orderedSectionIds = board.sections ?? expandedSections.map((section) => section.id);
 
         return orderedSectionIds
             .map((sectionId) => sectionsById.get(sectionId))
@@ -119,7 +121,7 @@
 </script>
 
 <div class="kanban">
-    <KanbanMenu {project} {sections} cards={boardCards} bind:this={kanbanMenu} />
+    <KanbanMenu {project} {board} {sections} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel
         card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}

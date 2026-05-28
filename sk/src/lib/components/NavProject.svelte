@@ -2,19 +2,18 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { type ExpandResponse } from "$lib/pocketbase";
-    import type { ProjectsResponse } from "$lib/pocketbase/generated-types";
     import { grow } from "$lib/transitions";
-    import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban } from "lucide-svelte";
+    import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "lucide-svelte";
     import { untrack } from "svelte";
     
     // svelte-ignore non_reactive_update ???
     enum CollapsedState { Collapsed, Expanded, Auto };
     
     const { project }: {
-        project: ExpandResponse<"projects", "subprojects">
+        project: ExpandResponse<"projects", "subprojects,boards">
     } = $props();
 
-    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]/(kanban)" && page.params.id === project.id);
+    const selfSelected = $derived(page.route.id === "/(authed)/projects/[id]" && page.params.id === project.id);
     const treeSelected = $derived(page.route.id?.startsWith("/(authed)/projects/[id]") && page.params.id === project.id);
     
     let collapsed = $state<CollapsedState>(CollapsedState.Auto);
@@ -47,23 +46,33 @@
         <SquareKanban />
         {project.title}
     </button>
-    {#if subprojects.length > 0}
-        <button class="unstyled" onclick={toggleCollapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
-            {#if collapsed === CollapsedState.Expanded}
-                <ChevronUp />
-            {:else}
-                <ChevronDown />
-            {/if}
-        </button>
-    {/if}
+    <button class="unstyled" onclick={toggleCollapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
+        {#if collapsed === CollapsedState.Expanded}
+            <ChevronUp />
+        {:else}
+            <ChevronDown />
+        {/if}
+    </button>
 </div>
 
-{#if showOpen && subprojects.length > 0}
+{#if showOpen}
     <div class="sublist" transition:grow={{ duration: 100 }} style="--color: {project.color ?? 'var(--bg-secondary)'}">
         <!-- Only show the settings button when on that page; it makes the UI cleaner and there are other navigation options -->
         {#if page.route.id === "/(authed)/projects/[id]/settings"}
             <button class="selected"><Settings />Settings</button>
         {/if}
+        {#each project.boards as boardId}
+            {@const board = project.expand.boards?.find(b => b.id === boardId)}
+            {#if board}
+                <button
+                    onclick={() => { goto(`/projects/${project.id}/boards/${boardId}`); }}
+                    class:selected={page.route.id === "/(authed)/projects/[id]/boards/[boardId]" && page.params.boardId === boardId}
+                >
+                    <Kanban />
+                    {board.title}
+                </button>
+            {/if}
+        {/each}
         {#each project.subprojects as subprojectId}
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}
             {#if subproject}
@@ -71,7 +80,7 @@
                     onclick={() => { goto(`/projects/${project.id}/subprojects/${subproject.id}`); }}
                     class:selected={page.route.id === "/(authed)/projects/[id]/subprojects/[subprojectId]" && page.params.subprojectId === subproject.id}
                 >
-                    <Kanban />
+                    <Tag />
                     {subproject.name}
                 </button>
             {/if}

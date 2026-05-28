@@ -8,7 +8,7 @@
     import { ArrowLeft, Save } from "lucide-svelte";
     import { goto } from "$app/navigation";
     import { deepEqual } from "$lib/util";
-    import type { ProjectLinkedSite, TypedProjectsResponse } from "$lib/project";
+    import type { ProjectLinkedSite, TypedProjectsResponse } from "$lib/data/project";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";

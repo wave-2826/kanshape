@@ -1,17 +1,23 @@
-import type { TypedCardPreviewResponse } from "$lib/components/kanban/kanban";
+import type { TypedCardPreviewResponse } from "$lib/data/kanban";
 import { watch, watchOne, type PageStore } from "$lib/pocketbase";
 import { Collections } from "$lib/pocketbase/generated-types";
 import { createContext } from "svelte";
 
 export function watchProject(id: string) {
     return watchOne(Collections.Projects, id, {
-        expand: "subprojects,sections"
+        expand: "subprojects"
     });
 }
 
-export function watchCards(projectId: string): Promise<PageStore<TypedCardPreviewResponse> | null> {
+export function watchBoard(id: string) {
+    return watchOne(Collections.Boards, id, {
+        expand: "sections"
+    });
+}
+
+export function watchCards(boardId: string): Promise<PageStore<TypedCardPreviewResponse> | null> {
     return watch(Collections.CardPreview, {
-        filter: `project = "${projectId}"`,
+        filter: `board = "${boardId}"`,
         sort: "position,created"
     }, 1, 500, {
         waitForConnection: true,
@@ -24,6 +30,11 @@ export function watchCards(projectId: string): Promise<PageStore<TypedCardPrevie
 
 export type ProjectContext = {
     project: Awaited<ReturnType<typeof watchProject>> | null;
-    cards: Awaited<ReturnType<typeof watchCards>> | null;
 };
 export const [getProjectContext, setProjectContext] = createContext<ProjectContext>();
+
+export type BoardContext = {
+    board: Awaited<ReturnType<typeof watchBoard>> | null;
+    cards: Awaited<ReturnType<typeof watchCards>> | null;
+};
+export const [getBoardContext, setBoardContext] = createContext<BoardContext>();

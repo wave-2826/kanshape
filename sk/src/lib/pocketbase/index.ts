@@ -20,13 +20,16 @@ type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
 const expandCollections = {
     projects: {
         subprojects: "subprojects",
-        sections: "sections"
+        boards: "boards"
     },
     cards: {
         created_by: "users",
-        subproject: "subprojects",
+        subprojects: "subprojects",
         project: "projects",
         section: "sections"
+    },
+    boards: {
+        sections: "sections"
     },
     leaderboard: {
         user: "users",
@@ -353,7 +356,7 @@ export async function watch<
                 client.collection(coll).subscribe(
                     "*",
                     () => {
-                        console.info("Change detected in collection", coll, "- refreshing list for", collectionName);
+                        console.info(`Change detected in collection ${coll} - refreshing list for ${collectionName}`);
                         setPage(result.page);
                     },
                     queryParams

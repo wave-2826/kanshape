@@ -1,10 +1,10 @@
 <script lang="ts">
     import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
-    import { getPriorityColor, type CardAssignmentData } from "./cards";
+    import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
-    import type { TypedCardPreviewResponse } from "./kanban";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     
     // TODO: Remove this silly assignment cache thing and manually
     // query for the expanded user/group data when needed. This requires one
@@ -30,9 +30,9 @@
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="header">
         <h3>{card.title}</h3>
-        {#if card.subproject !== ""}
-            <span class="subproject"><Kanban />{subprojects.find((sp) => sp.id === card.subproject)?.name ?? card.subproject}</span>
-        {/if}
+        {#each card.subprojects as subprojectId}
+            <span class="meta-pill subproject"><Kanban />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+        {/each}
     </div>
 
     {#if card.description}

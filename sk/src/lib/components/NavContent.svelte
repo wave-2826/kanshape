@@ -7,7 +7,7 @@
     import NavProject from "./NavProject.svelte";
 
     const projects = await watch(Collections.Projects, {
-        expand: "subprojects"
+        expand: "subprojects,boards"
     }, 1, 500).catch((err) => {
         console.error("Failed to load projects:", err);
         return null;

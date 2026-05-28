@@ -1,10 +1,10 @@
 <script lang="ts">
     import { type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
-    import { getPriorityColor, type CardAssignmentData } from "./cards";
+    import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
-    import type { TypedCardPreviewResponse } from "./kanban";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     
     const {
         card,
@@ -26,9 +26,9 @@
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="main">
         <h3>{card.title}</h3>
-        {#if card.subproject !== ""}
-            <span class="meta-pill subproject"><Kanban />{subprojects.find((sp) => sp.id === card.subproject)?.name ?? card.subproject}</span>
-        {/if}
+        {#each card.subprojects as subprojectId}
+            <span class="meta-pill subproject"><Kanban />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+        {/each}
 
         <span class="meta-pill section" style="color: {section?.color ?? 'var(--text-primary)'}"><Kanban />{section?.title ?? card.section}</span>
 

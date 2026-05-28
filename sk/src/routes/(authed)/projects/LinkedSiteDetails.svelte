@@ -1,7 +1,7 @@
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { getConfig } from "$lib/config";
-    import type { ProjectLinkedSite } from "$lib/project";
+    import type { ProjectLinkedSite } from "$lib/data/project";
     import { X } from "lucide-svelte";
 
     const config = getConfig();

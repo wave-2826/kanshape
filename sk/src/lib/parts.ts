@@ -2,6 +2,7 @@
  * Constructs a part ID string. The current part ID format is:
  * `{project id}-{part number + subproject offset}{revision letter}`.
  * For example, the second revision of part 1 of project `2826-26` in subproject `1000` would be `2826-26-1001B`.
+ * subsystems/projects.
  * @param projectIdPrefix
  * @param subprojectOffset
  * @param partNumber

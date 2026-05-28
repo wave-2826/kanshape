@@ -3,8 +3,8 @@
     import { batch, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
-    import ProjectDetails from "../ProjectDetails.svelte";
-    import type { ProjectLinkedSite } from "$lib/data/project";
+    import ProjectDetails, { type BoardCreationData } from "../ProjectDetails.svelte";
+    import { generateRecordID, getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
 
     $effect(() => {
         $metadata.title = "New project";
@@ -18,19 +18,29 @@
     let linkedSites = $state<ProjectLinkedSite[]>([]);
     
     let subprojects = $state<Create<"subprojects">[]>([]);
-    let sections = $state<Create<"sections">[]>([
-        { title: "To Design", description: "Items that still need to be designed in CAD", color: undefined, is_completed: false },
-        { title: "Being Designed", description: "Items currently being worked on in CAD", color: "#fdcb6e", is_completed: false },
-        { title: "To Manufacture", description: "Items ready for manufacturing", color: "#00b894", is_completed: false },
-        { title: "Completed", description: "Items that have been completed", color: "#0984e3", is_completed: true }
+    let boards = $state<BoardCreationData[]>([
+        { title: "Default", description: "", type: "blank", sections: getTemplateSections() }
     ]);
 
     async function createProject() {
         const result = await batch(async (batch) => {
-            for(const [i, section] of sections.entries()) {
-                save(Collections.Sections, {
-                    ...section,
-                    position: i * 10000 + Math.random() * 1000
+            for(const board of boards) {
+                let sectionIds: string[] = [];
+                for(const [sectionIndex, section] of board.sections.entries()) {
+                    const id = generateRecordID();
+                    sectionIds.push(id);
+                    save(Collections.Sections, {
+                        ...section,
+                        position: sectionIndex * 10000 + Math.random() * 100,
+                        id
+                    }, { batch, create: true });
+                }
+
+                save(Collections.Boards, {
+                    title: board.title,
+                    description: board.description,
+                    type: board.type,
+                    sections: sectionIds
                 }, { batch, create: true });
             }
             
@@ -38,9 +48,15 @@
                 save(Collections.Subprojects, subproject, { batch, create: true });
             }
         });
+        if(!result) return;
 
-        let sectionIds = result.filter(r => r.body.collectionName === Collections.Sections).map(r => r.body.id);
+        let boardIds = result.filter(r => r.body.collectionName === Collections.Boards).map(r => r.body.id);
         let subprojectIds = result.filter(r => r.body.collectionName === Collections.Subprojects).map(r => r.body.id);
+
+        if(boardIds.length !== boards.length || subprojectIds.length !== subprojects.length) {
+            alert("Failed to create all boards or subprojects");
+            return;
+        }
 
         // Sadly, PB doesn't support transactions, so we have to do this across multiple requests.
         const projectRecord = await save(Collections.Projects, {
@@ -49,9 +65,8 @@
             part_id_prefix: partIdPrefix,
             current_part_id: 1,
             color: color ?? "",
-            sections: sectionIds,
+            boards: boardIds,
             subprojects: subprojectIds,
-            custom_card_fields: {},
             linked_sites: linkedSites,
             type: "blank"
         }, {
@@ -67,7 +82,7 @@
     <h1>New project</h1>
 
     <div class="options">
-        <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:sections bind:linkedSites />
+        <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:boards bind:linkedSites />
 
         <button onclick={createProject} disabled={name.trim().length === 0 || partIdPrefix.trim().length === 0} class="create">
             <Plus />Create {name}

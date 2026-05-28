@@ -123,7 +123,7 @@ export type BoardsRecord<Tcustom_card_fields = unknown, Tlinked_sites = unknown>
 	updated: IsoAutoDateString
 }
 
-export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown> = {
+export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown> = {
 	assignment_data?: null | Tassignment_data
 	assignment_name_cache?: null | Tassignment_name_cache
 	board?: null | Tboard
@@ -135,7 +135,6 @@ export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache
 	moved_at?: null | Tmoved_at
 	position?: null | Tposition
 	priority?: null | Tpriority
-	project?: null | Tproject
 	section?: null | Tsection
 	subprojects?: null | Tsubprojects
 	title?: null | Ttitle
@@ -161,7 +160,6 @@ export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	moved_at?: IsoDateString
 	position?: number
 	priority: CardsPriorityOptions
-	project: RecordIdString
 	section: RecordIdString
 	subprojects?: RecordIdString[]
 	title?: string
@@ -283,7 +281,7 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type BoardsResponse<Tcustom_card_fields = unknown, Tlinked_sites = unknown, Texpand = unknown> = Required<BoardsRecord<Tcustom_card_fields, Tlinked_sites>> & BaseSystemFields<Texpand>
-export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tproject = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tboard, Tcreated, Tcreated_by, Tdescription, Tdue_by, Tmoved_at, Tposition, Tpriority, Tproject, Tsection, Tsubprojects, Ttitle, Tupdated>> & BaseSystemFields<Texpand>
+export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdescription = unknown, Tdue_by = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tboard, Tcreated, Tcreated_by, Tdescription, Tdue_by, Tmoved_at, Tposition, Tpriority, Tsection, Tsubprojects, Ttitle, Tupdated>> & BaseSystemFields<Texpand>
 export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>

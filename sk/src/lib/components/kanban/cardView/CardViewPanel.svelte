@@ -57,7 +57,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             assignment_data: preview.assignment_data,
             position: preview.position,
 
-            project: preview.project,
             board: preview.board,
             section: preview.section,
             subprojects: preview.subprojects,

@@ -30,7 +30,6 @@
 
         await save(Collections.Cards, {
             title,
-            project: projectId,
             board: boardId,
             section: sectionId,
             position: nextCardPosition(boardCards, sectionId),

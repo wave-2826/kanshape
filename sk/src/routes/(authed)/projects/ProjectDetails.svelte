@@ -1,8 +1,15 @@
+<script lang="ts" module>
+    import { BoardsTypeOptions, ProjectsTypeOptions, type Create, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
+
+    export type BoardCreationData = Omit<Create<"boards">, "sections"> & {
+        sections: Create<"sections">[]
+    };
+</script>
+
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { createPartIDString } from "$lib/parts";
-    import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
-    import type { ProjectLinkedSite } from "$lib/data/project";
+    import { boardTypes, getTemplateSections, projectTypes, type ProjectLinkedSite } from "$lib/data/project";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
     import OnshapeLinks from "./[id]/boards/[boardId]/OnshapeLinks.svelte";
 
@@ -12,7 +19,7 @@
         description = $bindable(),
         partIdPrefix = $bindable(),
         type = $bindable(),
-        sections = $bindable(),
+        boards = $bindable(),
         subprojects = $bindable(),
         linkedSites = $bindable(),
         editedProject = null
@@ -22,27 +29,11 @@
         description: string;
         partIdPrefix: string;
         type: ProjectsTypeOptions;
-        sections: Create<"sections">[];
+        boards: BoardCreationData[];
         subprojects: Create<"subprojects">[];
         linkedSites: ProjectLinkedSite[];
         editedProject?: ProjectsResponse | null;
     } = $props();
-
-    const projectTypes: {
-        [key in ProjectsTypeOptions]: {
-            name: string;
-            description: string;
-        }
-    } = {
-        "blank": {
-            name: "Blank",
-            description: "Miscellaneous project type with no special features"
-        },
-        "manufacturing": {
-            name: "Manufacturing",
-            description: "Allows configuring part IDs"
-        }
-    };
 
     const colorSelected = $derived(color !== undefined && color.trim() !== "");
 </script>
@@ -63,13 +54,15 @@
 </div>
 
 <h2>Project type</h2>
-{#each (Object.keys(ProjectsTypeOptions) as ProjectsTypeOptions[]) as option}
-    {@const optionDetails = projectTypes[option]}
-    <button class:selected={type === option} onclick={() => type = option}>
-        {optionDetails.name}
-        <span class="description">{optionDetails.description}</span>
-    </button>
-{/each}
+<div class="type-selector">
+    {#each (Object.keys(ProjectsTypeOptions) as ProjectsTypeOptions[]) as option}
+        {@const optionDetails = projectTypes[option]}
+        <button class:selected={type === option} onclick={() => type = option}>
+            {optionDetails.name}
+            <span class="description">{optionDetails.description}</span>
+        </button>
+    {/each}
+</div>
 {#if type === "manufacturing"}
     <div class="option">
         <label for="partIdPrefix">Part ID prefix</label>
@@ -89,45 +82,98 @@
 <p>Linked sites</p>
 <LinkedSiteDetails bind:linkedSites />
 
-<h2>Sections</h2>
+<h2>Boards</h2>
 <LeftPaneChooser
-    options={sections.map(s => ({ name: s.title ?? "", tooltip: s.description, color: s.color ?? undefined }))}
-    oncreate={() => sections.push({ title: `Section ${sections.length + 1}`, color: undefined, is_completed: false })}
-    ondelete={(option) => sections.splice(option, 1)}
+    options={boards.map(b => ({ name: b.title ?? "", tooltip: b.description }))}
+    oncreate={() => boards.push({
+        title: `Board ${boards.length + 1}`,
+        type: "blank",
+        description: "",
+        sections: getTemplateSections()
+    })}
+    ondelete={(option) => boards.splice(option, 1)}
     ordered
     onreorder={(from, to) => {
-        const selArr = sections.map((_, i) => i);
+        const selArr = boards.map((_, i) => i);
         const selItem = selArr.splice(from, 1)[0];
         selArr.splice(to, 0, selItem);
-        sections = selArr.map(i => sections[i]);
+        boards = selArr.map(i => boards[i]);
     }}
 >
     {#snippet pane(selected)}
-        {@const colorSelected = sections[selected].color !== undefined && sections[selected].color.trim() !== ""}
-        <div class="section">
-            <input type="text" placeholder="Section name" bind:value={sections[selected].title} />
-            <textarea placeholder="Section description (optional)" bind:value={sections[selected].description}></textarea>
-            <div class="option">
-                <label for="color">Section color</label>
-                <button onclick={() => sections[selected].color = ""} class:selected={!colorSelected}>None</button>
-                <input
-                    type="color"
-                    id="color"
-                    value={sections[selected].color ?? "#ffffff"}
-                    onchange={(e) => sections[selected].color = e.currentTarget.value}
-                    class:selected={colorSelected}
-                />
+        {@const board = boards[selected]}
+        {#if board}
+            <div class="board">
+                <input type="text" placeholder="Board name" bind:value={board.title} />
+                <textarea placeholder="Board description (optional)" bind:value={board.description}></textarea>
+
+                <p>Board type</p>
+                <div class="type-selector">
+                    {#each (Object.keys(BoardsTypeOptions) as BoardsTypeOptions[]) as option}
+                        {@const optionDetails = boardTypes[option]}
+                        <button class:selected={board.type === option} onclick={() => board.type = option}>
+                            {optionDetails.name}
+                            <span class="description">{optionDetails.description}</span>
+                        </button>
+                    {/each}
+                </div>
+
+                <p>Sections</p>
+                <LeftPaneChooser
+                    options={board.sections?.map(s => ({ name: s.title ?? "", tooltip: s.description })) ?? []}
+                    oncreate={() => {
+                        if(!board.sections) board.sections = [];
+                        board.sections.push({ title: `Section ${board.sections.length + 1}`, description: "", color: undefined, is_completed: false });
+                    }}
+                    ondelete={(option) => board.sections?.splice(option, 1)}
+                    ordered
+                    onreorder={(from, to) => {
+                        if(!board.sections) return;
+                        const selArr = board.sections.map((_, i) => i);
+                        const selItem = selArr.splice(from, 1)[0];
+                        selArr.splice(to, 0, selItem);
+                        board.sections = selArr.map(i => board.sections![i]);
+                    }}
+                    background="var(--bg-site)"
+                >
+                    {#snippet pane(selected)}
+                        {@const section = board.sections?.[selected]}
+                        {#if section}
+                            {@const hasColor = section.color !== undefined && section.color.trim() !== ""}
+                            <div class="section">
+                                <input type="text" placeholder="Section name" bind:value={section.title} />
+                                <textarea placeholder="Section description (optional)" bind:value={section.description}></textarea>
+
+                                <div class="option">
+                                    <label for="sectionColor">Section color</label>
+                                    <input
+                                        type="color"
+                                        id="sectionColor"
+                                        value={section.color ?? "#ffffff"}
+                                        onchange={(e) => section.color = e.currentTarget.value}
+                                        class:selected={hasColor}
+                                    />
+                                    <button onclick={() => section.color = ""} class:selected={!hasColor}>None</button>
+                                </div>
+                                <div class="option">
+                                    <label for="isCompleted">Is completed?</label>
+                                    <input
+                                        type="checkbox"
+                                        id="isCompleted"
+                                        checked={section.is_completed}
+                                        onchange={(e) => section.is_completed = e.currentTarget.checked}
+                                    />
+                                </div>
+                            </div>
+                        {/if}
+                    {/snippet}
+                </LeftPaneChooser>
+
+                <p>Linked sites</p>
+                <!-- TODO: this UI is stupid -->
+                <LinkedSiteDetails bind:linkedSites={board.linked_sites as ProjectLinkedSite[]} background="var(--bg-site)" />
             </div>
-            <div class="option" title="Used only for leaderboards and display for now">
-                <label for="isCompleted">Is Completed</label>
-                <input
-                    type="checkbox"
-                    id="isCompleted"
-                    checked={sections[selected].is_completed}
-                    onchange={(e) => sections[selected].is_completed = e.currentTarget.checked}
-                />
-            </div>
-        </div>
+        {/if}
     {/snippet}
 </LeftPaneChooser>
 
@@ -161,22 +207,33 @@
 </LeftPaneChooser>
 
 <style lang="scss">
-.description {
-    font-size: var(--font-small);
-    color: var(--text-secondary);
-    margin-left: 0.5rem;
+.type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    button {
+        display: block;
+        text-align: left;
+    }
+    .description {
+        font-size: var(--font-small);
+        color: var(--text-secondary);
+        margin-left: 0.75rem;
+        white-space: normal;
+    }
 }
 .option {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
-.subproject, .section {
+.subproject, .board, .section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
-.subproject label, .subproject p, .section label {
+.subproject label, .subproject p {
     font-size: var(--font-small);
     margin-left: 0.5rem;
 }

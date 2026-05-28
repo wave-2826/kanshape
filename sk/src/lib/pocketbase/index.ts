@@ -25,7 +25,6 @@ const expandCollections = {
     cards: {
         created_by: "users",
         subprojects: "subprojects",
-        project: "projects",
         section: "sections"
     },
     boards: {
@@ -91,9 +90,27 @@ export function stripExpand<Record extends { expand?: any }>(record: Record): Om
     return rest;
 }
 
-export async function batch(run: (batch: BatchService) => Promise<void>): Promise<BatchRequestResult[]> {
+export class CancelBatch extends Error {
+    constructor(message?: string) {
+        super(message);
+        this.name = "CancelBatch";
+    }
+}
+
+export async function batch(run: (batch: BatchService) => Promise<void>): Promise<BatchRequestResult[] | null> {
     const batch = client.createBatch();
-    await run(batch);
+
+    try {
+        await run(batch);
+    } catch(err) {
+        if(err instanceof CancelBatch) {
+            console.warn("Batch cancelled:", err.message);
+            return null;
+        }
+    
+        throw err;
+    }
+
     return await batch.send();
 }
 
@@ -440,9 +457,10 @@ export async function deleteRecord<C extends Collections | string>(
     collectionName: C,
     recordId: string,
     options?: {
-        fetch?: typeof window.fetch
+        fetch?: typeof window.fetch,
+        batch?: BatchService
     }
 ): Promise<void> {
-    const collection = client.collection(collectionName);
+    const collection = options?.batch ? options.batch.collection(collectionName) : client.collection(collectionName);
     await collection.delete(recordId, { fetch: options?.fetch });
 }

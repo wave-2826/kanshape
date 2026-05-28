@@ -19,6 +19,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { DirtyTracker } from "./dirtyTracker.svelte";
     import { onDestroy, untrack } from "svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import InlineSelector from "$lib/components/InlineSelector.svelte";
 
     let {
         card = $bindable(),
@@ -208,22 +209,14 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
             {#if subprojects.length > 0}
                 <div class="property">
-                    <span class="prop-label"><Kanban />Subproject</span>
+                    <span class="prop-label"><Kanban />Subprojects</span>
                     <div class="prop-value">
-                        <select
-                            id="subproject"
-                            name="subproject"
-                            bind:value={
-                                () => localCard.subprojects?.[0] ?? "",
-                                (v) => localCard.subprojects = v ? [v] : []
-                            } // TODO: Support multiple subprojects
-                            disabled={tracker.loadingFull}
-                        >
-                            <option value="">None</option>
-                            {#each subprojects as subproject}
-                                <option value={subproject.id}>{subproject.name}</option>
-                            {/each}
-                        </select>
+                        <InlineSelector
+                            values={localCard.subprojects?.map(id => ({ id, name: subprojects.find(s => s.id === id)?.name ?? "Unknown Subproject" })) ?? []}
+                            data={subprojects.map(s => ({ id: s.id, name: s.name ?? "Unknown subproject" }))}
+                            onchange={(ids) => localCard.subprojects = ids}
+                            itemName="subprojects"
+                        />
                     </div>
                 </div>
             {/if}

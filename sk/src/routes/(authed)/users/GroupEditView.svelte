@@ -1,6 +1,6 @@
 <script lang="ts">
     import { query, save } from "$lib/pocketbase";
-    import BlockSelector from "$lib/pocketbase/selector/BlockSelector.svelte";
+    import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
     import { Collections, type GroupOverviewRecord, type UsersRecord } from "$lib/pocketbase/generated-types";
     import { debounce } from "$lib/util";
     import { Trash } from "lucide-svelte";
@@ -62,7 +62,7 @@
         <p>{localGroup.card_count as number} cards assigned. {localGroup.card_count as number > 0 ? "nag us if you want a list here I guess" : ""}</p>
 
         <h3>Members ({members?.length ?? 0})</h3>
-        <BlockSelector
+        <BlockCollectionSelector
             values={members ? members.map(m => ({ id: m.id, name: m.name ?? m.username })) : []}
             saveToRelation={["groups", localGroup.id]}
             searchField="name"

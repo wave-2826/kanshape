@@ -1,6 +1,6 @@
 <script lang="ts">
     import { queryOne, save } from "$lib/pocketbase";
-    import BlockSelector from "$lib/pocketbase/selector/BlockSelector.svelte";
+    import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
     import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
     import { Info, Trash } from "lucide-svelte";
 
@@ -67,7 +67,7 @@
         </dl>
 
         <h3>Groups ({user.groups.length})</h3>
-        <BlockSelector
+        <BlockCollectionSelector
             values={fullUser?.expand.groups?.map(g => ({ id: g.id, name: g.name ?? "Unnamed group" })) ?? []}
             searchField="name"
             onchange={async (ids) => {

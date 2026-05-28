@@ -2,7 +2,7 @@
     import { dateOnly, tomorrowDate } from "$lib/datetime";
     import { client } from "$lib/pocketbase";
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../../../data/cards";
-    import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
+    import InlineCollectionSelector from "$lib/pocketbase/selector/InlineCollectionSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { authModel } from "$lib/pocketbase/auth";
     import { Flag } from "lucide-svelte";
@@ -45,19 +45,25 @@
             </select>
 
             {#if assignmentData.type === "users"}
-                <InlineSelector
+                <InlineCollectionSelector
                     collection={Collections.Users}
                     searchField="name"
                     values={assignmentData.ids.map((id, i) => ({ id, name: nameCache[i] ?? "Unknown User" }))}
-                    onchange={(ids) => assignmentData = { type: "users", ids }}
+                    onchange={(ids, datas) => {
+                        assignmentData = { type: "users", ids };
+                        nameCache = datas.map(d => d.name);
+                    }}
                     itemName="users"
                 />
             {:else if assignmentData.type === "groups"}
-                <InlineSelector
+                <InlineCollectionSelector
                     collection={Collections.Groups}
                     searchField="name"
                     values={assignmentData.ids.map((id, i) => ({ id, name: nameCache[i] ?? "Unknown Group" }))}
-                    onchange={(ids) => assignmentData = { type: "groups", ids }}
+                    onchange={(ids, datas) => {
+                        assignmentData = { type: "groups", ids };
+                        nameCache = datas.map(d => d.name);
+                    }}
                     itemName="groups"
                 />
                 {#if canClaimGroupAssignment(assignmentData)}

@@ -44,7 +44,7 @@
                 <tr ondblclick={() => showingUser = user.id}>
                     <td class="button-row">
                         <button onclick={() => showingUser = user.id}>
-                            <span class:active={user.id === $authModel?.id}>{user.username}</span>
+                            <span class:active={user.id === $authModel?.id} class:inactive={!user.verified}>{user.username}</span>
                             <span>{user.name}</span>
                             <span class:empty={user.groups?.length === 0}>
                                 {#if !user.expand.groups || user.expand.groups?.length === 0}
@@ -89,6 +89,9 @@ span {
     
     &.active {
         color: var(--accent);
+    }
+    &.inactive {
+        color: var(--text-secondary);
     }
 }
 

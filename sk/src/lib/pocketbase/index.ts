@@ -13,7 +13,6 @@ import { browser } from "$app/environment";
 import { base } from "$app/paths";
 import { Collections, type CollectionRecords, type CollectionResponses, type RecordIdString, type TypedPocketBase, type Update, type Create as CreateRecord } from "./generated-types";
 
-type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
 /**
  * The collections that expand types reference for every collection.
  */
@@ -41,32 +40,77 @@ const expandCollections = {
     users: {
         groups: "groups"
     }
-} as const satisfies {
-    [K in Collections]?: {
-        [field in KeysOfType<CollectionRecords[K], RecordIdString | RecordIdString[] | undefined>]?:
-            Collections
-    }
+} as const satisfies ExpandConfig;
+
+type KeysOfType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T];
+type RelationFieldKeys<Collection extends Collections> = KeysOfType<
+    CollectionRecords[Collection],
+    RecordIdString | RecordIdString[] | undefined
+> & string;
+type BackRelationKey = `${string}_via_${string}`;
+type ExpandDescriptor = Collections | {
+    collection: Collections,
+    /**
+     * Override relation cardinality for the expand result.
+     * Defaults to PocketBase behavior:
+     * - direct relation fields: inferred from field type
+     * - back-relations (`foo_via_bar`): treated as arrays
+     * See https://pocketbase.io/docs/working-with-relations/#back-relations
+     */
+    many?: boolean
+};
+type ExpandConfig = {
+    [Collection in Collections]?: Partial<Record<RelationFieldKeys<Collection> | BackRelationKey, ExpandDescriptor>>
 };
 
 type ExpandCollections = typeof expandCollections;
-type ExpandValue<Collection extends Collections, Field extends keyof CollectionRecords[Collection]> =
-    Collection extends keyof ExpandCollections ? Field extends keyof ExpandCollections[Collection] ?
-        ExpandCollections[Collection][Field] extends Collections ? CollectionRecords[ExpandCollections[Collection][Field]] : never
-    : never : never;
-type ExpandField<Collection extends Collections, Field extends keyof CollectionRecords[Collection]> =
-    CollectionRecords[Collection][Field] extends RecordIdString | undefined ? ExpandValue<Collection, Field> | undefined :
-    CollectionRecords[Collection][Field] extends RecordIdString[] | undefined ? ExpandValue<Collection, Field>[] | undefined :
+type ExpandMapping<Collection extends Collections, Field extends string> =
+    Collection extends keyof ExpandCollections ?
+        Field extends keyof ExpandCollections[Collection] ?
+            ExpandCollections[Collection][Field]
+        : never
+    : never;
+type ExpandTargetCollection<Mapping extends ExpandDescriptor> =
+    Mapping extends Collections ? Mapping :
+    Mapping extends { collection: infer Target extends Collections } ? Target :
     never;
+type IsExpandMany<
+    Collection extends Collections,
+    Field extends string,
+    Mapping extends ExpandDescriptor
+> = Mapping extends { many: infer Many extends boolean } ? Many :
+    Field extends keyof CollectionRecords[Collection] ?
+        CollectionRecords[Collection][Field] extends RecordIdString[] | undefined ? true :
+        CollectionRecords[Collection][Field] extends RecordIdString | undefined ? false :
+        true
+    :
+    // PocketBase defaults back-relation expands to arrays unless UNIQUE.
+    true;
+type ExpandValue<Collection extends Collections, Field extends string> =
+    ExpandMapping<Collection, Field> extends infer Mapping extends ExpandDescriptor ?
+        CollectionRecords[ExpandTargetCollection<Mapping>]
+    : never;
+type ExpandField<Collection extends Collections, Field extends string> =
+    ExpandMapping<Collection, Field> extends infer Mapping extends ExpandDescriptor ?
+        IsExpandMany<Collection, Field, Mapping> extends true ?
+            ExpandValue<Collection, Field>[] | undefined :
+            ExpandValue<Collection, Field> | undefined
+    :
+    never;
+
+type Trim<S extends string> =
+    S extends ` ${infer Rest}` ? Trim<Rest> :
+    S extends `${infer Rest} ` ? Trim<Rest> :
+    S;
+type ExpandEntry<Collection extends Collections, Field extends string> =
+    ExpandField<Collection, Field> extends never ? {} :
+    { [K in Field]: ExpandField<Collection, Field> };
 
 type ExpandResult<Collection extends Collections, Expand extends string> =
     Expand extends `${infer Field},${infer Rest}` ?
-        Field extends keyof CollectionRecords[Collection] ?
-            { [K in Field]: ExpandField<Collection, Field> } & ExpandResult<Collection, Rest> :
-            ExpandResult<Collection, Rest> :
+        ExpandEntry<Collection, Trim<Field>> & ExpandResult<Collection, Rest> :
     Expand extends `${infer Field}` ?
-        Field extends keyof CollectionRecords[Collection] ?
-            { [K in Field]: ExpandField<Collection, Field> } :
-            {} :
+        ExpandEntry<Collection, Trim<Field>> :
     {};
 
 export const client = new PocketBase(

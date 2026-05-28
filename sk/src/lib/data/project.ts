@@ -1,5 +1,8 @@
 import type { BoardsResponse, ProjectsResponse, ProjectsTypeOptions } from "../pocketbase/generated-types";
 
+// TODO: This database schema isn't very scalable. We should use back-relations instead of
+// forward relations on projects to allow cascade deletion and avoid having to update multiple records
+
 export type TypedProjectsResponse<Expand = {}> = ProjectsResponse<ProjectLinkedSite[], Expand>;
 export type TypedBoardsResponse<Expand = {}> = BoardsResponse<CustomCardFields, ProjectLinkedSite[], Expand>;
 

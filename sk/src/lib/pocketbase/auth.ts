@@ -1,27 +1,25 @@
-import { readable } from "svelte/store";
+import { readable, readonly } from "svelte/store";
 import { client, save } from ".";
-import type { AuthModel, AuthProviderInfo, RecordService } from "pocketbase";
+import type { AuthProviderInfo, RecordService } from "pocketbase";
 import { goto, invalidateAll } from "$app/navigation";
 import { page } from "$app/state";
+import type { UsersResponse } from "./generated-types";
 
-
-export const authModel = readable<AuthModel | null>(
-    null,
-    function (set, update) {
-        client.authStore.onChange((token, model) => {
+export const authWritable = readable<UsersResponse | null>(
+    client.authStore.record as UsersResponse | null,
+    (set, update) => {
+        client.authStore.onChange((token, record) => {
             update((oldval) => {
-                if(
-                    (oldval?.isValid && !model?.isValid) ||
-                    (!oldval?.isValid && model?.isValid)
-                ) {
-                    // if the auth changed, invalidate all page load data
+                if((oldval === null) !== (record === null)) {
+                    // if we went from logged out to logged in, or vice versa, invalidate all data
                     invalidateAll();
                 }
-                return model;
+                return record as UsersResponse | null;
             });
         }, true);
     }
 );
+export const authModel = readonly(authWritable);
 
 export async function login(
     email: string,
@@ -29,15 +27,17 @@ export async function login(
     register = false,
     rest: { [key: string]: any; } = {}
 ) {
-    if (register) {
+    if(register) {
         const user = { ...rest, email, password, confirmPassword: password };
         await client.collection("users").create({ ...user, metadata: {} });
     }
     await client.collection("users").authWithPassword(email, password);
 }
 
-export function logout() {
+export async function logout() {
     client.authStore.clear();
+    // This will run anyway but we await it here
+    await invalidateAll();
 }
 
 export async function providerLogin(

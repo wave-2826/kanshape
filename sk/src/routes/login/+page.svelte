@@ -4,7 +4,7 @@ import { onMount } from "svelte";
 import { client } from "$lib/pocketbase";
 import { page } from "$app/state";
 import type { AuthProviderInfo } from "pocketbase";
-import { providerLogin } from "$lib/pocketbase/auth";
+import { authModel, providerLogin } from "$lib/pocketbase/auth";
 import { goto } from "$app/navigation";
 
 const { data } = $props();
@@ -14,7 +14,7 @@ let error = $state("");
 
 onMount(async () => {
     // If already logged in, redirect to home
-    if(client.authStore.isValid) {
+    if($authModel !== null) {
         const followPath = page.url.searchParams.get("r") || "/";
         goto(decodeURIComponent(followPath));
         return;

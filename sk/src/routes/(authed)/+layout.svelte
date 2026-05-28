@@ -9,14 +9,14 @@
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
     import { onMount } from "svelte";
-    import { client } from "$lib/pocketbase";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import { ExternalLink, LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/NavContent.svelte";
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
+    import { authModel, logout } from "$lib/pocketbase/auth";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -29,9 +29,8 @@
 
     // Client-side redirect to /login if not authenticated
     onMount(() => {
-        const isLoginPage = page.url.pathname.startsWith("/login");
         const followPath = page.url.pathname;
-        if(!client.authStore.isValid && !isLoginPage) goto("/login?r=" + encodeURIComponent(followPath));
+        if($authModel === null) goto("/login?r=" + encodeURIComponent(followPath));
     });
 
     setIsMobile(new MediaQuery("screen and (max-width: 640px)"));
@@ -79,9 +78,9 @@
         {/if}
         <div style="flex-grow: 1;"></div>
         <NavProfile />
-        <button onclick={() => {
-            client.authStore.clear();
-            goto("/login");
+        <button onclick={async () => {
+            await logout();
+            await goto("/login");
         }}>
             <LogOut />
         </button>

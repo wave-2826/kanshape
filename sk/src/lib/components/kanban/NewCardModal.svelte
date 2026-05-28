@@ -4,6 +4,7 @@
     import Modal from "../Modal.svelte";
     import { priorities } from "../../data/cards";
     import { nextCardPosition, type TypedCardPreviewResponse } from "$lib/data/kanban";
+    import { authModel } from "$lib/pocketbase/auth";
 
     let {
         projectId,
@@ -34,7 +35,7 @@
             section: sectionId,
             position: nextCardPosition(boardCards, sectionId),
             moved_at: new Date().toISOString(),
-            created_by: client.authStore.record?.id,
+            created_by: $authModel?.id,
             description,
             priority
         }, { create: true }).catch((err) => {

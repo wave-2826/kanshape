@@ -4,6 +4,8 @@
     import type { AnyoneOnAssignmentData, CardAssignmentData } from "../../../data/cards";
     import InlineSelector from "$lib/pocketbase/selector/InlineSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { authModel } from "$lib/pocketbase/auth";
+    import { Flag } from "lucide-svelte";
 
     let {
         assignmentData = $bindable(),
@@ -12,6 +14,11 @@
         assignmentData: CardAssignmentData;
         nameCache: string[]
     } = $props();
+
+    function canClaimGroupAssignment(data: CardAssignmentData | null) {
+        if(!$authModel) return false;
+        return data?.type === "groups" && $authModel.groups.some((groupId) => data.ids.includes(groupId));
+    }
 </script>
 
 <!-- TODO: Card only saves once when changing this -->
@@ -53,10 +60,14 @@
                     onchange={(ids) => assignmentData = { type: "groups", ids }}
                     itemName="groups"
                 />
-                {#if client.authStore.record?.id && assignmentData.ids.includes(client.authStore.record?.id)}
-                    <button onclick={() => {
-                        if(client.authStore.record) assignmentData = { type: "users", ids: [client.authStore.record?.id] };
-                    }}>Claim</button>
+                {#if canClaimGroupAssignment(assignmentData)}
+                    <button
+                        onclick={() => {
+                            if($authModel) assignmentData = { type: "users", ids: [$authModel.id] };
+                        }}
+                        class="claim"
+                        title="This task is assigned to one or more of the groups you are in. Click to claim the task for yourself."
+                    ><Flag /> Claim</button>
                 {/if}
             {:else if assignmentData.type === "anyone_on"}
                 <input type="date" bind:value={
@@ -80,15 +91,21 @@
 
 .assignment {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     justify-content: flex-start;
     gap: 0.5rem;
 
     select {
         flex: 1;
+        min-width: 5rem;
     }
     input {
         flex: 1;
     }
+}
+
+.claim {
+    color: var(--success);
 }
 </style>

@@ -66,7 +66,7 @@
             {#if board}
                 <button
                     onclick={() => { goto(`/projects/${project.id}/boards/${boardId}`); }}
-                    class:selected={page.route.id === "/(authed)/projects/[id]/boards/[boardId]" && page.params.boardId === boardId}
+                    class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/boards/[boardId]") && page.params.boardId === boardId}
                 >
                     <Kanban />
                     {board.title}
@@ -78,7 +78,7 @@
             {#if subproject}
                 <button
                     onclick={() => { goto(`/projects/${project.id}/subprojects/${subproject.id}`); }}
-                    class:selected={page.route.id === "/(authed)/projects/[id]/subprojects/[subprojectId]" && page.params.subprojectId === subproject.id}
+                    class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/subprojects/[subprojectId]") && page.params.subprojectId === subproject.id}
                 >
                     <Tag />
                     {subproject.name}

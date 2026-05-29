@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
+    import { link } from "$lib/actions";
     import { type ExpandResponse } from "$lib/pocketbase";
     import { grow } from "$lib/transitions";
     import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "lucide-svelte";
@@ -65,7 +66,7 @@
             {@const board = project.expand.boards?.find(b => b.id === boardId)}
             {#if board}
                 <button
-                    onclick={() => { goto(`/projects/${project.id}/boards/${boardId}`); }}
+                    use:link={`/projects/${project.id}/boards/${boardId}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/boards/[boardId]") && page.params.boardId === boardId}
                 >
                     <Kanban />
@@ -77,7 +78,7 @@
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}
             {#if subproject}
                 <button
-                    onclick={() => { goto(`/projects/${project.id}/subprojects/${subproject.id}`); }}
+                    use:link={`/projects/${project.id}/subprojects/${subproject.id}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/subprojects/[subprojectId]") && page.params.subprojectId === subproject.id}
                 >
                     <Tag />

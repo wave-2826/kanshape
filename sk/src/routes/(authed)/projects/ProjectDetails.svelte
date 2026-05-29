@@ -107,7 +107,7 @@
                 <input type="text" placeholder="Board name" bind:value={board.title} />
                 <textarea placeholder="Board description (optional)" bind:value={board.description}></textarea>
 
-                <p>Board type</p>
+                <h2>Board type</h2>
                 <div class="type-selector">
                     {#each (Object.keys(BoardsTypeOptions) as BoardsTypeOptions[]) as option}
                         {@const optionDetails = boardTypes[option]}
@@ -118,9 +118,9 @@
                     {/each}
                 </div>
 
-                <p>Sections</p>
+                <h2>Sections</h2>
                 <LeftPaneChooser
-                    options={board.sections?.map(s => ({ name: s.title ?? "", tooltip: s.description })) ?? []}
+                    options={board.sections?.map(s => ({ name: s.title ?? "", tooltip: s.description, color: s.color })) ?? []}
                     oncreate={() => {
                         if(!board.sections) board.sections = [];
                         board.sections.push({ title: `Section ${board.sections.length + 1}`, description: "", color: undefined, is_completed: false });
@@ -169,7 +169,7 @@
                     {/snippet}
                 </LeftPaneChooser>
 
-                <p>Linked sites</p>
+                <h2>Linked sites</h2>
                 <!-- TODO: this UI is stupid -->
                 <LinkedSiteDetails bind:linkedSites={board.linked_sites as ProjectLinkedSite[]} background="var(--bg-site)" />
             </div>

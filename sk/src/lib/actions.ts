@@ -1,3 +1,5 @@
+import { goto } from "$app/navigation";
+
 export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, maxHeight: number = 300) {
     function resize() {
         node.style.height = "auto";
@@ -16,6 +18,30 @@ export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, max
         },
         destroy() {
             node.removeEventListener("input", resize);
+        }
+    };
+}
+
+export function link(node: HTMLButtonElement, href: string) {
+    function onClick(event: MouseEvent) {
+        event.preventDefault();
+        
+        if(event.metaKey || event.ctrlKey || event.button === 1) {
+            window.open(href, "_blank");
+            return;
+        }
+
+        goto(href);
+    }
+
+    node.addEventListener("click", onClick);
+
+    return {
+        update(newHref: string) {
+            href = newHref;
+        },
+        destroy() {
+            node.removeEventListener("click", onClick);
         }
     };
 }

@@ -55,15 +55,9 @@
         }
     })[]): BoardCreationData[] {
         return boards.map(board => ({
-            id: board.id,
-            title: board.title,
-            description: board.description,
-            type: board.type,
+            ...board,
             sections: board.expand.sections?.map(section => ({
-                id: section.id,
-                title: section.title,
-                description: section.description,
-                position: section.position
+                ...section
             })) ?? []
         }));
     }
@@ -272,7 +266,7 @@
     }
 </script>
 
-<div class="details">
+{#snippet backButton()}
     <button onclick={() => {
         if(changed) {
             if(!confirm("You have unsaved changes. Are you sure you want to leave?")) return;
@@ -285,12 +279,19 @@
             <span class="unsaved-warning">Unsaved changes</span>
         {/if}
     </button>
+{/snippet}
+
+<div class="details">
+    {@render backButton()}
+
     <ProjectDetails
         bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:boards bind:linkedSites
         editedProject={project}
     />
 
     <div class="actions">
+        {@render backButton()}
+        <div style="flex: 1"></div>
         <button onclick={deleteProject} class="delete">
             <Trash />
             Delete project

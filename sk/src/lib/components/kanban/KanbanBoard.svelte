@@ -200,6 +200,15 @@
     flex: 1;
     min-height: 0;
 }
+
+p {
+    color: var(--text-secondary);
+    font-size: var(--font-small);
+    font-style: italic;
+    text-align: center;
+    margin: 1rem;
+}
+
 .board {
     flex: 1;
 

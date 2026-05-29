@@ -160,57 +160,75 @@
     </li>
 {/snippet}
 
-<div class="chooser" class:compact={compact} style={background ? `--bg: ${background};` : undefined}>
-    <ul bind:this={listEl}>
-        {#each options as option, i (i)}
-            {#if dragState !== null && dragState.placeholderIndex === i}
-                <li class="drag-placeholder button">
+<div class="chooser-container">
+    <div class="chooser" class:compact={compact} style={background ? `--bg: ${background};` : undefined}>
+        <ul bind:this={listEl}>
+            {#each options as option, i (i)}
+                {#if dragState !== null && dragState.placeholderIndex === i}
+                    <li class="drag-placeholder button">
+                        <div class="unstyled action button"><GripHorizontal /></div>
+                    </li>
+                {/if}
+    
+                {#if dragState === null || dragState.itemIndex !== i}
+                    {@render listItem(option, i, {})}
+                {/if}
+            {/each}
+            {#if dragState !== null && dragState.placeholderIndex === options.length}
+                <li class="drag-placeholder end button">
                     <div class="unstyled action button"><GripHorizontal /></div>
                 </li>
             {/if}
-
-            {#if dragState === null || dragState.itemIndex !== i}
-                {@render listItem(option, i, {})}
+    
+            {#if dragState !== null && dragState.placeholderIndex !== null}
+                {@render listItem(options[dragState.itemIndex], dragState.placeholderIndex, {
+                    style: `position: absolute; top: ${floatTop}px; left: ${floatLeft}px; width: ${floatWidth}px; z-index: 1000; pointer-events: none;`,
+                    class: "drag-float"
+                })}
             {/if}
-        {/each}
-        {#if dragState !== null && dragState.placeholderIndex === options.length}
-            <li class="drag-placeholder end button">
-                <div class="unstyled action button"><GripHorizontal /></div>
-            </li>
-        {/if}
-
-        {#if dragState !== null && dragState.placeholderIndex !== null}
-            {@render listItem(options[dragState.itemIndex], dragState.placeholderIndex, {
-                style: `position: absolute; top: ${floatTop}px; left: ${floatLeft}px; width: ${floatWidth}px; z-index: 1000; pointer-events: none;`,
-                class: "drag-float"
-            })}
-        {/if}
-        
-        {#if oncreate}
-            <li>
-                <button onclick={() => {
-                    oncreate();
-                    selected = options.length - 1;
-                }} class="label"><Plus />Create new</button>
-            </li>
-        {/if}
-    </ul>
-    <div class="pane" class:selected={selected !== null}>
-        {#if selected !== null}
-            {@render pane(selected)}
-        {:else}
-            <p class="select-option">Select an option</p>
-        {/if}
+            
+            {#if oncreate}
+                <li>
+                    <button onclick={() => {
+                        oncreate();
+                        selected = options.length - 1;
+                    }} class="label"><Plus />Create new</button>
+                </li>
+            {/if}
+        </ul>
+        <div class="pane" class:selected={selected !== null}>
+            {#if selected !== null}
+                {#key selected}
+                    {@render pane(selected)}
+                {/key}
+            {:else}
+                <p class="select-option">Select an option</p>
+            {/if}
+        </div>
     </div>
 </div>
 
 <style lang="scss">
+.chooser-container {
+    width: 100%;
+    container: left-pane-chooser / inline-size;
+}
 .chooser {
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
     width: 100%;
     position: relative;
+}
+
+@container left-pane-chooser (max-width: 30rem) {
+    .chooser {
+        flex-direction: column;
+    }
+    .chooser ul {
+        width: 100%;
+        min-height: 0;
+    }
 }
 
 ul {

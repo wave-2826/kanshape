@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { page } from "$app/state";
-    import { Kanban, List, Settings } from "lucide-svelte";
+    import { Kanban, List } from "lucide-svelte";
     import type { Snippet } from "svelte";
     import { getProjectContext, setBoardContext, watchBoard, watchCards, type BoardContext } from "../../context";
     import SiteLinks from "./SiteLinks.svelte";
     import type { ProjectLinkedSite } from "$lib/data/project";
     import OnshapeLinks from "./OnshapeLinks.svelte";
     import { getIsMobile } from "../../../../+layout.svelte";
+    import { link } from "$lib/actions";
 
     const {
         children
@@ -50,28 +50,26 @@
             {/snippet}
 
             <header>
-                <h1 style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</h1>
+                <h1>
+                    <span style={`color: ${$project.color ? $project.color : 'inherit'};`}>{$project.title}</span>
+                    <span class="separator">/</span>
+                    <span>{$board.title}</span>
+                </h1>
                 {#if !onOnshape && !getIsMobile().current}
                     <OnshapeLinks project={$project} />
                 {/if}
                 <SiteLinks links={$project.linked_sites as ProjectLinkedSite[]} />
                 <div style="flex: 1"></div>
                 <div class="multi-button">
-                    <button onclick={() => goto(`/projects/${$project.id}/boards/${$board.id}/list`)} class:active={page.route.id?.endsWith("/list")}>
+                    <button use:link={`/projects/${$project.id}/boards/${$board.id}/list`} class:active={page.route.id?.endsWith("/list")}>
                         <List />
                         List
                     </button>
-                    <button onclick={() => goto(`/projects/${$project.id}/boards/${$board.id}`)} class:active={!page.route.id?.endsWith("/list")}>
+                    <button use:link={`/projects/${$project.id}/boards/${$board.id}`} class:active={!page.route.id?.endsWith("/list")}>
                         <Kanban />
                         Board
                     </button>
                 </div>
-                {#if !onOnshape}
-                    <button onclick={() => goto(`/projects/${$project.id}/settings`)}>
-                        <Settings />
-                        Settings
-                    </button>
-                {/if}
             </header>
             {@render children()}
         </svelte:boundary>
@@ -91,6 +89,10 @@ header {
 }
 h1 {
     margin: 0 0.5rem;
+
+    .separator {
+        color: var(--text-secondary);
+    }
 }
 .page {
     display: flex;

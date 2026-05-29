@@ -5,6 +5,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
     import NavProject from "./NavProject.svelte";
+    import { link } from "$lib/actions";
 
     const projects = await watch(Collections.Projects, {
         expand: "subprojects,boards"
@@ -14,11 +15,11 @@
     });
 </script>
 
-<button onclick={() => { goto("/"); }} class:selected={page.route.id === "/(authed)"}>
+<button use:link={"/"} class:selected={page.route.id === "/(authed)"}>
     <FolderKanban />
     Overview
 </button>
-<button onclick={() => { goto("/leaderboard"); }} class:selected={page.route.id === "/(authed)/leaderboard"}>
+<button use:link={"/leaderboard"} class:selected={page.route.id === "/(authed)/leaderboard"}>
     <Medal />
     Leaderboard
 </button>
@@ -34,7 +35,7 @@
             <p>No projects found.</p>
         {/if}
     </div>
-    <button onclick={() => { goto("/projects/new"); }} class:selected={page.route.id === "/(authed)/projects/new"}>
+    <button use:link={"/projects/new"} class:selected={page.route.id === "/(authed)/projects/new"}>
         <Plus />
         New project
     </button>
@@ -45,11 +46,11 @@
 <div style="flex-grow: 1;"></div>
 
 <!-- TODO (priority medium): users page to see all application users, remove them (for admins), see assigned tasks, etc -->
-<button onclick={() => { goto("/users"); }} class:selected={page.route.id === "/(authed)/users"}>
+<button use:link={"/users"} class:selected={page.route.id === "/(authed)/users"}>
     <Users />
     Users and Groups
 </button>
-<button onclick={() => { goto("/settings"); }} class:selected={page.route.id === "/(authed)/settings"}>
+<button use:link={"/settings"} class:selected={page.route.id === "/(authed)/settings"}>
     <Settings />
     Application Settings
 </button>

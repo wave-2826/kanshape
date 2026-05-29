@@ -6,6 +6,7 @@
     import OnshapeLinks from "./OnshapeLinks.svelte";
     import BoardSettings, { type BoardCreationData } from "./BoardSettings.svelte";
     import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
+    import SubprojectSettings from "./SubprojectSettings.svelte";
 
     let {
         color = $bindable(),
@@ -111,43 +112,19 @@
     ondelete={(option) => subprojects.splice(option, 1)}
 >
     {#snippet pane(selected)}
-        {@const subproject = subprojects[selected]}
-        <div class="subproject">
-            <input type="text" placeholder="Subproject name" bind:value={subproject.name} />
-            <textarea placeholder="Subproject description (optional)" bind:value={subproject.description}></textarea>
-            {#if type === "manufacturing"}
-                <div class="option">
-                    <label for="partIdOffset">Part ID offset</label>
-                    <input type="number" placeholder="Part ID offset" bind:value={subproject.part_id_offset} min="0" />
-                    <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, subproject.part_id_offset || 0, 1, 1)}</span>
-                </div>
-            {/if}
-
-            <p>Linked sites</p>
-            <!-- TODO: this UI is stupid -->
-            <LinkedSiteDetails bind:linkedSites={subproject.linked_sites as ProjectLinkedSite[]} background="var(--bg-site)" />
-        </div>
+        {#if subprojects[selected]}
+            <SubprojectSettings
+                bind:subproject={subprojects[selected]}
+                projectType={type}
+                partIdPrefix={partIdPrefix}
+                panelBackgrounds="var(--bg-site)"
+            />
+        {/if}
     {/snippet}
 </LeftPaneChooser>
 
 <style lang="scss">
 @use "settings.scss";
-
-.subproject {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-.subproject label, .subproject p {
-    font-size: var(--font-small);
-    margin-left: 0.5rem;
-}
-
-.part-id-preview {
-    font-size: var(--font-small);
-    color: var(--text-secondary);
-    margin-left: 1rem;
-}
 
 .linked-sites {
     display: flex;

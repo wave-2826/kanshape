@@ -1,6 +1,6 @@
 import type { TypedCardPreviewResponse } from "$lib/data/kanban";
 import { watch, watchOne, type PageStore } from "$lib/pocketbase";
-import { Collections } from "$lib/pocketbase/generated-types";
+import { Collections, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
 import { createContext } from "svelte";
 
 export function watchProject(id: string) {
@@ -38,3 +38,8 @@ export type BoardContext = {
     cards: Awaited<ReturnType<typeof watchCards>> | null;
 };
 export const [getBoardContext, setBoardContext] = createContext<BoardContext>();
+
+export type SubprojectContext = {
+    subproject: SubprojectsRecord | null;
+}
+export const [getSubprojectContext, setSubprojectContext] = createContext<SubprojectContext>();

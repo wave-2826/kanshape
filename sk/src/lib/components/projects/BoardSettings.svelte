@@ -177,6 +177,7 @@
     <LinkedSiteDetails bind:linkedSites={board.linked_sites as ProjectLinkedSite[]} background={panelBackgrounds} />
 </div>
 
+<!-- svelte-ignore css_unused_selector - shared styles -->
 <style lang="scss">
 @use "settings.scss";
 

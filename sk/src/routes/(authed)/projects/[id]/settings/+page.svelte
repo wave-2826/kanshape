@@ -10,6 +10,8 @@
     import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     import { boardCreationData, deleteBoard, saveBoardRecords, type BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
+    import SettingsPage from "../SettingsPage.svelte";
+    import { deleteSubproject } from "$lib/components/projects/SubprojectSettings.svelte";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";
@@ -96,18 +98,7 @@
             }
             // Deleted subprojects
             for(const subproject of originalSubprojects) {
-                if(!subprojects.find(s => s.id === subproject.id)) {
-                    // Check if any cards are associated with the subproject and warn
-                    if((await query(Collections.Cards, {
-                        filter: `subprojects ~ "${subproject.id}"`
-                    })).length > 0) {
-                        if(!confirm(`Subproject "${subproject.name}" has associated cards. Deleting it will remove it from every card. Are you sure you want to delete it?`)) {
-                            throw new CancelBatch("User cancelled batch due to associated cards with subproject");
-                        }
-                    }
-
-                    await deleteRecord(Collections.Subprojects, subproject.id, { batch });
-                }
+                if(!subprojects.find(s => s.id === subproject.id)) await deleteSubproject(subproject, batch);
             }
 
             // Save changes to boards
@@ -163,6 +154,10 @@
             await batch(async (batch) => {
                 if(!project) return;
 
+                // We don't use the dedicated deletion functions here because the user already confirmed
+                // they want all associated data gone; we don't need to ask for every board, subproject,
+                // etc.
+
                 // Delete subprojects
                 for(const subproject of (project.expand.subprojects ?? [])) {
                     await deleteRecord(Collections.Subprojects, subproject.id, { batch }).catch((err) => {
@@ -197,79 +192,15 @@
     }
 </script>
 
-{#snippet backButton()}
-    <button onclick={() => {
-        if(changed) {
-            if(!confirm("You have unsaved changes. Are you sure you want to leave?")) return;
-        }
-        goto(`/projects/${id}`);
-    }} class="back">
-        <ArrowLeft />
-        Back to project
-        {#if changed}
-            <span class="unsaved-warning">Unsaved changes</span>
-        {/if}
-    </button>
-{/snippet}
-
-<div class="details">
-    {@render backButton()}
-
+<SettingsPage
+    returnPath={`/projects/${project?.id ?? ""}`}
+    settingsType="project"
+    {changed}
+    onsave={saveChanges}
+    ondelete={deleteProject}
+>
     <ProjectDetails
         bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:boards bind:linkedSites
         editedProject={project}
     />
-
-    <div class="actions">
-        {@render backButton()}
-        <div style="flex: 1"></div>
-        <button onclick={deleteProject} class="delete">
-            <Trash />
-            Delete project
-        </button>
-        <button onclick={saveChanges} class="save" disabled={!changed}>
-            <Save />
-            Save Changes
-        </button>
-    </div>
-</div>
-
-<style lang="scss">
-.back {
-    align-self: flex-start;
-
-    .unsaved-warning {
-        color: var(--error);
-        font-size: var(--font-small);
-        margin-left: 0.5rem;
-    }
-}
-.details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    overflow-y: auto;
-    height: 100%;
-    padding-bottom: 10rem;
-}
-
-.actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: 1rem;
-
-    button {
-        padding: 0.5rem 1rem;
-        font-size: var(--font-medium);
-    }
-    
-    .save {
-        --bg-color: var(--bg-selection);
-    }
-    .delete {
-        color: var(--error);
-    }
-}
-</style>
+</SettingsPage>

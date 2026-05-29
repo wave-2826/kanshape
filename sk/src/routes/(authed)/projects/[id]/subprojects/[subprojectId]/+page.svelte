@@ -1,6 +1,8 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import { link } from "$lib/actions";
     import type { ProjectLinkedSite } from "$lib/data/project";
+    import { Settings } from "lucide-svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
 
@@ -20,6 +22,13 @@
         linkedSites={subproject.linked_sites as ProjectLinkedSite[]}
         onshapeLinks={subproject}
     >
+        {#snippet navItems()}
+            <button use:link={`/projects/${$project.id}/subprojects/${subproject.id}/settings`}>
+                <Settings />
+                Settings
+            </button>
+        {/snippet}
+
         <span></span>
     </ProjectPage>
 {:else}

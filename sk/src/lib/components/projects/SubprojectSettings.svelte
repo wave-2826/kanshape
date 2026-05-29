@@ -25,6 +25,7 @@
     import { createPartIDString } from "$lib/parts";
     import type { ProjectLinkedSite } from "$lib/data/project"
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
+    import OnshapeLinks from "./OnshapeLinks.svelte";
 
     const {
         subproject = $bindable(),
@@ -50,6 +51,14 @@
         </div>
     {/if}
 
+    <h2>Linked pages</h2>
+    {#if projectType === "manufacturing" && subproject.id}
+        <p>Linked Onshape documents</p>
+        <div class="linked-sites">
+            <!-- Technically, this doesn't have the same saving behavior as the rest of the settings, but... whatever -->
+            <OnshapeLinks linkedTo={subproject as SubprojectsRecord} fullPreview />
+        </div>
+    {/if}
     <p>Linked sites</p>
     <LinkedSiteDetails bind:linkedSites={subproject.linked_sites as ProjectLinkedSite[]} background={panelBackgrounds} />
 </div>
@@ -63,8 +72,13 @@
     flex-direction: column;
     gap: 0.5rem;
 }
-.subproject label, .subproject p {
+
+h2 {
+    margin-left: 0.5rem;
+}
+label, p {
     font-size: var(--font-small);
     margin-left: 0.5rem;
+    margin-top: 0.5rem;
 }
 </style>

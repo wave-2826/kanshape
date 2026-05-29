@@ -26,3 +26,10 @@
     color: var(--text-secondary);
     margin-left: 1rem;
 }
+
+.linked-sites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}

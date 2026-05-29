@@ -125,11 +125,4 @@
 
 <style lang="scss">
 @use "settings.scss";
-
-.linked-sites {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-left: 0.5rem;
-}
 </style>

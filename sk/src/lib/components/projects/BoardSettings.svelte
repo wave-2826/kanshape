@@ -1,5 +1,5 @@
 <script lang="ts" module>
-    import { Collections, type BoardsRecord, type Create, type RecordIdString, type SectionsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, ProjectsTypeOptions, type BoardsRecord, type Create, type RecordIdString, type SectionsRecord } from "$lib/pocketbase/generated-types";
 
     export type BoardCreationData = Omit<Create<"boards">, "sections"> & {
         sections: Create<"sections">[]
@@ -181,6 +181,9 @@
 <style lang="scss">
 @use "settings.scss";
 
+h2 {
+    margin-left: 0.5rem;
+}
 .board, .section {
     display: flex;
     flex-direction: column;

@@ -24,8 +24,8 @@
         return treeSelected;
     });
     function toggleCollapsed() {
-        if(collapsed === CollapsedState.Collapsed) collapsed = CollapsedState.Expanded;
-        else collapsed = CollapsedState.Collapsed;
+        if(showOpen) collapsed = CollapsedState.Collapsed;
+        else collapsed = CollapsedState.Expanded;
     }
     
     $effect(() => {

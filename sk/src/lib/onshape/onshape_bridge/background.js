@@ -82,7 +82,7 @@ async function handleFetch(payload) {
         method: payload.method || "GET",
         headers: payload.headers || {},
         body: payload.body,
-        credentials: "include",
+        credentials: "include"
     });
 
     const text = await response.text();

@@ -38,7 +38,7 @@
     });
 
     const isMobile = $derived(new MediaQuery("screen and (max-width: 640px)").current);
-    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true");
+    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/onshape") || page.url.searchParams.get("onshape") === "true");
     let layoutParams = $state<LayoutParams>({
         // svelte-ignore state_referenced_locally
         isMobile,

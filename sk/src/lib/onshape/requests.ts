@@ -1,4 +1,8 @@
-import type { AppConfig } from "$lib/config";
+import { loadConfig, type AppConfig } from "$lib/config";
+import createClient from "openapi-fetch";
+
+// Schema generated with "npx openapi-typescript https://api.onshape.com/api/v16/openapi -o ./schema.d.ts"
+import type { paths } from "./schema.d.ts";
 
 let kanshapeExtensionDetected: boolean | null = null;
 
@@ -54,7 +58,31 @@ export async function detectBridgeExtension(timeout = 100) {
     });
 }
 
-export async function onshapeApiRequest<T>(config: AppConfig, method: string, path: string, body?: any): Promise<{
+function canonicalizeHeaders(headers: HeadersInit): Record<string, string> {
+    const result: Record<string, string> = {};
+    if(headers instanceof Headers) {
+        headers.forEach((value, key) => {
+            result[key.toLowerCase()] = value;
+        });
+    } else if(Array.isArray(headers)) {
+        headers.forEach(([key, value]) => {
+            result[key.toLowerCase()] = value;
+        });
+    } else {
+        for(const key in headers) {
+            result[key.toLowerCase()] = headers[key];
+        }
+    }
+    return result;
+}
+
+export async function onshapeApiRequest<T>(
+    config: AppConfig,
+    method: string,
+    path: string,
+    body?: any,
+    headers?: Record<string, string>
+): Promise<{
     status: number;
     headers: Record<string, string>;
     body: T;
@@ -146,7 +174,8 @@ export async function onshapeApiRequest<T>(config: AppConfig, method: string, pa
                 payload: {
                     method,
                     url: `${config.onshape.baseDomain}${path}`,
-                    body
+                    body,
+                    headers
                 }
             }, "*");
         });
@@ -157,3 +186,35 @@ export async function onshapeApiRequest<T>(config: AppConfig, method: string, pa
         return Promise.reject(new Error("proxied Onshape API requests aren't implemented yet. load the extension under `onshape_bridge` unpacked for dev."));
     }
 }
+
+let onshapeApiFetch: typeof fetch = async (input: URL | RequestInfo, init?: RequestInit): Promise<Response> => {
+    // Fetch wrapper that uses our custom request logic
+    if(typeof input === "string" || input instanceof URL) {
+        const url = input.toString();
+        const method = init?.method || "GET";
+        const body = init?.body;
+        const headers = init?.headers || {};
+
+        // Only intercept requests to the Onshape API
+        if(url.includes("onshape.com/api/")) {
+            return await onshapeApiRequest(
+                await loadConfig(),
+                method,
+                url,
+                body,
+                canonicalizeHeaders(headers)
+            )
+                .then(result => new Response(JSON.stringify(result.body), {
+                    status: result.status,
+                    headers: result.headers
+                }));
+        }
+    }
+    // For non-Onshape requests, just do a normal fetch
+    return fetch(input, init);
+};
+
+export let onshapeClient = createClient<paths>({
+    baseUrl: await loadConfig().then(config => config.onshape.baseDomain),
+    fetch: onshapeApiFetch
+});

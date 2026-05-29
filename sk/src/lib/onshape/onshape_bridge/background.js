@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const _browser = globalThis.browser ?? globalThis.chrome;
 
 const CACHE_KEY = "requestCache";

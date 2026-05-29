@@ -11,7 +11,7 @@
     import { createPartIDString } from "$lib/parts";
     import { boardTypes, getTemplateSections, projectTypes, type ProjectLinkedSite } from "$lib/data/project";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
-    import OnshapeLinks from "./[id]/boards/[boardId]/OnshapeLinks.svelte";
+    import OnshapeLinks from "./OnshapeLinks.svelte";
 
     let {
         color = $bindable(),
@@ -76,7 +76,7 @@
     <p>Linked Onshape documents</p>
     <div class="linked-sites">
         <!-- Technically, this doesn't have the same saving behavior as the rest of the settings, but... whatever -->
-        <OnshapeLinks project={editedProject} fullPreview />
+        <OnshapeLinks linkedTo={editedProject} fullPreview />
     </div>
 {/if}
 <p>Linked sites</p>

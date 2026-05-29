@@ -211,7 +211,7 @@ export type OnshapeDocumentsRecord = {
 	created: IsoAutoDateString
 	id: string
 	project: RecordIdString
-	subprojects?: RecordIdString
+	subproject?: RecordIdString
 	title?: string
 	updated: IsoAutoDateString
 }

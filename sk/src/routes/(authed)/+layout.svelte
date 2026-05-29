@@ -1,7 +1,11 @@
 <script module lang="ts">
     import { createContext } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
-    export const [getIsMobile, setIsMobile] = createContext<MediaQuery>();
+    export type LayoutParams = {
+        isMobile: boolean;
+        onOnshape: boolean;
+    };
+    export const [getLayoutParams, setLayoutParams] = createContext<LayoutParams>();
 </script>
 
 <script lang="ts">
@@ -33,13 +37,23 @@
         if($authModel === null) goto("/login?r=" + encodeURIComponent(followPath));
     });
 
-    setIsMobile(new MediaQuery("screen and (max-width: 640px)"));
-    const isMobile = $derived(getIsMobile().current);
+    const isMobile = $derived(new MediaQuery("screen and (max-width: 640px)").current);
+    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true");
+    let layoutParams = $state<LayoutParams>({
+        // svelte-ignore state_referenced_locally
+        isMobile,
+        // svelte-ignore state_referenced_locally
+        onOnshape
+    });
+    $effect(() => {
+        layoutParams.isMobile = isMobile;
+        layoutParams.onOnshape = onOnshape;
+    });
+    setLayoutParams(layoutParams);
 
     // svelte-ignore state_referenced_locally
     let navOpen = $state(!isMobile);
-    
-    const onOnshape = $derived((page.route.id?.startsWith("/(authed)/(onshape)") || page.url.searchParams.get("onshape") === "true") ?? false);
+
     const forceNavOpen = $derived(page.url.pathname === "/" && !isMobile);
     let showNav = $derived(!onOnshape && (navOpen || forceNavOpen));
 </script>

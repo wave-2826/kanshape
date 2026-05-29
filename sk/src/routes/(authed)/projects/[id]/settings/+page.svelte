@@ -1,7 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { untrack } from "svelte";
-    import ProjectDetails, { type BoardCreationData } from "../../ProjectDetails.svelte";
     import { batch, CancelBatch, deleteRecord, query, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type BoardsRecord, type Create, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
@@ -9,6 +8,8 @@
     import { goto } from "$app/navigation";
     import { deepEqual } from "$lib/util";
     import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
+    import type { BoardCreationData } from "$lib/components/projects/ProjectDetails.svelte";
+    import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";
@@ -29,15 +30,6 @@
             sections: SectionsRecord[]
         }
     })[]);
-    let originalSections = $derived.by(() => {
-        if(!project) return [];
-        const boards = project.expand.boards as (BoardsRecord & {
-            expand: {
-                sections: SectionsRecord[] | undefined
-            }
-        })[];
-        return boards.flatMap(board => board.expand.sections).filter((s): s is SectionsRecord => s !== undefined);
-    });
 
     let name: string = $state("");
     let description: string = $state("");
@@ -135,23 +127,25 @@
             for(let i = 0; i < boards.length; i++) {
                 const board = boards[i];
 
+                const originalBoard = originalBoardCreationData.find(s => s.id === board.id);
+
                 // Save changes to sections
                 const sections = board.sections;
                 let sectionIds = [];
                 for(let i = 0; i < sections.length; i++) {
                     const section = sections[i];
-                    if(!section.id) {
+                    if(!board.id || !section.id) {
                         // New sections
-                        const id = generateRecordID();
-                        await save(Collections.Sections, { ...section, id }, { batch, create: true });
-                        sectionIds.push(id);
-                    } else if(!deepEqual(section, originalSections.find(s => s.id === section.id))) {
+                        section.id = generateRecordID();
+                        await save(Collections.Sections, section, { batch, create: true });
+                    } else if(!deepEqual(section, originalBoard?.sections.find(s => s.id === section.id))) {
                         // Changed sections
                         await save(Collections.Sections, { ...section, id: section.id }, { batch });
-                        sectionIds.push(section.id);
                     }
-                }
 
+                    sectionIds.push(section.id);
+                }
+                
                 if(!board.id) {
                     // New boards
                     board.id = generateRecordID();
@@ -159,8 +153,10 @@
                         ...board,
                         sections: sectionIds
                     }, { batch, create: true });
-                } else if(!deepEqual(board, originalBoardCreationData.find(s => s.id === board.id))) {
-                    // Technically could give a false positive but like whatever
+                } else if(
+                    // Technically could give a false positive if only section data changes but whatever
+                    !deepEqual(board, originalBoardCreationData.find(s => s.id === board.id))
+                ) {
                     // Changed boards
                     await save(Collections.Boards, {
                         ...board,

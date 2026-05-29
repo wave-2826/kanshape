@@ -3,8 +3,9 @@
     import { batch, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
-    import ProjectDetails, { type BoardCreationData } from "../ProjectDetails.svelte";
     import { generateRecordID, getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
+    import type { BoardCreationData } from "$lib/components/projects/ProjectDetails.svelte";
+    import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
 
     $effect(() => {
         $metadata.title = "New project";

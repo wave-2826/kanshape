@@ -1,14 +1,14 @@
 <script lang="ts">
     import { getConfig } from "$lib/config";
     import { deleteRecord, watch, type PageStore } from "$lib/pocketbase";
-    import { Collections, type OnshapeDocumentsResponse, type ProjectsResponse } from "$lib/pocketbase/generated-types";
+    import { Collections, type OnshapeDocumentsResponse, type ProjectsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { X } from "lucide-svelte";
 
     const {
-        project,
+        linkedTo,
         fullPreview = false
     }: {
-        project: ProjectsResponse,
+        linkedTo: ProjectsRecord | SubprojectsRecord,
         /** If true, this is a full preview (not just small links for the page header). */
         fullPreview?: boolean
     } = $props();
@@ -19,7 +19,7 @@
     $effect(() => {
         (async () => {
             links = await watch(Collections.OnshapeDocuments, {
-                filter: `project = "${project.id}"`
+                filter: "subprojects" in linkedTo ? `project = "${linkedTo.id}"` : `subproject = "${linkedTo.id}"`,
             }, 1, 5);
         })();
     });

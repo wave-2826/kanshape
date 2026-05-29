@@ -2,14 +2,14 @@
     import { page } from "$app/state";
     import { untrack } from "svelte";
     import { batch, CancelBatch, deleteRecord, query, queryOne, save } from "$lib/pocketbase";
-    import { Collections, ProjectsTypeOptions, type BoardsRecord, type Create, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, ProjectsTypeOptions, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
     import { ArrowLeft, Save, Trash } from "lucide-svelte";
     import { goto } from "$app/navigation";
     import { deepEqual } from "$lib/util";
     import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
-    import type { BoardCreationData } from "$lib/components/projects/ProjectDetails.svelte";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
+    import { boardCreationData, deleteBoard, saveBoardRecords, type BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";
@@ -41,19 +41,7 @@
     let subprojects: SubprojectsRecord[] = $state([]);
     let boards: BoardCreationData[] = $state([]);
 
-    function boardCreationData(boards: (BoardsRecord & {
-        expand: {
-            sections: SectionsRecord[] | undefined
-        }
-    })[]): BoardCreationData[] {
-        return boards.map(board => ({
-            ...board,
-            sections: board.expand.sections?.map(section => ({
-                ...section
-            })) ?? []
-        }));
-    }
-    let originalBoardCreationData = $derived(boardCreationData(originalBoards));
+    let originalBoardCreationData = $derived(originalBoards.map(boardCreationData));
 
     let changed = $derived.by(() => {
         if(!project) return false;
@@ -77,11 +65,11 @@
             type = p.type;
             linkedSites = p.linked_sites ?? [];
             subprojects = project.expand.subprojects ?? [];
-            boards = boardCreationData((project.expand.boards ?? []) as (BoardsRecord & {
+            boards = ((project.expand.boards ?? []) as (BoardsRecord & {
                 expand: {
                     sections: SectionsRecord[]
                 }
-            })[]);
+            })[]).map(boardCreationData);
         }
     });
 
@@ -126,66 +114,13 @@
             let boardIDs: string[] = [];
             for(let i = 0; i < boards.length; i++) {
                 const board = boards[i];
-
                 const originalBoard = originalBoardCreationData.find(s => s.id === board.id);
 
-                // Save changes to sections
-                const sections = board.sections;
-                let sectionIds = [];
-                for(let i = 0; i < sections.length; i++) {
-                    const section = sections[i];
-                    if(!board.id || !section.id) {
-                        // New sections
-                        section.id = generateRecordID();
-                        await save(Collections.Sections, section, { batch, create: true });
-                    } else if(!deepEqual(section, originalBoard?.sections.find(s => s.id === section.id))) {
-                        // Changed sections
-                        await save(Collections.Sections, { ...section, id: section.id }, { batch });
-                    }
-
-                    sectionIds.push(section.id);
-                }
-                
-                if(!board.id) {
-                    // New boards
-                    board.id = generateRecordID();
-                    await save(Collections.Boards, {
-                        ...board,
-                        sections: sectionIds
-                    }, { batch, create: true });
-                } else if(
-                    // Technically could give a false positive if only section data changes but whatever
-                    !deepEqual(board, originalBoardCreationData.find(s => s.id === board.id))
-                ) {
-                    // Changed boards
-                    await save(Collections.Boards, {
-                        ...board,
-                        sections: sectionIds,
-                        id: board.id // typescript moment
-                    }, { batch });
-                }
-
-                boardIDs.push(board.id);
+                boardIDs.push(await saveBoardRecords(board, originalBoard, batch));
             }
             // Deleted boards
             for(const board of originalBoards) {
-                if(!boards.find(s => s.id === board.id)) {
-                    // Check if any cards are associated with the board and warn
-                    if((await query(Collections.Cards, {
-                        filter: `board = "${board.id}"`
-                    })).length > 0) {
-                        if(!confirm(`Board "${board.title}" has associated cards. Deleting it will delete every card on the board! Are you sure you want to delete it?`)) {
-                            throw new CancelBatch("User cancelled batch due to associated cards with board");
-                        }
-                    }
-
-                    await deleteRecord(Collections.Boards, board.id, { batch });
-                    // Sections unfortunately aren't cascade deleted because we use a forward relation
-
-                    for(const section of board.expand.sections) {
-                        await deleteRecord(Collections.Sections, section.id, { batch });
-                    }
-                }
+                if(!boards.find(s => s.id === board.id)) await deleteBoard(board, batch);
             }
 
             // Save changes to the project record

@@ -2,8 +2,9 @@
     import { SquareKanban, Kanban } from "lucide-svelte";
     import { metadata } from "$lib/metadata";
     import { page } from "$app/state";
-    import { queryOne, query, save } from "$lib/pocketbase";
+    import { query, save, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { goto } from "$app/navigation";
 
     $effect(() => {
         $metadata.title = "Onshape Tab";
@@ -11,13 +12,18 @@
 
     const documentId = page.url.searchParams.get("documentId");
 
-    const record = await queryOne(Collections.OnshapeDocuments, documentId || "").catch(() => null);
-    if(record?.project) {
-        window.location.href = record?.subprojects ?
-            `/projects/${record?.project}/subprojects/${record?.subprojects}?onshape=true` :
-            `/projects/${record?.project}?onshape=true`;
+    const watchRecord = await watchOne(Collections.OnshapeDocuments, documentId || "").catch(() => null);
+    const record = $watchRecord;
+    
+    function redirect() {
+        goto(record?.subproject ?
+            `/projects/${record?.project}/subprojects/${record?.subproject}?onshape=true` :
+            `/projects/${record?.project}?onshape=true`);
     }
-
+    $effect(() => {
+        if(record?.project) redirect();
+    });
+        
     const projects = await query(Collections.Projects, {expand: "subprojects"});
 
     async function linkDocumentToProject(projectId: string, subprojectId?: string) {
@@ -26,14 +32,12 @@
         await save(Collections.OnshapeDocuments, {
             id: documentId,
             project: projectId,
-            subprojects: subprojectId || "",
+            subproject: subprojectId || "",
         }, {
             create: true
         }).catch((e) => {
             console.error("Failed to save Onshape document record:", e);
         });
-
-        window.location.reload();
     }
 </script>
 

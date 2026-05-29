@@ -1,12 +1,8 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { Kanban, List } from "lucide-svelte";
     import type { Snippet } from "svelte";
     import { getProjectContext, setBoardContext, watchBoard, watchCards, type BoardContext } from "../../context";
-    import type { ProjectLinkedSite } from "$lib/data/project";
-    import { link } from "$lib/actions";
-    import ProjectPage from "../../ProjectPage.svelte";
-
+    
     const {
         children
     }: {
@@ -32,30 +28,6 @@
         boardContext.board = board;
         boardContext.cards = cards;
     });
-
-    const project = $derived(getProjectContext().project);
 </script>
 
-{#if project && $project !== null && board && $board !== null}
-    <ProjectPage
-        project={$project}
-        subtitle={$board.title}
-        linkedSites={$board.linked_sites as ProjectLinkedSite[]}
-    >
-        {#snippet navItems()}
-            <div class="multi-button">
-                <button use:link={`/projects/${$project.id}/boards/${$board.id}/list`} class:active={page.route.id?.endsWith("/list")}>
-                    <List />
-                    List
-                </button>
-                <button use:link={`/projects/${$project.id}/boards/${$board.id}`} class:active={!page.route.id?.endsWith("/list")}>
-                    <Kanban />
-                    Board
-                </button>
-            </div>
-        {/snippet}
-        {@render children()}
-    </ProjectPage>
-{:else}
-    <p>Loading...</p>
-{/if}
+{@render children()}

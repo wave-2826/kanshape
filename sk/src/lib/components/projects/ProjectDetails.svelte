@@ -1,17 +1,11 @@
-<script lang="ts" module>
-    import { BoardsTypeOptions, ProjectsTypeOptions, type Create, type ProjectsResponse, type SectionsResponse } from "$lib/pocketbase/generated-types";
-
-    export type BoardCreationData = Omit<Create<"boards">, "sections"> & {
-        sections: Create<"sections">[]
-    };
-</script>
-
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
     import { createPartIDString } from "$lib/parts";
-    import { boardTypes, getTemplateSections, projectTypes, type ProjectLinkedSite } from "$lib/data/project";
+    import { getTemplateSections, projectTypes, type ProjectLinkedSite } from "$lib/data/project";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
     import OnshapeLinks from "./OnshapeLinks.svelte";
+    import BoardSettings, { type BoardCreationData } from "./BoardSettings.svelte";
+    import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
 
     let {
         color = $bindable(),
@@ -101,78 +95,8 @@
     }}
 >
     {#snippet pane(selected)}
-        {@const board = boards[selected]}
-        {#if board}
-            <div class="board">
-                <input type="text" placeholder="Board name" bind:value={board.title} />
-                <textarea placeholder="Board description (optional)" bind:value={board.description}></textarea>
-
-                <h2>Board type</h2>
-                <div class="type-selector">
-                    {#each (Object.keys(BoardsTypeOptions) as BoardsTypeOptions[]) as option}
-                        {@const optionDetails = boardTypes[option]}
-                        <button class:selected={board.type === option} onclick={() => board.type = option}>
-                            {optionDetails.name}
-                            <span class="description">{optionDetails.description}</span>
-                        </button>
-                    {/each}
-                </div>
-
-                <h2>Sections</h2>
-                <LeftPaneChooser
-                    options={board.sections?.map(s => ({ name: s.title ?? "", tooltip: s.description, color: s.color })) ?? []}
-                    oncreate={() => {
-                        if(!board.sections) board.sections = [];
-                        board.sections.push({ title: `Section ${board.sections.length + 1}`, description: "", color: undefined, is_completed: false });
-                    }}
-                    ondelete={(option) => board.sections?.splice(option, 1)}
-                    ordered
-                    onreorder={(from, to) => {
-                        if(!board.sections) return;
-                        const selArr = board.sections.map((_, i) => i);
-                        const selItem = selArr.splice(from, 1)[0];
-                        selArr.splice(to, 0, selItem);
-                        board.sections = selArr.map(i => board.sections![i]);
-                    }}
-                    background="var(--bg-site)"
-                >
-                    {#snippet pane(selected)}
-                        {@const section = board.sections?.[selected]}
-                        {#if section}
-                            {@const hasColor = section.color !== undefined && section.color.trim() !== ""}
-                            <div class="section">
-                                <input type="text" placeholder="Section name" bind:value={section.title} />
-                                <textarea placeholder="Section description (optional)" bind:value={section.description}></textarea>
-
-                                <div class="option">
-                                    <label for="sectionColor">Section color</label>
-                                    <input
-                                        type="color"
-                                        id="sectionColor"
-                                        value={section.color ?? "#ffffff"}
-                                        onchange={(e) => section.color = e.currentTarget.value}
-                                        class:selected={hasColor}
-                                    />
-                                    <button onclick={() => section.color = ""} class:selected={!hasColor}>None</button>
-                                </div>
-                                <div class="option">
-                                    <label for="isCompleted">Is completed?</label>
-                                    <input
-                                        type="checkbox"
-                                        id="isCompleted"
-                                        checked={section.is_completed}
-                                        onchange={(e) => section.is_completed = e.currentTarget.checked}
-                                    />
-                                </div>
-                            </div>
-                        {/if}
-                    {/snippet}
-                </LeftPaneChooser>
-
-                <h2>Linked sites</h2>
-                <!-- TODO: this UI is stupid -->
-                <LinkedSiteDetails bind:linkedSites={board.linked_sites as ProjectLinkedSite[]} background="var(--bg-site)" />
-            </div>
+        {#if boards[selected]}
+            <BoardSettings bind:board={boards[selected]} panelBackgrounds="var(--bg-site)" />
         {/if}
     {/snippet}
 </LeftPaneChooser>
@@ -207,28 +131,9 @@
 </LeftPaneChooser>
 
 <style lang="scss">
-.type-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+@use "settings.scss";
 
-    button {
-        display: block;
-        text-align: left;
-    }
-    .description {
-        font-size: var(--font-small);
-        color: var(--text-secondary);
-        margin-left: 0.75rem;
-        white-space: normal;
-    }
-}
-.option {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.subproject, .board, .section {
+.subproject {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

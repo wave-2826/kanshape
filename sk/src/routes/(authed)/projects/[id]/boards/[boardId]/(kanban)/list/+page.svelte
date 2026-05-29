@@ -1,6 +1,6 @@
 <script>
-    import KanbanBoard from "$lib/components/kanban/KanbanBoard.svelte";
-    import { getBoardContext, getProjectContext } from "../../context";
+    import KanbanList from "$lib/components/kanban/KanbanList.svelte";
+    import { getProjectContext, getBoardContext } from "../../../../context";
 
     const project = $derived(getProjectContext().project);
     const board = $derived(getBoardContext().board);
@@ -8,5 +8,5 @@
 </script>
 
 {#if $project && $board}
-    <KanbanBoard project={$project} board={$board} cards={cards} />
+    <KanbanList project={$project} board={$board} cards={cards} />
 {/if}

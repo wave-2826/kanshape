@@ -35,7 +35,7 @@ const expandCollections = {
     },
     onshape_documents: {
         project: "projects",
-        subprojects: "subprojects"
+        subproject: "subprojects"
     },
     users: {
         groups: "groups"
@@ -358,6 +358,7 @@ export async function watch<
 ): Promise<PageStore<T>> {
     const collection = client.collection(collectionName);
     let result = await collection.getList<T>(page, perPage, queryParams);
+    if(result.totalPages === 0) result.totalPages = 1;
 
     let set: Subscriber<ListResult<T>>;
     let unsubRealtime: UnsubscribeFunc[] = [];
@@ -431,7 +432,7 @@ export async function watch<
 
     async function setPage(newpage: number) {
         const { page, totalPages, perPage } = result;
-        if(page > 0 && page <= totalPages) {
+        if(page > 0 && newpage <= totalPages) {
             set((result = await collection.getList(newpage, perPage, queryParams)));
         }
     }

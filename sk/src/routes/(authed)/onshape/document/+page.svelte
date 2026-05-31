@@ -1,37 +1,31 @@
 <script lang="ts">
     import { metadata } from "$lib/metadata";
-    import { page } from "$app/state";
-    import { watchOne } from "$lib/pocketbase";
-    import { Collections } from "$lib/pocketbase/generated-types";
     import { goto } from "$app/navigation";
-    import LinkOnshapeDocument from "$lib/components/LinkOnshapeDocument.svelte";
+    import LinkOnshapeDocument from "../LinkOnshapeDocument.svelte";
+    import { getOnshapeContext } from "../onshapeContext";
 
     $effect(() => {
-        $metadata.title = "Onshape Tab";
+        $metadata.title = "Onshape Document Redirect";
     });
 
-    const documentId = page.url.searchParams.get("documentId");
-
-    const watchRecord = await watchOne(Collections.OnshapeDocuments, documentId || "").catch(() => null);
-    const record = $watchRecord;
+    const linkedProject = $derived(getOnshapeContext().linkedProject);
     
     function redirect() {
-        goto(record?.subproject ?
-            `/projects/${record?.project}/subprojects/${record?.subproject}?onshape=true` :
-            `/projects/${record?.project}?onshape=true`);
+        goto(linkedProject?.subproject ?
+            `/projects/${linkedProject?.project}/subprojects/${linkedProject?.subproject}?onshape=true` :
+            `/projects/${linkedProject?.project}?onshape=true`);
     }
     $effect(() => {
-        if(record?.project) redirect();
+        if(linkedProject?.project) redirect();
     });
 </script>
 
-{#if record?.project}
-    <p>Redirecting to project...</p>
-{/if}
-{#if !record?.project}
+{#if linkedProject === null}
     <div class="container">
         <LinkOnshapeDocument />
     </div>
+{:else}
+    <p>Redirecting to project...</p>
 {/if}
 
 

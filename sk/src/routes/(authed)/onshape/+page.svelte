@@ -3,8 +3,11 @@
     import { metadata } from "$lib/metadata";
     import { OnshapeClient } from "$lib/onshape/client";
     import { page } from "$app/state";
-    import { onshapeApiRequest } from "$lib/onshape/requests";
-
+    import { getOnshapeContext } from "./onshapeContext";
+    import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
+    import { Collections } from "$lib/pocketbase/generated-types";
+    import { save } from "$lib/pocketbase";
+    
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
     });
@@ -23,18 +26,21 @@
         };
     });
 
-    const req = onshapeApiRequest(config, "GET", "/api/v16/metadata/d/27513eb20fd7a7d9e3043aa2/w/f122e4cc32f851f888ad6e1b/e");
+    const onshapeCtx = getOnshapeContext();
+    const linkedProject = $derived(onshapeCtx.linkedProject);    
 </script>
 
 <h1>WIP Onshape panel</h1>
 
-{#await req}
-    <p>Loading...</p>
-{:then data}
-    <p style="font-size: 12px">Data: {JSON.stringify({
-        ...data,
-        body: ""
-    }, null, 4)}</p>
-{:catch error}
-    <p>Error: {error.message}</p>
-{/await}
+{#if linkedProject === null}
+    <LinkOnshapeDocument />
+    <button onclick={() => {
+        save(Collections.OnshapeDocuments, { id: onshapeCtx.documentId }, { create: true });
+    }}>Continue with no linked project</button>
+{:else}
+    <p>Linked to project: {linkedProject.title}</p>
+{/if}
+
+<style lang="scss">
+
+</style>

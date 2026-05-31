@@ -1,11 +1,13 @@
 <script module lang="ts">
-    import { createContext } from "svelte";
+    import { createContext, type Snippet } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
     export type LayoutParams = {
         isMobile: boolean;
         onOnshape: boolean;
     };
     export const [getLayoutParams, setLayoutParams] = createContext<LayoutParams>();
+
+    export let customHeader = writable<Snippet | null>(null);
 </script>
 
 <script lang="ts">
@@ -13,14 +15,15 @@
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
     import { onMount } from "svelte";
-    import { goto, invalidateAll } from "$app/navigation";
-    import { ExternalLink, LogOut, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
+    import { goto } from "$app/navigation";
+    import { ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/NavContent.svelte";
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
-    import { authModel, logout } from "$lib/pocketbase/auth";
+    import { authModel } from "$lib/pocketbase/auth";
+    import { writable } from "svelte/store";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -90,14 +93,9 @@
         {#if dev}
             <span class="dev-build-warning" title="This instance is running a development build">[DEV]</span>
         {/if}
-        <div style="flex-grow: 1;"></div>
-        <NavProfile />
-        <button onclick={async () => {
-            await logout();
-            await goto("/login");
-        }}>
-            <LogOut />
-        </button>
+        <div style="flex-grow: 1; margin: 0 -0.25rem;"></div>
+        {@render $customHeader?.()}
+        <NavProfile collapsed={onOnshape} />
     </header>
     {#if isMobile && showNav}
         <button
@@ -135,7 +133,6 @@
 
     > * {
         min-width: 0;
-        overflow: hidden;
     }
 }
 header {
@@ -153,7 +150,7 @@ header {
 
     img {
         height: 2rem;
-        margin-right: 1rem;
+        margin-right: 0.5rem;
     }
     a, h1 {
         color: var(--text-primary);

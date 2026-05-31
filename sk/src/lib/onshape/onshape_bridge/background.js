@@ -85,12 +85,12 @@ async function handleFetch(payload) {
         credentials: "include"
     });
 
-    const text = await response.text();
+    const body = await response.json();
 
     const result = {
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        body: text
+        body
     };
 
     cache[cacheKey] = {

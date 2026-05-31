@@ -1,11 +1,16 @@
 <script lang="ts">
-    import { authModel } from "$lib/pocketbase/auth";
-    import { User } from "lucide-svelte";
+    import { authModel, logout } from "$lib/pocketbase/auth";
+    import { LogOut, User } from "lucide-svelte";
     import { client } from "$lib/pocketbase";
+    import { goto } from "$app/navigation";
+
+    const { collapsed }: { collapsed?: boolean } = $props();
 </script>
 
-<div class="nav-profile" title="Name or avatar changed? Sign out and back in to refresh.">
-    {#if $authModel}
+{#if $authModel}
+    <!-- TODO: better hint than title text, especially for when collapsed -->
+    <div class="nav-profile" title="{$authModel.name || $authModel.email || "Unknown User"}
+Name or avatar changed? Sign out and back in to refresh.">
         {#if $authModel.avatar}
             <img class="avatar" src={client.files.getUrl($authModel, $authModel.avatar, { thumb: '100x100' })} alt="Avatar" />
         {:else}
@@ -13,45 +18,52 @@
                 <User />
             </div>
         {/if}
-        <span class="name">{$authModel.name || $authModel.email || "Unknown User"}</span>
-    {/if}
-</div>
+        {#if !collapsed}
+            <span class="name">{$authModel.name || $authModel.email || "Unknown User"}</span>
+            <button onclick={async () => {
+                await logout();
+                await goto("/login");
+            }}>
+                <LogOut />
+            </button>
+        {/if}
+    </div>
+{/if}
 
 <style lang="scss">
-    .nav-profile {
+.nav-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-size: var(--font-text);
+}
+
+.avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+
+    &.fallback {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        color: var(--text-primary);
-        font-size: var(--font-text);
-        padding: 0 0.5rem;
-    }
+        justify-content: center;
+        background-color: var(--bg-secondary);
 
-    .avatar {
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-
-        &.fallback {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-secondary);
-
-            :global(svg) {
-                width: 1.1em;
-                height: 1.1em;
-                color: var(--text-secondary);
-            }
+        :global(svg) {
+            width: 1.1em;
+            height: 1.1em;
+            color: var(--text-secondary);
         }
     }
+}
 
-    .name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px;
-    }
+.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
 </style>

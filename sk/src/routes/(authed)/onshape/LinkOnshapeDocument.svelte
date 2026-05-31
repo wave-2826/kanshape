@@ -4,11 +4,13 @@
     import { query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Kanban, SquareKanban } from "lucide-svelte";
+    import { getOnshapeContext } from "./onshapeContext";
     
     const documentId = page.url.searchParams.get("documentId");
 
     const projects = await query(Collections.Projects, { expand: "subprojects" });
 
+    const onshapeCtx = getOnshapeContext();
     async function linkDocumentToProject(projectId: string, subprojectId?: string) {
         if(!documentId) return;
 
@@ -17,22 +19,26 @@
                 path: { did: documentId }
             }
         });
+        console.log("Fetched document details:", { data, error });
 
         if(!data) {
             console.error("Failed to fetch Onshape document details:", error);
             return;
         }
 
-        await save(Collections.OnshapeDocuments, {
+        const record = await save(Collections.OnshapeDocuments, {
             id: documentId,
             project: projectId,
             subproject: subprojectId || "",
-            title: data.name || "Untitled Document"
+            title: data.name ?? "Untitled Document"
         }, {
             create: true
         }).catch((e) => {
             console.error("Failed to save Onshape document record:", e);
         });
+        if(!record) return;
+
+        onshapeCtx.linkedProject = record;
     }
 </script>
 

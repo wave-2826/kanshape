@@ -187,34 +187,42 @@ export async function onshapeApiRequest<T>(
     }
 }
 
-let onshapeApiFetch: typeof fetch = async (input: URL | RequestInfo, init?: RequestInit): Promise<Response> => {
+let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?: RequestInit): Promise<Response> => {
     // Fetch wrapper that uses our custom request logic
-    if(typeof input === "string" || input instanceof URL) {
-        const url = input.toString();
-        const method = init?.method || "GET";
-        const body = init?.body;
-        const headers = init?.headers || {};
-
-        // Only intercept requests to the Onshape API
-        if(url.includes("onshape.com/api/")) {
-            return await onshapeApiRequest(
-                await loadConfig(),
-                method,
-                url,
-                body,
-                canonicalizeHeaders(headers)
-            )
-                .then(result => new Response(JSON.stringify(result.body), {
-                    status: result.status,
-                    headers: result.headers
-                }));
-        }
+    const url = input instanceof URL ? input.toString() : (typeof input === "string" ? input : input.url);
+    let method = init?.method ?? "GET";
+    let body = init?.body;
+    let headers = init?.headers ?? {};
+    if(input instanceof Request) {
+        method = input.method ?? method;
+        body = input.body ?? body;
+        headers = input.headers ?? headers;
     }
-    // For non-Onshape requests, just do a normal fetch
+
+    // Only intercept requests to the Onshape API
+    if(url.includes("onshape.com/api/")) {
+        const path = new URL(url).pathname;
+        return await onshapeApiRequest(
+            await loadConfig(),
+            method,
+            path,
+            body,
+            canonicalizeHeaders(headers)
+        )
+            .then(result => new Response(JSON.stringify(result.body), {
+                status: result.status,
+                headers: {
+                    ...result.headers,
+                    "X-From-Cache": result.cached ? "true" : "false"
+                }
+            }));
+    }
+
+    console.warn("Attempted to fetch non-Onshape URL through onshapeApiFetch:", input);
     return fetch(input, init);
 };
 
 export let onshapeClient = createClient<paths>({
-    baseUrl: await loadConfig().then(config => config.onshape.baseDomain),
+    baseUrl: await loadConfig().then(config => config.onshape.baseDomain + "/api/v16"),
     fetch: onshapeApiFetch
 });

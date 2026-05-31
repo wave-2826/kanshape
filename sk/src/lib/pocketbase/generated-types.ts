@@ -210,7 +210,7 @@ export type LeaderboardRecord = {
 export type OnshapeDocumentsRecord = {
 	created: IsoAutoDateString
 	id: string
-	project: RecordIdString
+	project?: RecordIdString
 	subproject?: RecordIdString
 	title?: string
 	updated: IsoAutoDateString

@@ -101,7 +101,8 @@ export async function loadConfig(fetch: typeof window.fetch = window.fetch): Pro
     // eh no cache for now since this is pretty fast
     const pairs = await query(Collections.Config, {
         fields: "key,value,id",
-        fetch
+        fetch,
+        requestKey: null
     });
 
     configPathIDs = new Map();

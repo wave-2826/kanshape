@@ -5,15 +5,13 @@
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
     import OnshapeLinks from "./OnshapeLinks.svelte";
     import BoardSettings, { type BoardCreationData } from "./BoardSettings.svelte";
-    import { ProjectsTypeOptions, type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
+    import { type Create, type ProjectsResponse } from "$lib/pocketbase/generated-types";
     import SubprojectSettings from "./SubprojectSettings.svelte";
 
     let {
         color = $bindable(),
         name = $bindable(),
         description = $bindable(),
-        partIdPrefix = $bindable(),
-        type = $bindable(),
         boards = $bindable(),
         subprojects = $bindable(),
         linkedSites = $bindable(),
@@ -22,8 +20,6 @@
         color?: string;
         name: string;
         description: string;
-        partIdPrefix: string;
-        type: ProjectsTypeOptions;
         boards: BoardCreationData[];
         subprojects: Create<"subprojects">[];
         linkedSites: ProjectLinkedSite[];
@@ -48,26 +44,8 @@
     />
 </div>
 
-<h2>Project type</h2>
-<div class="type-selector">
-    {#each (Object.keys(ProjectsTypeOptions) as ProjectsTypeOptions[]) as option}
-        {@const optionDetails = projectTypes[option]}
-        <button class:selected={type === option} onclick={() => type = option}>
-            {optionDetails.name}
-            <span class="description">{optionDetails.description}</span>
-        </button>
-    {/each}
-</div>
-{#if type === "manufacturing"}
-    <div class="option">
-        <label for="partIdPrefix">Part ID prefix</label>
-        <input type="text" placeholder="Part ID prefix" id="partIdPrefix" bind:value={partIdPrefix} maxlength="20" />
-        <span class="part-id-preview">Part IDs will look like {createPartIDString(partIdPrefix, 0, 1, 1)}</span>
-    </div>
-{/if}
-
 <h2>Linked pages</h2>
-{#if editedProject && type === "manufacturing"}
+{#if editedProject}
     <p>Linked Onshape documents</p>
     <div class="linked-sites">
         <!-- Technically, this doesn't have the same saving behavior as the rest of the settings, but... whatever -->
@@ -84,7 +62,8 @@
         title: `Board ${boards.length + 1}`,
         type: "blank",
         description: "",
-        sections: getTemplateSections()
+        sections: getTemplateSections(),
+        part_id_prefix: new Date().getFullYear().toString(),
     })}
     ondelete={(option) => boards.splice(option, 1)}
     ordered
@@ -115,14 +94,18 @@
         {#if subprojects[selected]}
             <SubprojectSettings
                 bind:subproject={subprojects[selected]}
-                projectType={type}
-                partIdPrefix={partIdPrefix}
                 panelBackgrounds="var(--bg-site)"
+                editing={editedProject !== null}
+                sectionPartIDPrefixes={boards
+                    .filter(b => b.type === "parts")
+                    .map(b => b.part_id_prefix)
+                    .filter((v): v is string => !!v) ?? []}
             />
         {/if}
     {/snippet}
 </LeftPaneChooser>
 
+<!-- svelte-ignore css_unused_selector - shared styles -->
 <style lang="scss">
 @use "settings.scss";
 </style>

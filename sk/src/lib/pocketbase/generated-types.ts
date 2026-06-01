@@ -113,10 +113,12 @@ export const BoardsTypeOptions = {
 export type BoardsTypeOptions = typeof BoardsTypeOptions[keyof typeof BoardsTypeOptions]
 export type BoardsRecord<Tcustom_card_fields = unknown, Tlinked_sites = unknown> = {
 	created: IsoAutoDateString
+	current_part_id?: number
 	custom_card_fields?: null | Tcustom_card_fields
 	description?: string
 	id: string
 	linked_sites?: null | Tlinked_sites
+	part_id_prefix?: string
 	sections?: RecordIdString[]
 	title?: string
 	type: BoardsTypeOptions
@@ -216,23 +218,15 @@ export type OnshapeDocumentsRecord = {
 	updated: IsoAutoDateString
 }
 
-export const ProjectsTypeOptions = {
-	"blank": "blank",
-	"manufacturing": "manufacturing",
-} as const
-export type ProjectsTypeOptions = typeof ProjectsTypeOptions[keyof typeof ProjectsTypeOptions]
 export type ProjectsRecord<Tlinked_sites = unknown> = {
 	boards?: RecordIdString[]
 	color?: string
 	created: IsoAutoDateString
-	current_part_id?: number
 	description?: string
 	id: string
 	linked_sites?: null | Tlinked_sites
-	part_id_prefix?: string
 	subprojects?: RecordIdString[]
 	title: string
-	type: ProjectsTypeOptions
 	updated: IsoAutoDateString
 }
 

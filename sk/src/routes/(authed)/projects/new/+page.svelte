@@ -1,11 +1,12 @@
 <script lang="ts">
     import { metadata } from "$lib/metadata";
     import { batch, save } from "$lib/pocketbase";
-    import { Collections, ProjectsTypeOptions, type Create } from "$lib/pocketbase/generated-types";
+    import { Collections, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import { generateRecordID, getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
-    import type { BoardCreationData } from "$lib/components/projects/ProjectDetails.svelte";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
+    import type { BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
+    import { nav } from "$lib/navigation";
 
     $effect(() => {
         $metadata.title = "New project";
@@ -14,13 +15,11 @@
     let name = $state("");
     let description = $state("");
     let color = $state<string | undefined>(undefined);
-    let partIdPrefix = $state(new Date().getFullYear().toString());
-    let type = $state<ProjectsTypeOptions>("blank");
     let linkedSites = $state<ProjectLinkedSite[]>([]);
     
     let subprojects = $state<Create<"subprojects">[]>([]);
     let boards = $state<BoardCreationData[]>([
-        { title: "Default", description: "", type: "blank", sections: getTemplateSections() }
+        { title: "Default", description: "", type: "blank", sections: getTemplateSections(), part_id_prefix: new Date().getFullYear().toString() }
     ]);
 
     async function createProject() {
@@ -38,9 +37,7 @@
                 }
 
                 save(Collections.Boards, {
-                    title: board.title,
-                    description: board.description,
-                    type: board.type,
+                    ...board,
                     sections: sectionIds
                 }, { batch, create: true });
             }
@@ -63,19 +60,15 @@
         const projectRecord = await save(Collections.Projects, {
             title: name,
             description,
-            part_id_prefix: partIdPrefix,
-            current_part_id: 1,
             color: color ?? "",
             boards: boardIds,
             subprojects: subprojectIds,
-            linked_sites: linkedSites,
-            type: "blank"
+            linked_sites: linkedSites
         }, {
             create: true
         });
 
-        // Redirect to the new project page
-        window.location.href = `/projects/${projectRecord.id}`;
+        nav(`/projects/${projectRecord.id}`);
     }
 </script>
 
@@ -83,9 +76,9 @@
     <h1>New project</h1>
 
     <div class="options">
-        <ProjectDetails bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:boards bind:linkedSites />
+        <ProjectDetails bind:name bind:description bind:color bind:subprojects bind:boards bind:linkedSites />
 
-        <button onclick={createProject} disabled={name.trim().length === 0 || partIdPrefix.trim().length === 0} class="create">
+        <button onclick={createProject} disabled={name.trim().length === 0} class="create">
             <Plus />Create {name}
         </button>
     </div>

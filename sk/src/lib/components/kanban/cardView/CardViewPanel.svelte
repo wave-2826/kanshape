@@ -10,7 +10,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
-    import { Collections, ProjectsTypeOptions, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { BoardsTypeOptions, Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
@@ -25,13 +25,13 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         card = $bindable(),
         sections,
         subprojects,
-        projectType,
+        boardType,
         onclose
     }: {
         card: TypedCardPreviewResponse | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
-        projectType: ProjectsTypeOptions,
+        boardType: BoardsTypeOptions,
         onclose: () => void
     } = $props();
 
@@ -262,9 +262,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             </div>
         </div>
 
-        {#if projectType === "manufacturing"}
-            <h3><Factory /> Manufacturing</h3>
+        {#if boardType === "parts"}
+            <h3><Factory /> Parts board</h3>
             <!-- TEMPORARY -->
+            <!-- TODO -->
             <div class="properties">
                 <div class="property">
                     <span class="prop-label"><Circle />Material</span>

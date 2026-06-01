@@ -42,8 +42,11 @@
     {#if $project && subprojectData}
         <SubprojectSettings
             bind:subproject={subprojectData}
-            projectType={$project.type}
-            partIdPrefix={$project.part_id_prefix}
+            editing={true}
+            sectionPartIDPrefixes={$project.expand.boards
+                ?.filter(b => b.type === "parts")
+                .map(b => b.part_id_prefix)
+                .filter((v): v is string => !!v) ?? []}
         />
     {/if}
 </SettingsPage>

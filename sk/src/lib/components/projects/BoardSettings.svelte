@@ -1,5 +1,5 @@
 <script lang="ts" module>
-    import { Collections, ProjectsTypeOptions, type BoardsRecord, type Create, type RecordIdString, type SectionsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type BoardsRecord, type Create, type RecordIdString, type SectionsRecord } from "$lib/pocketbase/generated-types";
 
     export type BoardCreationData = Omit<Create<"boards">, "sections"> & {
         sections: Create<"sections">[]
@@ -97,6 +97,7 @@
     import type { BatchService } from "pocketbase";
     import { CancelBatch, deleteRecord, query, save, type ExpandRecord, type ExpandResponse } from "$lib/pocketbase";
     import { deepEqual } from "$lib/util";
+    import { createPartIDString } from "$lib/parts";
 
     const {
         board = $bindable(),
@@ -121,6 +122,14 @@
             </button>
         {/each}
     </div>
+
+    {#if board.type === "parts"}
+        <div class="option">
+            <label for="partIdPrefix">Part ID prefix</label>
+            <input type="text" placeholder="Part ID prefix" id="partIdPrefix" bind:value={board.part_id_prefix} maxlength="20" />
+            <span class="part-id-preview">Part IDs will look like {createPartIDString(board.part_id_prefix ?? "", 0, 1, 1)}</span>
+        </div>
+    {/if}
 
     <h2>Sections</h2>
     <LeftPaneChooser

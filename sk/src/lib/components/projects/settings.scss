@@ -19,12 +19,14 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    white-space: nowrap;
 }
 
 .part-id-preview {
     font-size: var(--font-small);
     color: var(--text-secondary);
     margin-left: 1rem;
+    white-space: normal;
 }
 
 .linked-sites {

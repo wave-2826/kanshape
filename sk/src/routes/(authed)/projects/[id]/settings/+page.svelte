@@ -2,7 +2,7 @@
     import { page } from "$app/state";
     import { untrack } from "svelte";
     import { batch, deleteRecord, queryOne, save } from "$lib/pocketbase";
-    import { Collections, ProjectsTypeOptions, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
     import { deepEqual } from "$lib/util";
     import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
@@ -35,8 +35,6 @@
     let name: string = $state("");
     let description: string = $state("");
     let color: string | undefined = $state(undefined);
-    let partIdPrefix: string = $state("");
-    let type: ProjectsTypeOptions = $state("blank");
     let linkedSites: ProjectLinkedSite[] = $state([]);
     
     let subprojects: SubprojectsRecord[] = $state([]);
@@ -49,8 +47,6 @@
         return name !== project.title ||
             description !== project.description ||
             color !== project.color ||
-            partIdPrefix !== project.part_id_prefix ||
-            type !== project.type ||
             !deepEqual(subprojects, originalSubprojects) ||
             !deepEqual(boards, originalBoardCreationData) ||
             !deepEqual(linkedSites, project.linked_sites ?? []);
@@ -62,8 +58,6 @@
             name = p.title;
             description = p.description;
             color = p.color;
-            partIdPrefix = p.part_id_prefix;
-            type = p.type;
             linkedSites = p.linked_sites ?? [];
             subprojects = project.expand.subprojects ?? [];
             boards = ((project.expand.boards ?? []) as (BoardsRecord & {
@@ -119,11 +113,9 @@
                 title: name,
                 description,
                 color: color,
-                part_id_prefix: partIdPrefix,
                 subprojects: subprojectIDs,
                 boards: boardIDs,
-                linked_sites: linkedSites,
-                type
+                linked_sites: linkedSites
             }, {
                 create: false,
                 batch
@@ -199,7 +191,7 @@
     ondelete={deleteProject}
 >
     <ProjectDetails
-        bind:name bind:description bind:color bind:partIdPrefix bind:type bind:subprojects bind:boards bind:linkedSites
+        bind:name bind:description bind:color bind:subprojects bind:boards bind:linkedSites
         editedProject={project}
     />
 </SettingsPage>

@@ -5,7 +5,7 @@ import { createContext } from "svelte";
 
 export function watchProject(id: string) {
     return watchOne(Collections.Projects, id, {
-        expand: "subprojects"
+        expand: "subprojects,boards"
     });
 }
 

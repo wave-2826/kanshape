@@ -2,7 +2,7 @@
     import { authModel, logout } from "$lib/pocketbase/auth";
     import { LogOut, User } from "lucide-svelte";
     import { client } from "$lib/pocketbase";
-    import { goto } from "$app/navigation";
+    import { nav } from "$lib/navigation";
 
     const { collapsed }: { collapsed?: boolean } = $props();
 </script>
@@ -22,7 +22,7 @@ Name or avatar changed? Sign out and back in to refresh.">
             <span class="name">{$authModel.name || $authModel.email || "Unknown User"}</span>
             <button onclick={async () => {
                 await logout();
-                await goto("/login");
+                await nav("/login");
             }}>
                 <LogOut />
             </button>

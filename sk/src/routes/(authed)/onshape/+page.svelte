@@ -3,7 +3,7 @@
     import { metadata } from "$lib/metadata";
     import { OnshapeClient } from "$lib/onshape/client";
     import { page } from "$app/state";
-    import { getOnshapeContext } from "./onshapeContext";
+    import { getOnshapeContext, LinkedProjectType } from "../../../lib/components/nav/onshapeContext.svelte";
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { save } from "$lib/pocketbase";
@@ -30,15 +30,19 @@
     const linkedProject = $derived(onshapeCtx.linkedProject);    
 </script>
 
-<h1>WIP Onshape panel</h1>
-
 {#if linkedProject === null}
+    <p>Loading...</p>
+{:else if linkedProject.type === LinkedProjectType.Unregistered}
     <LinkOnshapeDocument />
     <button onclick={() => {
-        save(Collections.OnshapeDocuments, { id: onshapeCtx.documentId }, { create: true });
+        save(Collections.OnshapeDocuments, { id: onshapeCtx.documentId ?? "" }, { create: true });
     }}>Continue with no linked project</button>
 {:else}
-    <p>Linked to project: {linkedProject.title}</p>
+    {#if linkedProject.type === LinkedProjectType.Unlinked}
+        <p>Linked to no project</p>
+    {:else}
+        <p>Linked to project: {linkedProject.expand.project?.title ?? "Unknown Project"}{#if linkedProject.expand.subproject} and subproject {linkedProject.expand.subproject?.name ?? "Unknown Subproject"}{/if}.</p>
+    {/if}
 {/if}
 
 <style lang="scss">

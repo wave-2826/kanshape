@@ -1,40 +1,40 @@
 <script lang="ts">
 import "../../app.scss";
 import { onMount } from "svelte";
-import { client } from "$lib/pocketbase";
-import { page } from "$app/state";
-import type { AuthProviderInfo } from "pocketbase";
-import { authModel, providerLogin } from "$lib/pocketbase/auth";
-import { goto } from "$app/navigation";
+    import { client } from "$lib/pocketbase";
+    import { page } from "$app/state";
+    import type { AuthProviderInfo } from "pocketbase";
+    import { authModel, providerLogin } from "$lib/pocketbase/auth";
+    import { nav } from "$lib/navigation";
 
-const { data } = $props();
+    const { data } = $props();
 
-let providers: AuthProviderInfo[] = $state([]);
-let error = $state("");
+    let providers: AuthProviderInfo[] = $state([]);
+    let error = $state("");
 
-onMount(async () => {
-    // If already logged in, redirect to home
-    if($authModel !== null) {
-        const followPath = page.url.searchParams.get("r") || "/";
-        goto(decodeURIComponent(followPath));
-        return;
-    }
-
-    try {
-        // Get OIDC providers from PocketBase
-        const res = await client.send("/api/collections/users/auth-methods", {});
-        providers = (res?.authProviders ?? []).filter((p: AuthProviderInfo) => p.name !== "password");
-
-        // If autologin is enabled, redirect to the provider immediately
-        if(data.config.auth.autoOAuth !== null) {
-            const autoProvider = providers.find(p => p.displayName === data.config.auth.autoOAuth);
-            if(autoProvider) providerLogin(autoProvider, client.collection("users"));
-            else error = `Auto-login provider "${data.config.auth.autoOAuth}" not found`;
+    onMount(async () => {
+        // If already logged in, redirect to home
+        if($authModel !== null) {
+            const followPath = page.url.searchParams.get("r") || "/";
+            nav(decodeURIComponent(followPath));
+            return;
         }
-    } catch(e: any) {
-        error = `Failed to load login providers: ${e.message}`;
-    }
-});
+
+        try {
+            // Get OIDC providers from PocketBase
+            const res = await client.send("/api/collections/users/auth-methods", {});
+            providers = (res?.authProviders ?? []).filter((p: AuthProviderInfo) => p.name !== "password");
+
+            // If autologin is enabled, redirect to the provider immediately
+            if(data.config.auth.autoOAuth !== null) {
+                const autoProvider = providers.find(p => p.displayName === data.config.auth.autoOAuth);
+                if(autoProvider) providerLogin(autoProvider, client.collection("users"));
+                else error = `Auto-login provider "${data.config.auth.autoOAuth}" not found`;
+            }
+        } catch(e: any) {
+            error = `Failed to load login providers: ${e.message}`;
+        }
+    });
 </script>
 
 <header>

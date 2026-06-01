@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { link } from "$lib/actions";
+    import { nav } from "$lib/navigation";
     import { type ExpandResponse } from "$lib/pocketbase";
     import { grow } from "$lib/transitions";
     import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "lucide-svelte";
@@ -40,7 +40,7 @@
     <button
         onclick={() => {
             if(selfSelected) toggleCollapsed();
-            else goto(`/projects/${project.id}`);
+            else nav(`/projects/${project.id}`);
         }}
         class="unstyled"
     >

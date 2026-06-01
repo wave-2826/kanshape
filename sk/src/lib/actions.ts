@@ -1,4 +1,5 @@
 import { goto } from "$app/navigation";
+import { nav } from "./navigation";
 
 export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, maxHeight: number = 300) {
     function resize() {
@@ -31,7 +32,7 @@ export function link(node: HTMLButtonElement, href: string) {
             return;
         }
 
-        goto(href);
+        nav(href);
     }
 
     node.addEventListener("click", onClick);

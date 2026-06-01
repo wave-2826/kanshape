@@ -79,4 +79,9 @@ h1 {
         color: var(--text-secondary);
     }
 }
+
+.error {
+    color: var(--error);
+    font-size: var(--font-small);
+}
 </style>

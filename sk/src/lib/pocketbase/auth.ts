@@ -1,9 +1,10 @@
 import { readable, readonly } from "svelte/store";
 import { client, save } from ".";
 import type { AuthProviderInfo, RecordService } from "pocketbase";
-import { goto, invalidateAll } from "$app/navigation";
+import { invalidateAll } from "$app/navigation";
 import { page } from "$app/state";
 import type { UsersResponse } from "./generated-types";
+import { nav } from "$lib/navigation";
 
 export const authWritable = readable<UsersResponse | null>(
     client.authStore.record as UsersResponse | null,
@@ -75,7 +76,7 @@ export async function providerLogin(
     }
 
     const followPath = page.url.searchParams.get("r") || "/";
-    goto(decodeURIComponent(followPath));
+    nav(decodeURIComponent(followPath));
 
     return authResponse;
 }

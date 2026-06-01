@@ -4,7 +4,7 @@
     import { query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Kanban, SquareKanban } from "lucide-svelte";
-    import { getOnshapeContext } from "./onshapeContext";
+    import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
     
     const documentId = page.url.searchParams.get("documentId");
 
@@ -32,17 +32,26 @@
             subproject: subprojectId || "",
             title: data.name ?? "Untitled Document"
         }, {
-            create: true
+            expand: "project,subproject",
+            create: onshapeCtx.linkedProject?.type === LinkedProjectType.Unregistered // Only create if not already registered, otherwise update
         }).catch((e) => {
             console.error("Failed to save Onshape document record:", e);
         });
         if(!record) return;
 
-        onshapeCtx.linkedProject = record;
+        onshapeCtx.linkedProject = {
+            type: subprojectId ? LinkedProjectType.Subproject : LinkedProjectType.Project,
+            ...record
+        };
     }
 </script>
 
+<!-- TODO: This will need to scroll -->
+
 <div class="list">
+    {#if onshapeCtx.linkedProject?.type === LinkedProjectType.Unlinked}
+        <p>This document is registered but not linked to a particular Onshape document. Link it to use the document tab.</p>
+    {/if}
     <h2>Select a project or subproject to link to this document:</h2>
     <dl>
         {#each projects as project}
@@ -70,6 +79,14 @@
 </div>
 
 <style lang="scss">
+.list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em;
+    max-width: 400px;
+}
+
 dl {
     display: flex;
     flex-direction: column;
@@ -82,12 +99,5 @@ dt {
 }
 h2 {
     margin-left: 0;
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1em;
 }
 </style>

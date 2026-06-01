@@ -38,6 +38,7 @@
 <style lang="scss">
 button {
     position: relative;
+    z-index: 100;
 }
 .popover-content {
     position: absolute;

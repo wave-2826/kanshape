@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+    import { nav } from '$lib/navigation';
     import { ArrowLeft, Save, Trash } from 'lucide-svelte';
     import type { Snippet } from 'svelte';
 
@@ -25,7 +25,7 @@
         if(changed) {
             if(!confirm("You have unsaved changes. Are you sure you want to leave?")) return;
         }
-        goto(returnPath);
+        nav(returnPath);
     }} class="back">
         <ArrowLeft />
         Back to {settingsType}

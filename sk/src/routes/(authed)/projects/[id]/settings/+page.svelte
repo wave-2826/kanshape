@@ -1,17 +1,16 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { untrack } from "svelte";
-    import { batch, CancelBatch, deleteRecord, query, queryOne, save } from "$lib/pocketbase";
+    import { batch, deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, ProjectsTypeOptions, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
-    import { ArrowLeft, Save, Trash } from "lucide-svelte";
-    import { goto } from "$app/navigation";
     import { deepEqual } from "$lib/util";
     import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     import { boardCreationData, deleteBoard, saveBoardRecords, type BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
     import SettingsPage from "../SettingsPage.svelte";
     import { deleteSubproject } from "$lib/components/projects/SubprojectSettings.svelte";
+    import { nav } from "$lib/navigation";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";
@@ -184,7 +183,7 @@
                 await deleteRecord(Collections.Projects, project.id, { batch });
             });
 
-            goto("/");
+            nav("/");
         } catch(err) {
             console.error("Failed to delete project:", err);
             alert("Failed to fully delete project. Please try again.");

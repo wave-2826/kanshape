@@ -3,8 +3,8 @@
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
-    import NavProject from "./NavProject.svelte";
     import { link } from "$lib/actions";
+    import NavProject from "./NavProject.svelte";
 
     const projects = await watch(Collections.Projects, {
         expand: "subprojects,boards"

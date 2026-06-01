@@ -1,13 +1,11 @@
 <script module lang="ts">
-    import { createContext, type Snippet } from "svelte";
+    import { createContext } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
     export type LayoutParams = {
         isMobile: boolean;
         onOnshape: boolean;
     };
     export const [getLayoutParams, setLayoutParams] = createContext<LayoutParams>();
-
-    export let customHeader = writable<Snippet | null>(null);
 </script>
 
 <script lang="ts">
@@ -15,15 +13,16 @@
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
     import { onMount } from "svelte";
-    import { goto } from "$app/navigation";
     import { ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
-    import NavContent from "$lib/components/NavContent.svelte";
+    import NavContent from "$lib/components/nav/NavContent.svelte";
     import { setConfig } from "$lib/config";
-    import NavProfile from "$lib/components/NavProfile.svelte";
+    import NavProfile from "$lib/components/nav/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
     import { authModel } from "$lib/pocketbase/auth";
-    import { writable } from "svelte/store";
+    import { nav } from "$lib/navigation";
+    import LinkedOnshapeProject from "$lib/components/nav/LinkedOnshapeProject.svelte";
+    import { addOnshapeContext, watchOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
 
     const { data, children } = $props();
     const config = $derived(data.config ?? {});
@@ -37,11 +36,18 @@
     // Client-side redirect to /login if not authenticated
     onMount(() => {
         const followPath = page.url.pathname;
-        if($authModel === null) goto("/login?r=" + encodeURIComponent(followPath));
+        if($authModel === null) nav("/login?r=" + encodeURIComponent(followPath));
     });
 
     const isMobile = $derived(new MediaQuery("screen and (max-width: 640px)").current);
-    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/onshape") || page.url.searchParams.get("onshape") === "true");
+    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/onshape") || page.url.searchParams.get("documentId") !== null);
+    const onshapeContext = addOnshapeContext();
+
+    const documentId = $derived(page.url.searchParams.get("documentId"));
+    $effect(() => {
+        return watchOnshapeContext(documentId, onshapeContext);
+    });
+    
     let layoutParams = $state<LayoutParams>({
         // svelte-ignore state_referenced_locally
         isMobile,
@@ -62,8 +68,8 @@
 </script>
 
 <svelte:head>
-<link rel="icon" href="{config.site.faviconUrl}" />
-<title>{$metadata.title} - {config.site.name}</title>
+    <link rel="icon" href="{config.site.faviconUrl}" />
+    <title>{$metadata.title} - {config.site.name}</title>
 </svelte:head>
 
 <div class="layout" class:isMobile={isMobile}>
@@ -94,7 +100,11 @@
             <span class="dev-build-warning" title="This instance is running a development build">[DEV]</span>
         {/if}
         <div style="flex-grow: 1; margin: 0 -0.25rem;"></div>
-        {@render $customHeader?.()}
+
+        {#if onOnshape}
+            <LinkedOnshapeProject />
+        {/if}
+
         <NavProfile collapsed={onOnshape} />
     </header>
     {#if isMobile && showNav}

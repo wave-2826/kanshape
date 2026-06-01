@@ -81,7 +81,8 @@ export async function onshapeApiRequest<T>(
     method: string,
     path: string,
     body?: any,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    customCacheKey?: string
 ): Promise<{
     status: number;
     headers: Record<string, string>;
@@ -175,7 +176,8 @@ export async function onshapeApiRequest<T>(
                     method,
                     url: `${config.onshape.baseDomain}${path}`,
                     body,
-                    headers
+                    headers,
+                    cacheKey: customCacheKey
                 }
             }, "*");
         });
@@ -187,6 +189,7 @@ export async function onshapeApiRequest<T>(
     }
 }
 
+let customBody = Symbol("customBody");
 let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?: RequestInit): Promise<Response> => {
     // Fetch wrapper that uses our custom request logic
     const url = input instanceof URL ? input.toString() : (typeof input === "string" ? input : input.url);
@@ -195,13 +198,13 @@ let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?:
     let headers = init?.headers ?? {};
     if(input instanceof Request) {
         method = input.method ?? method;
-        body = input.body ?? body;
+        body = (input as any)[customBody] as string ?? body;
         headers = input.headers ?? headers;
     }
-
+    
     // Only intercept requests to the Onshape API
     if(url.includes("onshape.com/api/")) {
-        const path = new URL(url).pathname;
+        const path = new URL(url).pathname + new URL(url).search;
         return await onshapeApiRequest(
             await loadConfig(),
             method,
@@ -224,5 +227,12 @@ let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?:
 
 export let onshapeClient = createClient<paths>({
     baseUrl: await loadConfig().then(config => config.onshape.baseDomain + "/api/v16"),
-    fetch: onshapeApiFetch
+    fetch: onshapeApiFetch,
+    // omg why do i need to mess with my fetch library i'm crashing out 😔
+    Request: class extends Request {
+        constructor(input: URL | string | Request, init?: RequestInit) {
+            super(input, init);
+            (this as any)[customBody] = init?.body ?? null;
+        }
+    }
 });

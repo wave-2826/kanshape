@@ -1,3 +1,4 @@
+import { writable, type Writable } from "svelte/store";
 import type { AppConfig } from "../config";
 
 type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE";
@@ -37,6 +38,9 @@ export class OnshapeClient {
     private boundHandleMessage: (event: MessageEvent) => void;
     private baseDomain: string;
     private keepAliveInterval: number | null = null;
+
+    /** The transient entity IDs selected. */
+    public selectedIDs: Writable<string[]> = writable([]);
 
     constructor(private config: AppConfig, private docId: string, private wvmId: string, private elementId: string) {
         this.baseDomain = this.config.onshape.baseDomain;
@@ -104,11 +108,7 @@ export class OnshapeClient {
                         });
                     }
 
-                    if(selectedIds.length > 0) {
-                        // this.loadSelectedParts(selectedIds); // Call the load function with selected IDs
-                    } else {
-                        // console.log("No selected IDs found in message; skipping load.");
-                    }
+                    this.selectedIDs.set(selectedIds);
                     break;
                 default:
                     // Ignore other messages

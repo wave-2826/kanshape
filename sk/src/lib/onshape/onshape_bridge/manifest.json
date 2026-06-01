@@ -11,11 +11,12 @@
     "https://*.onshape.com/*"
   ],
 
-  "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
-  },
-
+  "web_accessible_resources": [
+    {
+      "resources": ["content_fetch.js"],
+      "matches": ["https://*.onshape.com/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": [

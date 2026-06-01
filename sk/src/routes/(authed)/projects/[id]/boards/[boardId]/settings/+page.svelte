@@ -1,7 +1,8 @@
 <script lang="ts">
     import BoardSettings, { boardCreationData, deleteBoard, saveBoardRecords, type BoardCreationData } from '$lib/components/projects/BoardSettings.svelte';
     import { metadata } from '$lib/metadata';
-    import { batch } from '$lib/pocketbase';
+    import { batch, save } from '$lib/pocketbase';
+    import { Collections } from '$lib/pocketbase/generated-types';
     import { deepEqual } from '$lib/util';
     import { getBoardContext, getProjectContext } from '../../../context';
     import SettingsPage from '../../../SettingsPage.svelte';
@@ -25,8 +26,13 @@
 
     async function saveChanges() {
         await batch(async (batch) => {
+            if(!$project) return;
+
             if(!creationData) return;
             await saveBoardRecords(creationData, originalCreationData, batch);
+            // Re-save the project itself to trigger realtime updates
+            // this is the most efficient way I've found to make this work. oh well
+            await save(Collections.Projects, $project, { create: false, batch });
         });
     }
 

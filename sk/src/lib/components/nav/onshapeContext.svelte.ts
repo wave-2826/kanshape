@@ -3,7 +3,6 @@ import { nav } from "$lib/navigation";
 import { watch, type ExpandResponse } from "$lib/pocketbase";
 import { Collections } from "$lib/pocketbase/generated-types";
 import { createContext } from "svelte";
-import { get } from "svelte/store";
 
 export enum LinkedProjectType {
     /** This document is linked to a project */
@@ -23,6 +22,9 @@ export type OnshapeContext = {
         type: LinkedProjectType.Unregistered;
     } | null;
     documentId: string | null;
+    wvm?: "w" | "v" | "m";
+    wvmId?: string;
+    partStudioId?: string;
 };
 
 export const [getOnshapeContext, setOnshapeContext] = createContext<OnshapeContext>();
@@ -30,16 +32,33 @@ export const [getOnshapeContext, setOnshapeContext] = createContext<OnshapeConte
 export function addOnshapeContext(): OnshapeContext {
     let onshapeContext: OnshapeContext = $state({
         linkedProject: null,
-        documentId: null
+        documentId: null,
+        wvm: undefined,
+        wvmId: undefined,
+        partStudioId: undefined
     });
     setOnshapeContext(onshapeContext);
     return onshapeContext;
 }
 
-export function watchOnshapeContext(documentId: string | null, onshapeContext: OnshapeContext) {
+export function watchOnshapeContext(
+    documentId: string | null,
+    workspaceId: string | null,
+    elementId: string | null,
+    onshapeContext: OnshapeContext
+) {
     if(!documentId) return;
 
     onshapeContext.documentId = documentId;
+    if(workspaceId && elementId) {
+        onshapeContext.wvm = "w";
+        onshapeContext.wvmId = workspaceId;
+        onshapeContext.partStudioId = elementId;
+    } else {
+        onshapeContext.wvm = undefined;
+        onshapeContext.wvmId = undefined;
+        onshapeContext.partStudioId = undefined;
+    }
 
     let unsub: (() => void) | undefined;
 

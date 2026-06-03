@@ -15,6 +15,11 @@ type FeatureScriptValue = (
     ({ btType: "com.belmonttech.serialize.fsvalue.BTFSValueOther" } & Omit<components["schemas"]["BTFSValueOther-1124"], "btType">)
 );
 
+type FSUnitValue = {
+    value: number,
+    units: Record<string, number>
+};
+
 function parseFSValue(value: FeatureScriptValue): any {
     switch(value.btType) {
         case "com.belmonttech.serialize.fsvalue.BTFSValueMap": {
@@ -37,9 +42,15 @@ function parseFSValue(value: FeatureScriptValue): any {
         case "com.belmonttech.serialize.fsvalue.BTFSValueNumber":
         case "com.belmonttech.serialize.fsvalue.BTFSValueString":
             return value.value ?? undefined;
+        case "com.belmonttech.serialize.fsvalue.BTFSValueWithUnits":
+            return {
+                value: value.value ?? 0,
+                units: value.unitToPower ?? {}
+            } satisfies FSUnitValue;
         case "com.belmonttech.serialize.fsvalue.BTFSValueUndefined":
         case "com.belmonttech.serialize.fsvalue.BTFSValueTooBig":
         case "com.belmonttech.serialize.fsvalue.BTFSValueOther":
+        default:
             return value.btType; // for now, whatever
     }
 }
@@ -72,9 +83,55 @@ export async function evalFeatureScript<T = any>(
     );
 
     if(data_) {
-        let data = data_ as components["schemas"]["BTFeatureScriptEvalResponse-1859"];
+        let data = data_ as EvalResponse;
+        if(!data.result) {
+            console.error("FeatureScript evaluation failed", data);
+            return null;
+        }
+        console.log(data.result);
         return parseFSValue(data.result as FeatureScriptValue) as T;
     }
 
     return null;
+}
+
+/**
+ * Evaluate a templated FeatureScript. We use simple {{param}} templates. The intended
+ * use is passing an imported .fs file.
+ */
+export async function evalTemplatedFS<T = any>(
+    script: string,
+    params: Record<string, string>,
+    did: string, wvm: "w" | "v" | "m", wvmid: string, eid: string
+): Promise<T | null> {
+    const templatedScript = script.replace(/{{\s*([\w]+)\s*}}/g, (_, key) => {
+        if(key in params) {
+            return params[key];
+        } else {
+            console.warn(`Missing parameter ${key} for templated FeatureScript`);
+            return "";
+        }
+    });
+
+    // For testing, we can use dummy values since the script will likely fail to evaluate anyway
+    return evalFeatureScript(
+        did, wvm, wvmid, eid,
+        stripCommentsAndWhitespace(templatedScript)
+    );
+}
+
+/**
+ * Very rough script optimization to strip comments and repeated whitespace to
+ * reduce the size of the script being sent to the API. This isn't robust, but
+ * none of the FeatureScript code we'd ever use should break.
+ */
+export function stripCommentsAndWhitespace(script: string): string {
+    // Strip comments
+    script = script.replace(/\/\/.*$/gm, ""); // line comments
+    script = script.replace(/\/\*[\s\S]*?\*\//g, ""); // block comments
+
+    // Strip repeated whitespace
+    script = script.replace(/\s+/g, " ");
+
+    return script.trim();
 }

@@ -8,6 +8,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { save } from "$lib/pocketbase";
     import { evalFeatureScript } from "$lib/onshape/featureScript";
+    import { getPartHeuristics } from "$lib/onshape/partHeuristics";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -40,39 +41,8 @@
                 <span class="ids">entities {$selectedIDs.join(", ")}</span>
             </p>
             <button onclick={async () => {
-                const script = `function(context is Context, queries)
-{
-    const body = evaluateQuery(context, qOwnerBody(qTransient('${$selectedIDs[0]}')))[0];
-    const partID = transientQueriesToStrings([ body ]);
-    return {
-        'partID': partID,
-        'name': getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
-        'material': getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL }),
-        'appearance': getProperty(context, { entity: body, propertyType: PropertyType.APPEARANCE }),
-        'description': getProperty(context, { entity: body, propertyType: PropertyType.DESCRIPTION }),
-        'part_number': getProperty(context, { entity: body, propertyType: PropertyType.PART_NUMBER }),
-        'revision': getProperty(context, { entity: body, propertyType: PropertyType.REVISION })
-    };
-}`;
-
-                if(onshapeCtx.documentId) console.log(await evalFeatureScript<{
-                    partID: string;
-                    name: string;
-                    material: {
-                        density?: number;
-                        name?: string;
-                    } | undefined;
-                    appearance: string | undefined;
-                    description: string | undefined;
-                    part_number: string | undefined;
-                    revision: string | undefined;
-                }>(
-                    onshapeCtx.documentId,
-                    "w",
-                    "f122e4cc32f851f888ad6e1b",
-                    "8103a53cd0958b951fbebef4",
-                    script
-                ));
+                if(onshapeCtx.documentId && onshapeCtx.wvm && onshapeCtx.wvmId && onshapeCtx.partStudioId)
+                    console.log(await getPartHeuristics(onshapeCtx.documentId, onshapeCtx.wvm, onshapeCtx.wvmId, onshapeCtx.partStudioId, $selectedIDs[0]));
             }}>Create card</button>
         {:else}
             <p>No selected parts. Select something to create a card.</p>

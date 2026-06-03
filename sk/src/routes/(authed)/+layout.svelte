@@ -44,8 +44,10 @@
     const onshapeContext = addOnshapeContext();
 
     const documentId = $derived(page.url.searchParams.get("documentId"));
+    const workspaceId = $derived(page.url.searchParams.get("workspaceId"));
+    const elementId = $derived(page.url.searchParams.get("elementId"));
     $effect(() => {
-        return watchOnshapeContext(documentId, onshapeContext);
+        return watchOnshapeContext(documentId, workspaceId, elementId, onshapeContext);
     });
     
     let layoutParams = $state<LayoutParams>({

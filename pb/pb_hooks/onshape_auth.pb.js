@@ -10,7 +10,7 @@ const ONSHAPE_SCOPES = "OAuth2Read OAuth2Write OAuth2ReadPII";
 // Their docs don't cover all API details, but they use passport which implements the normal
 // flow. See their docs here: https://onshape-public.github.io/docs/auth/oauth/
 
-const { getConfigOption, getRequiredConfigOption } = require("./config");
+const { getConfigOption, getRequiredConfigOption } = require(`${__hooks}/config`);
 
 // XSRF handling
 // Maybe I'm not doing this right, but the point of the OAuth `state` parameter is twofold:

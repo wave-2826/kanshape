@@ -38,8 +38,6 @@ export type AppConfig = {
         clientSecret: string;
         /** The Onshape base server domain */
         baseDomain: string;
-        /** The OAuth redirect URI to use for Onshape OAuth */
-        redirectUri: string;
     }
 };
 const defaultConfig: AppConfig = {
@@ -54,8 +52,7 @@ const defaultConfig: AppConfig = {
     onshape: {
         clientId: "",
         clientSecret: "",
-        baseDomain: "https://cad.onshape.com",
-        redirectUri: ""
+        baseDomain: "https://cad.onshape.com"
     }
 };
 export type ConfigValueType = {
@@ -68,11 +65,9 @@ export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
     "site/name": { optional: false, type: "string", name: "Site Name" },
     "site/logoUrl": { optional: true, type: "string", name: "Site Logo URL" },
     "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" },
-    "onshape/clientId": { optional: false, type: "string", name: "Onshape Client ID" },
-    "onshape/clientSecret": { optional: false, type: "string", name: "Onshape Client Secret" },
-    "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain" },
-    "onshape/redirectUri": { optional: false, type: "string", name: "Onshape OAuth Redirect URI (base url + /api/hello_onshape, ie: https://example.com/api/hello_onshape )" }
-
+    "onshape/clientId": { optional: false, type: "string", name: "Onshape OAuth Client ID" },
+    "onshape/clientSecret": { optional: false, type: "string", name: "Onshape OAuth Client Secret" },
+    "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain, like https://cad.onshape.com" }
 } as const;
 
 

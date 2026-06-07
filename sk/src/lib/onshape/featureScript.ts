@@ -88,7 +88,6 @@ export async function evalFeatureScript<T = any>(
             console.error("FeatureScript evaluation failed", data);
             return null;
         }
-        console.log(data.result);
         return parseFSValue(data.result as FeatureScriptValue) as T;
     }
 

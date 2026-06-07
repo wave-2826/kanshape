@@ -116,6 +116,8 @@ type ExpandResult<Collection extends Collections, Expand extends string> =
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
 ) as TypedPocketBase;
+// @ts-expect-error - for debugging in the console
+window.pb = client;
 
 /**
  * Add a comma-separated expand list like `foo,bar` to the expand result of a returned query

@@ -19,6 +19,7 @@ export const Collections = {
 	GroupOverview: "group_overview",
 	Groups: "groups",
 	Leaderboard: "leaderboard",
+	OauthTransactions: "oauth_transactions",
 	OnshapeDocuments: "onshape_documents",
 	Projects: "projects",
 	Sections: "sections",
@@ -209,6 +210,19 @@ export type LeaderboardRecord = {
 	user?: RecordIdString
 }
 
+export const OauthTransactionsProviderOptions = {
+	"onshape": "onshape",
+} as const
+export type OauthTransactionsProviderOptions = typeof OauthTransactionsProviderOptions[keyof typeof OauthTransactionsProviderOptions]
+export type OauthTransactionsRecord = {
+	created: IsoAutoDateString
+	id: string
+	provider?: OauthTransactionsProviderOptions
+	return_to?: string
+	updated: IsoAutoDateString
+	user?: RecordIdString
+}
+
 export type OnshapeDocumentsRecord = {
 	created: IsoAutoDateString
 	id: string
@@ -251,7 +265,7 @@ export type SubprojectsRecord<Tlinked_sites = unknown> = {
 	updated: IsoAutoDateString
 }
 
-export type UsersRecord<Tmetadata = unknown> = {
+export type UsersRecord<Tmetadata = unknown, Tonshape_oauth = unknown> = {
 	avatar?: FileNameString
 	created: IsoAutoDateString
 	email?: string
@@ -261,6 +275,7 @@ export type UsersRecord<Tmetadata = unknown> = {
 	is_admin?: boolean
 	metadata?: null | Tmetadata
 	name?: string
+	onshape_oauth?: null | Tonshape_oauth
 	password: string
 	tokenKey: string
 	updated: IsoAutoDateString
@@ -282,11 +297,12 @@ export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSyste
 export type GroupOverviewResponse<Tcard_count = unknown, Tmember_count = unknown, Texpand = unknown> = Required<GroupOverviewRecord<Tcard_count, Tmember_count>> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
+export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransactionsRecord> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<SubprojectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
-export type UsersResponse<Tmetadata = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata>> & AuthSystemFields<Texpand>
+export type UsersResponse<Tmetadata = unknown, Tonshape_oauth = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata, Tonshape_oauth>> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
@@ -304,6 +320,7 @@ export type CollectionRecords = {
 	group_overview: GroupOverviewRecord
 	groups: GroupsRecord
 	leaderboard: LeaderboardRecord
+	oauth_transactions: OauthTransactionsRecord
 	onshape_documents: OnshapeDocumentsRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
@@ -325,6 +342,7 @@ export type CollectionResponses = {
 	group_overview: GroupOverviewResponse
 	groups: GroupsResponse
 	leaderboard: LeaderboardResponse
+	oauth_transactions: OauthTransactionsResponse
 	onshape_documents: OnshapeDocumentsResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse

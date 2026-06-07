@@ -75,15 +75,16 @@
         border-radius: 4px;
     }
 
-    .name {
-        color: var(--accent);
-    }
+}
 
-    .popover-content {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: 200px;
-    }
+.name {
+    color: var(--accent);
+}
+.popover-content {
+    font-size: var(--font-small);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 200px;
 }
 </style>

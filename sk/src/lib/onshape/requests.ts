@@ -3,6 +3,8 @@ import createClient from "openapi-fetch";
 
 // Schema generated with "npx openapi-typescript https://api.onshape.com/api/v16/openapi -o ./schema.d.ts"
 import type { paths } from "./schema.d.ts";
+import { dev } from "$app/environment";
+import { client } from "$lib/pocketbase/index.js";
 
 let kanshapeExtensionDetected: boolean | null = null;
 
@@ -182,10 +184,42 @@ export async function onshapeApiRequest<T>(
             }, "*");
         });
     } else {
-        // If the extension is not installed, make a direct fetch request to the Onshape API.
-        // ...eventually
-        // TODO
-        return Promise.reject(new Error("proxied Onshape API requests aren't implemented yet. load the extension under `onshape_bridge` unpacked for dev."));
+        if(dev) console.warn("Kanshape extension not detected. Onshape API requests will be made directly");
+
+        // TODO: Extend caching to here
+
+        if(path.startsWith("/api/")) {
+            path = path.slice(4); // remove /api prefix if present, since the backend assumes it
+        }
+
+        if(!client.authStore.token) {
+            console.error("Can't make unauthenticated Onshape API call");
+            return Promise.reject(new Error("Not authenticated with Onshape API"));
+        }
+
+        return fetch(`/api/onshape/${path}`, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                ...headers,
+                "Authorization": client.authStore.token
+            },
+            body: JSON.stringify({
+                content: typeof body === "string" ? body : JSON.stringify(body || {})
+            })
+        })
+            .then(async response => {
+                const responseBody = await response.json();
+                if(!response.ok) {
+                    throw new Error(`Onshape API error: ${response.status} ${response.statusText} - ${JSON.stringify(responseBody)}`);
+                }
+                return {
+                    status: response.status,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    body: responseBody,
+                    cached: false
+                };
+            });
     }
 }
 

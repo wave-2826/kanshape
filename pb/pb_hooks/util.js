@@ -13,16 +13,6 @@ function parseJSONFile(path) {
     return parseJSON($os.readFile(path));
 }
 
-// if obj.slug is empty, make it same as obj.id
-function slugDefault(obj) {
-    if (obj) {
-        const slug = obj.get("slug");
-        if (!slug) {
-            obj.set("slug", obj.id);
-        }
-    }
-}
-
 // Cannot be placed within auditlog.pb.js
 /**
 * 
@@ -70,6 +60,5 @@ function doAudit(event, request) {
 module.exports = {
     parseJSON,
     parseJSONFile,
-    slugDefault,
     doAudit,
 };

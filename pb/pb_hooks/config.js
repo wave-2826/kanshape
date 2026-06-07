@@ -1,13 +1,18 @@
 /**
  * Get the value of a config option by key
+ * @template T [null]
  * @param {string} key The key of the config option to retrieve
- * @param {string | null} defaultValue The default value to return if the config option is not found (default: null)
- * @returns {string | null} The value of the config option, or the default value if not found
+ * @param {T} defaultValue The default value to return if the config option is not found (default: null)
+ * @returns {string | T} The value of the config option, or the default value if not found
  */
 function getConfigOption(key, defaultValue = null) {
-    const record = $app.findFirstRecordByData("config", "key", key);
-    if(record) {
-        return record.get("value");
+    try {
+        const record = $app.findFirstRecordByData("config", "key", key);
+        if(record) {
+            return record.get("value");
+        }
+    } catch(err) {
+        // record probably not found
     }
     return defaultValue;
 }
@@ -19,11 +24,13 @@ function getConfigOption(key, defaultValue = null) {
  * @throws {Error} If the config option is not found
  */
 function getRequiredConfigOption(key) {
-    const value = getConfigOption(key);
-    if(value === null) {
-        throw new Error(`Missing required application config option: ${key}`);
+    try {
+        const value = getConfigOption(key);
+        if(value) return value;
+    } catch(err) {
+        throw new BadRequestError(`Missing required application config option: ${key}`);
     }
-    return value;
+    throw new BadRequestError(`Missing required application config option: ${key}`);
 }
 
 module.exports = {

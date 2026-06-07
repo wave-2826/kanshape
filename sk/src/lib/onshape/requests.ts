@@ -197,7 +197,7 @@ export async function onshapeApiRequest<T>(
             return Promise.reject(new Error("Not authenticated with Onshape API"));
         }
 
-        return fetch(`/api/onshape/${path}`, {
+        return fetch(`/api/onshape/proxy/${path}`, {
             method,
             headers: {
                 "Content-Type": "application/json",

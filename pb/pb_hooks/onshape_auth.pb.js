@@ -19,6 +19,7 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
     const code = query.get("code");
     if(!code) {    
         const authRecord = /** @type core.Record */ (e.requestInfo().auth);
+        // for jake :)
         if(!authRecord) e.json(418, { error: "I'm a teapot", message: "authentication required to start Onshape OAuth flow" });
 
         const callbackUrl = getCallbackUrl(e.request, e.requestInfo());
@@ -56,15 +57,16 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
  */
 
 routerUse((e) => {
-    if(e.request?.url?.path?.startsWith("/api/onshape/")) {
+    if(e.request?.url?.path?.startsWith("/api/onshape/proxy/")) {
+        if(!e.request) throw new BadRequestError("Missing request information");
+
         /** @type import("./config") */
         const { getConfigOption } = require(`${__hooks}/config`);
         /** @type import("./onshape_auth") */
         const { getValidOnshapeToken } = require(`${__hooks}/onshape_auth`);
 
         const authRecord = /** @type core.Record */ (e.requestInfo().auth);
-
-        if(!e.request) throw new BadRequestError("Missing request information");
+        if(!authRecord) throw new BadRequestError("Authentication required to access Onshape API");
 
         const path = e.request.url.path.replace("/api/onshape/", "") + "?" + (e.request.url.rawQuery ?? ""); // preserve query parameters
         

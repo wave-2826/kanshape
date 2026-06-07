@@ -19,7 +19,7 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
     const code = query.get("code");
     if(!code) {    
         const authRecord = /** @type core.Record */ (e.requestInfo().auth);
-        if(!authRecord) throw new BadRequestError("Missing authentication information");
+        if(!authRecord) e.json(418, { error: "I'm a teapot", message: "authentication required to start Onshape OAuth flow" });
 
         const callbackUrl = getCallbackUrl(e.request, e.requestInfo());
         const transaction = createOnshapeTransaction(authRecord, query.get("returnTo") ?? "/", callbackUrl);

@@ -58,48 +58,9 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
 
 routerUse((e) => {
     if(e.request?.url?.path?.startsWith("/api/onshape/proxy/")) {
-        if(!e.request) throw new BadRequestError("Missing request information");
-
-        /** @type import("./config") */
-        const { getConfigOption } = require(`${__hooks}/config`);
-        /** @type import("./onshape_auth") */
-        const { getValidOnshapeToken } = require(`${__hooks}/onshape_auth`);
-
-        const authRecord = /** @type core.Record */ (e.requestInfo().auth);
-        if(!authRecord) throw new BadRequestError("Authentication required to access Onshape API");
-
-        const path = e.request.url.path.replace("/api/onshape/", "") + "?" + (e.request.url.rawQuery ?? ""); // preserve query parameters
-        
-        const metadata = getValidOnshapeToken(authRecord);
-        if(!metadata) throw new BadRequestError("User is missing Onshape OAuth metadata");
-        
-        const baseOnshapeUrl = getConfigOption("onshape/baseDomain", "https://cad.onshape.com").replace(/\/+$/, ""); // remove trailing slashes just in case
-
-        const content = e.requestInfo().body.content;
-
-        const res = $http.send({
-            url: `${baseOnshapeUrl}/api/${path}`,
-            method: e.request.method,
-            headers: {
-                "Authorization": `Bearer ${metadata.access_token}`,
-                // Forward content-type header if present, otherwise Onshape will reject the request
-                "Content-Type": e.request.header.get("Content-Type") ?? "application/json",
-                "X-XSRF-TOKEN": e.request.header.get("X-XSRF-TOKEN") ?? "",
-                "Accept": e.request.header.get("Accept") ?? "application/json;charset=UTF-8; qs=0.09"
-            },
-            body: content,
-            timeout: 10,
-        });
-
-        if(!res) throw new InternalServerError("No response from Onshape");
-        
-        // Copy headers to response
-        for(const [key, value] of Object.entries(res.headers)) {
-            for(const v of Array.isArray(value) ? value : [value]) {
-                e.response.header().add(key, v);
-            }
-        }
-        return e.json(res.statusCode, res.json);
+        /** @type {typeof import("./onshape_proxy")} */
+        const { handleProxyRequest } = require(`${__hooks}/onshape_proxy`);
+        handleProxyRequest(e);
     }
 
     return e.next();
@@ -117,6 +78,10 @@ routerUse((e) => {
 
 cronAdd("cleanup_onshape_oauth_transactions", "*/15 * * * *", () => {
     require(`${__hooks}/onshape_auth`).cleanupExpiredTransactions();
+});
+
+cronAdd("cleanup_onshape_request_cache", "*/15 * * * *", () => {
+    require(`${__hooks}/onshape_proxy`).cleanupRequestCache();
 });
 
 // Enrich users records with their current onshape auth state so we can show it in the UI without sending everything

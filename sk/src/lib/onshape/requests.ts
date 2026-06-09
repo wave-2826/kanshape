@@ -92,8 +92,11 @@ export async function onshapeApiRequest<T>(
     cached: boolean;
 }> {
     // First, try to detect if the companion extension is installed, and if so, route reqests through it.
-    // This allows locally making API calls without needing to use API quota. It's really sketchy but not
-    // against TOS from what I can tell.
+    // This allows locally making API calls without needing to use API quota. It's really sketchy but useful
+    // for development testing if we want to avoid API calls
+
+    // Create cache key from request parameters
+    const cacheKey = await hash(`${method}:${config.onshape.baseDomain}${path}:${JSON.stringify(body || "")}`);
 
     // Check if the extension is installed
     if(await detectBridgeExtension()) {
@@ -102,9 +105,6 @@ export async function onshapeApiRequest<T>(
             const waitTime = rateLimitBackoffUntil - Date.now();
             return Promise.reject(new Error(`Rate limited. Backoff period active for ${waitTime}ms`));
         }
-        
-        // Create cache key from request parameters
-        const cacheKey = await hash(`${method}:${config.onshape.baseDomain}${path}:${JSON.stringify(body || "")}`);
         
         // Check if response is cached and not expired
         if(requestCache.has(cacheKey)) {
@@ -186,7 +186,7 @@ export async function onshapeApiRequest<T>(
     } else {
         if(dev) console.warn("Kanshape extension not detected. Onshape API requests will be made directly");
 
-        // TODO: Extend caching to here
+        // caching here happens on the server
 
         if(path.startsWith("/api/")) {
             path = path.slice(4); // remove /api prefix if present, since the backend assumes it
@@ -205,6 +205,7 @@ export async function onshapeApiRequest<T>(
                 "Authorization": client.authStore.token
             },
             body: JSON.stringify({
+                hash: customCacheKey ?? cacheKey,
                 content: typeof body === "string" ? body : JSON.stringify(body || {})
             })
         })

@@ -302,6 +302,7 @@ function cleanupExpiredOnshapeTransactions() {
     const cutoff = Date.now() - OAUTH_TRANSACTION_MAX_AGE_MS;
     const transactions = $app.findAllRecords(OAUTH_TRANSACTION_COLLECTION);
 
+    // N+1 ftw (on small data) hehe
     for(const transaction of transactions) {
         if(!transaction) continue;
 

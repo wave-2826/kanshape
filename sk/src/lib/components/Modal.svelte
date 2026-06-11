@@ -4,12 +4,13 @@
     import type { Snippet } from "svelte";
     import { fade, fly } from "svelte/transition";
 
-    const { id, children }: {
+    const { id, children, forceOpen = false }: {
         id: string,
         children: Snippet<[{
             open: () => void,
             close: () => void
-        }]>
+        }]>,
+        forceOpen?: boolean
     } = $props();
 
     const openKey = $derived(`modal${id}Open`);
@@ -25,13 +26,13 @@
 </script>
 
 <svelte:window onkeydown={(e) => {
-    if(isOpen && e.key === "Escape") {
+    if(isOpen && e.key === "Escape" && !forceOpen) {
         close();
         e.preventDefault();
     }
 }} />
 
-{#if isOpen}
+{#if isOpen || forceOpen}
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="modal-box backdrop" onclick={(e) => {

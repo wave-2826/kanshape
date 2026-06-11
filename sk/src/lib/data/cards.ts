@@ -1,4 +1,7 @@
-import type { CardsPriorityOptions } from "$lib/pocketbase/generated-types";
+import type { CardsPriorityOptions, CardsResponse } from "$lib/pocketbase/generated-types";
+import type { CardMetadataFieldType } from "./project";
+
+export type TypedCardsResponse<Expand = {}> = CardsResponse<CardAssignmentData, CardMetadata, Expand>;
 
 export const priorities: { [key in CardsPriorityOptions]: {
     label: string;
@@ -29,3 +32,12 @@ export type CardAssignmentData = {
 } | AnyoneOnAssignmentData | {
     type: "looking_for_assignment"
 } | null;
+
+export type CardMetadata = {
+    [id: string]: {
+        /** The value of the metadata field */
+        value: string | number | boolean | string[] | number[] | boolean[] | null;
+        /** The metadata type is stored on the field to stay valid after schema changes */
+        type: CardMetadataFieldType;
+    }
+};

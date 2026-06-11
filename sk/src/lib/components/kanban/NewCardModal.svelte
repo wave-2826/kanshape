@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { client, save } from "$lib/pocketbase";
+    import { save } from "$lib/pocketbase";
     import { CardsPriorityOptions, Collections, type SectionsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
     import { priorities } from "../../data/cards";
@@ -10,12 +10,14 @@
         projectId,
         boardId,
         sections,
-        boardCards
+        boardCards,
+        forceOpen = false
     }: {
         projectId: string,
         boardId: string,
         sections: SectionsRecord[],
-        boardCards: TypedCardPreviewResponse[]
+        boardCards: TypedCardPreviewResponse[],
+        forceOpen?: boolean
     } = $props();
 
     let title = $state("");
@@ -58,7 +60,7 @@
     }
 </script>
 
-<Modal id="new-card" bind:this={modal}>
+<Modal id="new-card" bind:this={modal} {forceOpen}>
     {#snippet children({ close })}
         <h2>New Card</h2>
         

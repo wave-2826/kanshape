@@ -1,7 +1,6 @@
 <script lang="ts">
     import LeftPaneChooser from "$lib/components/LeftPaneChooser.svelte";
-    import { createPartIDString } from "$lib/parts";
-    import { getTemplateSections, projectTypes, type ProjectLinkedSite } from "$lib/data/project";
+    import { getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
     import OnshapeLinks from "./OnshapeLinks.svelte";
     import BoardSettings, { type BoardCreationData } from "./BoardSettings.svelte";

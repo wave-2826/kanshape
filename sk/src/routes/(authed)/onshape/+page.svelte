@@ -7,8 +7,7 @@
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { save } from "$lib/pocketbase";
-    import { evalFeatureScript } from "$lib/onshape/featureScript";
-    import { getPartHeuristics } from "$lib/onshape/partHeuristics";
+    import SelectionBanner from "./SelectionBanner.svelte";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -34,20 +33,7 @@
 </script>
 
 <div class="page">
-    <header>
-        {#if $selectedIDs && $selectedIDs.length > 0}
-            <p>
-                Part selected.
-                <span class="ids">entities {$selectedIDs.join(", ")}</span>
-            </p>
-            <button onclick={async () => {
-                if(onshapeCtx.documentId && onshapeCtx.wvm && onshapeCtx.wvmId && onshapeCtx.partStudioId)
-                    console.log(await getPartHeuristics(onshapeCtx.documentId, onshapeCtx.wvm, onshapeCtx.wvmId, onshapeCtx.partStudioId, $selectedIDs[0]));
-            }}>Create card</button>
-        {:else}
-            <p>No selected parts. Select something to create a card.</p>
-        {/if}
-    </header>
+    <SelectionBanner selectedIDs={$selectedIDs ?? null} />
     
     <div class="content">
         {#if linkedProject === null}
@@ -74,27 +60,5 @@
 }
 .content {
     padding: 1rem;
-}
-
-header {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    background-color: var(--bg-primary);
-    border-bottom: 1px solid var(--border);
-
-    p {
-        display: flex;
-        flex-direction: column;
-        color: var(--accent);
-    }
-    .ids {
-        font-family: monospace;
-        font-size: var(--font-tiny);
-        color: var(--text-secondary);
-    }
 }
 </style>

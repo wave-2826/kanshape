@@ -77,7 +77,7 @@ routerUse((e) => {
 
 
 cronAdd("cleanup_onshape_oauth_transactions", "*/15 * * * *", () => {
-    require(`${__hooks}/onshape_auth`).cleanupExpiredTransactions();
+    require(`${__hooks}/onshape_auth`).cleanupExpiredOnshapeTransactions();
 });
 
 cronAdd("cleanup_onshape_request_cache", "*/15 * * * *", () => {

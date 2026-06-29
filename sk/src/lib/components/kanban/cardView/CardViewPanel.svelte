@@ -10,8 +10,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
-    import { BoardsTypeOptions, Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { ChartColumnBig, Circle, Clock, Factory, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
+    import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { ChartColumnBig, Clock, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -20,18 +20,19 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { onDestroy, untrack } from "svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import InlineSelector from "$lib/components/InlineSelector.svelte";
+    import { getCardMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
 
     let {
+        board,
         card = $bindable(),
         sections,
         subprojects,
-        boardType,
         onclose
     }: {
+        board: TypedBoardsResponse,
         card: TypedCardPreviewResponse | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
-        boardType: BoardsTypeOptions,
         onclose: () => void
     } = $props();
 
@@ -262,25 +263,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             </div>
         </div>
 
-        {#if boardType === "parts"}
-            <h3><Factory /> Parts board</h3>
-            <!-- TEMPORARY -->
-            <!-- TODO -->
-            <div class="properties">
-                <div class="property">
-                    <span class="prop-label"><Circle />Material</span>
-                    <div class="prop-value">
-                        <input type="text" placeholder="e.g. Aluminum" disabled={tracker.loadingFull} />
-                    </div>
-                </div>
-                <div class="property">
-                    <span class="prop-label"><Circle />Machine</span>
-                    <div class="prop-value">
-                        <input type="text" placeholder="e.g. Mill" disabled={tracker.loadingFull} />
-                    </div>
-                </div>
-            </div>
-        {/if}
+        {JSON.stringify(getCardMetadataItems(board, {
+            board: $state.snapshot(board) as TypedBoardsResponse,
+            metadata: $state.snapshot(localCard.metadata ?? {})
+        }, true))}
     </div>
 
     <hr />

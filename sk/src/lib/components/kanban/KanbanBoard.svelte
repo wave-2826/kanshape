@@ -5,6 +5,7 @@
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
     import KanbanMenu from "./KanbanMenu.svelte";
     import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";
+    import type { TypedBoardsResponse } from "$lib/data/project";
 
     const {
         project,
@@ -12,7 +13,7 @@
         cards
     }: {
         project: ExpandResponse<"projects", "subprojects">,
-        board: ExpandResponse<"boards", "sections">,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
 
@@ -124,9 +125,10 @@
     <KanbanMenu {project} {board} {sections} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel
+        board={board as TypedBoardsResponse}
         card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}
         onclose={() => openCardId = null}
-        {sections} {subprojects} projectType={project.type}
+        {sections} {subprojects}
     />
 
     {#if cards !== null && $cards !== null}

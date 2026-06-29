@@ -150,6 +150,30 @@ export type CardMetadataSection = {
     } & CardMetadataField)[];
 }
 
+function materializeMetadataType(type: CardMetadataFieldType, ctx: MetadataCtx): CardMetadataFieldType {
+    if(type.base === "object") {
+        type = {
+            ...type,
+            fields: Object.fromEntries(
+                Object.entries(type.fields)
+                .map(([id, subfield]) =>
+                    [id, {
+                        ...subfield,
+                        type: materializeMetadataType(subfield.type, ctx)
+                    }]
+                )
+            )
+        };
+    } else if(type.base === "select" && typeof type.options === "function") {
+        type = {
+            ...type,
+            options: type.options(ctx)
+        };
+    }
+
+    return type;
+}
+
 /**
  * Gets the schema for all non-essential card metadata fields.  
  * Metadata is stored with type for if the schema ever changes.  
@@ -162,19 +186,26 @@ export type CardMetadataSection = {
  */
 export function getCardMetadataItems(
     board: TypedBoardsResponse,
-    includeCustom: boolean = true
+    ctx: MetadataCtx,
+    includeCustom: boolean = true,
 ): CardMetadataSection[] {
     const sections: CardMetadataSection[] = [];
 
     // Board type fields
     const typeInfo = boardTypes[board.type];
     if(typeInfo) {
-        const typeFields = typeInfo.fields || {};
+        let typeFields = typeInfo.fields || {};
+        if(typeof typeFields === "function") typeFields = typeFields(ctx);
+
         const typeFieldEntries = Object.entries(typeFields);
         if(typeFieldEntries.length > 0) {
             sections.push({
                 title: typeInfo.name,
-                fields: typeFieldEntries.map(([id, field]) => ({ id: `${board.type}/${id}`, ...field }))
+                fields: typeFieldEntries.map(([id, field]) => ({
+                    ...field,
+                    id: `${board.type}/${id}`,
+                    type: materializeMetadataType(field.type, ctx)
+                }))
             });
         }
     }
@@ -185,7 +216,11 @@ export function getCardMetadataItems(
         if(customFieldEntries.length > 0) {
             sections.push({
                 title: "Board Fields",
-                fields: customFieldEntries.map(([id, field]) => ({ id: `user/${id}`, ...field }))
+                fields: customFieldEntries.map(([id, field]) => ({
+                    ...field,
+                    id: `user/${id}`,
+                    type: materializeMetadataType(field.type, ctx)
+                }))
             });
         }
     }

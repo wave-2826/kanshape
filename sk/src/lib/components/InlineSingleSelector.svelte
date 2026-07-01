@@ -1,31 +1,36 @@
 <script lang="ts" generics="Item extends { id: string; name: string }">
-	import { Check, ChevronDown, X } from "lucide-svelte";
+    // I hate the code duplication here, but oh well...
+
+	import { Check, ChevronDown } from "lucide-svelte";
 	import { fly } from "svelte/transition";
 	import type { Snippet } from "svelte";
 
 	const {
-		values,
+		value,
 		data,
 		onchange,
-		itemName = "items",
+		itemName = "item",
 		children
 	}: {
-		values: { id: string; name: string }[],
+		value: { id: string; name: string } | null,
 		data: Item[],
-		onchange: (ids: string[]) => void,
+		onchange: (id: string | null) => void,
 		itemName?: string,
 		children?: Snippet
 	} = $props();
 
 	let isOpen = $state(false);
 
-	function toggle(item: { id: string }) {
-		const isSelected = values.find((value) => value.id === item.id);
-		if(isSelected) {
-			onchange(values.filter((value) => value.id !== item.id).map((value) => value.id));
-		} else {
-			onchange([...values.map((value) => value.id), item.id]);
-		}
+	function select(item: { id: string }) {
+        // If the item is already selected, deselect it
+        if(value && value.id === item.id) {
+            onchange(null);
+            isOpen = false;
+            return;
+        }
+
+		onchange(item.id);
+		isOpen = false;
 	}
 
 	function handleWindowClick(e: MouseEvent) {
@@ -53,19 +58,10 @@
 		onclick={() => isOpen = !isOpen}
 		onkeydown={handleKeydown}
 	>
-		{#if values.length === 0}
+		{#if !value}
 			<span class="placeholder">Select {itemName}...</span>
 		{:else}
-			<div class="selected-values-inline">
-				{#each values as value (value.id)}
-					<span class="badge">
-						{value.name}
-						<button type="button" class="unstyled remove-btn" onclick={(e) => { e.stopPropagation(); toggle(value); }}>
-							<X />
-						</button>
-					</span>
-				{/each}
-			</div>
+			<span class="selected-value">{value.name}</span>
 		{/if}
 		<ChevronDown class="dropdown-icon" />
 	</div>
@@ -85,9 +81,9 @@
 			{/if}
 
 			{#each data as item (item.id)}
-				{@const isSelected = !!values.find((value) => value.id === item.id)}
+				{@const isSelected = !!value && value.id === item.id}
 				<li>
-					<button type="button" class="dropdown-item" class:selected={isSelected} onclick={() => toggle(item)}>
+					<button type="button" class="dropdown-item" class:selected={isSelected} onclick={() => select(item)}>
 						<span>{item.name}</span>
 						{#if isSelected}
 							<Check />

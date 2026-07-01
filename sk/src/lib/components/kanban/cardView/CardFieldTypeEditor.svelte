@@ -5,7 +5,8 @@ cases where the expected type doesn't match the value type by displaying a reset
 <script lang="ts">
     import type { CardMetadata } from "$lib/data/cards";
     import type { CardMetadataFieldType } from "$lib/data/project";
-    
+    import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
+
     let {
         type, value = $bindable()
     }: {
@@ -32,6 +33,10 @@ cases where the expected type doesn't match the value type by displaying a reset
 {:else if type.base === "onshape_part"}
     <!-- TODO: Better selection for when user is in onshape -->
     <input type="text" bind:value={get, set<string>} />
+{:else if type.base === "user"}
+    <div class="select">
+        <CachedCollectionSelector collection="users" nameField="name" bind:value={get, set<null | string | string[]>} multi={type.multi} />
+    </div>
 {:else}
     <span>Unsupported field type: {type.base}</span>
 {/if}
@@ -40,5 +45,13 @@ cases where the expected type doesn't match the value type by displaying a reset
     input {
         flex: 1;
         padding: 0.25rem 0.5rem;
+    }
+
+    .select {
+        display: contents;
+        > :global(*) {
+            flex: 1;
+            min-width: 0;
+        }
     }
 </style>

@@ -94,6 +94,11 @@ export function checkMetadataValue(type: CardMetadataFieldType<false>, value: Me
             return value === null || typeof value === "string";
         case "user":
         case "group":
+            if(type.multi) {
+                return Array.isArray(value) && value.every(v => typeof v === "string");
+            } else {
+                return value === null || typeof value === "string";
+            }
         case "file":
             function isFile(v: MetadataValue): v is MetadataFile {
                 return typeof v === "object" && v !== null &&
@@ -183,6 +188,11 @@ export const boardTypes: {
                 name: "Files",
                 description: "Files associated with the part.",
                 type: { base: "file", multi: true }
+            },
+            "users": {
+                name: "Users",
+                description: "Users associated with the part.",
+                type: { base: "user", multi: true }
             }
         }
     },

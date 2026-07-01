@@ -92,6 +92,11 @@ export class DirtyTracker<
     public get current(): TInternal {
         return this.internal;
     }
+    public set current(value: TInternal) {
+        for(const key of Object.keys(value) as (keyof TInternal)[]) {
+            this.internal[key] = value[key];
+        }
+    }
 
     public get currentState(): DirtyTrackerState {
         return this.state;

@@ -10,9 +10,9 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
-    import { Collections, type CardsResponse, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { ChartColumnBig, Clock, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
-    import { getPriorityColor, priorities, type CardAssignmentData } from "../../../data/cards";
+    import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
@@ -21,6 +21,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import InlineSelector from "$lib/components/InlineSelector.svelte";
     import { getCardMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
+    import CardFieldCategory from "./CardFieldCategory.svelte";
 
     let {
         board,
@@ -41,7 +42,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
      * don't send unnecessary data for the full board). This constructs a partial full card from
      * the preview data to use as our local editable state.
      */
-    function constructPartialFullCard(preview: TypedCardPreviewResponse): CardsResponse {
+    function constructPartialFullCard(preview: TypedCardPreviewResponse): TypedCardsResponse {
         return {
             collectionId: Collections.Cards,
             collectionName: Collections.Cards,
@@ -62,13 +63,15 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             section: preview.section,
             subprojects: preview.subprojects,
             
-            metadata: {}
+            metadata: {},
+
+            expand: {}
         };
     }
 
     const saveDebounce = 200;
 
-    let tracker = $state<DirtyTracker<CardsResponse, TypedCardPreviewResponse> | null>(null);
+    let tracker = $state<DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse> | null>(null);
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
     const creationUser = $derived(card?.created_by ? queryOne(Collections.Users, card.created_by) : null);
@@ -87,12 +90,12 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         } else if(!tracker) {
             console.log("Card selected, initializing tracker");
             untrack(() => {
-                tracker = new DirtyTracker<CardsResponse, TypedCardPreviewResponse>(
+                tracker = new DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse>(
                     $state.snapshot(card),
                     {
                         transformExternal: (ext) => constructPartialFullCard($state.snapshot(ext)),
                         fetchFull: async (id) => {
-                            return await queryOne(Collections.Cards, id) as CardsResponse;
+                            return await queryOne(Collections.Cards, id) as TypedCardsResponse;
                         }
                     }
                 );
@@ -147,6 +150,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(!id) return;
         deleteRecord(Collections.Cards, id);
     }
+
+    const metadataItems = $derived(getCardMetadataItems(board, {
+        board: $state.snapshot(board) as TypedBoardsResponse,
+        metadata: $state.snapshot(tracker ? tracker.current.metadata ?? null : null) as CardMetadata | null
+    }, true));
 </script>
 
 
@@ -170,7 +178,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 disabled={tracker.loadingFull}
             ></textarea>
         </div>
-        
+
         <h3><SquareKanban /> Task</h3>
         <div class="properties">
             <div class="property">
@@ -263,10 +271,21 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             </div>
         </div>
 
-        {JSON.stringify(getCardMetadataItems(board, {
-            board: $state.snapshot(board) as TypedBoardsResponse,
-            metadata: $state.snapshot(localCard.metadata ?? {})
-        }, true))}
+        {#each metadataItems as { icon, title, fields }}
+            <h3>
+                <!-- svelte-ignore svelte_component_deprecated - this could be a v4 component -->
+                {#if icon}<svelte:component this={icon} />{/if}
+                {title}
+            </h3>
+            <CardFieldCategory {fields} bind:card={
+                () => localCard,
+                (v) => {
+                    if(tracker) {
+                        tracker.current = v;
+                    }
+                }
+            } />
+        {/each}
     </div>
 
     <hr />

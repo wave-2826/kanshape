@@ -1,5 +1,5 @@
 import type { CardsPriorityOptions, CardsResponse } from "$lib/pocketbase/generated-types";
-import type { CardMetadataFieldType } from "./project";
+import type { CardMetadataFieldType, MetadataValue } from "./project";
 
 export type TypedCardsResponse<Expand = {}> = CardsResponse<CardAssignmentData, CardMetadata, Expand>;
 
@@ -36,7 +36,7 @@ export type CardAssignmentData = {
 export type CardMetadata = {
     [id: string]: {
         /** The value of the metadata field */
-        value: string | number | boolean | string[] | number[] | boolean[] | null;
+        value: MetadataValue;
         /** The metadata type is stored on the field to stay valid after schema changes */
         type: CardMetadataFieldType;
     }

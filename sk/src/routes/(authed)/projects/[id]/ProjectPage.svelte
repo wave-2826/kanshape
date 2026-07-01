@@ -21,14 +21,17 @@
         subtitle?: string,
         linkedSites: ProjectLinkedSite[]
     } = $props();
-</script>
 
+    function logError(error: unknown): false {
+        console.error("Error loading project page:", error);
+        return false;
+    }
+</script>
 
 <div class="page">
     <svelte:boundary>
         {#snippet failed(error)}
-            {@debug error}
-            <p>Failed to load page.</p>
+            <p {@attach logError(error)}>Failed to load page.</p>
             <span class="error">{(error as any)["message"]}</span>
         {/snippet}
 

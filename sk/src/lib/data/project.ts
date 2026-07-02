@@ -189,10 +189,10 @@ export const boardTypes: {
                 description: "Files associated with the part.",
                 type: { base: "file", multi: true }
             },
-            "users": {
-                name: "Users",
-                description: "Users associated with the part.",
-                type: { base: "user", multi: true }
+            "instructions": {
+                name: "Further instructions",
+                description: "Any additional instructions for the part.",
+                type: { base: "longtext" }
             }
         }
     },

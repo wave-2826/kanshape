@@ -5,14 +5,16 @@ cases where the expected type doesn't match the value type by displaying a reset
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import type { CardMetadata } from "$lib/data/cards";
-    import type { CardMetadataFieldType } from "$lib/data/project";
+    import { defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataValue } from "$lib/data/project";
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
+    import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
+    import { Plus, X } from "lucide-svelte";
 
     let {
         type, value = $bindable()
     }: {
-        type: CardMetadataFieldType,
+        type: CardMetadataFieldType<false>,
         value: CardMetadata[string]["value"]
     } = $props();
 
@@ -52,6 +54,45 @@ cases where the expected type doesn't match the value type by displaying a reset
             multi={type.multi}
         />
     </div>
+{:else if type.base === "list"}
+    <div class="list">
+        {#each (value as MetadataValue[]) as item, index (index)}
+            <div class="list-item">
+                <CardFieldTypeEditor
+                    type={type.field}
+                    bind:value={() => item, (v) => {
+                        let newValue = [...(value as MetadataValue[])];
+                        newValue[index] = v;
+                        set(newValue);
+                    }}
+                />
+                <button onclick={() => {
+                    let newValue = [...(value as MetadataValue[])];
+                    newValue.splice(index, 1);
+                    set(newValue);
+                }} class="remove"><X /></button>
+            </div>
+        {/each}
+        <button
+            class="add-item"
+            onclick={() => (value as MetadataValue[]).push(defaultMetadataFieldValue(type.field))}
+        >
+            <Plus /> Add {type.fieldName ?? "item"}
+        </button>
+    </div>
+{:else if type.base === "tuple"}
+    <div class="tuple">
+        {#each type.fields as field, index}
+            <CardFieldTypeEditor
+                type={field}
+                bind:value={() => (value as MetadataValue[])[index], (v) => {
+                    let newValue = [...(value as MetadataValue[])];
+                    newValue[index] = v;
+                    set(newValue);
+                }}
+            />
+        {/each}
+    </div>
 {:else}
     <span>Unsupported field type: {_exhaustiveCheck(type.base)}</span>
 {/if}
@@ -68,5 +109,39 @@ cases where the expected type doesn't match the value type by displaying a reset
             flex: 1;
             min-width: 0;
         }
+    }
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+        min-width: 0;
+
+        .list-item {
+            display: flex;
+            gap: 0.25rem;
+            
+            > :global(:first-child) {
+                flex: 1;
+                min-width: 0;
+            }
+            .remove {
+                padding: 0.25rem;
+            }
+        }
+
+        .add-item {
+            align-self: flex-end;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+
+    .tuple {
+        display: flex;
+        gap: 0.25rem;
+        flex: 1;
+        min-width: 0;
     }
 </style>

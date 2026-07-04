@@ -35,6 +35,8 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
 } | {
     base: "list";
     field: CardMetadataFieldType<Dynamic>;
+    /** optional name for the field, used in the UI */
+    fieldName?: string;
 } | {
     base: "tuple";
     fields: CardMetadataFieldType<Dynamic>[];
@@ -182,7 +184,7 @@ export const boardTypes: {
                         ], allow_other: true },
                         { base: "text" }
                     ]
-                } }
+                }, fieldName: "step" }
             },
             "files": {
                 name: "Files",

@@ -1,13 +1,15 @@
 <script lang="ts">
     import type { CardMetadataSection } from "$lib/data/project";
-    import CardFieldTypeEditor from "./CardFieldEditor.svelte";
+    import CardFieldEditor from "./CardFieldEditor.svelte";
     import type { TypedCardsResponse } from "$lib/data/cards";
 
     let {
-        fields, card = $bindable()
+        fields, card = $bindable(),
+        updateCard
     }: {
         fields: CardMetadataSection["fields"],
-        card: TypedCardsResponse
+        card: TypedCardsResponse,
+        updateCard: (card: TypedCardsResponse) => void
     } = $props();
 </script>
 
@@ -16,7 +18,7 @@
         <div class="property" title={field.description}>
             <span class="prop-label">{field.name}</span>
             <div class="prop-value">
-                <CardFieldTypeEditor {field} bind:card={card} />
+                <CardFieldEditor {field} bind:card={card} {updateCard} />
             </div>
         </div>
     {/each}

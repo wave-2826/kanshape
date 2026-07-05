@@ -38,6 +38,6 @@ export type CardMetadata = {
         /** The value of the metadata field */
         value: MetadataValue;
         /** The metadata type is stored on the field to stay valid after schema changes */
-        type: CardMetadataFieldType;
+        type: CardMetadataFieldType<false>;
     }
 };

@@ -435,7 +435,10 @@ export async function watch<
     async function setPage(newpage: number) {
         const { page, totalPages, perPage } = result;
         if(page > 0 && newpage <= totalPages) {
-            set((result = await collection.getList(newpage, perPage, queryParams)));
+            set((result = await collection.getList(newpage, perPage, {
+                ...queryParams,
+                requestKey: null
+            })));
         }
     }
 

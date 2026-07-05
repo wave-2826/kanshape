@@ -158,25 +158,38 @@ export class DirtyTracker<
             this.external = external;
             const transformed = this.transformExternal(external);
             
-            this.suppressDirty++;
-            try {
-                if(isNew) {
+            if(isNew) {
+                this.suppressDirty++;
+                try {
                     this.reset(external);
-                } else { 
-                    for(const key of Object.keys(transformed) as (keyof TInternal)[]) {
-                        const extVal = transformed[key];
-                        const changed = !deepEqual(this.prevExternalValues.get(key), extVal);
-                        this.prevExternalValues.set(key, $state.snapshot(extVal));
-                        if(!this.dirtyFields.has(key) && changed) {
-                            this.internal[key] = extVal;
-                        }
-                    }
+                   this.snapshotValues();
+                } finally {
+                    setTimeout(() => this.suppressDirty--, 0);
                 }
-                this.snapshotValues();
-            } finally {
-                setTimeout(() => this.suppressDirty--, 0);
+            } else {
+                this.updateInternal(transformed);
             }
         });
+    }
+
+    /**
+     * An external update to the internal value
+     */
+    public async updateInternal(newInternal: TInternal) {
+        this.suppressDirty++;
+        try {
+            for(const key of Object.keys(newInternal) as (keyof TInternal)[]) {
+                const extVal = newInternal[key];
+                const changed = !deepEqual(this.prevExternalValues.get(key), extVal);
+                this.prevExternalValues.set(key, $state.snapshot(extVal));
+                if(!this.dirtyFields.has(key) && changed) {
+                    this.internal[key] = extVal;
+                }
+            }
+            this.snapshotValues();
+        } finally {
+            setTimeout(() => this.suppressDirty--, 0);
+        }
     }
 
     private async performFetchFull(id: string, partial: TInternal) {

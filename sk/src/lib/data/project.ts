@@ -42,7 +42,7 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
     fields: CardMetadataFieldType<Dynamic>[];
 };
 
-type MetadataFile = {
+export type MetadataFile = {
     id: string;
     /** Original name of the file */
     name: string;
@@ -126,6 +126,31 @@ export function checkMetadataValue(type: CardMetadataFieldType<false>, value: Me
             );
         default:
             return false;
+    }
+}
+
+export function walkMetadataValues(
+    type: CardMetadataFieldType<false>,
+    value: MetadataValue,
+    callback: (type: CardMetadataFieldType<false>, value: MetadataValue) => void
+) {
+    callback(type, value);
+
+    switch(type.base) {
+        case "list":
+            if(Array.isArray(value)) {
+                for(const v of value) {
+                    walkMetadataValues(type.field, v, callback);
+                }
+            }
+            break;
+        case "tuple":
+            if(Array.isArray(value)) {
+                for(let i = 0; i < type.fields.length; i++) {
+                    walkMetadataValues(type.fields[i], value[i], callback);
+                }
+            }
+            break;
     }
 }
 

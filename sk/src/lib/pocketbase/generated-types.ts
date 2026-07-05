@@ -20,6 +20,7 @@ export const Collections = {
 	Groups: "groups",
 	Leaderboard: "leaderboard",
 	OauthTransactions: "oauth_transactions",
+	OnshapeApiCache: "onshape_api_cache",
 	OnshapeDocuments: "onshape_documents",
 	Projects: "projects",
 	Sections: "sections",
@@ -158,6 +159,7 @@ export type CardsRecord<Tassignment_data = unknown, Tmetadata = unknown> = {
 	created_by?: RecordIdString
 	description?: string
 	due_by?: IsoDateString
+	files?: FileNameString[]
 	id: string
 	metadata?: null | Tmetadata
 	moved_at?: IsoDateString
@@ -218,9 +220,19 @@ export type OauthTransactionsRecord = {
 	created: IsoAutoDateString
 	id: string
 	provider?: OauthTransactionsProviderOptions
+	redirect_uri?: string
 	return_to?: string
 	updated: IsoAutoDateString
 	user?: RecordIdString
+}
+
+export type OnshapeApiCacheRecord<Tbody = unknown, Theaders = unknown> = {
+	body?: null | Tbody
+	hash?: string
+	headers?: null | Theaders
+	id: string
+	statusCode?: number
+	timestamp?: number
 }
 
 export type OnshapeDocumentsRecord = {
@@ -298,6 +310,7 @@ export type GroupOverviewResponse<Tcard_count = unknown, Tmember_count = unknown
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord> & BaseSystemFields<Texpand>
 export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransactionsRecord> & BaseSystemFields<Texpand>
+export type OnshapeApiCacheResponse<Tbody = unknown, Theaders = unknown, Texpand = unknown> = Required<OnshapeApiCacheRecord<Tbody, Theaders>> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
@@ -321,6 +334,7 @@ export type CollectionRecords = {
 	groups: GroupsRecord
 	leaderboard: LeaderboardRecord
 	oauth_transactions: OauthTransactionsRecord
+	onshape_api_cache: OnshapeApiCacheRecord
 	onshape_documents: OnshapeDocumentsRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
@@ -343,6 +357,7 @@ export type CollectionResponses = {
 	groups: GroupsResponse
 	leaderboard: LeaderboardResponse
 	oauth_transactions: OauthTransactionsResponse
+	onshape_api_cache: OnshapeApiCacheResponse
 	onshape_documents: OnshapeDocumentsResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse

@@ -64,6 +64,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             subprojects: preview.subprojects,
             
             metadata: {},
+            files: [],
 
             expand: {}
         };
@@ -95,6 +96,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     {
                         transformExternal: (ext) => constructPartialFullCard($state.snapshot(ext)),
                         fetchFull: async (id) => {
+                            console.log("Fetching full");
                             return await queryOne(Collections.Cards, id) as TypedCardsResponse;
                         }
                     }
@@ -132,7 +134,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         if(!tracker) return;
 
         try {
-            await save(Collections.Cards, stripExpand(tracker.current), {
+            await save(Collections.Cards, {
+                ...stripExpand(tracker.current),
+                files: undefined // don't update files, since it's handled separately
+            }, {
                 create: false,
                 expand: ""
             });
@@ -284,7 +289,11 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                         tracker.current = v;
                     }
                 }
-            } />
+            } updateCard={(card) => {
+                if(tracker) {
+                    tracker.updateInternal(card);
+                }
+            }} />
         {/each}
     </div>
 

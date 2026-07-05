@@ -5,17 +5,20 @@ cases where the expected type doesn't match the value type by displaying a reset
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import type { CardMetadata } from "$lib/data/cards";
-    import { defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataValue } from "$lib/data/project";
+    import { defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataFile, type MetadataValue } from "$lib/data/project";
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
     import { Plus, X } from "lucide-svelte";
 
     let {
-        type, value = $bindable()
+        type, value = $bindable(),
+        addFile, getFileUrl
     }: {
         type: CardMetadataFieldType<false>,
-        value: CardMetadata[string]["value"]
+        value: CardMetadata[string]["value"],
+        addFile: (name: string, file: File) => void,
+        getFileUrl: (file: MetadataFile) => string
     } = $props();
 
     function get<T>(): T {
@@ -65,6 +68,7 @@ cases where the expected type doesn't match the value type by displaying a reset
                         newValue[index] = v;
                         set(newValue);
                     }}
+                    {addFile} {getFileUrl}
                 />
                 <button onclick={() => {
                     let newValue = [...(value as MetadataValue[])];
@@ -90,9 +94,38 @@ cases where the expected type doesn't match the value type by displaying a reset
                     newValue[index] = v;
                     set(newValue);
                 }}
+                {addFile} {getFileUrl}
             />
         {/each}
     </div>
+{:else if type.base === "file"}
+    {#if type.multi}
+        <div class="files">
+            {#each (value as MetadataFile[]) as file, index (index)}
+                <div class="file-capsule">
+                    <a href={getFileUrl(file)} target="_blank">{file.name}</a>
+                    <button onclick={() => {
+                        let newValue = [...(value as MetadataValue[])];
+                        newValue.splice(index, 1);
+                        set(newValue);
+                    }} class="remove"><X /></button>
+                </div>
+            {/each}
+            <input type="file" onchange={async (e) => {
+                const files = (e.target as HTMLInputElement).files;
+                if(files && files.length > 0) {
+                    for(const file of files) {
+                        // The actual name of the file isn't the uploaded name, but we store it
+                        const generatedName = crypto.randomUUID().replace(/-/g, "");
+                        addFile(generatedName + "." + file.name.split(".").pop(), file);
+                        set([...(value as MetadataValue[]), { name: file.name, id: generatedName }]);
+                    }
+                }
+            }} />
+        </div>
+    {:else}
+        <p>todo: single files</p>
+    {/if}
 {:else}
     <span>Unsupported field type: {_exhaustiveCheck(type.base)}</span>
 {/if}

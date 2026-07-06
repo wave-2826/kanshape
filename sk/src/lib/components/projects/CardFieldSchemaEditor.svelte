@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { CardMetadataFieldType } from "$lib/data/project";
-    import { X } from "lucide-svelte";
+    import { Plus, X } from "lucide-svelte";
     import CardFieldSchemaEditor from "./CardFieldSchemaEditor.svelte";
 
     let {
@@ -69,34 +69,35 @@
             <CardFieldSchemaEditor bind:type={type.field} />
         </div>
     {:else if type.base === "tuple"}
+        {#each type.fields as field, i (i)}
+            <div class="child horizontal-field">
+                <div class="line"></div>
+                <button class="remove-field" title="Remove field" onclick={() => {
+                    if(type.base !== "tuple") return;
+                    type.fields = type.fields.filter((_, j) => j !== i);
+                }}><X /></button>
+                <CardFieldSchemaEditor bind:type={type.fields[i]} />
+            </div>
+        {/each}
+
         <div class="child">
             <div class="line"></div>
-            <span class="label">
-                Fields
-            </span>
-
-            {#each type.fields as field, i (i)}
-                <div class="child horizontal-field">
-                    <div class="line"></div>
-                    <button class="remove-field" title="Remove field" onclick={() => {
-                        if(type.base !== "tuple") return;
-                        type.fields = type.fields.filter((_, j) => j !== i);
-                    }}><X /></button>
-                    <CardFieldSchemaEditor bind:type={type.fields[i]} />
-                </div>
-            {/each}
-
-            <div class="child">
-                <div class="line"></div>
-                <button class="add-field" onclick={() => {
-                    if(type.base !== "tuple") return;
-                    type.fields = [...type.fields, { base: "text" }];
-                }}>
-                    Add
-                </button>
-            </div>
+            <button class="add-field" onclick={() => {
+                if(type.base !== "tuple") return;
+                type.fields = [...type.fields, { base: "text" }];
+            }}>
+                <Plus /> Add
+            </button>
         </div>
     {:else if type.base === "select"}
+        <div class="child">
+            <div class="line"></div>
+            <label title="Should users be able to enter a value that isn't in the list of options?">
+                Allow other
+                <input type="checkbox" bind:checked={type.allow_other} />
+            </label>
+        </div>
+
         <div class="child">
             <div class="line"></div>
             <span class="label">
@@ -126,17 +127,9 @@
                         value: ""
                     }];
                 }}>
-                    Add
+                    <Plus /> Add
                 </button>
             </div>
-        </div>
-
-        <div class="child">
-            <div class="line"></div>
-            <label title="Should users be able to enter a value that isn't in the list of options?">
-                Allow other
-                <input type="checkbox" bind:checked={type.allow_other} />
-            </label>
         </div>
     {/if}
 </div>
@@ -151,13 +144,17 @@
         min-width: 0;
     }
 
+    select, button {
+        align-self: flex-start;
+        padding-right: 0.75rem;
+    }
+
     .child {
         display: flex;
         flex-direction: column;
 
         margin-left: 0.5rem;
         padding-left: 1rem;
-        padding-bottom: 0.5rem;
         position: relative;
 
         &:nth-child(2) {
@@ -214,12 +211,12 @@
         gap: 0.25rem;
 
         .remove-field {
-            color: var(--text-tertiary);
+            color: color-mix(var(--error), var(--text-secondary) 50%);
             padding: 0.25rem;
             transition: color 0.2s;
 
             &:hover {
-                color: var(--text-primary);
+                color: var(--error);
             }
         }
     }

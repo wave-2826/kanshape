@@ -26,6 +26,7 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
     /** the options for the select field */
     options: {
         id: string;
+        /** label for the option, used in the UI */
         value: string;
         color?: string;
     }[] | (

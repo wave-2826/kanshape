@@ -169,7 +169,32 @@ cases where the expected type doesn't match the value type by displaying a reset
         {/if}
     </div>    
 {:else if type.base === "select"}
-    <p>todo: select</p>
+    {@const isOther = type.allow_other && typeof value === "string" && !type.options.some(o => o.id === value)}
+    <div class="custom-select" class:is-other={isOther}>
+        <select bind:value={() => {
+            if(isOther) {
+                return "other";
+            } else {
+                return value;
+            }
+        }, (v) => {
+            if(v === "other") {
+                set("");
+            } else {
+                set(v);
+            }
+        }}>
+            {#each type.options as option}
+                <option value={option.id}>{option.value}</option>
+            {/each}
+            {#if type.allow_other}
+                <option value="other">Other...</option>
+            {/if}
+        </select>
+        {#if isOther}
+            <input type="text" bind:value={get, set<string>} placeholder="Custom value..." />
+        {/if}
+    </div>
 {:else}
     <span>Unsupported field type: {_exhaustiveCheck(type.base)}</span>
 {/if}
@@ -256,6 +281,25 @@ cases where the expected type doesn't match the value type by displaying a reset
 
         input[type="file"] {
             display: none;
+        }
+    }
+
+    .custom-select {
+        display: flex;
+        min-width: min-content;
+        flex: 0;
+
+        &.is-other select {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            width: 5rem;
+        }
+        &.is-other input[type="text"] {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            flex: 0;
+            width: 10rem;
+            border-left: 1px solid var(--border);
         }
     }
 </style>

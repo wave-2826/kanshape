@@ -7,21 +7,31 @@ into localCard but do not overwrite any fields that have been edited locally aft
 save. This allows us to keep user edits intact while still reflecting remote updates.
 -->
 
+<script lang="ts" module>
+    import { createContext, onDestroy, untrack } from "svelte";
+    
+    type UploadContext = {
+        queueUpload(name: string, file: File): void;
+        update(): void;
+    };
+    export const [getUploadContext, setUploadContext] = createContext<UploadContext>();
+</script>
+
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
-    import { Collections, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { client, deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
+    import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { ChartColumnBig, Clock, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
     import { DirtyTracker } from "./dirtyTracker.svelte";
-    import { onDestroy, untrack } from "svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import InlineSelector from "$lib/components/InlineSelector.svelte";
-    import { getCardMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
+    import { getCardMetadataItems, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
     import CardFieldCategory from "./CardFieldCategory.svelte";
+    import { debounce } from "$lib/util";
 
     let {
         board,
@@ -160,6 +170,71 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         board: $state.snapshot(board) as TypedBoardsResponse,
         metadata: $state.snapshot(tracker ? tracker.current.metadata ?? null : null) as CardMetadata | null
     }, true));
+
+    
+    let uploadQueue: { name: string, file: File }[] = [];
+
+    async function updateCardFiles() {
+        const card = tracker?.current;
+        if(!card) return;
+
+        // 1. check what files the metadata still contains
+        let metadataFiles: string[] = [];
+        for(const category of metadataItems) {
+            for(const field of category.fields) {
+                const metadataItem = card.metadata?.[field.id];
+                if(!metadataItem) continue;
+
+                walkMetadataValues(metadataItem.type, metadataItem.value, (ty, val) => {
+                    if(ty.base === "file") {
+                        if(ty.multi) {
+                            metadataFiles.push(...(val as MetadataFile[]).map(f => f.id));
+                        } else if(val !== null) {
+                            metadataFiles.push((val as MetadataFile).id);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 2. remove files that are no longer referenced in the metadata from the card and the upload queue
+        // Since Pocketbase adds random suffixes, we check if any of the metadata files are prefixes of each
+        // file in the card's files array.
+        let removedFiles = card.files.filter(f => !metadataFiles.some(mf => f.startsWith(mf)));
+
+        // 3. construct an array of Files of new files to upload with the changed names
+        let newFiles = uploadQueue
+            .filter(f => !card.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
+            .map(f => new File([f.file], f.name, { type: f.file.type, lastModified: f.file.lastModified }));
+        uploadQueue = [];
+
+        // 4. update the record with additions and removals
+        if(newFiles.length === 0 && removedFiles.length === 0) {
+            return;
+        }
+        
+        console.log("Updating card files:", { newFiles, removedFiles });
+        const newCard = await client.collection(Collections.Cards).update(card.id, {
+            "files+": newFiles.length > 0 ? newFiles : undefined,
+            "files-": removedFiles.length > 0 ? removedFiles : undefined
+        }, {
+            requestKey: null // don't cancel
+        });
+
+        card.files = newCard.files;
+    }
+    const updateCardFilesDebounced = debounce(updateCardFiles, 100);
+
+    let uploadContext: UploadContext = {
+        queueUpload(name: string, file: File) {
+            uploadQueue.push({ name, file });
+            updateCardFilesDebounced();
+        },
+        update() {
+            updateCardFilesDebounced();
+        }
+    };
+    setUploadContext(uploadContext);
 </script>
 
 
@@ -288,6 +363,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     if(tracker) {
                         tracker.current = v;
                     }
+                    updateCardFilesDebounced();
                 }
             } />
         {/each}

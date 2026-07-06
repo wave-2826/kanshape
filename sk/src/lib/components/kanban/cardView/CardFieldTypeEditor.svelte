@@ -9,7 +9,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
-    import { Plus, X } from "lucide-svelte";
+    import { FileIcon, Plus, X } from "lucide-svelte";
 
     let {
         type, value = $bindable(),
@@ -99,33 +99,77 @@ cases where the expected type doesn't match the value type by displaying a reset
         {/each}
     </div>
 {:else if type.base === "file"}
-    {#if type.multi}
-        <div class="files">
-            {#each (value as MetadataFile[]) as file, index (index)}
-                <div class="file-capsule">
-                    <a href={getFileUrl(file)} target="_blank">{file.name}</a>
-                    <button onclick={() => {
-                        let newValue = [...(value as MetadataValue[])];
-                        newValue.splice(index, 1);
-                        set(newValue);
-                    }} class="remove"><X /></button>
-                </div>
-            {/each}
-            <input type="file" onchange={async (e) => {
-                const files = (e.target as HTMLInputElement).files;
-                if(files && files.length > 0) {
-                    for(const file of files) {
-                        // The actual name of the file isn't the uploaded name, but we store it
-                        const generatedName = crypto.randomUUID().replace(/-/g, "");
-                        addFile(generatedName + "." + file.name.split(".").pop(), file);
-                        set([...(value as MetadataValue[]), { name: file.name, id: generatedName }]);
+    <div class="files">
+        {#snippet capsule(file: MetadataFile)}
+            <div class="file-capsule">
+                <FileIcon />
+                <a
+                    href={getFileUrl(file as MetadataFile)}
+                    target="_blank"
+                    onclick={(e) => {
+                        // manual download handler to set the filename properly
+                        // progressive enhancement; the link will work normally too
+                        e.preventDefault();
+                        const url = getFileUrl(file as MetadataFile);
+                        // TODO: Download progress indicator
+                        // TODO: Handle errors
+                        fetch(url).then(async (res) => {
+                            const blob = await res.blob();
+                            const a = document.createElement("a");
+                            a.href = URL.createObjectURL(blob);
+                            a.download = (file as MetadataFile).name;
+                            a.click();
+                        });
+                    }}
+                >{(file as MetadataFile).name}</a>
+                <button onclick={() => {
+                    if(type.multi) {
+                        set((value as MetadataFile[]).filter(f => f.id !== (file as MetadataFile).id));
+                    } else {
+                        set(null);
                     }
-                }
-            }} />
-        </div>
-    {:else}
-        <p>todo: single files</p>
-    {/if}
+                }} class="remove unstyled"><X /></button>
+            </div>
+        {/snippet}
+        {#if type.multi}
+            {#each (value as MetadataFile[]) as file, index (index)}
+                {@render capsule(file)}
+            {/each}
+            <label class="button">
+                <Plus /> Add file(s)
+                <input type="file" multiple onchange={async (e) => {
+                    const files = (e.target as HTMLInputElement).files;
+                    if(files && files.length > 0) {
+                        for(const file of files) {
+                            // The actual name of the file isn't the uploaded name, but we store it
+                            const generatedName = crypto.randomUUID().replace(/-/g, "");
+                            addFile(generatedName + "." + file.name.split(".").pop(), file);
+                            set([...(value as MetadataValue[]), { name: file.name, id: generatedName }]);
+                        }
+                    }
+                }} />
+            </label>
+        {:else}
+            {#if (value as MetadataFile)?.id}
+                {@render capsule(value as MetadataFile)}
+            {:else}
+                <label class="button">
+                    <Plus /> Add file
+                    <input type="file" onchange={async (e) => {
+                        const files = (e.target as HTMLInputElement).files;
+                        if(files && files.length > 0) {
+                            const file = files[0];
+                            const generatedName = crypto.randomUUID().replace(/-/g, "");
+                            addFile(generatedName + "." + file.name.split(".").pop(), file);
+                            set({ name: file.name, id: generatedName });
+                        }
+                    }} />
+                </label>
+            {/if}
+        {/if}
+    </div>    
+{:else if type.base === "select"}
+    <p>todo: select</p>
 {:else}
     <span>Unsupported field type: {_exhaustiveCheck(type.base)}</span>
 {/if}
@@ -176,5 +220,42 @@ cases where the expected type doesn't match the value type by displaying a reset
         gap: 0.25rem;
         flex: 1;
         min-width: 0;
+    }
+
+    .files {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+
+        .file-capsule {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0 0 0 0.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: 0.25rem;
+
+            a {
+                color: var(--text-primary);
+            }
+            > :global(svg) {
+                width: 1em;
+                height: 1em;
+                margin-right: 0.25rem;
+            }
+
+            .remove {
+                padding: 0.25rem;
+                color: var(--text-secondary);
+                transition: color 0.2s;
+            }
+            .remove:hover {
+                color: var(--text-primary);
+            }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
     }
 </style>

@@ -1,11 +1,10 @@
 <script lang="ts">
     import type { TypedCardsResponse } from "$lib/data/cards";
-    import { type CardMetadataField, checkMetadataValue, defaultMetadataFieldValue, type MetadataFile, walkMetadataValues } from "$lib/data/project";
+    import { type CardMetadataField, checkMetadataValue, defaultMetadataFieldValue } from "$lib/data/project";
     import { TriangleAlert } from "lucide-svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
-    import { debounce } from "$lib/util";
-    import { Collections, type FileNameString } from "$lib/pocketbase/generated-types";
     import { client } from "$lib/pocketbase";
+    import { getUploadContext } from "./CardViewPanel.svelte";
     
     let {
         field, card = $bindable()
@@ -22,6 +21,8 @@
     // If the value isn't valid for the field type, we use the stored type instead
     const usedType = $derived(valueTypeIsValid ? field.type : metadataItem.type);
 
+    const uploadContext = getUploadContext();
+
     function set(newValue: typeof metadataItem.value) {
         card.metadata = {
             ...card.metadata,
@@ -30,52 +31,8 @@
                 value: newValue
             }
         };
-
-        updateCardFilesDebounced();
+        uploadContext.update();
     }
-
-    let uploadQueue: { name: string, file: File }[] = [];
-
-    async function updateCardFiles() {
-        // 1. check what files the metadata still contains
-        let metadataFiles: string[] = [];
-        walkMetadataValues(usedType, metadataItem.value, (ty, val) => {
-            if(ty.base === "file") {
-                if(ty.multi) {
-                    metadataFiles.push(...(val as MetadataFile[]).map(f => f.id));
-                } else {
-                    metadataFiles.push((val as MetadataFile).id);
-                }
-            }
-        });
-
-        // 2. remove files that are no longer referenced in the metadata from the card and the upload queue
-        // Since Pocketbase adds random suffixes, we check if any of the metadata files are prefixes of each
-        // file in the card's files array.
-        let removedFiles = card.files.filter(f => !metadataFiles.some(mf => f.startsWith(mf)));
-
-        // 3. construct an array of Files of new files to upload with the changed names
-        let newFiles = uploadQueue
-            .filter(f => !card.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
-            .map(f => new File([f.file], f.name, { type: f.file.type, lastModified: f.file.lastModified }));
-        uploadQueue = [];
-
-        // 4. update the record with additions and removals
-        if(newFiles.length === 0 && removedFiles.length === 0) {
-            return;
-        }
-        
-        console.log("Updating card files:", { newFiles, removedFiles });
-        const newCard = await client.collection(Collections.Cards).update(card.id, {
-            "files+": newFiles.length > 0 ? newFiles : undefined,
-            "files-": removedFiles.length > 0 ? removedFiles : undefined
-        }, {
-            requestKey: null // don't cancel
-        });
-
-        card.files = newCard.files;
-    }
-    const updateCardFilesDebounced = debounce(updateCardFiles, 100);
 </script>
 
 <div class="card-field-editor">
@@ -91,6 +48,7 @@ Reset this field to its default value?" onclick={() => {
                     value: defaultMetadataFieldValue(field.type)
                 }
             };
+            uploadContext.update();
         }}>
             <TriangleAlert />
             Reset
@@ -100,11 +58,9 @@ Reset this field to its default value?" onclick={() => {
     <CardFieldTypeEditor
         type={usedType} bind:value={() => metadataItem.value, set}
         addFile={async (name: string, file: File) => {
-            uploadQueue.push({ name, file });
-            updateCardFilesDebounced();
+            uploadContext.queueUpload(name, file);
         }}
         getFileUrl={(file) => {
-            console.log("Getting file URL for", file.id, $state.snapshot(card.files));
             // Files are given random suffixes by pocketbase, so we just find the file
             // in the card's files array. could be a little cleaner, but whatever.
             const foundFile = card.files.find(f => f.startsWith(file.id)) ?? file.id;

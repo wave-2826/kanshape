@@ -54,6 +54,19 @@ Reset this field to its default value?" onclick={() => {
             Reset
         </button>
     {/if}
+    {#if field.unknown}
+        <button class="invalid-value-warning" title="This field is unknown to the current project.
+It may have been removed or renamed, but is still present on this card.
+Remove this field?" onclick={() => {
+            // We don't set() since we want to reset the type as well
+            const { [field.id]: _, ...rest } = card.metadata ?? {};
+            card.metadata = rest;
+            uploadContext.update();
+        }}>
+            <TriangleAlert />
+            Unknown
+        </button>
+    {/if}
 
     <CardFieldTypeEditor
         type={usedType} bind:value={() => metadataItem.value, set}

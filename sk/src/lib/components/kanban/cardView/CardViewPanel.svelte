@@ -29,7 +29,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { DirtyTracker } from "./dirtyTracker.svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import InlineSelector from "$lib/components/InlineSelector.svelte";
-    import { getCardMetadataItems, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
+    import { getCardMetadataItems, getExtraMetadataItems, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
     import CardFieldCategory from "./CardFieldCategory.svelte";
     import { debounce } from "$lib/util";
 
@@ -170,7 +170,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         board: $state.snapshot(board) as TypedBoardsResponse,
         metadata: $state.snapshot(tracker ? tracker.current.metadata ?? null : null) as CardMetadata | null
     }, true));
-
+    const extraItems = $derived(getExtraMetadataItems(metadataItems, tracker ? tracker.current.metadata ?? null : null));
     
     let uploadQueue: { name: string, file: File }[] = [];
 
@@ -180,11 +180,8 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
         // 1. check what files the metadata still contains
         let metadataFiles: string[] = [];
-        for(const category of metadataItems) {
-            for(const field of category.fields) {
-                const metadataItem = card.metadata?.[field.id];
-                if(!metadataItem) continue;
-
+        if(card.metadata) {
+            for(const metadataItem of Object.values(card.metadata)) {
                 walkMetadataValues(metadataItem.type, metadataItem.value, (ty, val) => {
                     if(ty.base === "file") {
                         if(ty.multi) {
@@ -367,6 +364,18 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 }
             } />
         {/each}
+        {#if extraItems.length > 0}
+            <h3>Other</h3>
+            <CardFieldCategory fields={extraItems} bind:card={
+                () => localCard,
+                (v) => {
+                    if(tracker) {
+                        tracker.current = v;
+                    }
+                    updateCardFilesDebounced();
+                }
+            } />
+        {/if}
     </div>
 
     <hr />

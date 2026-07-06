@@ -159,6 +159,7 @@ export type CardMetadataField<Dynamic extends boolean = true> = {
     name: string;
     description: string;
     type: CardMetadataFieldType<Dynamic>;
+    unknown?: boolean;
 };
 
 export type CustomCardFields = {
@@ -349,4 +350,37 @@ export function getCardMetadataItems(
     }
 
     return sections;
+}
+
+/**
+ * Gets metadata items on a card that aren't part of the board's schema.  
+ * These "extra" items are still displayed so data isn't lost.
+ */
+export function getExtraMetadataItems(
+    metadataItems: CardMetadataSection[],
+    cardMetadata: CardMetadata | null
+): ({ id: string } & CardMetadataField<false>)[] {
+    const knownFieldIds = new Set<string>();
+    for(const section of metadataItems) {
+        for(const field of section.fields) {
+            knownFieldIds.add(field.id);
+        }
+    }
+
+    const extraItems: ({ id: string } & CardMetadataField<false>)[] = [];
+    if(cardMetadata) {
+        for(const [id, item] of Object.entries(cardMetadata)) {
+            if(!knownFieldIds.has(id)) {
+                extraItems.push({
+                    id,
+                    name: `${id} (unknown field)`,
+                    description: "This field is not part of the board's schema. It may have been removed or renamed.",
+                    type: item.type,
+                    unknown: true
+                });
+            }
+        }
+    }
+
+    return extraItems;
 }

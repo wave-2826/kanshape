@@ -163,7 +163,7 @@ export type CardMetadataField<Dynamic extends boolean = true> = {
 };
 
 export type CustomCardFields = {
-    [id: string]: CardMetadataField
+    [id: string]: CardMetadataField<false>
 };
 
 export type ProjectLinkedSite = {

@@ -5,6 +5,7 @@
     import KanbanListEntry from "./KanbanListEntry.svelte";
     import Masonry from "../Masonry.svelte";
     import { sortListCards, type TypedCardPreviewResponse } from "$lib/data/kanban";
+    import type { TypedBoardsResponse } from "$lib/data/project";
 
     const {
         project,
@@ -12,7 +13,7 @@
         cards
     }: {
         project: ExpandResponse<"projects", "subprojects">,
-        board: ExpandResponse<"boards", "sections">,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
 
@@ -42,7 +43,8 @@
     <CardViewPanel
         card={openCardId ? listCards.find((c) => c.id === openCardId) ?? null : null}
         onclose={() => openCardId = null}
-        {sections} {subprojects} projectType={project.type}
+        {sections} {subprojects}
+        {board}
     />
 
     {#if cards !== null && $cards !== null}

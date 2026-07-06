@@ -21,7 +21,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { autoSize } from "$lib/actions";
     import { client, deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { ChartColumnBig, Clock, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
+    import { ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -365,7 +365,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             } />
         {/each}
         {#if extraItems.length > 0}
-            <h3>Other</h3>
+            <h3><FileQuestionMark /> Other</h3>
             <CardFieldCategory fields={extraItems} bind:card={
                 () => localCard,
                 (v) => {

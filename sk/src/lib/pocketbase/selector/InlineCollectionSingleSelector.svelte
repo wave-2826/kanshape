@@ -11,7 +11,7 @@
         onchange,
         collection,
         searchField,
-        itemName = "items"
+        itemName = "item"
     }: {
         value: { id: string, name: string } | null,
         onchange: (id: string | null, data: { id: string, name: string } | null) => void,

@@ -90,7 +90,7 @@
 </script>
 
 <script lang="ts">
-    import { boardTypes, generateRecordID, type ProjectLinkedSite } from "$lib/data/project";
+    import { boardTypes, generateRecordID, type CustomCardFields, type ProjectLinkedSite } from "$lib/data/project";
     import { BoardsTypeOptions } from "$lib/pocketbase/generated-types";
     import LeftPaneChooser from "../LeftPaneChooser.svelte";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
@@ -98,6 +98,7 @@
     import { CancelBatch, deleteRecord, query, save, type ExpandRecord, type ExpandResponse } from "$lib/pocketbase";
     import { deepEqual } from "$lib/util";
     import { createPartIDString } from "$lib/parts";
+    import CustomCardFieldDetails from "./CustomCardFieldDetails.svelte";
 
     const {
         board = $bindable(),
@@ -184,6 +185,9 @@
 
     <h2>Linked sites</h2>
     <LinkedSiteDetails bind:linkedSites={board.linked_sites as ProjectLinkedSite[]} background={panelBackgrounds} />
+
+    <h2>Custom card fields</h2>
+    <CustomCardFieldDetails bind:customFields={board.custom_card_fields as CustomCardFields | null} background={panelBackgrounds} />
 </div>
 
 <!-- svelte-ignore css_unused_selector - shared styles -->

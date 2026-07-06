@@ -40,7 +40,7 @@ cases where the expected type doesn't match the value type by displaying a reset
 {:else if type.base === "url"}
     <UrlInput bind:value={get, set<string>} />
 {:else if type.base === "number"}
-    <input type="number" bind:value={get, set<number>} />
+    <input type="number" bind:value={get, (v) => set(Number(v))} />
 {:else if type.base === "checkbox"}
     <input type="checkbox" bind:checked={get, set<boolean>} />
 {:else if type.base === "date"}

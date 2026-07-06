@@ -289,11 +289,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                         tracker.current = v;
                     }
                 }
-            } updateCard={(card) => {
-                if(tracker) {
-                    tracker.updateInternal(card);
-                }
-            }} />
+            } />
         {/each}
     </div>
 

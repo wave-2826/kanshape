@@ -8,12 +8,10 @@
     import { client } from "$lib/pocketbase";
     
     let {
-        field, card = $bindable(),
-        updateCard
+        field, card = $bindable()
     }: {
         field: CardMetadataField<false> & { id: string },
-        card: TypedCardsResponse,
-        updateCard: (card: TypedCardsResponse) => void
+        card: TypedCardsResponse
     } = $props();
 
     const metadataItem = $derived(card.metadata && card.metadata[field.id] ? card.metadata[field.id] : {
@@ -58,22 +56,24 @@
 
         // 3. construct an array of Files of new files to upload with the changed names
         let newFiles = uploadQueue
-            .filter(f => !card.files.some(cf => cf.startsWith(f.name as FileNameString)))
+            .filter(f => !card.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
             .map(f => new File([f.file], f.name, { type: f.file.type, lastModified: f.file.lastModified }));
+        uploadQueue = [];
 
         // 4. update the record with additions and removals
-        console.log("Updating card files:", { newFiles, removedFiles });
-
         if(newFiles.length === 0 && removedFiles.length === 0) {
             return;
         }
-
-        updateCard(await client.collection(Collections.Cards).update(card.id, {
+        
+        console.log("Updating card files:", { newFiles, removedFiles });
+        const newCard = await client.collection(Collections.Cards).update(card.id, {
             "files+": newFiles.length > 0 ? newFiles : undefined,
             "files-": removedFiles.length > 0 ? removedFiles : undefined
         }, {
             requestKey: null // don't cancel
-        }));
+        });
+
+        card.files = newCard.files;
     }
     const updateCardFilesDebounced = debounce(updateCardFiles, 100);
 </script>

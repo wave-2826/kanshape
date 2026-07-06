@@ -4,12 +4,10 @@
     import type { TypedCardsResponse } from "$lib/data/cards";
 
     let {
-        fields, card = $bindable(),
-        updateCard
+        fields, card = $bindable()
     }: {
         fields: CardMetadataSection["fields"],
-        card: TypedCardsResponse,
-        updateCard: (card: TypedCardsResponse) => void
+        card: TypedCardsResponse
     } = $props();
 </script>
 
@@ -18,7 +16,7 @@
         <div class="property" title={field.description}>
             <span class="prop-label">{field.name}</span>
             <div class="prop-value">
-                <CardFieldEditor {field} bind:card={card} {updateCard} />
+                <CardFieldEditor {field} bind:card={card} />
             </div>
         </div>
     {/each}

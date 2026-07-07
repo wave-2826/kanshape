@@ -4,6 +4,8 @@
 	import { Check, ChevronDown } from "lucide-svelte";
 	import { fly } from "svelte/transition";
 	import type { Snippet } from "svelte";
+	import Portal from "./Portal.svelte";
+	import { anchor } from "$lib/actions";
 
 	const {
 		value,
@@ -35,7 +37,7 @@
 
 	function handleWindowClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if(!target.closest('.inline-selector')) {
+		if(!target.closest('.inline-dropdown') && !selectorInput?.contains(target)) {
 			isOpen = false;
 		}
 	}
@@ -46,6 +48,8 @@
 			isOpen = !isOpen;
 		}
 	}
+
+	let selectorInput: HTMLDivElement | null = $state(null);
 </script>
 
 <svelte:window onclick={handleWindowClick} />
@@ -57,6 +61,7 @@
 		class="input selector-trigger"
 		onclick={() => isOpen = !isOpen}
 		onkeydown={handleKeydown}
+		bind:this={selectorInput}
 	>
 		{#if !value}
 			<span class="placeholder">Select {itemName}...</span>
@@ -67,13 +72,14 @@
 	</div>
 
 	{#if isOpen}
-		<!-- TODO: Make this dropdown escape its parent scrolling containers and be positioned correctly relative to the page -->
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<ul
-			class="dropdown inline-dropdown"
-			transition:fly={{ y: -10, duration: 100 }}
-			onmousedown={(e) => e.stopPropagation()}
-		>
+		<Portal target="body">
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<ul
+				class="dropdown inline-dropdown"
+				use:anchor={{ element: selectorInput, placement: "vauto-end", offset: 0 }}
+				transition:fly={{ y: -10, duration: 100 }}
+				onmousedown={(e) => e.stopPropagation()}
+			>
 			{#if children}
 				<li class="dropdown-controls">
 					{@render children()}
@@ -91,7 +97,8 @@
 					</button>
 				</li>
 			{/each}
-		</ul>
+			</ul>
+		</Portal>
 	{/if}
 </div>
 

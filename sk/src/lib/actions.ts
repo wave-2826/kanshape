@@ -23,16 +23,20 @@ export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, max
     };
 }
 
+export function openWithLinkBehavior(href: string, event: MouseEvent) {
+    event.preventDefault();
+    
+    if(event.metaKey || event.ctrlKey || event.button === 1) {
+        window.open(href, "_blank");
+        return;
+    }
+
+    nav(href);
+}
+
 export function link(node: HTMLButtonElement, href: string) {
     function onClick(event: MouseEvent) {
-        event.preventDefault();
-        
-        if(event.metaKey || event.ctrlKey || event.button === 1) {
-            window.open(href, "_blank");
-            return;
-        }
-
-        nav(href);
+        openWithLinkBehavior(href, event);
     }
 
     node.addEventListener("click", onClick);
@@ -47,7 +51,7 @@ export function link(node: HTMLButtonElement, href: string) {
     };
 }
 
-type AnchorSide = "top" | "bottom" | "left" | "right";
+type AnchorSide = "top" | "bottom" | "left" | "right" | "vauto" | "hauto";
 type AnchorPlacement = "start" | "center" | "end";
 export function anchor(
     /** The node to anchor */
@@ -75,10 +79,26 @@ export function anchor(
         const scrollX = window.scrollX || window.pageXOffset || 0;
         const scrollY = window.scrollY || window.pageYOffset || 0;
 
-        const { side, align } = parsePlacement(placement);
+        let { side, align } = parsePlacement(placement);
 
         let top = 0;
         let left = 0;
+
+        if(side === "vauto") {
+            // Default to bottom unless the node doesn't fit (and it's more than 50% down the page)
+            if(parentRect.bottom + nodeRect.height + offset > window.innerHeight && parentRect.top > window.innerHeight / 2) {
+                side = "top";
+            } else {
+                side = "bottom";
+            }
+        } else if(side === "hauto") {
+            // Default to right unless the node doesn't fit (and it's more than 50% across the page)
+            if(parentRect.right + nodeRect.width + offset > window.innerWidth && parentRect.left > window.innerWidth / 2) {
+                side = "left";
+            } else {
+                side = "right";
+            }
+        }
 
         if(side === "top") {
             top = parentRect.top + scrollY - nodeRect.height - offset;

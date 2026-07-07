@@ -1,6 +1,8 @@
 import { deepEqual } from "$lib/util";
 import { untrack } from "svelte";
 
+// TODO: Replace this with something better. This is stupid.
+
 export enum DirtyTrackerState {
     Clean, // No local edits, external updates can be merged in directly
     Dirty, // Local edits have been made, external updates should be merged in but not overwrite local edits
@@ -125,7 +127,6 @@ export class DirtyTracker<
     }
 
     public reset(newExternal: TExternal) {
-        this.suppressDirty++;
         try {
             const transformed = this.transformExternal(newExternal);
 
@@ -147,8 +148,6 @@ export class DirtyTracker<
             }
         } catch (error) {
             console.error("Error resetting dirty tracker:", error);
-        } finally {
-            this.suppressDirty--;
         }
     }
 
@@ -181,11 +180,11 @@ export class DirtyTracker<
 
     private async performFetchFull(id: string, partial: TInternal) {
         if(!this.fetchFull) return;
+        this.state = DirtyTrackerState.NeedsFull;
         
         this._loadingFull = true;
         try {
             const full = await this.fetchFull(id, partial);
-            console.log("Fetched full data for dirty tracker:", full);
             
             this.suppressDirty++;
             try {

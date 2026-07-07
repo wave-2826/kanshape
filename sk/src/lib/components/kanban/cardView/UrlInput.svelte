@@ -77,9 +77,9 @@
 
 <div class="url-input-container">
     {#if !isEditing}
-        <a href={value} target="_blank" rel="noopener noreferrer" class="url-display">
-            {#if value}
-                {@const urlParts = parseUrl(value)}
+        {#if value}
+            {@const urlParts = parseUrl(value)}
+            <a href={value} target="_blank" rel="noopener noreferrer" class="url-display">
                 <img 
                     src={getFaviconUrl(value)} 
                     alt="Favicon" 
@@ -88,10 +88,10 @@
                 />
                 <span class="url-text">{@render url(urlParts)}</span>
                 <ExternalLink />
-            {:else}
-                <span class="placeholder">No URL</span>
-            {/if}
-        </a>
+            </a>
+        {:else}
+            <span class="placeholder">No URL</span>
+        {/if}
         <button class="edit-button" aria-label="Edit URL" onclick={handleEdit}>
             <Pencil />
         </button>
@@ -149,6 +149,11 @@
         .url-protocol, .url-query {
             color: color-mix(in srgb, currentColor, transparent 20%);
         }
+    }
+    .placeholder {
+        color: var(--text-tertiary);
+        flex: 1;
+        padding-left: 0.5rem;
     }
     button {
         padding: 0.25rem;

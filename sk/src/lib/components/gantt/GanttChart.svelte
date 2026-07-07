@@ -7,6 +7,7 @@
     import CardViewPanel from "../kanban/cardView/CardViewPanel.svelte";
     import { getPriorityColor } from "$lib/data/cards";
     import type { CardsPriorityOptions } from "$lib/pocketbase/generated-types";
+    import { layoutCardsToGantt } from "./layout";
 
     const {
         project,
@@ -29,27 +30,20 @@
         // yes, svelte, we want the whole thing reactive
         $state.snapshot($cards);
 
-        function fallbackDate(date: string | null, created: string): Date {
-            if(date) {
-                const d = new Date(date);
-                if(!isNaN(d.getTime())) return d;
-            }
-            const createdDate = new Date(created);
-            if(!isNaN(createdDate.getTime())) return createdDate;
-            return new Date();
-        }
+        const layout = layoutCardsToGantt($cards.items);
 
-        const items = $cards.items.toSorted((a, b) => a.created.localeCompare(b.created)).map((card) => ({
-            id: card.id,
-            name: card.title,
-            start: new Date(card.created),
-            end: fallbackDate(card.due_by, addDays(new Date(card.created), card.duration_days === 0 ? 2 : card.duration_days).toISOString()),
-            color: card.priority === "critical" ? "var(--error)" : undefined,
-            group: groupBy === "subproject" ? (subprojects.find((sp) => sp.id === card.subprojects?.[0])?.name ?? "No subproject") :
-                   groupBy === "section" ? (sections.find((s) => s.id === card.section)?.title ?? "No section") :
-                   groupBy === "priority" ? card.priority :
-                   ""
-        }));
+        const items = layout
+            .toSorted((a, b) => a.start.getTime() - b.start.getTime())
+            .map(({ start, end, card }) => ({
+                id: card.id,
+                name: card.title,
+                start, end,
+                color: card.priority === "critical" ? "var(--error)" : undefined,
+                group: groupBy === "subproject" ? (subprojects.find((sp) => sp.id === card.subprojects?.[0])?.name ?? "No subproject") :
+                    groupBy === "section" ? (sections.find((s) => s.id === card.section)?.title ?? "No section") :
+                    groupBy === "priority" ? card.priority :
+                    ""
+            }));
         
         const categoryMap = new Map<string, GanttCategory>();
         for(const item of items) {
@@ -73,8 +67,12 @@
 
 <div class="page">
     <CardViewPanel
-        board={board as TypedBoardsResponse}
-        card={openCardId ? $cards?.items.find((c) => c.id === openCardId) ?? null : null}
+        {board}
+        boardCards={$cards?.items ?? []}
+        bind:card={
+            () => openCardId ? $cards?.items.find((c) => c.id === openCardId) ?? null : null,
+            (v) => openCardId = v?.id ?? null
+        }
         onclose={() => openCardId = null}
         {sections} {subprojects}
     />

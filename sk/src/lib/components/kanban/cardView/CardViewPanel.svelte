@@ -8,7 +8,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 -->
 
 <script lang="ts" module>
-    import { createContext, onDestroy, untrack } from "svelte";
+    import { createContext, onDestroy, tick, untrack } from "svelte";
     
     type UploadContext = {
         queueUpload(name: string, file: File): void;
@@ -19,9 +19,9 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { client, queryOne, save, stripExpand } from "$lib/pocketbase";
+    import { client, queryOne, save, stripExpand, type ExpandResponse } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
+    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -33,20 +33,29 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import CardFieldCategory from "./CardFieldCategory.svelte";
     import { debounce } from "$lib/util";
     import CardViewFooter from "./CardViewFooter.svelte";
+    import CardDependencySelector from "./CardDependencySelector.svelte";
 
     let {
         board,
+        boardCards,
         card = $bindable(),
         sections,
         subprojects,
         onclose
     }: {
-        board: TypedBoardsResponse,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        boardCards: TypedCardPreviewResponse[],
         card: TypedCardPreviewResponse | null,
         sections: SectionsRecord[],
         subprojects: SubprojectsRecord[],
         onclose: () => void
     } = $props();
+
+    let selectingCard = $state<{
+        message: string;
+        callback: (card: TypedCardPreviewResponse, originalCard: TypedCardsResponse) => void;
+        originalSelection: string;
+    } | null>(null);
 
     /**
      * This panel shows a full card, but the card we get is a preview (with limited fields so we
@@ -91,6 +100,18 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     // Initialize or merge incoming `card` prop changes
     $effect(() => {
+        let newSelected: TypedCardPreviewResponse | null = null;
+        untrack(() => {
+            if(card && selectingCard) {
+                // Re-select the original card and run the callback
+                const originalCard = boardCards.find((c) => c.id === selectingCard!.originalSelection);
+                newSelected = card;
+                if(originalCard) {
+                    card = originalCard;
+                }
+            }
+        });
+
         if(card == null) {
             if(tracker) {
                 tracker.destroy();
@@ -104,11 +125,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             console.log("Card selected, initializing tracker");
             untrack(() => {
                 tracker = new DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse>(
-                    $state.snapshot(card),
+                    $state.snapshot(card!),
                     {
                         transformExternal: (ext) => constructPartialFullCard($state.snapshot(ext)),
                         fetchFull: async (id) => {
-                            console.log("Fetching full");
                             return await queryOne(Collections.Cards, id) as TypedCardsResponse;
                         }
                     }
@@ -118,6 +138,16 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             console.log("Card updated externally, merging changes");
             tracker.updateExternal($state.snapshot(card));
         }
+
+        untrack(async () => {
+            await tick();
+            await tick();
+            await tick();
+            if(tracker && newSelected && selectingCard) {
+                selectingCard.callback(newSelected, tracker.current);
+                selectingCard = null;
+            }
+        });
     });
 
     onDestroy(() => {
@@ -230,6 +260,16 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     setUploadContext(uploadContext);
 </script>
 
+{#if selectingCard}
+    <div class="selecting-card-overlay">
+        <div class="selecting-card-message">
+            <p>{selectingCard.message}</p>
+            <button class="cancel" onclick={() => {
+                selectingCard = null;
+            }}>Cancel</button>
+        </div>
+    </div>
+{/if}
 
 <ModalPanel open={tracker !== null} {onclose}>
 {#if tracker}
@@ -352,6 +392,31 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     <span>days</span>
                 </div>
             </div>
+            <div class="property dependencies">
+                <span class="prop-label"><ListTree /> Dependencies</span>
+                <div class="prop-value">
+                    <CardDependencySelector
+                        bind:dependencies={localCard.dependencies}
+                        {boardCards}
+                        {sections} {subprojects}
+                        onopendependency={(id) => {
+                            // Open the dependency card instead of the current card
+                            card = boardCards.find((c) => c.id === id) ?? null;
+                        }}
+                        onselectcard={async (message, callback) => {
+                            // close ourself and wait for a new card to be selected, then
+                            // re-select this card and return it
+                            const id = localCard.id;
+                            card = null;
+                            await tick();
+                            selectingCard = {
+                                message, callback,
+                                originalSelection: id
+                            };
+                        }}
+                    />
+                </div>
+            </div>
         </div>
 
         {#each metadataItems as { icon, title, fields }}
@@ -392,6 +457,29 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <style lang="scss">
 @use "props.scss";
+
+.selecting-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+
+    .selecting-card-message {
+        background-color: var(--bg-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-align: center;
+
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }    
+}
 
 header {
     margin-bottom: 0.5rem;
@@ -462,6 +550,10 @@ h3 {
     span {
         color: var(--text-tertiary);
     }
+}
+
+.dependencies {
+    grid-column: 1 / -1;
 }
 
 hr {

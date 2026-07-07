@@ -41,7 +41,11 @@
     <KanbanMenu {project} {board} {sections} cards={listCards} />
 
     <CardViewPanel
-        card={openCardId ? listCards.find((c) => c.id === openCardId) ?? null : null}
+        boardCards={listCards}
+        bind:card={
+            () => openCardId ? listCards.find((c) => c.id === openCardId) ?? null : null,
+            (v) => openCardId = v?.id ?? null
+        }
         onclose={() => openCardId = null}
         {sections} {subprojects}
         {board}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
+    import { type ExpandResponse, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
     import { Plus } from "lucide-svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
@@ -28,7 +28,7 @@
     });
     const subprojects = $derived(project.expand.subprojects ?? []);
 
-    let boardCards = $state<PageItemType<typeof cards>[]>([]);
+    let boardCards = $state<TypedCardPreviewResponse[]>([]);
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
     let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);
@@ -125,8 +125,12 @@
     <KanbanMenu {project} {board} {sections} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel
-        board={board as TypedBoardsResponse}
-        card={openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null}
+        {board}
+        {boardCards}
+        bind:card={
+            () => openCardId ? boardCards.find((c) => c.id === openCardId) ?? null : null,
+            (v) => openCardId = v?.id ?? null
+        }
         onclose={() => openCardId = null}
         {sections} {subprojects}
     />

@@ -11,8 +11,10 @@ export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     string, // board
     IsoAutoDateString, // created
     string, // created_by
+    string[], // dependencies
     string, // description (truncated)
     string, // due_by
+    number, // duration_days
     string, // moved_at
     number, // position
     CardsPriorityOptions, // priority

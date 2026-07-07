@@ -5,14 +5,6 @@
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-    
-    // TODO: Remove this silly assignment cache thing and manually
-    // query for the expanded user/group data when needed. This requires one
-    // more API call but saves a TON of redundant data. We wouldn't want to
-    // make a separate call per card, though, so we need to load everything and
-    // deduplicate first.
-    // Alternatively, make a suitable view in the backend that already does this
-    // joining and caching properly.
 
     const {
         card,

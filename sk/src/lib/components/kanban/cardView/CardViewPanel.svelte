@@ -19,9 +19,9 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import { client, deleteRecord, queryOne, save, stripExpand } from "$lib/pocketbase";
+    import { client, queryOne, save, stripExpand } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, SquareKanban, Trash, Users } from "lucide-svelte";
+    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
     import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -32,6 +32,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     import { getCardMetadataItems, getExtraMetadataItems, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
     import CardFieldCategory from "./CardFieldCategory.svelte";
     import { debounce } from "$lib/util";
+    import CardViewFooter from "./CardViewFooter.svelte";
 
     let {
         board,
@@ -62,6 +63,9 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             description: "Loading...", // don't show a truncated description while loading the full one
             priority: preview.priority,
             due_by: preview.due_by,
+            duration_days: preview.duration_days,
+            dependencies: preview.dependencies,
+            
             created: preview.created,
             updated: preview.updated,
             moved_at: preview.moved_at,
@@ -84,8 +88,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     let tracker = $state<DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse> | null>(null);
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const creationUser = $derived(card?.created_by ? queryOne(Collections.Users, card.created_by) : null);
 
     // Initialize or merge incoming `card` prop changes
     $effect(() => {
@@ -158,12 +160,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 saveTimer = null;
             }
         }
-    }
-
-    function deleteCard() {
-        const id = tracker?.current?.id ?? card?.id;
-        if(!id) return;
-        deleteRecord(Collections.Cards, id);
     }
 
     const metadataItems = $derived(getCardMetadataItems(board, {
@@ -306,9 +302,28 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                 </div>
             {/if}
 
+            <div class="property assignment">
+                <span class="prop-label">
+                    <Users />
+                    Assignment
+                    {#if localCard.assignment_data}
+                        <button class="clear" onclick={() => localCard.assignment_data = null} title="Clear assignment">
+                            <Trash />
+                        </button>
+                    {/if}
+                </span>
+                <CardAssignmentValue
+                    bind:assignmentData={localCard.assignment_data as CardAssignmentData}
+                    nameCache={card?.assignment_name_cache ?? []}
+                />
+            </div>
+        </div>
+
+        <h3><Timer />Scheduling</h3>
+        <div class="properties">
             <div class="property due-date">
                 <span class="prop-label">
-                    <Clock />
+                    <Calendar />
                     Due date
                     {#if localCard.due_by}
                         <button class="clear" onclick={() => localCard.due_by = ""} title="Clear due date">
@@ -330,21 +345,12 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     {/if}
                 </div>
             </div>
-
-            <div class="property assignment">
-                <span class="prop-label">
-                    <Users />
-                    Assignment
-                    {#if localCard.assignment_data}
-                        <button class="clear" onclick={() => localCard.assignment_data = null} title="Clear assignment">
-                            <Trash />
-                        </button>
-                    {/if}
-                </span>
-                <CardAssignmentValue
-                    bind:assignmentData={localCard.assignment_data as CardAssignmentData}
-                    nameCache={card?.assignment_name_cache ?? []}
-                />
+            <div class="property">
+                <span class="prop-label"><Clock /> Duration</span>
+                <div class="prop-value duration">
+                    <input type="number" min="0" bind:value={localCard.duration_days} placeholder="Duration in days" />
+                    <span>days</span>
+                </div>
             </div>
         </div>
 
@@ -380,27 +386,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
     <hr />
 
-    <footer>
-        <div class="metadata">
-            <span>
-                Created by
-                {#if creationUser === null}
-                    Unknown User
-                {:else}
-                    {#await creationUser}
-                        Loading user...
-                    {:then user}
-                        {user?.name ?? "Unknown User"}
-                    {/await}
-                {/if}
-                on {new Date(localCard.created).toLocaleString()}
-            </span>
-            <span>Last updated {new Date(localCard.updated).toLocaleString()}</span>
-            <span>Moved sections at {new Date(localCard.moved_at).toLocaleString()}</span>
-        </div>
-        
-        <button onclick={deleteCard} class="delete"><Trash /> Delete Card</button>
-    </footer>
+    <CardViewFooter card={localCard} />    
 {/if}
 </ModalPanel>
 
@@ -427,6 +413,8 @@ header {
     flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
+
+    padding-bottom: 3rem;
 }
 
 .description {
@@ -446,6 +434,11 @@ h3 {
     font-weight: 500;
 }
 
+.assignment {
+    grid-column: span 2;
+}
+
+
 .due-date {
     font-size: var(--font-tiny);
 
@@ -460,32 +453,18 @@ h3 {
     }
 }
 
-.assignment {
-    grid-column: span 2;
+.duration {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0
+    
+    span {
+        color: var(--text-tertiary);
+    }
 }
 
 hr {
     margin: 1rem 0;
-}
-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-    .metadata {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        font-size: var(--font-tiny);
-        color: var(--text-tertiary);
-        white-space: nowrap;
-        // yeah, this just overflows. we go with it.
-        max-width: 50%;
-    }
-    button.delete {
-        color: var(--error);
-        --bg-color: transparent;
-        padding: 0.5rem 1rem;
-    }
 }
 </style>

@@ -173,6 +173,7 @@
             
             color: transparent;
             caret-color: var(--text-primary);
+            overscroll-behavior: none;
             padding: 0.25rem 0.5rem;
         }
 

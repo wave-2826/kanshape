@@ -1,24 +1,39 @@
 <script lang="ts">
-	/**
-	 * A barebones Gantt chart for displaying tasks along a time axis.
-	 * Items are rendered as horizontal bars positioned by their start/end dates.
-	 */
+    import { Tag } from "lucide-svelte";
+    import { onMount, tick, type Snippet } from "svelte";
 
-	type GanttItem = {
+	export type GanttItem = {
 		id: string;
 		name: string;
 		start: Date;
 		end: Date;
 		color?: string;
 	};
+    export type GanttCategory = {
+        name: string;
+        color?: string;
+        items: GanttItem[];
+    };
 
 	const {
-		items,
-        onclickitem
+		categories,
+        onclickitem,
+        cornerHeader
 	}: {
-		items: GanttItem[];
+		categories: GanttCategory[];
         onclickitem?: ((id: string) => void);
+        cornerHeader?: Snippet;
 	} = $props();
+
+    const items = $derived.by(() => {
+        const result: GanttItem[] = [];
+        for(const category of categories) {
+            for(const item of category.items) {
+                result.push(item);
+            }
+        }
+        return result;
+    });
 
 	let dateRange = $derived.by(() => {
 		if(items.length === 0) {
@@ -35,9 +50,9 @@
 			if(item.end > max) max = new Date(item.end);
 		}
         
-		// Add ~10% padding on each side
+		// Add ~20% padding on each side plus a day
 		const rangeMs = max.getTime() - min.getTime();
-		const padMs = Math.max(rangeMs * 0.1, 24 * 60 * 60 * 1000);
+		const padMs = Math.max(rangeMs * 0.2, 24 * 60 * 60 * 1000);
         function snapDate(date: Date): Date {
             const d = new Date(date);
             d.setHours(0, 0, 0, 0);
@@ -86,17 +101,16 @@
 		return result;
 	});
 
-	let todayPercent = $derived.by(() => {
+	let todayDays = $derived.by(() => {
 		const now = new Date();
-		if (now < dateRange.start || now > dateRange.end) return -1;
-		const totalMs = dateRange.end.getTime() - dateRange.start.getTime();
-		return ((now.getTime() - dateRange.start.getTime()) / totalMs) * 100;
+		if(now < dateRange.start || now > dateRange.end) return -1;
+		return (now.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24);
 	});
 
 	function barStyle(item: GanttItem): string {
 		const startDay = (item.start.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24);
         const endDay = (item.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24);
-		return `--start-day: ${startDay}; --end-day: ${endDay}; --bar-color: ${item.color ?? "var(--accent)"}`;
+		return `--start-day: ${startDay}; --end-day: ${endDay}; --bar-color: ${item.color ?? "var(--category-color)"}`;
 	}
 
 	function dayLabel(d: Date): string {
@@ -113,57 +127,87 @@
 			&& d.getMonth() === now.getMonth()
 			&& d.getDate() === now.getDate();
 	}
+
+    let scrollContainer: HTMLElement | null = null;
+    onMount(async () => {
+        if(!scrollContainer) return;
+        if(todayDays >= 0) {
+            const originalMarginLeft = scrollContainer.style.marginLeft;
+            const originalMarginRight = scrollContainer.style.marginRight;
+
+            // we can't use getComputedStyle directly on custom properties, so we tell
+            // CSS it's a size with the hackiest code i've ever written. yeah. not proud of this.
+            scrollContainer.style.marginLeft = "var(--day-width)";
+            scrollContainer.style.marginRight = "var(--label-width)";
+            const dayWidth = parseFloat(getComputedStyle(scrollContainer).marginLeft);
+            const labelWidth = parseFloat(getComputedStyle(scrollContainer).marginRight);
+            scrollContainer.style.marginLeft = originalMarginLeft;
+            scrollContainer.style.marginRight = originalMarginRight;
+
+            const pos = todayDays * dayWidth + labelWidth;
+            const scroll = pos - scrollContainer.clientWidth / 2;
+            scrollContainer.scrollLeft = Math.max(0, Math.min(scroll, scrollContainer.scrollWidth - scrollContainer.clientWidth));
+        }
+    });
 </script>
 
-<div class="gantt" style="--day-count: {days.length}">
+<div class="gantt" style="--day-count: {days.length}" bind:this={scrollContainer}>
     <div class="content">
         {#if items.length === 0}
             <div class="empty">
                 <p>No tasks to display.</p>
             </div>
         {:else}
-            <header>
-                <div class="label-col"></div>
-                <div class="timeline">
-                    <div class="months">
-                        {#each months as month}
-                            <div class="month" style="--start: {month.startDay}; --span: {month.span}">
-                                {month.label}
-                            </div>
-                        {/each}
-                    </div>
-                    <div class="days">
-                        {#each days as day, i}
-                            <div
-                                class="day"
-                                class:weekend={isWeekend(day)}
-                                class:today={isToday(day)}
-                            >
-                                {dayLabel(day)}
-                            </div>
-                        {/each}
-                    </div>
+            <div class="header label-col">
+                {@render cornerHeader?.()}
+            </div>
+            <div class="header timeline">
+                <div class="months">
+                    {#each months as month}
+                        <div class="month" style="--start: {month.startDay}; --span: {month.span}">
+                            {month.label}
+                        </div>
+                    {/each}
                 </div>
-            </header>
+                <div class="days">
+                    {#each days as day, i}
+                        <div
+                            class="day"
+                            class:weekend={isWeekend(day)}
+                            class:today={isToday(day)}
+                        >
+                            {dayLabel(day)}
+                        </div>
+                    {/each}
+                </div>
+            </div>
 
             <div class="body">
-                {#each items as item (item.id)}
-                    <div class="row">
-                        <div class="label-col" title={item.name}>
-                            <span class="label">{item.name}</span>
-                        </div>
-                        <div class="timeline">
-                            {#if todayPercent >= 0}
-                                <div class="today-bar" style="left: {todayPercent}%"></div>
-                            {/if}
-                            <button
-                                style={barStyle(item)}
-                                title={`${item.name}: ${item.start.toLocaleDateString()} - ${item.end.toLocaleDateString()}`}
-                                onclick={() => onclickitem?.(item.id)}
-                            >
-                                <span class="label">{item.name}</span>
-                            </button>
-                        </div>
+                {#if todayDays >= 0}
+                    <div class="today-bar" style="--pos: {todayDays}"></div>
+                {/if}
+                {#each categories as category, i (i)}
+                    {@const categoryColors = ["#ff6e64", "#ffb473", "#ffdc73", "#deff73", "#73ff9e", "#73fff0", "#73b3ff", "#b473ff", "#ff73f0"]}
+                    <div class:category={category.name !== ""} style="--category-color: {category.color ?? categoryColors[i % categoryColors.length]}">
+                        {#if category.name !== ""}
+                            <span class="label-col category-label"><Tag />{category.name}</span>
+                        {/if}
+                        {#each category.items as item (item.id)}
+                            <div class="row">
+                                <div class="label-col" title={item.name}>
+                                    <span class="label">{item.name}</span>
+                                </div>
+                                <div class="timeline">
+                                    <button
+                                        style={barStyle(item)}
+                                        title={`${item.name}: ${item.start.toLocaleDateString()} - ${item.end.toLocaleDateString()}`}
+                                        onclick={() => onclickitem?.(item.id)}
+                                    >
+                                        <span class="label">{item.name}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        {/each}
                     </div>
                 {/each}
             </div>
@@ -174,6 +218,7 @@
 <style lang="scss">
 .gantt {
     --day-width: 2rem;
+    --label-width: 160px;
     
     flex: 1;
     min-height: 0;
@@ -181,13 +226,22 @@
 	overflow: auto;
 	font-size: var(--font-small);
 	user-select: none;
+    overscroll-behavior: none;
 
     padding: 0 0.5rem 5rem 0;
     margin: 0 0 0 0.5rem;
 
+	position: relative;
+
     .content {
-        display: inline-flex;
-        flex-direction: column;
+        display: inline-grid;
+        grid-template-columns: var(--label-width) 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "corner header"
+            "body body";
+        
+        border-radius: 4px;
     }
 }
 
@@ -197,14 +251,23 @@
 	color: var(--text-tertiary);
 }
 
-header {
-	display: flex;
-	position: sticky;
-	top: 0;
-	z-index: 3;
-    border-radius: 4px 4px 0 0;
-	background-color: var(--bg-primary);
-    
+.header.label-col {
+    z-index: 4;
+    top: 0;
+    grid-area: corner;
+    // this doesn't quite work with sticky elements under it but i've decided to ignore it
+    // because i can't care enough at this point
+    border-top-left-radius: 4px;
+    padding-left: 0.25rem;
+}
+.header.timeline {
+    z-index: 3;
+    position: sticky;
+    top: 0;
+    grid-area: header;
+    background-color: var(--bg-primary);
+    border-top-right-radius: 4px;
+
     .months {
         display: grid;
         grid-template-columns: repeat(var(--day-count), var(--day-width));
@@ -223,10 +286,6 @@ header {
         &:not(:last-child) {
             border-right: 1px solid var(--border);
         }
-    }
-
-    .label-col {
-        background-color: transparent;
     }
 }
 
@@ -259,14 +318,16 @@ header {
 .body {
 	display: flex;
 	flex-direction: column;
+    grid-area: body;
+    position: relative;
     border-radius: 0 0 4px 4px;
-    contain: content;
+    contain: paint;
 }
 
 .row {
 	display: flex;
 	border-bottom: 1px solid var(--bg-secondary);
-	min-height: 2.25rem;
+	min-height: 2rem;
 
 	&:last-child {
 		border-bottom: none;
@@ -311,6 +372,32 @@ button {
     position: sticky;
     z-index: 3;
     left: 0;
+
+    padding-left: 0.75rem;
+
+    &.category-label {
+        color: var(--text-primary);
+
+        border-left: 1px solid var(--category-color);
+
+        > :global(svg) {
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-right: 0.25rem;
+        }
+    }
+}
+
+.category {
+    position: relative;
+}
+.category::before {
+    content: "";
+    position: absolute;
+    top: 0.75rem;
+    left: 0;
+    right: 0;
+    border-top: 1px dotted color-mix(var(--category-color), transparent 30%);
 }
 
 .label {
@@ -325,6 +412,7 @@ button {
     position: absolute;
     top: 0;
     bottom: 0;
+    left: calc(var(--pos) * var(--day-width) + var(--label-width));
     width: 1px;
     background-color: var(--error);
     z-index: 2;

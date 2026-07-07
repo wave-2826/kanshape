@@ -7,6 +7,7 @@
     import { link } from "$lib/actions";
     import ProjectPage from "../../../ProjectPage.svelte";
     import { getBoardContext } from "../../../context";
+    import { metadata } from "$lib/metadata";
 
     const {
         children
@@ -16,6 +17,10 @@
 
     const project = $derived(getProjectContext().project);
     const board = $derived(getBoardContext().board);
+
+    $effect(() => {
+        $metadata.title = $board?.title ?? "";
+    });
 </script>
 
 {#if project && $project !== null && board && $board !== null}

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { link } from "$lib/actions";
+    import { link, openWithLinkBehavior } from "$lib/actions";
     import { nav } from "$lib/navigation";
     import { type ExpandResponse } from "$lib/pocketbase";
     import { grow } from "$lib/transitions";
@@ -38,9 +38,9 @@
 
 <div class="button project-button" class:selected={treeSelected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>
     <button
-        onclick={() => {
+        onclick={(e) => {
             if(selfSelected) toggleCollapsed();
-            else nav(`/projects/${project.id}`);
+            else openWithLinkBehavior(`/projects/${project.id}`, e);
         }}
         class="unstyled"
     >

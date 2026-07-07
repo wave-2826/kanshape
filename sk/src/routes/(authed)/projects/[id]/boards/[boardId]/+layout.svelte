@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from "$app/state";
     import type { Snippet } from "svelte";
-    import { getProjectContext, setBoardContext, watchBoard, watchCards, type BoardContext } from "../../context";
+    import { setBoardContext, watchBoard, watchCards, type BoardContext } from "../../context";
     
     const {
         children

@@ -13,6 +13,9 @@ const pocketbase_url = fs.existsSync("/.dockerenv")
 
 export default defineConfig({
     plugins: [sveltekit()],
+    build: {
+        target: "esnext"
+    },
     server: {
         allowedHosts: true,
         proxy: {

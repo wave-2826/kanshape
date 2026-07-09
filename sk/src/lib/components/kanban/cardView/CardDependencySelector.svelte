@@ -49,7 +49,7 @@
 
 <!-- svelte-ignore css_unused_selector - shared stylesheet -->
 <style lang="scss">
-@import "./props.scss";
+@use "./props.scss";
 
 .dependencies {
     display: flex;

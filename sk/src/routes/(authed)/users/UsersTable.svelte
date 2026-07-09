@@ -36,7 +36,7 @@
                 <th>Username</th>
                 <th>Name</th>
                 <th>Groups</th>
-                <th>Admin</th>
+                <th class="admin">Admin</th>
             </tr>
         </thead>
         <tbody>
@@ -60,14 +60,16 @@
                             </span>
                         </button>
                     </td>
-                    <td class="actions">
-                        <button onclick={() => showingUser = user.id} title="Edit user">
-                            <Pencil />
-                        </button>
-                        <button class="delete" onclick={() => deleteUser(user)} title="Delete user">
-                            <Trash />
-                        </button>
-                    </td>
+                    {#if $authModel?.is_admin}
+                        <td class="actions">
+                            <button onclick={() => showingUser = user.id} title="Edit user">
+                                <Pencil />
+                            </button>
+                            <button class="delete" onclick={() => deleteUser(user)} title="Delete user">
+                                <Trash />
+                            </button>
+                        </td>
+                    {/if}
                 </tr>
             {/each}
         </tbody>
@@ -100,5 +102,6 @@ span {
 }
 .admin {
     color: var(--text-secondary);
+    text-align: right;
 }
 </style>

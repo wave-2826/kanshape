@@ -5,6 +5,7 @@
     import Paginator from "$lib/pocketbase/Paginator.svelte";
     import { Pencil, Plus, Trash } from "lucide-svelte";
     import GroupEditView from "./GroupEditView.svelte";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const { groups }: {
         groups: PageStore<GroupOverviewRecord>
@@ -50,7 +51,7 @@
 {#if $groups.items.length === 0}
     <p>No groups found.</p>
 {:else}
-    <table>
+    <table class:has-actions={$authModel?.is_admin}>
         <thead>
             <tr>
                 <th>Name</th>
@@ -67,14 +68,16 @@
                             <span class="stats">{group.member_count} / {group.card_count}</span>
                         </button>
                     </td>
-                    <td class="actions">
-                        <button {onclick} title="Edit group">
-                            <Pencil />
-                        </button>
-                        <button class="delete" onclick={() => deleteGroup(group)} title="Delete group">
-                            <Trash />
-                        </button>
-                    </td>
+                    {#if $authModel?.is_admin}
+                        <td class="actions"> 
+                            <button {onclick} title="Edit group">
+                                <Pencil />
+                            </button>
+                            <button class="delete" onclick={() => deleteGroup(group)} title="Delete group">
+                                <Trash />
+                            </button>
+                        </td>
+                    {/if}
                 </tr>
             {/each}
         </tbody>
@@ -95,11 +98,19 @@
 .stats {
     font-size: var(--font-tiny);
     color: var(--text-secondary);
+    text-align: right;
 }
 .stats-title {
     grid-column: span 2;
 }
 table {
+    grid-template-columns: 1fr 6rem min-content;
+}
+table.has-actions {
     grid-template-columns: 1fr 4rem min-content;
+
+    .stats {
+        text-align: left;
+    }
 }
 </style>

@@ -26,9 +26,6 @@
     const categories = $derived.by(() => {
         if(cards === null || $cards === null) return [];
 
-        // yes, svelte, we want the whole thing reactive
-        $state.snapshot($cards);
-
         const layout = layoutCardsToGantt($cards.items);
 
         const items = layout

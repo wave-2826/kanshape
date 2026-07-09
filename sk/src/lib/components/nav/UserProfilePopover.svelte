@@ -29,9 +29,11 @@
             <dt>Account created</dt>
             <dd>{new Date($authModel.created).toLocaleDateString()}</dd>
             <dt>Groups</dt>
-            <dd>{($fullModel?.expand.groups?.map(g => g.name) ?? []).join(", ") || "None"}</dd>
+            <dd>{$fullModel ?
+                    ($fullModel.expand.groups?.map(g => g.name) ?? []).join(", ") || "None" :
+                    $authModel.groups.length
+            }</dd>
             <dt>Onshape OAuth</dt>
-            {@debug $fullModel}
             {#if $fullModel?.onshape_auth_expiry}
                 {#if new Date($fullModel?.onshape_auth_expiry ?? 0) > new Date()}
                     <dd class="connected">Connected</dd>
@@ -41,7 +43,10 @@
             {:else}
                 <dd class="disconnected">Not connected</dd>
             {/if}
-            <!-- <dd>{($authModel.onshapeId ? "Connected" : "Not connected")}</dd> -->
+            {#if $authModel.is_admin}
+                <dt>Admin</dt>
+                <dd class="admin">Yes</dd>
+            {/if}
         </dl>
 
         {#if $fullModel && !$fullModel.onshape_auth_expiry}
@@ -91,4 +96,5 @@
 .connected { color: var(--success); }
 .expired { color: var(--warning-medium); }
 .disconnected { color: var(--error); }
+.admin { color: var(--success); }
 </style>

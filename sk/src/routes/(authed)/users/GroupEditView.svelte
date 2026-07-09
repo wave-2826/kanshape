@@ -5,6 +5,7 @@
     import { debounce } from "$lib/util";
     import { Trash } from "lucide-svelte";
     import { untrack } from "svelte";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const { group, ondelete }: {
         group: GroupOverviewRecord,
@@ -54,8 +55,13 @@
 
 <div class="group">
     <div class="content">
-        <input type="text" bind:value={localGroup.name} class="group-name" placeholder="Group name"/>
-        <textarea bind:value={localGroup.description} class="group-description" placeholder="Group description"></textarea>
+        {#if $authModel?.is_admin}
+            <input type="text" bind:value={localGroup.name} class="group-name" placeholder="Group name"/>
+            <textarea bind:value={localGroup.description} class="group-description" placeholder="Group description"></textarea>
+        {:else}
+            <span class="group-name">{localGroup.name}</span>
+            <p class="group-description">{localGroup.description}</p>
+        {/if}
 
         <h3>Cards ({localGroup.card_count as number})</h3>
         <!-- TODO -->
@@ -70,14 +76,16 @@
                 queryGroupMembers();
             }}
             collection={Collections.Users}
+            readonly={!$authModel?.is_admin}
         />
     </div>
 
-    <hr />
-
-    <footer>
-        <button onclick={ondelete} class="delete"><Trash /> Delete Group</button>
-    </footer>
+    {#if $authModel?.is_admin}
+        <hr />
+        <footer>
+            <button onclick={ondelete} class="delete"><Trash /> Delete Group</button>
+        </footer>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -96,6 +104,8 @@
 
     .group-name {
         font-size: var(--font-large);
+    }
+    input.group-name {
         padding: 0.5rem 0.75rem;
     }
 

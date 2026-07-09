@@ -81,9 +81,6 @@ export function anchor(
 
         let { side, align } = parsePlacement(placement);
 
-        let top = 0;
-        let left = 0;
-
         if(side === "vauto") {
             // Default to bottom unless the node doesn't fit (and it's more than 50% down the page)
             if(parentRect.bottom + nodeRect.height + offset > window.innerHeight && parentRect.top > window.innerHeight / 2) {
@@ -100,6 +97,8 @@ export function anchor(
             }
         }
 
+        let top = 0, left = 0;
+        
         if(side === "top") {
             top = parentRect.top + scrollY - nodeRect.height - offset;
             if(align === "start") left = parentRect.left + scrollX;

@@ -5,6 +5,7 @@
     import { FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
     import { link } from "$lib/actions";
     import NavProject from "./NavProject.svelte";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const projects = await watch(Collections.Projects, {
         expand: "subprojects,boards"
@@ -49,10 +50,12 @@
     <Users />
     Users and Groups
 </button>
-<button use:link={"/settings"} class:selected={page.route.id === "/(authed)/settings"}>
-    <Settings />
-    Application Settings
-</button>
+{#if $authModel?.is_admin}
+    <button use:link={"/settings"} class:selected={page.route.id === "/(authed)/settings"}>
+        <Settings />
+        Application Settings
+    </button>
+{/if}
 
 <style lang="scss">
 button {

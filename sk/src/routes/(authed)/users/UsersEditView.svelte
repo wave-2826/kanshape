@@ -3,6 +3,7 @@
     import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
     import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
     import { Info, Trash } from "lucide-svelte";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const { user, ondelete }: {
         user: UsersResponse,
@@ -30,9 +31,13 @@
     });
 </script>
 
-<div class="group">
+<div class="user">
     <div class="content">
-        <input type="text" value={user.name} class="group-name" placeholder="Group name"/>
+        {#if $authModel?.is_admin}
+            <input type="text" value={user.name} class="user-name" placeholder="User name" />
+        {:else}
+            <span class="user-name">{user.name}</span>
+        {/if}
 
         <dl>
             <div class="field">
@@ -79,18 +84,20 @@
                 fullUser = await queryFullUser();
             }}
             collection={Collections.Groups}
+            readonly={!$authModel?.is_admin}
         />
     </div>
 
-    <hr />
-
-    <footer>
-        <button onclick={ondelete} class="delete"><Trash /> Delete User</button>
-    </footer>
+    {#if $authModel?.is_admin}
+        <hr />
+        <footer>
+            <button onclick={ondelete} class="delete"><Trash /> Delete User</button>
+        </footer>
+    {/if}
 </div>
 
 <style lang="scss">
-.group {
+.user {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -103,8 +110,10 @@
     flex: 1;
     overflow-y: auto;
 
-    .group-name {
+    .user-name {
         font-size: var(--font-large);
+    }
+    input.user-name {
         padding: 0.5rem 0.75rem;
     }
 
@@ -118,6 +127,7 @@ dl {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-top: 0;
 
     .field {
         display: flex;

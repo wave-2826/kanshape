@@ -62,5 +62,7 @@ button {
     padding: 0.5rem;
     display: block;
     text-align: left;
+    z-index: 1000;
+    width: max-content;
 }
 </style>

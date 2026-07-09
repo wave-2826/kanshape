@@ -14,7 +14,8 @@
         onchange,
         collection,
         saveToRelation,
-        searchField
+        searchField,
+        readonly
     }: {
         values: { id: string, name: string }[],
         onchange: (ids: string[]) => void,
@@ -30,7 +31,8 @@
          * is for. In that case, save to the record separately in onchange.
          */
         saveToRelation?: [field: keyof CollectionRecords[Collection] & string, record_id: string],
-        searchField: keyof CollectionRecords[Collection] & string
+        searchField: keyof CollectionRecords[Collection] & string,
+        readonly?: boolean
     } = $props();
 
     let searchTerm = $state("");
@@ -115,36 +117,40 @@
             {#each values as value}
                 <span class="badge">
                     {value.name}
-                    <button type="button" class="unstyled remove-btn" onclick={() => remove(value.id)}>
-                        <X />
-                    </button>
+                    {#if !readonly}
+                        <button type="button" class="unstyled remove-btn" onclick={() => remove(value.id)}>
+                            <X />
+                        </button>
+                    {/if}
                 </span>
             {/each}
         </div>
     {/if}
     
-    <div class="search-container">
-        <input 
-            type="text" 
-            bind:value={searchTerm} 
-            placeholder="Search to add..."
-            class="search-input"
-            bind:focused={isFocused}
-        />
-        
-        {#if isFocused && clientFilteredResults.length > 0}
-            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-            <ul class="dropdown" transition:fly={{ y: -10, duration: 100 }} onmousedown={(e) => e.preventDefault()}>
-                {#each clientFilteredResults as result}
-                    <li>
-                        <button type="button" class="dropdown-item" onclick={() => add(result)}>
-                            {result[searchField]}
-                        </button>
-                    </li>
-                {/each}
-            </ul>
-        {/if}
-    </div>
+    {#if !readonly}
+        <div class="search-container">
+            <input 
+                type="text" 
+                bind:value={searchTerm} 
+                placeholder="Search to add..."
+                class="search-input"
+                bind:focused={isFocused}
+            />
+            
+            {#if isFocused && clientFilteredResults.length > 0}
+                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                <ul class="dropdown" transition:fly={{ y: -10, duration: 100 }} onmousedown={(e) => e.preventDefault()}>
+                    {#each clientFilteredResults as result}
+                        <li>
+                            <button type="button" class="dropdown-item" onclick={() => add(result)}>
+                                {result[searchField]}
+                            </button>
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <!-- svelte-ignore css_unused_selector - shared styles -->

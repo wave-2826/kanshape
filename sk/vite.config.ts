@@ -1,5 +1,8 @@
+// same as vite config but with testing config
+import { defineConfig } from "vitest/config";
+import { playwright } from '@vitest/browser-playwright'
+
 import { sveltekit } from "@sveltejs/kit/vite";
-import type { UserConfig } from "vite";
 // @ts-ignore
 import fs from "fs";
 
@@ -8,7 +11,7 @@ const pocketbase_url = fs.existsSync("/.dockerenv")
     ? "http://pb:8090" // docker-to-docker
     : "http://127.0.0.1:8090"; // localhost-to-localhost
 
-const config: UserConfig = {
+export default defineConfig({
     plugins: [sveltekit()],
     server: {
         allowedHosts: true,
@@ -22,6 +25,14 @@ const config: UserConfig = {
             "/_": pocketbase_url,
         },
     },
-};
-
-export default config;
+    test: {
+        browser: {
+            provider: playwright(),
+            instances: [{
+                browser: 'chromium',
+                headless: false,
+                viewport: { width: 1280, height: 768 }
+            }]
+        },
+    }
+});

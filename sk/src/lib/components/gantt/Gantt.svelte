@@ -7,6 +7,7 @@
 		name: string;
 		start: Date;
 		end: Date;
+        due?: Date;
 		color?: string;
 	};
     export type GanttCategory = {
@@ -205,6 +206,9 @@
                                     >
                                         <span class="label">{item.name}</span>
                                     </button>
+                                    {#if item.due}
+                                        <div class="due-date" style="--pos: {(item.due.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)}"></div>
+                                    {/if}
                                 </div>
                             </div>
                         {/each}
@@ -413,10 +417,17 @@ button {
     top: 0;
     bottom: 0;
     left: calc(var(--pos) * var(--day-width) + var(--label-width));
-    width: 1px;
-    background-color: var(--error);
+    border-right: 1px solid var(--accent);
     z-index: 2;
     pointer-events: none;
-    opacity: 0.6;
+}
+
+.due-date {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--pos) * var(--day-width));
+    border-right: 1.5px dashed var(--error);
+    pointer-events: none;
 }
 </style>

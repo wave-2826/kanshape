@@ -3,7 +3,6 @@
     import { type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import Gantt, { type GanttCategory, type GanttItem } from "./Gantt.svelte";
-    import { addDays } from "$lib/datetime";
     import CardViewPanel from "../kanban/cardView/CardViewPanel.svelte";
     import { getPriorityColor } from "$lib/data/cards";
     import type { CardsPriorityOptions } from "$lib/pocketbase/generated-types";
@@ -38,6 +37,7 @@
                 id: card.id,
                 name: card.title,
                 start, end,
+                due: card.due_by ? new Date(card.due_by) : undefined,
                 color: card.priority === "critical" ? "var(--error)" : undefined,
                 group: groupBy === "subproject" ? (subprojects.find((sp) => sp.id === card.subprojects?.[0])?.name ?? "No subproject") :
                     groupBy === "section" ? (sections.find((s) => s.id === card.section)?.title ?? "No section") :

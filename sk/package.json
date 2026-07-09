@@ -34,14 +34,13 @@
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
     "vite": "^6.4.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "vitest-browser-svelte": "^2.2.1"
   },
   "type": "module",
   "dependencies": {
-    "@simplewebauthn/browser": "^13.3.0",
     "lucide-svelte": "^1.0.1",
     "openapi-fetch": "^0.17.0",
-    "pocketbase": "^0.26.9",
-    "zod": "^3.25.76"
+    "pocketbase": "^0.26.9"
   }
 }

@@ -26,13 +26,30 @@ export default defineConfig({
         },
     },
     test: {
-        browser: {
-            provider: playwright(),
-            instances: [{
-                browser: 'chromium',
-                headless: false,
-                viewport: { width: 1280, height: 768 }
-            }]
-        },
+        projects: [
+            {
+                test: {
+                    include: ["tests/**/*.test.ts", "src/**/*.test.ts"],
+                    exclude: ["tests/**/*.browser.test.ts", "src/**/*.browser.test.ts"],
+                    name: "node",
+                }
+            },
+            {
+                test: {
+                    include: ["tests/**/*.browser.test.ts", "src/**/*.browser.test.ts"],
+                    name: "browser",
+                    browser: {
+                        provider: playwright(),
+                        enabled: true,
+                        instances: [{
+                            browser: 'chromium',
+                            headless: true,
+                            viewport: { width: 1280, height: 768 },
+                            execArgv: ['--no-sandbox']
+                        }]
+                    },
+                }
+            }
+        ],
     }
 });

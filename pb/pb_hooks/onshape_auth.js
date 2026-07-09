@@ -134,8 +134,16 @@ function loadOnshapeTransaction(transactionId) {
 function getOnshapeMetadata(userRecord) {
     /** @type import("./util") */
     const { parseJSON } = require(`${__hooks}/util`);
-    const metadata = parseJSON(userRecord.get("onshape_oauth"));
-    return metadata;
+    const oauthData = userRecord.get("onshape_oauth");
+    if(!oauthData) return null;
+
+    try {
+        const metadata = parseJSON(oauthData);
+        return metadata;
+    } catch(err) {
+        console.warn("Failed to parse Onshape OAuth metadata:", err);
+        return null;
+    }
 }
 
 /**
@@ -227,7 +235,7 @@ function sendTokenRequest(body, errorMessage) {
  * @returns {any} The parsed token response from Onshape.
  */
 function exchangeAuthorizationCode(code, redirectUri) {
-    /** @type {typeof import("./url")} */
+    /** @type {import("./url")} */
     const { URLSearchParams } = require(`${__hooks}/url`);
 
     const body = new URLSearchParams({
@@ -259,7 +267,7 @@ function exchangeAuthorizationCode(code, redirectUri) {
 function refreshOnshapeToken(userRecord, metadata) {
     if(!metadata?.refresh_token) throw new BadRequestError("Missing Onshape refresh token");
 
-    /** @type {typeof import("./url")} */
+    /** @type {import("./url")} */
     const { URLSearchParams } = require(`${__hooks}/url`);
 
     const body = new URLSearchParams({

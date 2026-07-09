@@ -1,16 +1,25 @@
+// @ts-check
+
 /**
  * Simple (bad) URL polyfill. Created because none of the existing polyfills are any good for simple use cases like this.
  * Unfortunately, PocketBase doesn't expose url.URL for users to create even though it's on certain objects lik Request.
  */
 
+/**  @param {string} str */
 function encode(str) {
     return encodeURIComponent(str);
 }
 
+/** @param {string} str */
 function decode(str) {
     return decodeURIComponent(str.replace(/\+/g, " "));
 }
 
+/**
+ * @constructor
+ * @param {string | Record<string, string>} [init]
+ * @param {URL} [owner]
+ */
 function URLSearchParams(init, owner) {
     this._owner = owner;
     this._params = [];
@@ -26,17 +35,17 @@ function URLSearchParams(init, owner) {
             if (!pairs[i]) continue;
 
             var eq = pairs[i].indexOf("=");
-            var key, value;
+            var paramKey, paramValue;
 
             if (eq === -1) {
-                key = decode(pairs[i]);
-                value = "";
+                paramKey = decode(pairs[i]);
+                paramValue = "";
             } else {
-                key = decode(pairs[i].slice(0, eq));
-                value = decode(pairs[i].slice(eq + 1));
+                paramKey = decode(pairs[i].slice(0, eq));
+                paramValue = decode(pairs[i].slice(eq + 1));
             }
 
-            this._params.push([key, value]);
+            this._params.push([paramKey, paramValue]);
         }
     } else if (init && typeof init === "object") {
         // we can't use iterators in this environment :pensive:
@@ -48,6 +57,8 @@ function URLSearchParams(init, owner) {
             }
         }
     }
+
+    return this;
 }
 
 URLSearchParams.prototype._sync = function () {
@@ -57,6 +68,10 @@ URLSearchParams.prototype._sync = function () {
     }
 };
 
+/**
+ * @param {string} name
+ * @returns {string | null}
+ */
 URLSearchParams.prototype.get = function (name) {
     for (var i = 0; i < this._params.length; i++) {
         if (this._params[i][0] === name) {
@@ -66,6 +81,10 @@ URLSearchParams.prototype.get = function (name) {
     return null;
 };
 
+/**
+ * @param {string} name
+ * @param {string} value
+ */
 URLSearchParams.prototype.set = function (name, value) {
     var found = false;
 
@@ -87,11 +106,16 @@ URLSearchParams.prototype.set = function (name, value) {
     this._sync();
 };
 
+/**
+ * @param {string} name
+ * @param {string} value
+ */
 URLSearchParams.prototype.append = function (name, value) {
     this._params.push([name, String(value)]);
     this._sync();
 };
 
+/** @param {string} name */
 URLSearchParams.prototype.delete = function (name) {
     for (var i = this._params.length - 1; i >= 0; i--) {
         if (this._params[i][0] === name) {
@@ -101,6 +125,7 @@ URLSearchParams.prototype.delete = function (name) {
     this._sync();
 };
 
+/** @returns {string} */
 URLSearchParams.prototype.toString = function () {
     var out = [];
 
@@ -115,6 +140,10 @@ URLSearchParams.prototype.toString = function () {
     return out.join("&");
 };
 
+/**
+ * @constructor
+ * @param {string} input
+ */
 function URL(input) {
     var match = String(input).match(
         /^([a-zA-Z][a-zA-Z0-9+.-]*:)?\/\/([^\/?#]*)([^?#]*)(\?[^#]*)?(#.*)?$/
@@ -134,8 +163,13 @@ function URL(input) {
         this._search.slice(1),
         this
     );
+
+    return this;
 }
 
+/**
+ * @type {string}
+ */
 Object.defineProperty(URL.prototype, "pathname", {
     get: function () {
         return this._pathname;
@@ -149,6 +183,7 @@ Object.defineProperty(URL.prototype, "pathname", {
     }
 });
 
+/** @type {string} */
 Object.defineProperty(URL.prototype, "search", {
     get: function () {
         return this._search;
@@ -168,6 +203,7 @@ Object.defineProperty(URL.prototype, "search", {
     }
 });
 
+/** @type {string} */
 Object.defineProperty(URL.prototype, "href", {
     get: function () {
         return (
@@ -181,6 +217,7 @@ Object.defineProperty(URL.prototype, "href", {
     }
 });
 
+/** @returns {string} */
 URL.prototype.toString = function () {
     return this.href;
 };

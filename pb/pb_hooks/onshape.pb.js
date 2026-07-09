@@ -87,7 +87,7 @@ cronAdd("cleanup_onshape_request_cache", "*/15 * * * *", () => {
 // Enrich users records with their current onshape auth state so we can show it in the UI without sending everything
 // or making extra requests
 onRecordEnrich((e) => {
-    /** @type import("./onshape_auth") */
+    /** @type typeof import("./onshape_auth") */
     const { getOnshapeMetadata } = require(`${__hooks}/onshape_auth`);
 
     if(!e.record) {
@@ -95,11 +95,16 @@ onRecordEnrich((e) => {
         return;
     }
 
-    // add new custom field for registered users
-    if(e.requestInfo?.auth?.collection()?.name == "users") {
-        e.record.withCustomData(true) // for security custom props require to be enabled explicitly
-        const oauthState = getOnshapeMetadata(e.requestInfo.auth);
-        e.record.set("onshape_auth_expiry", oauthState?.access_token ? new Date(oauthState.expires_at).toISOString() : null);
+    try {
+        // add new custom field for registered users
+        if(e.requestInfo?.auth?.collection()?.name == "users") {
+            e.record.withCustomData(true) // for security custom props require to be enabled explicitly
+            const oauthState = getOnshapeMetadata(e.requestInfo.auth);
+            e.record.set("onshape_auth_expiry", oauthState?.access_token ? new Date(oauthState.expires_at).toISOString() : null);
+        }
+    } catch(err) {
+        // never fail the request if we can't enrich the record, just log it
+        console.error("Failed to enrich user record with Onshape auth state:", err);
     }
 
     e.next();

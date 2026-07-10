@@ -60,7 +60,7 @@ routerUse((e) => {
     if(e.request?.url?.path?.startsWith("/api/onshape/proxy/")) {
         /** @type {typeof import("./onshape_proxy")} */
         const { handleProxyRequest } = require(`${__hooks}/onshape_proxy`);
-        handleProxyRequest(e);
+        return handleProxyRequest(e);
     }
 
     return e.next();

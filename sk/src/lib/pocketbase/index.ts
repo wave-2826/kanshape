@@ -26,6 +26,9 @@ const expandCollections = {
         subprojects: "subprojects",
         section: "sections"
     },
+    parts: {
+        card: "cards"
+    },
     boards: {
         sections: "sections"
     },

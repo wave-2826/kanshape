@@ -38,17 +38,24 @@
     <div class="content">
         {#if linkedProject === null}
             <p>Loading...</p>
-        {:else if linkedProject.type === LinkedProjectType.Unregistered}
+        {:else if linkedProject.type === LinkedProjectType.Unregistered || linkedProject.type === LinkedProjectType.Unlinked}
+            {#if linkedProject.type === LinkedProjectType.Unlinked}
+                <p>This document is registered but not linked to a particular Onshape document. Link it to use the document tab.</p>
+            {/if}
             <LinkOnshapeDocument />
             <button onclick={() => {
-                save(Collections.OnshapeDocuments, { id: onshapeCtx.documentId ?? "" }, { create: true });
+                save(Collections.OnshapeDocuments, {
+                    id: onshapeCtx.documentId ?? "",
+                    workspace_id: onshapeCtx.wvmId ?? ""
+                }, { create: true });
             }}>Continue with no linked project</button>
         {:else}
-            {#if linkedProject.type === LinkedProjectType.Unlinked}
-                <p>Linked to no project</p>
-            {:else}
-                <p>Linked to project: {linkedProject.expand.project?.title ?? "Unknown Project"}{#if linkedProject.expand.subproject} and subproject {linkedProject.expand.subproject?.name ?? "Unknown Subproject"}{/if}.</p>
-            {/if}
+            <!-- <p>
+                Linked to project "{linkedProject.expand.project?.title ?? "Unknown Project"}"
+                {#if linkedProject.expand.subproject} and subproject "{linkedProject.expand.subproject?.name ?? "Unknown Subproject"}"{/if}
+                .
+            </p> -->
+
         {/if}
     </div>
 </div>

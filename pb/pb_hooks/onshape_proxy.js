@@ -86,13 +86,13 @@ function handleProxyRequest(e) {
     const authRecord = /** @type core.Record */ (e.requestInfo().auth);
     if(!authRecord) throw new BadRequestError("Authentication required to access Onshape API");
 
-    const body = e.requestInfo().body;
-    if(typeof body !== "object" || body === null || !("content" in body)) {
-        throw new BadRequestError("Missing request body content");
+    let body = /** @type any */ (e.requestInfo().body);
+    if(body && typeof body !== "string") {
+        body = JSON.stringify(body);
     }
 
     // Check if there's a cache entry if the user provided a hash
-    const cacheHash = body.hash ?? null;
+    const cacheHash = e.request.header.get("X-Kanshape-Cache-Key");
     if(cacheHash) {
         const cachedResponse = checkRequestCache(cacheHash);
         if(cachedResponse) {
@@ -114,7 +114,6 @@ function handleProxyRequest(e) {
     
     const baseOnshapeUrl = getConfigOption("onshape/baseDomain", "https://cad.onshape.com").replace(/\/+$/, ""); // remove trailing slashes just in case
 
-    const content = body.content;
     const res = $http.send({
         url: `${baseOnshapeUrl}/api/${path}`,
         method: e.request.method,
@@ -125,7 +124,7 @@ function handleProxyRequest(e) {
             "X-XSRF-TOKEN": e.request.header.get("X-XSRF-TOKEN") ?? "",
             "Accept": e.request.header.get("Accept") ?? "application/json;charset=UTF-8; qs=0.09"
         },
-        body: content,
+        body,
         timeout: 10,
     });
 

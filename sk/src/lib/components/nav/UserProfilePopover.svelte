@@ -33,14 +33,15 @@
                     ($fullModel.expand.groups?.map(g => g.name) ?? []).join(", ") || "None" :
                     $authModel.groups.length
             }</dd>
-            <dt>Onshape OAuth</dt>
             {#if $fullModel?.onshape_auth_expiry}
+                <dt>Onshape OAuth</dt>
                 {#if new Date($fullModel?.onshape_auth_expiry ?? 0) > new Date()}
                     <dd class="connected">Connected</dd>
                 {:else}
                     <dd class="expired">Connected</dd>
                 {/if}
-            {:else}
+            {:else if $fullModel}
+                <dt>Onshape OAuth</dt>
                 <dd class="disconnected">Not connected</dd>
             {/if}
             {#if $authModel.is_admin}

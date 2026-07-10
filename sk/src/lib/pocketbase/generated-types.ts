@@ -22,6 +22,7 @@ export const Collections = {
 	OauthTransactions: "oauth_transactions",
 	OnshapeApiCache: "onshape_api_cache",
 	OnshapeDocuments: "onshape_documents",
+	Parts: "parts",
 	Projects: "projects",
 	Sections: "sections",
 	Subprojects: "subprojects",
@@ -246,6 +247,19 @@ export type OnshapeDocumentsRecord = {
 	subproject?: RecordIdString
 	title?: string
 	updated: IsoAutoDateString
+	workspace_id?: string
+}
+
+export type PartsRecord<Tpart_heuristic_result = unknown> = {
+	card?: RecordIdString
+	created: IsoAutoDateString
+	document_id?: string
+	element_id?: string
+	id: string
+	part_heuristic_result?: null | Tpart_heuristic_result
+	part_id?: string
+	thumbnail?: FileNameString
+	updated: IsoAutoDateString
 }
 
 export type ProjectsRecord<Tlinked_sites = unknown> = {
@@ -316,6 +330,7 @@ export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord>
 export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransactionsRecord> & BaseSystemFields<Texpand>
 export type OnshapeApiCacheResponse<Tbody = unknown, Theaders = unknown, Texpand = unknown> = Required<OnshapeApiCacheRecord<Tbody, Theaders>> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
+export type PartsResponse<Tpart_heuristic_result = unknown, Texpand = unknown> = Required<PartsRecord<Tpart_heuristic_result>> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<SubprojectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
@@ -340,6 +355,7 @@ export type CollectionRecords = {
 	oauth_transactions: OauthTransactionsRecord
 	onshape_api_cache: OnshapeApiCacheRecord
 	onshape_documents: OnshapeDocumentsRecord
+	parts: PartsRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
 	subprojects: SubprojectsRecord
@@ -363,6 +379,7 @@ export type CollectionResponses = {
 	oauth_transactions: OauthTransactionsResponse
 	onshape_api_cache: OnshapeApiCacheResponse
 	onshape_documents: OnshapeDocumentsResponse
+	parts: PartsResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse
 	subprojects: SubprojectsResponse

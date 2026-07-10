@@ -28,6 +28,7 @@
 
         const record = await save(Collections.OnshapeDocuments, {
             id: documentId,
+            workspace_id: onshapeCtx.wvmId ?? "",
             project: projectId,
             subproject: subprojectId || "",
             title: data.name ?? "Untitled Document"

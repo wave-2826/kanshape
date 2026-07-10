@@ -202,12 +202,10 @@ export async function onshapeApiRequest<T>(
             headers: {
                 "Content-Type": "application/json",
                 ...headers,
-                "Authorization": client.authStore.token
+                "Authorization": client.authStore.token,
+                "X-Kanshape-Cache-Key": customCacheKey ?? cacheKey
             },
-            body: JSON.stringify({
-                hash: customCacheKey ?? cacheKey,
-                content: typeof body === "string" ? body : JSON.stringify(body || {})
-            })
+            body: body ? (typeof body === "string" ? body : JSON.stringify(body || {})) : undefined
         })
             .then(async response => {
                 const responseBody = await response.json();

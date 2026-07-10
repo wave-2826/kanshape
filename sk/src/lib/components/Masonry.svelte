@@ -154,7 +154,7 @@ $effect(() => {
     grid-template-columns: repeat(auto-fit, var(--masonry-col-width));
     // grid-template-rows: masonry;
     justify-content: center;
-    grid-gap: var(--masonry-grid-gap);
+    gap: var(--masonry-grid-gap);
     padding: var(--masonry-padding);
 }
 :global(.grid-masonry > *) { 

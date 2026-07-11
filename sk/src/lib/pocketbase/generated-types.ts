@@ -26,6 +26,7 @@ export const Collections = {
 	OnshapeApiCache: "onshape_api_cache",
 	OnshapeDocuments: "onshape_documents",
 	Parts: "parts",
+	ProjectOverview: "project_overview",
 	Projects: "projects",
 	Sections: "sections",
 	Subprojects: "subprojects",
@@ -322,6 +323,18 @@ export type PartsRecord<Tpart_heuristic_result = unknown> = {
 	updated: IsoAutoDateString
 }
 
+export type ProjectOverviewRecord<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown> = {
+	boards?: null | Tboards
+	card_count?: null | Tcard_count
+	color?: string
+	finished_card_count?: null | Tfinished_card_count
+	id: string
+	next_due?: null | Tnext_due
+	overdue_card_count?: null | Toverdue_card_count
+	subprojects?: null | Tsubprojects
+	title: string
+}
+
 export type ProjectsRecord<Tlinked_sites = unknown> = {
 	boards?: RecordIdString[]
 	color?: string
@@ -394,6 +407,7 @@ export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransac
 export type OnshapeApiCacheResponse<Tbody = unknown, Theaders = unknown, Texpand = unknown> = Required<OnshapeApiCacheRecord<Tbody, Theaders>> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
 export type PartsResponse<Tpart_heuristic_result = unknown, Texpand = unknown> = Required<PartsRecord<Tpart_heuristic_result>> & BaseSystemFields<Texpand>
+export type ProjectOverviewResponse<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<ProjectOverviewRecord<Tboards, Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count, Tsubprojects>> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<SubprojectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
@@ -422,6 +436,7 @@ export type CollectionRecords = {
 	onshape_api_cache: OnshapeApiCacheRecord
 	onshape_documents: OnshapeDocumentsRecord
 	parts: PartsRecord
+	project_overview: ProjectOverviewRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
 	subprojects: SubprojectsRecord
@@ -449,6 +464,7 @@ export type CollectionResponses = {
 	onshape_api_cache: OnshapeApiCacheResponse
 	onshape_documents: OnshapeDocumentsResponse
 	parts: PartsResponse
+	project_overview: ProjectOverviewResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse
 	subprojects: SubprojectsResponse

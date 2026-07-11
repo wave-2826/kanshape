@@ -3,36 +3,37 @@
     import { getPriorityColor } from "$lib/data/cards";
     import { relativeTime } from "$lib/datetime";
     import { metadata } from "$lib/metadata.js";
+    import { nav } from "$lib/navigation";
     import { watch } from "$lib/pocketbase";
     import { authModel } from "$lib/pocketbase/auth";
-    import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
+    import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
     import { AlarmClock, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
-    import { derived } from "svelte/store";
+    import type { ListResult } from "pocketbase";
+    import { derived, type Readable } from "svelte/store";
 
     $effect(() => {
         $metadata.title = "Overview";
     });
 
-    const myTasks = $derived($authModel ? derived(deasyncify(watch(Collections.AssignedCards, {
+    const myTasks = $derived($authModel ? deasyncify(watch(Collections.AssignedCards, {
         // filtering is done server-side based on auth
-    }, 0, 8)), (v) => {
-        // sort by priority, then due date
-        if(!v) return v;
-        return {
-            ...v,
-            items: v.items.toSorted((a, b) => {
-                const priorityOrder = ["critical", "high", "medium", "low"];
-                const aPriorityIndex = priorityOrder.indexOf(a.priority ?? "");
-                const bPriorityIndex = priorityOrder.indexOf(b.priority ?? "");
-                if(aPriorityIndex !== bPriorityIndex) return aPriorityIndex - bPriorityIndex;
-                if(a.due_by && b.due_by) return new Date(a.due_by).getTime() - new Date(b.due_by).getTime();
-                if(a.due_by) return -1;
-                if(b.due_by) return 1;
-                return a.title.localeCompare(b.title);
-            })
-        };
-    }) : null);
+        sort: "-priority_number,-due_by",
+    }, 0, 8)) : null);
+
+    const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0))) as Readable<ListResult<
+        {
+            id: string,
+            title: string,
+            color: string,
+            boards: { id: string; title: string }[],
+            subprojects: { id: string; name: string }[],
+            card_count: number,
+            finished_card_count: number,
+            overdue_card_count: number,
+            next_due: string | null
+        }
+    > | null>;
 </script>
 
 <div class="page">
@@ -72,50 +73,61 @@
         {/if}
     {/if}
     
-    <h2><SquareKanban /> Projects</h2>
-    <div class="horizontal-list">
-        {#each [1, 2, 3, 4, 5, 6] as i}
-            {@const finishedCards = Math.floor(Math.random() * 28)}
-            <div
-                class="project button"
-                // TODO: open project page
-                onclick={() => void(0)}
-                onkeydown={(e) => {
-                    if(e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        void(0);
-                    }
-                }}
-                role="button"
-                aria-label={`Open project Example Project ${i}`}
-                tabindex="0"
-            >
-                <span class="title" style="color: #ffe36c">Example Project {i}</span>
-                <label>
-                    <progress value="{finishedCards}" max="28"></progress>
-                    {Math.round(finishedCards / 28 * 100)}%
-                </label>
-                <span class="unfinished">{28 - finishedCards} / 28 unfinished</span>
-                <ul>
-                    {#each new Array(Math.floor(Math.random() * 3)) as _, j}
-                        <!-- todo: link to board -->
-                        <li><a href="#_"><Kanban /> Board {j + 1}</a></li>
-                    {/each}
-                </ul>
-                <ul>
-                    {#each new Array(Math.floor(Math.random() * 3)) as _, j}
-                        <!-- todo: link to subproject -->
-                        <li><a href="#_"><Tag /> Subproject {j + 1}</a></li>
-                    {/each}
-                </ul>
-                {#if Math.random() < 0.5}
-                    <span class="due overdue"><Clock /> 2 overdue</span>
-                {:else}
-                    <span class="due"><Clock /> next due in 3 days</span>
-                {/if}
+    {#if projects}
+        <h2><SquareKanban /> Projects</h2>
+        {#if $projects}
+            <div class="horizontal-list">
+                {#each $projects.items as project}
+                    <div
+                        class="project button"
+                        onclick={(e) => {
+                            if(e.target instanceof HTMLAnchorElement) return; // don't navigate if clicking a link
+                            nav(`/projects/${project.id}`);
+                        }}
+                        onkeydown={(e) => {
+                            if(e.target instanceof HTMLAnchorElement) return; // don't navigate if pressing enter on a link
+                            if(e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                nav(`/projects/${project.id}`);
+                            }
+                        }}
+                        role="button"
+                        aria-label={`Open project ${project.title}`}
+                        tabindex="0"
+                    >
+                        <span class="title" style="color: {project.color ?? 'inherit'}">{project.title}</span>
+                        <label>
+                            <progress value={project.finished_card_count} max={project.card_count}></progress>
+                            {Math.round(project.finished_card_count / project.card_count * 100)}%
+                        </label>
+                        <span class="unfinished">
+                            {project.card_count} card{project.card_count !== 1 ? 's' : ''}<!--
+                            -->{#if project.card_count > project.finished_card_count};
+                                {project.card_count - project.finished_card_count} unfinished
+                            {/if}
+                        </span>
+                        <ul>
+                            {#each project.boards as board}
+                                <!-- todo: link to board -->
+                                <li><a href="/projects/{project.id}/boards/{board.id}"><Kanban /> {board.title}</a></li>
+                            {/each}
+                        </ul>
+                        <ul>
+                            {#each project.subprojects as subproject}
+                                <!-- todo: link to subproject -->
+                                <li><a href="/projects/{project.id}/subprojects/{subproject.id}"><Tag /> {subproject.name}</a></li>
+                            {/each}
+                        </ul>
+                        {#if project.overdue_card_count > 0}
+                            <span class="due overdue"><Clock /> {project.overdue_card_count} overdue</span>
+                        {:else if project.next_due}
+                            <span class="due"><Clock /> next due {relativeTime(new Date(project.next_due))}</span>
+                        {/if}
+                    </div>
+                {/each}
             </div>
-        {/each}
-    </div>
+        {/if}
+    {/if}
     
     <h2><AlarmClock /> Recent activity <a href="/log"><ExternalLink /> Activity log</a></h2>
     <div class="list">
@@ -254,7 +266,7 @@ h2 {
 .horizontal-list {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    gap: 0.5rem;
     padding: 0.5rem;
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -274,12 +286,18 @@ h2 {
     flex-direction: column;
     gap: 0.25rem;
     align-items: flex-start;
+    align-self: flex-start;
     text-align: left;
 
     width: 12rem;
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
     --bg-color: var(--bg-primary);
+
+    .title {
+        font-size: var(--font-medium);
+        margin-bottom: 0.25rem;
+    }
 
     label {
         display: flex;

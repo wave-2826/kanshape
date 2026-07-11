@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { link } from "$lib/actions";
     import Masonry from "$lib/components/Masonry.svelte";
     import { getPriorityColor } from "$lib/data/cards";
     import { metadata } from "$lib/metadata.js";
-    import { AlarmClock, BookOpen, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
+    import { AlarmClock, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
 
     $effect(() => {
         $metadata.title = "Overview";
@@ -16,7 +15,9 @@
         <span title="Cards assigned to you or your groups" class="info"><Info /></span>
     </h2>
     <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem">
-        <button class="card">
+        <button class="card" onclick={() => {
+            // todo: open card panel inline on this page
+        }}>
             <span class="path"><Folder /> <span style="color: #ffe36c">Example Project</span> / <span style="color: #ffe36c">Example Board</span> / <span style="color: #6c757d">In Progress</span></span>
             <span class="priority" style="color: {getPriorityColor("critical")}"><Flag /> critical</span>
             <span class="due overdue"><Clock /> Due 1 week ago</span>
@@ -31,6 +32,7 @@
             </button>
         {/each}
     </Masonry>
+    <!-- todo: could instead be a full page with filtering and stuff? -->
     <button class="see-all"><ChevronDown /> Expand (10)</button>
     
     <h2><SquareKanban /> Projects</h2>
@@ -39,6 +41,7 @@
             {@const finishedCards = Math.floor(Math.random() * 28)}
             <div
                 class="project button"
+                // TODO: open project page
                 onclick={() => void(0)}
                 onkeydown={(e) => {
                     if(e.key === "Enter" || e.key === " ") {
@@ -58,11 +61,13 @@
                 <span class="unfinished">{28 - finishedCards} / 28 unfinished</span>
                 <ul>
                     {#each new Array(Math.floor(Math.random() * 3)) as _, j}
+                        <!-- todo: link to board -->
                         <li><a href="#_"><Kanban /> Board {j + 1}</a></li>
                     {/each}
                 </ul>
                 <ul>
                     {#each new Array(Math.floor(Math.random() * 3)) as _, j}
+                        <!-- todo: link to subproject -->
                         <li><a href="#_"><Tag /> Subproject {j + 1}</a></li>
                     {/each}
                 </ul>
@@ -78,12 +83,14 @@
     <h2><AlarmClock /> Recent activity <a href="/log"><ExternalLink /> Activity log</a></h2>
     <div class="list">
         {#each new Array(10) as _, i}
-            <div class="activity">
+            <button class="activity" onclick={() => {
+                // todo: open relevant card or project page
+            }}>
                 <span class="time">{i + 1}m ago</span>
                 <span class="description">
                     <span class="user">User</span> moved card <span class="card-name">Example card 1</span> to <span class="section">In Progress</span> in <span style="color: #ffe36c">Example Project</span> / <span style="color: #ffe36c">Example Board</span>
                 </span>
-            </div>
+            </button>
         {/each}
     </div>
 </div>
@@ -300,7 +307,7 @@ h2 {
     gap: 1rem;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
-    background-color: var(--bg-primary);
+    --bg-color: var(--bg-primary);
 
     .time {
         color: var(--text-tertiary);

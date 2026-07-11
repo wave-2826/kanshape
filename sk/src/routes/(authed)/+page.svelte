@@ -1,39 +1,76 @@
 <script lang="ts">
     import Masonry from "$lib/components/Masonry.svelte";
     import { getPriorityColor } from "$lib/data/cards";
+    import { relativeTime } from "$lib/datetime";
     import { metadata } from "$lib/metadata.js";
+    import { watch } from "$lib/pocketbase";
+    import { authModel } from "$lib/pocketbase/auth";
+    import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
+    import { deasyncify } from "$lib/util";
     import { AlarmClock, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
+    import { derived } from "svelte/store";
 
     $effect(() => {
         $metadata.title = "Overview";
     });
+
+    const myTasks = $derived($authModel ? derived(deasyncify(watch(Collections.AssignedCards, {
+        // filtering is done server-side based on auth
+    }, 0, 8)), (v) => {
+        // sort by priority, then due date
+        if(!v) return v;
+        return {
+            ...v,
+            items: v.items.toSorted((a, b) => {
+                const priorityOrder = ["critical", "high", "medium", "low"];
+                const aPriorityIndex = priorityOrder.indexOf(a.priority ?? "");
+                const bPriorityIndex = priorityOrder.indexOf(b.priority ?? "");
+                if(aPriorityIndex !== bPriorityIndex) return aPriorityIndex - bPriorityIndex;
+                if(a.due_by && b.due_by) return new Date(a.due_by).getTime() - new Date(b.due_by).getTime();
+                if(a.due_by) return -1;
+                if(b.due_by) return 1;
+                return a.title.localeCompare(b.title);
+            })
+        };
+    }) : null);
 </script>
 
 <div class="page">
-    <h2>
-        <Goal /> My tasks
-        <span title="Cards assigned to you or your groups" class="info"><Info /></span>
-    </h2>
-    <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem">
-        <button class="card" onclick={() => {
-            // todo: open card panel inline on this page
-        }}>
-            <span class="path"><Folder /> <span style="color: #ffe36c">Example Project</span> / <span style="color: #ffe36c">Example Board</span> / <span style="color: #6c757d">In Progress</span></span>
-            <span class="priority" style="color: {getPriorityColor("critical")}"><Flag /> critical</span>
-            <span class="due overdue"><Clock /> Due 1 week ago</span>
-            <span class="title">Example card 1 with a very very long name that should maybe wrap</span>
-        </button>
-        {#each new Array(7) as _, i}
-            <button class="card">
-                <span class="path"><Folder /> <span style="color: #ffe36c">Example Project</span> / <span style="color: #ffe36c">Example Board</span> / <span style="color: #6c757d">In Progress</span></span>
-                <span class="title">Example card {i + 2}</span>
-                <span class="priority" style="color: {getPriorityColor("medium")}"><Flag /> medium</span>
-                <span class="due"><Clock /> Due in 2 days</span>
-            </button>
-        {/each}
-    </Masonry>
-    <!-- todo: could instead be a full page with filtering and stuff? -->
-    <button class="see-all"><ChevronDown /> Expand (10)</button>
+    {#if myTasks}
+        <h2>
+            <Goal /> My tasks
+            <span title="Cards assigned to you or your groups" class="info"><Info /></span>
+        </h2>
+        {#if $myTasks}
+            <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem">
+                {#each $myTasks.items as task}
+                    <button class="card" onclick={() => {
+                        // todo: open card panel inline on this page
+                    }} class:critical={task.priority === "critical"}>
+                        <span class="path">
+                            <Folder />
+                            <span style="color: {task.project_color ?? "var(--text-primary)"}">{task.project_title}</span> /
+                            <span style="color: {task.project_color ?? "var(--text-primary)"}">{task.board_title}</span> /
+                            <span style="color: {task.section_color ?? "var(--text-primary)"}">{task.section_title}</span>
+                        </span>
+                        <span class="title">{task.title}</span>
+                        {#if task.priority}
+                            <span class="priority" style="color: {getPriorityColor(task.priority)}"><Flag /> {task.priority}</span>
+                        {/if}
+                        {#if task.due_by}
+                            <span class="due" class:overdue={new Date(task.due_by) < new Date()}><Clock /> Due {relativeTime(new Date(task.due_by))}</span>
+                        {/if}
+                    </button>
+                {/each}
+            </Masonry>
+            <!-- todo: could instead be a full page with filtering and stuff? -->
+            {#if $myTasks.totalItems > $myTasks.items.length}
+                <button class="see-all"><ChevronDown /> Expand ({$myTasks.totalItems})</button>
+            {/if}
+        {:else}
+            <p class="loading">Loading tasks...</p>
+        {/if}
+    {/if}
     
     <h2><SquareKanban /> Projects</h2>
     <div class="horizontal-list">
@@ -101,6 +138,12 @@
     overflow-y: auto;
     max-height: 100%;
 }
+
+.loading {
+    padding: 0.5rem;
+    color: var(--text-secondary);
+}
+
 h2 {
     display: flex;
     align-items: center;
@@ -154,6 +197,10 @@ h2 {
     border-radius: 4px;
     --bg-color: var(--bg-primary);
     text-align: left;
+
+    &.critical {
+        border-top: 1px solid var(--error);
+    }
 
     .path {
         grid-area: path;
@@ -304,6 +351,7 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    text-align: left;
     gap: 1rem;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;

@@ -26,8 +26,14 @@ const expandCollections = {
         subprojects: "subprojects",
         section: "sections"
     },
+    card_assignment_cache: {
+        card: "cards",
+        user: "users",
+        group: "groups"
+    },
     parts: {
-        card: "cards"
+        current_card: "cards",
+        past_revision_cards: "cards"
     },
     boards: {
         sections: "sections"

@@ -18,7 +18,9 @@ function updateAssignmentCache(app, card) {
 
     app.runInTransaction((app) => {
         const currentAssignmentRecords = app.findRecordsByFilter(assignmentsCollection, `card = "${card.id}"`, "created", 0, 0);
-        const cardAssignmentData = /** @type {CardAssignmentData} */ (parseJSON(card.get("assignment_data")));
+        const assignmentData = card.get("assignment_data");
+        if(!assignmentData || typeof assignmentData !== "string") return;
+        const cardAssignmentData = /** @type {CardAssignmentData} */ (parseJSON(assignmentData));
 
         if(!cardAssignmentData || typeof cardAssignmentData !== "object") throw new Error(`Invalid assignment data for card ${card.id}: ${card.get("assignment_data")}`);
         

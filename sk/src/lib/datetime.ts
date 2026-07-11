@@ -41,6 +41,8 @@ export function localToZoned(localDate: string | null): string | null {
 /**
  * Convert a date to a relative time string (e.g., "in 3 days", "2 hours ago").
  * Uses Intl.RelativeTimeFormat for localization.
+ * // TODO: uses of this should really be some sort of component that auto-updates the
+ * relative time string as time passes
  */
 export function relativeTime(date: Date): string {
     const now = new Date();

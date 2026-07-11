@@ -29,7 +29,7 @@ function checkRequestCache(hash) {
         return null;
     }
 
-    const { parseJSON } = require(`${__hooks}/util`);
+    const { parseJSON } = /** @type import("./util") */ (require(`${__hooks}/util`));
     const statusCode = record.get("statusCode");
     const headers = parseJSON(record.get("headers") ?? "{}");
     const body = parseJSON(record.get("body") ?? "null");

@@ -24,20 +24,20 @@ function URLSearchParams(init, owner) {
     this._owner = owner;
     this._params = [];
     
-    if (typeof init === "string" && init.length) {
-        if (init.charAt(0) === "?") {
+    if(typeof init === "string" && init.length) {
+        if(init.charAt(0) === "?") {
             init = init.slice(1);
         }
 
         var pairs = init.split("&");
 
-        for (var i = 0; i < pairs.length; i++) {
-            if (!pairs[i]) continue;
+        for(var i = 0; i < pairs.length; i++) {
+            if(!pairs[i]) continue;
 
             var eq = pairs[i].indexOf("=");
             var paramKey, paramValue;
 
-            if (eq === -1) {
+            if(eq === -1) {
                 paramKey = decode(pairs[i]);
                 paramValue = "";
             } else {
@@ -47,12 +47,12 @@ function URLSearchParams(init, owner) {
 
             this._params.push([paramKey, paramValue]);
         }
-    } else if (init && typeof init === "object") {
+    } else if(init && typeof init === "object") {
         // we can't use iterators in this environment :pensive:
         // just assume it's an object with string keys and values
 
-        for (var key in init) {
-            if (init.hasOwnProperty(key)) {
+        for(var key in init) {
+            if(init.hasOwnProperty(key)) {
                 this._params.push([String(key), String(init[key])]);
             }
         }
@@ -62,7 +62,7 @@ function URLSearchParams(init, owner) {
 }
 
 URLSearchParams.prototype._sync = function () {
-    if (this._owner) {
+    if(this._owner) {
         this._owner._search =
             this.toString() ? "?" + this.toString() : "";
     }
@@ -73,8 +73,8 @@ URLSearchParams.prototype._sync = function () {
  * @returns {string | null}
  */
 URLSearchParams.prototype.get = function (name) {
-    for (var i = 0; i < this._params.length; i++) {
-        if (this._params[i][0] === name) {
+    for(var i = 0; i < this._params.length; i++) {
+        if(this._params[i][0] === name) {
             return this._params[i][1];
         }
     }
@@ -88,9 +88,9 @@ URLSearchParams.prototype.get = function (name) {
 URLSearchParams.prototype.set = function (name, value) {
     var found = false;
 
-    for (var i = this._params.length - 1; i >= 0; i--) {
-        if (this._params[i][0] === name) {
-            if (!found) {
+    for(var i = this._params.length - 1; i >= 0; i--) {
+        if(this._params[i][0] === name) {
+            if(!found) {
                 this._params[i][1] = String(value);
                 found = true;
             } else {
@@ -99,7 +99,7 @@ URLSearchParams.prototype.set = function (name, value) {
         }
     }
 
-    if (!found) {
+    if(!found) {
         this._params.push([name, String(value)]);
     }
 
@@ -117,8 +117,8 @@ URLSearchParams.prototype.append = function (name, value) {
 
 /** @param {string} name */
 URLSearchParams.prototype.delete = function (name) {
-    for (var i = this._params.length - 1; i >= 0; i--) {
-        if (this._params[i][0] === name) {
+    for(var i = this._params.length - 1; i >= 0; i--) {
+        if(this._params[i][0] === name) {
             this._params.splice(i, 1);
         }
     }
@@ -129,7 +129,7 @@ URLSearchParams.prototype.delete = function (name) {
 URLSearchParams.prototype.toString = function () {
     var out = [];
 
-    for (var i = 0; i < this._params.length; i++) {
+    for(var i = 0; i < this._params.length; i++) {
         out.push(
             encode(this._params[i][0]) +
             "=" +
@@ -149,7 +149,7 @@ function URL(input) {
         /^([a-zA-Z][a-zA-Z0-9+.-]*:)?\/\/([^\/?#]*)([^?#]*)(\?[^#]*)?(#.*)?$/
     );
 
-    if (!match) {
+    if(!match) {
         throw new Error("Invalid URL " + input);
     }
 
@@ -176,7 +176,7 @@ Object.defineProperty(URL.prototype, "pathname", {
     },
     set: function (value) {
         value = String(value);
-        if (value.charAt(0) !== "/") {
+        if(value.charAt(0) !== "/") {
             value = "/" + value;
         }
         this._pathname = value;
@@ -191,7 +191,7 @@ Object.defineProperty(URL.prototype, "search", {
     set: function (value) {
         value = String(value || "");
 
-        if (value && value.charAt(0) !== "?") {
+        if(value && value.charAt(0) !== "?") {
             value = "?" + value;
         }
 

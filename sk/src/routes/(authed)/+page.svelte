@@ -10,7 +10,8 @@
     import { deasyncify } from "$lib/util";
     import { AlarmClock, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
     import type { ListResult } from "pocketbase";
-    import { derived, type Readable } from "svelte/store";
+    import { type Readable } from "svelte/store";
+    import ActivityEntry from "./log/ActivityEntry.svelte";
 
     $effect(() => {
         $metadata.title = "Overview";
@@ -34,6 +35,10 @@
             next_due: string | null
         }
     > | null>;
+
+    const changes = $derived(deasyncify(watch(Collections.ActivityLogPreview, {
+        sort: "-date"
+    }, 0, 10)));
 </script>
 
 <div class="page">
@@ -130,18 +135,19 @@
     {/if}
     
     <h2><AlarmClock /> Recent activity <a href="/log"><ExternalLink /> Activity log</a></h2>
-    <div class="list">
-        {#each new Array(10) as _, i}
-            <button class="activity" onclick={() => {
-                // todo: open relevant card or project page
-            }}>
-                <span class="time">{i + 1}m ago</span>
-                <span class="description">
-                    <span class="user">User</span> moved card <span class="card-name">Example card 1</span> to <span class="section">In Progress</span> in <span style="color: #ffe36c">Example Project</span> / <span style="color: #ffe36c">Example Board</span>
-                </span>
-            </button>
-        {/each}
-    </div>
+    {#if changes}
+        <div class="list">
+            {#if $changes && $changes.items.length > 0}
+                {#each $changes.items as entry}
+                    <ActivityEntry entry={entry} />
+                {/each}
+            {:else if $changes}
+                <p class="loading">No recent activity</p>
+            {:else}
+                <p class="loading">Loading activity...</p>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -361,37 +367,6 @@ h2 {
 
         &.overdue {
             color: var(--error);
-        }
-    }
-}
-
-.activity {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    text-align: left;
-    gap: 1rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    --bg-color: var(--bg-primary);
-
-    .time {
-        color: var(--text-tertiary);
-        font-size: var(--font-tiny);
-        white-space: nowrap;
-    }
-
-    .description {
-        color: var(--text-secondary);
-        span {
-            color: var(--text-primary);
-            margin: 0 0.125rem;
-        }
-        .user {
-            color: var(--accent);
-        }
-        .card-name {
-            font-style: italic;
         }
     }
 }

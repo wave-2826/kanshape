@@ -5,24 +5,55 @@
     import { metadata } from "$lib/metadata.js";
     import { nav } from "$lib/navigation";
     import { watch } from "$lib/pocketbase";
-    import { authModel } from "$lib/pocketbase/auth";
-    import { Collections } from "$lib/pocketbase/generated-types";
+    import { Collections, type AssignedCardsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-    import { AlarmClock, ChevronDown, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
+    import { AlarmClock, ChevronDown, ChevronUp, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
     import type { ListResult } from "pocketbase";
-    import { type Readable } from "svelte/store";
+    import { writable, type Readable } from "svelte/store";
     import ActivityEntry from "./log/ActivityEntry.svelte";
 
     $effect(() => {
         $metadata.title = "Overview";
     });
 
-    const myTasks = $derived($authModel ? deasyncify(watch(Collections.AssignedCards, {
-        // filtering is done server-side based on auth
-        sort: "-priority_number,-due_by",
-    }, 0, 8)) : null);
+    let expandTasks = $state(false);
 
-    const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0))) as Readable<ListResult<
+    const myTasks = $derived(writable<ListResult<AssignedCardsResponse>>());
+    $effect(() => {
+        const unsubImmediate = Symbol("unsubImmediate");
+        let unsub: null | typeof unsubImmediate | (() => void) = null;
+
+        (async () => {
+            const result = await watch(Collections.AssignedCards, {
+                // filtering is done server-side based on auth
+                sort: "-priority_number,-due_by",
+            }, 0, expandTasks ? 50 : 8);
+
+            // we always subscribe to make sure it's cleaned up
+            const unsubscribe = result.subscribe((value) => {
+                myTasks.set(value);
+            });
+
+            if(unsub === unsubImmediate) {
+                unsubscribe();
+                return;
+            }
+            unsub = unsubscribe;
+        })();
+
+        return () => {
+            if(unsub === null) {
+                unsub = unsubImmediate;
+            } else if(unsub !== unsubImmediate) {
+                unsub();
+            }
+        };
+    });
+
+    const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0, {
+        // technically cards too but that's expensive
+        pollOnChange: [Collections.Projects, Collections.Boards, Collections.Subprojects]
+    }))) as Readable<ListResult<
         {
             id: string,
             title: string,
@@ -38,7 +69,9 @@
 
     const changes = $derived(deasyncify(watch(Collections.ActivityLogPreview, {
         sort: "-date"
-    }, 0, 10)));
+    }, 0, 10, {
+        pollOnChange: [Collections.ActivityLog]
+    })));
 </script>
 
 <div class="page">
@@ -48,10 +81,12 @@
             <span title="Cards assigned to you or your groups" class="info"><Info /></span>
         </h2>
         {#if $myTasks}
-            <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem">
+            <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem" items={$myTasks.items}>
                 {#each $myTasks.items as task}
                     <button class="card" onclick={() => {
-                        // todo: open card panel inline on this page
+                        // TODO: open card panel inline on this page instead of navigating
+                        // TODO: at least highlight/open the selected card with a query parameter or something
+                        nav(`/projects/${task.project_id}/boards/${task.board_id}`);
                     }} class:critical={task.priority === "critical"}>
                         <span class="path">
                             <Folder />
@@ -70,8 +105,16 @@
                 {/each}
             </Masonry>
             <!-- todo: could instead be a full page with filtering and stuff? -->
-            {#if $myTasks.totalItems > $myTasks.items.length}
-                <button class="see-all"><ChevronDown /> Expand ({$myTasks.totalItems})</button>
+            {#if $myTasks.totalItems > $myTasks.items.length || expandTasks}
+                <button class="see-all" onclick={() => {
+                    expandTasks = !expandTasks;
+                }}>
+                    {#if expandTasks}
+                        <ChevronUp /> Collapse
+                    {:else}
+                        <ChevronDown /> Expand ({$myTasks.totalItems})
+                    {/if}
+                </button>
             {/if}
         {:else}
             <p class="loading">Loading tasks...</p>
@@ -102,8 +145,8 @@
                     >
                         <span class="title" style="color: {project.color ?? 'inherit'}">{project.title}</span>
                         <label>
-                            <progress value={project.finished_card_count} max={project.card_count}></progress>
-                            {Math.round(project.finished_card_count / project.card_count * 100)}%
+                            <progress value={project.finished_card_count} max={Math.max(1, project.card_count)}></progress>
+                            {project.card_count > 0 ? Math.round(project.finished_card_count / project.card_count * 100) : 0}%
                         </label>
                         <span class="unfinished">
                             {project.card_count} card{project.card_count !== 1 ? 's' : ''}<!--

@@ -2,10 +2,11 @@
     import { page } from "$app/state";
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
+    import { AlarmClock, FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
     import { link } from "$lib/actions";
     import NavProject from "./NavProject.svelte";
     import { authModel } from "$lib/pocketbase/auth";
+    import { fly } from "svelte/transition";
 
     const projects = await watch(Collections.Projects, {
         expand: "subprojects,boards"
@@ -45,7 +46,12 @@
 
 <div style="flex-grow: 1;"></div>
 
-<!-- TODO (priority medium): users page to see all application users, remove them (for admins), see assigned tasks, etc -->
+{#if page.route.id === "/(authed)/log"}
+    <button use:link={"/log"} class:selected={page.route.id === "/(authed)/log"} transition:fly={{ y: 5, duration: 100 }}>
+        <AlarmClock />
+        Activity Log
+    </button>
+{/if}
 <button use:link={"/users"} class:selected={page.route.id === "/(authed)/users"}>
     <Users />
     Users and Groups

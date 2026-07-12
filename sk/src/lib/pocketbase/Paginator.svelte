@@ -31,6 +31,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        margin: auto;
+        margin: 0 auto;
     }
 </style>

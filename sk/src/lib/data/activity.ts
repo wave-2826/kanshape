@@ -1,7 +1,7 @@
 import type { CardAssignmentData } from "./cards";
 
 export type EntryValue = string |
-    { id: string | null, title: string | null } |
+    { id: string | null, title: string | null, color: string | null } |
     { assignment: CardAssignmentData, names: string[] } |
     { json: any } | null;
 

@@ -70,9 +70,6 @@ button, input, select, textarea, .button, .input {
             background-color: color-mix(in srgb, var(--accent) 3%, var(--bg-color, var(--bg-secondary)));
         }
     }
-    &:focus-visible {
-        border: 1px solid var(--accent);
-    }
 
     &.selected {
         --bg-color: var(--bg-selection);
@@ -90,6 +87,9 @@ button, input, select, textarea, .button, .input {
 }
 button, .button {
     cursor: pointer;
+    &:focus-visible {
+        border: 1px solid var(--accent);
+    }
 }
 input, .input {
     // Smaller vertical padding looks weird on inputs

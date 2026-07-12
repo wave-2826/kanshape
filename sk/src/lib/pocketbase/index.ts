@@ -9,7 +9,7 @@ import type {
     UnsubscribeFunc,
 } from "pocketbase";
 import { readable, type Readable, type Subscriber } from "svelte/store";
-import { browser } from "$app/environment";
+import { browser, dev } from "$app/environment";
 import { base } from "$app/paths";
 import { Collections, type CollectionRecords, type CollectionResponses, type RecordIdString, type TypedPocketBase, type Update, type Create as CreateRecord } from "./generated-types";
 
@@ -124,6 +124,9 @@ type ExpandResult<Collection extends Collections, Expand extends string> =
 
 export const client = new PocketBase(
     browser ? window.location.origin + base : undefined
+).autoCancellation(
+    // causes more problems than it fixes usually; we want to know in dev, but keep it off for prod in case
+    dev
 ) as TypedPocketBase;
 // @ts-expect-error - for debugging in the console
 window.pb = client;

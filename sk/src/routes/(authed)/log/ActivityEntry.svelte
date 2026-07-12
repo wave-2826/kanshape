@@ -1,10 +1,12 @@
 <!-- messiest rendering code i've ever written oml -->
 
 <script lang="ts">
-    import type { EntryChanges } from "$lib/data/activity";
+    import type { EntryChanges, EntryValue } from "$lib/data/activity";
     import { getPriorityColor, type CardAssignmentData } from "$lib/data/cards";
     import { relativeTime } from "$lib/datetime";
-    import { CardsPriorityOptions, type ActivityLogPreviewRecord } from "$lib/pocketbase/generated-types";
+    import { nav } from "$lib/navigation";
+    import { queryOne } from "$lib/pocketbase";
+    import { CardsPriorityOptions, Collections, type ActivityLogPreviewRecord } from "$lib/pocketbase/generated-types";
 
     const {
         entry
@@ -76,7 +78,7 @@
     }
     
     function getUpdateDescription(changeField: string, definite: boolean): {
-        specialType?: "color" | "priority" | "rename" | "assignments";
+        specialType?: "color" | "priority" | "rename" | "assignments" | "section";
         action: string;
         oldValue: string | null;
         newValue: string | null;
@@ -128,6 +130,7 @@
                 }
             case "section":
                 return {
+                    specialType: "section",
                     action: definite ? `moved the ${fieldData.label} of` : `moved its ${fieldData.label}`,
                     oldValue:
                         change.old && typeof change.old !== "string" &&
@@ -160,8 +163,26 @@
     }
 </script>
 
-<button class="activity" onclick={() => {
-    // todo: open relevant card or project page
+<button class="activity" onclick={async () => {
+    // best effort to open relevant card or project page
+    // TODO: a way, in general, to open cards. probably hold the open card in a query parameter
+    if(entry.entity_type === "project" && entry.entity_id) {
+        nav(`/projects/${entry.entity_id}`);
+    } else if(entry.entity_type === "subproject" && entry.entity_id) {
+        nav(`/projects/${entry.project_id}/subprojects/${entry.entity_id}`);
+    } else if(entry.entity_type === "board" && entry.entity_id) {
+        nav(`/projects/${entry.project_id}/boards/${entry.entity_id}`);
+    } else if(entry.entity_type === "card" && entry.entity_id) {
+        // this is unfortunate. I'm not a fan but also don't want to include extra info in every entry..
+        const card = await queryOne(Collections.Cards, entry.entity_id).catch(() => null);
+        if(card) {
+            nav(`/projects/${entry.project_id}/boards/${card.board}`);
+        } else {
+            nav(`/projects/${entry.project_id}`);
+        }
+    } else if(entry.project_id) {
+        nav(`/projects/${entry.project_id}`);
+    }
 }}>
     <span class="time">{relativeTime(new Date(entry.date))}</span>
     <span class="description" style="--project-color: {entry.project_color || "var(--text-primary)"}">
@@ -182,8 +203,9 @@
                     to <span class="entity-name {entry.entity_type}">{newValue}</span>
                 {:else if specialType === "color"}
                     {#if i === 0}<span class="entity-name {entry.entity_type}">{truncate(entry.entity_title ?? null, 80)}</span>{/if}
-                    from <span style="color: {oldValue}">{oldValue}</span>
-                    to <span style="color: {newValue}">{newValue}</span>
+                    {#if oldValue}from <span style="color: {oldValue}">{oldValue}</span>{/if}
+                    {#if newValue}to <span style="color: {newValue}">{newValue}</span>
+                    {:else}to <span>none</span>{/if}
                 {:else if specialType === "priority"}
                     {#if i === 0}<span class="entity-name {entry.entity_type}">{truncate(entry.entity_title ?? null, 80)}</span>{/if}
                     from <span style="color: {getPriorityColor(oldValue as CardsPriorityOptions)}">{oldValue}</span>
@@ -209,6 +231,15 @@
                             {/if}
                         {/if}
                     {/if}
+                {:else if specialType === "section"}
+                    {@const sectionColor = (s: EntryValue) => {
+                        if(!s || typeof s === "string" || !("color" in s)) return "var(--text-primary)";
+                        return s.color ?? "var(--text-primary)";
+                    }}
+                    {#if i === 0}<span class="entity-name {entry.entity_type}">{truncate(entry.entity_title ?? null, 80)}</span>{/if}
+                    {#if oldValue}from <span style="color: {sectionColor(changes[field].old)}">{oldValue}</span>{/if}
+                    {#if newValue}to <span style="color: {sectionColor(changes[field].new)}">{newValue}</span>
+                    {:else}to <span>none</span>{/if}
                 {:else}
                     {#if i === 0}<span class="entity-name {entry.entity_type}">{truncate(entry.entity_title ?? null, 80)}</span>{/if}
                     {#if oldValue}from <span>{oldValue}</span>{/if}

@@ -70,13 +70,15 @@ function resolveEntityInfo(app, collectionName, record) {
         const boardId = record.getString("board");
         if(boardId) projectId = findProjectContaining(app, "boards", boardId);
     } else if(collectionName === "sections") {
+        // this actually fails when creating sections because we make the record first... i don't have
+        // a great solution for that except doing this the right way w back instead of forward relations
         const boards = app.findRecordsByFilter("boards", "sections ~ {:id}", "", 1, 0, { id: record.id });
         if(boards.length > 0 && boards[0]) projectId = findProjectContaining(app, "boards", boards[0].id);
     } else if(collectionName === "subprojects") {
         projectId = findProjectContaining(app, "subprojects", record.id);
     }
     
-    return { projectId: projectId };
+    return { projectId };
 }
 
 /**
@@ -197,11 +199,13 @@ function computeChanges(app, original, record, trackedFields) {
                     ) : null;
                     oldData = oldSection ? {
                         id: /** @type {string} */(oldVal),
-                        title: oldSection.getString("title")
+                        title: oldSection.getString("title"),
+                        color: oldSection.getString("color")
                     } : null;
                     newData = newSection ? {
                         id: /** @type {string} */(newVal),
-                        title: newSection.getString("title")
+                        title: newSection.getString("title"),
+                        color: newSection.getString("color")
                     } : null;
                 } else if(field.type === "assignment") {
                     if(oldVal && typeof oldVal === "object" && "json" in oldVal) oldData = {

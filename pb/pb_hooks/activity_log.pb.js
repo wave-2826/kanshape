@@ -108,3 +108,21 @@ onRecordDeleteRequest((e) => {
     
     e.next();
 });
+
+routerAdd("POST", "/api/clear_activity_log", (e) => {
+    if(!e.auth) throw new UnauthorizedError("Authentication required");
+    if(!e.auth.getBool("is_admin")) throw new ForbiddenError("Only admins can clear the activity log");
+
+    // we could run a custom query here, but since we want to run event hooks, we
+    // just loop through all activity_log records and delete in batches
+    const batchSize = 100;
+    while(true) {
+        const records = $app.findRecordsByFilter("activity_log", "", "", batchSize, 0);
+        if(records.length === 0) break;
+
+        for(const record of records) {
+            if(!record) continue;
+            $app.delete(record);
+        }
+    }
+});

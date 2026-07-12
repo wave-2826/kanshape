@@ -166,6 +166,7 @@ export type ActivityLogPreviewRecord<Tchanges = unknown> = {
 	entity_type: ActivityLogPreviewEntityTypeOptions
 	id: string
 	project_color?: string
+	project_id?: RecordIdString
 	project_title: string
 }
 
@@ -177,12 +178,14 @@ export const AssignedCardsPriorityOptions = {
 } as const
 export type AssignedCardsPriorityOptions = typeof AssignedCardsPriorityOptions[keyof typeof AssignedCardsPriorityOptions]
 export type AssignedCardsRecord<Tpriority_number = unknown> = {
+	board_id?: RecordIdString
 	board_title?: string
 	due_by?: IsoDateString
 	id: string
 	priority: AssignedCardsPriorityOptions
 	priority_number?: null | Tpriority_number
 	project_color?: string
+	project_id?: RecordIdString
 	project_title: string
 	section_color?: string
 	section_title?: string

@@ -23,33 +23,38 @@
     ]);
 
     async function createProject() {
-        const result = await batch(async (batch) => {
-            for(const board of boards) {
-                let sectionIds: string[] = [];
-                for(const [sectionIndex, section] of board.sections.entries()) {
-                    const id = generateRecordID();
-                    sectionIds.push(id);
-                    save(Collections.Sections, {
-                        ...section,
-                        position: sectionIndex * 10000 + Math.random() * 100,
-                        id
+        let boardIds: string[] = [];
+        let subprojectIds: string[] = [];
+        
+        if(boards.length > 0 && subprojects.length > 0) {
+            const result = await batch(async (batch) => {
+                for(const board of boards) {
+                    let sectionIds: string[] = [];
+                    for(const [sectionIndex, section] of board.sections.entries()) {
+                        const id = generateRecordID();
+                        sectionIds.push(id);
+                        save(Collections.Sections, {
+                            ...section,
+                            position: sectionIndex * 10000 + Math.random() * 100,
+                            id
+                        }, { batch, create: true });
+                    }
+    
+                    save(Collections.Boards, {
+                        ...board,
+                        sections: sectionIds
                     }, { batch, create: true });
                 }
+                
+                for(const subproject of subprojects) {
+                    save(Collections.Subprojects, subproject, { batch, create: true });
+                }
+            });
+            if(!result) return;
 
-                save(Collections.Boards, {
-                    ...board,
-                    sections: sectionIds
-                }, { batch, create: true });
-            }
-            
-            for(const subproject of subprojects) {
-                save(Collections.Subprojects, subproject, { batch, create: true });
-            }
-        });
-        if(!result) return;
-
-        let boardIds = result.filter(r => r.body.collectionName === Collections.Boards).map(r => r.body.id);
-        let subprojectIds = result.filter(r => r.body.collectionName === Collections.Subprojects).map(r => r.body.id);
+            boardIds = result.filter(r => r.body.collectionName === Collections.Boards).map(r => r.body.id);
+            subprojectIds = result.filter(r => r.body.collectionName === Collections.Subprojects).map(r => r.body.id);
+        }
 
         if(boardIds.length !== boards.length || subprojectIds.length !== subprojects.length) {
             alert("Failed to create all boards or subprojects");

@@ -11,6 +11,7 @@
     import type { ListResult } from "pocketbase";
     import { writable, type Readable } from "svelte/store";
     import ActivityEntry from "./log/ActivityEntry.svelte";
+    import type { TypedProjectOverviewResponse } from "$lib/data/project";
 
     $effect(() => {
         $metadata.title = "Overview";
@@ -53,19 +54,7 @@
     const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0, {
         // technically cards too but that's expensive
         pollOnChange: [Collections.Projects, Collections.Boards, Collections.Subprojects]
-    }))) as Readable<ListResult<
-        {
-            id: string,
-            title: string,
-            color: string,
-            boards: { id: string; title: string }[],
-            subprojects: { id: string; name: string }[],
-            card_count: number,
-            finished_card_count: number,
-            overdue_card_count: number,
-            next_due: string | null
-        }
-    > | null>;
+    }))) as Readable<ListResult<TypedProjectOverviewResponse> | null>;
 
     const changes = $derived(deasyncify(watch(Collections.ActivityLogPreview, {
         sort: "-date"
@@ -139,12 +128,13 @@
                                 nav(`/projects/${project.id}`);
                             }
                         }}
+                        style="--project-color: {project.color || 'var(--accent)'}"
                         role="button"
                         aria-label={`Open project ${project.title}`}
                         tabindex="0"
                     >
                         <span class="title" style="color: {project.color ?? 'inherit'}">{project.title}</span>
-                        <label>
+                        <label class="progress-label">
                             <progress value={project.finished_card_count} max={Math.max(1, project.card_count)}></progress>
                             {project.card_count > 0 ? Math.round(project.finished_card_count / project.card_count * 100) : 0}%
                         </label>
@@ -194,55 +184,12 @@
 </div>
 
 <style lang="scss">
+@use "./overview.scss";
+
 .page {
     padding: 1rem;
     overflow-y: auto;
     max-height: 100%;
-}
-
-.loading {
-    padding: 0.5rem;
-    color: var(--text-secondary);
-}
-
-h2 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    &:not(:first-child) {
-        margin-top: 2rem;
-    }
-
-    span {
-        line-height: 0;
-        :global(svg) {
-            width: 0.8em;
-            height: 0.8em;
-            color: var(--text-secondary);
-        }
-    }
-
-    a {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: var(--font-small);
-        margin-left: 0.5rem;
-        text-decoration: none;
-
-        :global(svg) {
-            width: 0.8em;
-            height: 0.8em;
-        }
-    }
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem;
 }
 
 .card {
@@ -312,24 +259,6 @@ h2 {
     width: 100%;
 }
 
-.horizontal-list {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    position: relative;
-
-    > * {
-        flex: 0 0 auto;
-    }
-
-    // fade
-    padding-right: 2rem;
-    mask-image: linear-gradient(to right, black 0%, black calc(100% - 2rem), transparent 100%);
-}
-
 .project {
     display: flex;
     flex-direction: column;
@@ -348,34 +277,8 @@ h2 {
         margin-bottom: 0.25rem;
     }
 
-    label {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.5rem;
+    .progress-label {
         font-size: var(--font-tiny);
-        width: 100%;
-    }
-    progress {
-        flex: 1;
-        width: 100%;
-        height: 0.5rem;
-        border-radius: 2px;
-        overflow: hidden;
-        appearance: none;
-        background-color: var(--bg-secondary);
-        border: none;
-
-        &::-webkit-progress-bar {
-            background-color: var(--bg-secondary);
-        }
-        &::-webkit-progress-value {
-            background-color: var(--accent);
-        }
-        // has to be separate or webkit drops the style
-        &::-moz-progress-bar {
-            background-color: var(--accent);
-        }
     }
 
     ul {

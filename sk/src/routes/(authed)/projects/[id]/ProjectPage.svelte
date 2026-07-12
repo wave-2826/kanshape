@@ -37,7 +37,9 @@
 
         <header>
             <h1>
-                <span style={`color: ${project.color ? project.color : 'inherit'};`}>{project.title}</span>
+                <a style={`color: ${project.color ? project.color : 'inherit'};`} href={`/projects/${project.id}`}>
+                    {project.title}
+                </a>
                 {#if subtitle}
                     <span class="separator">/</span>
                     <span>{subtitle}</span>

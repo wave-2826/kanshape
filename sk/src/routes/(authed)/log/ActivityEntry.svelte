@@ -1,17 +1,20 @@
 <!-- messiest rendering code i've ever written oml -->
+<!-- a cleaner implementation may be generating rich text and rendering separately -->
 
 <script lang="ts">
     import type { EntryChanges, EntryValue } from "$lib/data/activity";
-    import { getPriorityColor, type CardAssignmentData } from "$lib/data/cards";
+    import { getPriorityColor } from "$lib/data/cards";
     import { relativeTime } from "$lib/datetime";
     import { nav } from "$lib/navigation";
     import { queryOne } from "$lib/pocketbase";
     import { CardsPriorityOptions, Collections, type ActivityLogPreviewRecord } from "$lib/pocketbase/generated-types";
 
     const {
-        entry
+        entry,
+        hideProject = false
     }: {
-        entry: ActivityLogPreviewRecord
+        entry: ActivityLogPreviewRecord,
+        hideProject?: boolean
     } = $props();
 
     const changes = $derived<EntryChanges>(entry.changes as EntryChanges);
@@ -252,7 +255,7 @@
                 <span class="entity-name {entry.entity_type}">{truncate(entry.entity_title, 80)}</span>
             {/if}
         {/if}
-        {#if entry.project_title && entry.entity_type !== "project"}
+        {#if entry.project_title && entry.entity_type !== "project" && !hideProject}
             in <span class="project">{entry.project_title}</span>
         {/if}
     </span>

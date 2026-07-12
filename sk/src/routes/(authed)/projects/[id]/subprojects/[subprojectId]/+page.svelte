@@ -5,6 +5,9 @@
     import { Settings } from "lucide-svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
+    import { Collections } from "$lib/pocketbase/generated-types";
+    import { watchOne } from "$lib/pocketbase";
+    import { deasyncify } from "$lib/util";
 
     const subprojectId = $derived(page.params.subprojectId);
     

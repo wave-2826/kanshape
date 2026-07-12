@@ -1,13 +1,22 @@
 import type { Component } from "svelte";
-import type { BoardsResponse, ProjectsResponse } from "../pocketbase/generated-types";
+import type { BoardsResponse, ProjectOverviewResponse, ProjectsResponse } from "../pocketbase/generated-types";
 import type { CardMetadata } from "./cards";
 import { CodeXml, Factory, Palette } from "lucide-svelte";
+import type { NonNullValuesExcept } from "./kanban";
 
 // TODO: This database schema isn't very scalable. We should use back-relations instead of
 // forward relations on projects to allow cascade deletion and avoid having to update multiple records
 
 export type TypedProjectsResponse<Expand = {}> = ProjectsResponse<ProjectLinkedSite[], Expand>;
 export type TypedBoardsResponse<Expand = {}> = BoardsResponse<CustomCardFields, ProjectLinkedSite[], Expand>;
+export type TypedProjectOverviewResponse = NonNullValuesExcept<ProjectOverviewResponse<
+    { id: string; title: string }[], // boards
+    number, // card_count
+    number, // finished_card_count
+    string | null, // next_due
+    number, // overdue_card_count
+    { id: string; name: string }[] // subprojects
+>, "next_due">;
 
 /** Context object passed to functions that dynamically change metadata */
 export type MetadataCtx = {

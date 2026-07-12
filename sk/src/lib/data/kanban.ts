@@ -2,7 +2,7 @@ import { save } from "$lib/pocketbase";
 import { CardsPriorityOptions, Collections, type CardPreviewResponse, type CardsResponse, type IsoAutoDateString, type SectionsRecord } from "$lib/pocketbase/generated-types";
 import type { CardAssignmentData } from "./cards";
 
-type NonNullValuesExcept<T, K extends keyof T> = {
+export type NonNullValuesExcept<T, K extends keyof T> = {
     [P in keyof T]: P extends K ? T[P] : NonNullable<T[P]>;
 };
 export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<

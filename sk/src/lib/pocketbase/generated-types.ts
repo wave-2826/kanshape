@@ -307,7 +307,7 @@ export type LeaderboardRecord = {
 	tasks_completed?: number
 	tasks_created?: number
 	updated: IsoAutoDateString
-	user?: RecordIdString
+	user: RecordIdString
 }
 
 export const OauthTransactionsProviderOptions = {

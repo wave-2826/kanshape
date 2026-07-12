@@ -42,10 +42,10 @@
             if(selfSelected) toggleCollapsed();
             else openWithLinkBehavior(`/projects/${project.id}`, e);
         }}
-        class="unstyled"
+        class="unstyled text-button"
     >
         <SquareKanban />
-        {project.title}
+        <span>{project.title}</span>
     </button>
     <button class="unstyled" onclick={toggleCollapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
         {#if collapsed === CollapsedState.Expanded}
@@ -68,9 +68,10 @@
                 <button
                     use:link={`/projects/${project.id}/boards/${boardId}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/boards/[boardId]") && page.params.boardId === boardId}
+                    class="text-button"
                 >
                     <Kanban />
-                    {board.title}
+                    <span>{board.title}</span>
                 </button>
             {/if}
         {/each}
@@ -80,9 +81,10 @@
                 <button
                     use:link={`/projects/${project.id}/subprojects/${subproject.id}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/subprojects/[subprojectId]") && page.params.subprojectId === subproject.id}
+                    class="text-button"
                 >
                     <Tag />
-                    {subproject.name}
+                    <span>{subproject.name}</span>
                 </button>
             {/if}
         {/each}
@@ -92,9 +94,8 @@
 <style lang="scss">
 .project-button {
     padding: 0;
-
     gap: 0;
-
+    
     :first-child {
         flex-grow: 1;
     }
@@ -102,8 +103,18 @@
         padding: 0.35em 0.5em;
     }
 }
+.text-button {
+    min-width: 0;
+
+    span {
+        // force wrap if necessary
+        min-width: 0;
+        overflow-wrap: break-word;
+    }
+}
 button, .button {
     --bg-color: transparent;
+    text-align: left;
 }
 button.selected, .button.selected {
     --bg-color: var(--bg-secondary);

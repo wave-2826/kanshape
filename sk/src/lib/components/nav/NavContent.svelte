@@ -81,6 +81,7 @@ p {
 
 .projects {
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;

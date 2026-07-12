@@ -218,6 +218,7 @@
         align-items: center;
         gap: 0.25rem;
         white-space: nowrap;
+        overflow: hidden;
 
         :global(svg) {
             width: 0.8em;
@@ -275,6 +276,9 @@
     .title {
         font-size: var(--font-medium);
         margin-bottom: 0.25rem;
+        // force wrap if necessary
+        max-width: 100%;
+        overflow-wrap: break-word;
     }
 
     .progress-label {

@@ -10,6 +10,7 @@
     import type { Readable } from "svelte/store";
     import ActivityEntry from "../../log/ActivityEntry.svelte";
     import { relativeTime } from "$lib/datetime";
+    import { metadata } from "$lib/metadata";
 
     const project = $derived(getProjectContext().project);
 
@@ -24,6 +25,10 @@
     }, 0, 10, {
         pollOnChange: [Collections.ActivityLog]
     })) : null);
+
+    $effect(() => {
+        $metadata.title = $project?.title ?? "";
+    });
 </script>
 
 {#if project && $project !== null}

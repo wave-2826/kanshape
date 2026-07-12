@@ -187,7 +187,9 @@
         nav(`/projects/${entry.project_id}`);
     }
 }}>
-    <span class="time">{relativeTime(new Date(entry.date))}</span>
+    <span class="time" title={new Date(entry.date).toLocaleString()}>
+        {relativeTime(new Date(entry.date))}
+    </span>
     <span class="description" style="--project-color: {entry.project_color || "var(--text-primary)"}">
         <span class="user">{entry.actor_name}</span>
         {#if entry.action === "create"}

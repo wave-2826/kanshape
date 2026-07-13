@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
+    import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Clock, Flag, Kanban, Tag, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
@@ -9,28 +9,38 @@
     const {
         card,
         subprojects,
-        sections,
-        onclick
+        onclick,
+        showBoard = false,
+        boardColor = "var(--text-tertiary)"
     }: {
         card: TypedCardPreviewResponse;
         subprojects: SubprojectsRecord[];
-        sections: SectionsRecord[];
         onclick: () => void;
+        showBoard?: boolean;
+        boardColor?: string;
     } = $props();
 
     const assignment = $derived(card.assignment_data as CardAssignmentData | null);
-
-    const section = $derived(sections.find(s => s.id === card.section) ?? null);
 </script>
 
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="main">
         <h3>{card.title}</h3>
+        {#if showBoard && card.board_name}
+            <span class="meta-pill" style="color: {boardColor}"><Kanban /><span>{card.board_name}</span></span>
+        {/if}
+
         {#each card.subprojects as subprojectId}
-            <span class="meta-pill subproject"><Kanban />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+            <span class="meta-pill subproject">
+                <Tag />
+                <span>{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+            </span>
         {/each}
 
-        <span class="meta-pill section" style="color: {section?.color ?? 'var(--text-primary)'}"><Kanban />{section?.title ?? card.section}</span>
+        <span class="meta-pill section" style="color: {card.section_color ?? 'var(--text-primary)'}">
+            <Kanban />
+            <span>{card.section_name ?? card.section}</span>
+        </span>
 
         <span class="meta-pill" style="color: {getPriorityColor(card.priority)}"><Flag />{card.priority}</span>
 
@@ -102,17 +112,6 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-
-    .subproject {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        color: var(--text-tertiary);
-        font-size: var(--font-tiny);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
 }
 
 .description {
@@ -147,6 +146,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    &.subproject {
+        color: var(--text-tertiary);
     }
 }
 

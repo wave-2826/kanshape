@@ -1,6 +1,6 @@
 <script lang="ts">
     import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Clock, Flag, Kanban, TextInitial, Users } from "lucide-svelte";
+    import { Clock, Flag, Tag, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
@@ -23,7 +23,7 @@
     <div class="header">
         <h3>{card.title}</h3>
         {#each card.subprojects as subprojectId}
-            <span class="meta-pill subproject"><Kanban />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+            <span class="meta-pill subproject"><Tag />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
         {/each}
     </div>
 

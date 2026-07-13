@@ -43,7 +43,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         subprojects,
         onclose
     }: {
-        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections"> | null,
         boardCards: TypedCardPreviewResponse[],
         card: TypedCardPreviewResponse | null,
         sections: SectionsRecord[],
@@ -192,10 +192,10 @@ save. This allows us to keep user edits intact while still reflecting remote upd
         }
     }
 
-    const metadataItems = $derived(getCardMetadataItems(board, {
+    const metadataItems = $derived(board ? getCardMetadataItems(board, {
         board: $state.snapshot(board) as TypedBoardsResponse,
         metadata: $state.snapshot(tracker ? tracker.current.metadata ?? null : null) as CardMetadata | null
-    }, true));
+    }, true) : []);
     const extraItems = $derived(getExtraMetadataItems(metadataItems, tracker ? tracker.current.metadata ?? null : null));
     
     let uploadQueue: { name: string, file: File }[] = [];

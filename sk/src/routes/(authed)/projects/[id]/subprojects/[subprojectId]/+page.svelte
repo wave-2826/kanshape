@@ -1,15 +1,24 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { link } from "$lib/actions";
-    import type { ProjectLinkedSite, TypedSubprojectOverviewResponse } from "$lib/data/project";
-    import { Settings } from "lucide-svelte";
+    import type { ProjectLinkedSite, TypedBoardsResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
+    import { Kanban, Settings } from "lucide-svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
-    import { watchOne } from "$lib/pocketbase";
+    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import { deasyncify } from "$lib/util";
     import type { Readable } from "svelte/store";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
+    import type { ListResult } from "pocketbase";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import KanbanMenu from "$lib/components/kanban/KanbanMenu.svelte";
+    import KanbanCard from "$lib/components/kanban/KanbanCard.svelte";
+    import Masonry from "$lib/components/Masonry.svelte";
+    import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
+    import { untrack } from "svelte";
+    import { nav } from "$lib/navigation";
+    import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     
     const subprojectId = $derived(page.params.subprojectId);
     
@@ -23,6 +32,40 @@
         deasyncify(watchOne(Collections.SubprojectOverview, subproject.id)) :
         null
     ) as Readable<TypedSubprojectOverviewResponse | null> | null;
+
+    const cards = $derived(subproject ?
+        deasyncify(watch(Collections.CardPreview, {
+            filter: `subprojects ~ "${subproject.id}"`,
+            sort: "position,created"
+        }, 1, 500, {
+            waitForConnection: true,
+            pollOnChange: [Collections.Cards]
+        })) :
+        null
+    ) as Readable<ListResult<TypedCardPreviewResponse> | null> | null;
+
+    let openCardId: string | null = $state(null);
+    const openCard = $derived.by(() => {
+        if(!openCardId || untrack(() => !cards)) return null;
+        return untrack(() => $cards?.items.find((c) => c.id === openCardId)) ?? null;
+    });
+
+    // This is kind of a mess, but we need information from the open card's board, which depends
+    // on the open card, so we need to do a bunch of fetching to gather that information. It's not
+    // the worst, at least.
+    const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
+        expand: "sections,subprojects"
+    })) : null) as Readable<TypedBoardsResponse & ExpandResponse<"boards", "sections,subprojects"> | null> | null;
+    // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
+    // a separate cached card loading system or something
+    // TODO: Don't fetch all board cards
+    const openCardBoardCards = $derived(openCardBoard ? deasyncify(watch(Collections.CardPreview, {
+        filter: `board = "${$openCardBoard?.id}"`,
+        sort: "position,created"
+    }, 1, 500, {
+        waitForConnection: true,
+        pollOnChange: [Collections.Cards]
+    })) : null) as Readable<ListResult<TypedCardPreviewResponse> | null> | null;
 </script>
 
 {#if project && $project !== null && subproject !== null}
@@ -39,17 +82,69 @@
             </button>
         {/snippet}
         
-        <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">
-            {#if subprojectOverview && $subprojectOverview}
-                <BoardOverviewItems
-                    cardCount={$subprojectOverview.card_count}
-                    finishedCardCount={$subprojectOverview.finished_card_count}
-                    overdueCardCount={$subprojectOverview.overdue_card_count}
-                    nextDue={$subprojectOverview.next_due}
-                />
-            {:else}
-                <p class="empty">Loading overview...</p>
-            {/if}
+        <div class="shell">
+            <CardViewPanel
+                board={$openCardBoard}
+                boardCards={$openCardBoardCards ? $openCardBoardCards.items : []}
+                bind:card={
+                    () => openCardId && $openCardBoard && $openCardBoardCards ? openCard : null,
+                    (v) => {
+                        if(!$cards?.items.find((c) => c.id === v?.id)) {
+                            // this card is from another subproject; open its board
+                            // TODO: open the linked card with a query param or something
+                            nav(`/projects/${$project.id}/boards/${v?.board}`);
+                        }
+                        if(openCardId !== v?.id) openCardId = v?.id ?? null;
+                    }
+                }
+                onclose={() => openCardId = null}
+                sections={$openCardBoard?.expand.sections ?? []} subprojects={$openCardBoard?.expand.subprojects ?? []}
+            />
+    
+            <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">
+                {#if subprojectOverview && $subprojectOverview}
+                    <BoardOverviewItems
+                        cardCount={$subprojectOverview.card_count}
+                        finishedCardCount={$subprojectOverview.finished_card_count}
+                        overdueCardCount={$subprojectOverview.overdue_card_count}
+                        nextDue={$subprojectOverview.next_due}
+                    />
+                {:else}
+                    <p class="empty">Loading overview...</p>
+                {/if}
+
+                <h2><Kanban /> Cards ({$subprojectOverview?.card_count ?? 0})</h2>
+                {#if cards}
+                    {#if $cards !== null}
+                        <KanbanMenu project={$project} cards={$cards.items} />
+                        <div class="card-list">
+                            {#if $cards.items.length > 0}
+                                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)"items={$cards.items}>
+                                    {#each $cards.items as card (card.id)}
+                                        <!-- TODO: a way to open any card in its board -->
+                                        <KanbanListEntry
+                                            showBoard boardColor={$project.color}
+                                            card={card}
+                                            // All cards are guarenteed to be this subproject
+                                            // This does break dependencies' subproject display, but...
+                                            // whatever for now
+                                            // TODO: find an efficient way to fix that
+                                            subprojects={[subproject]}
+                                            onclick={() => openCardId = card.id}
+                                        />
+                                    {/each}
+                                </Masonry>
+                            {:else}
+                                <p class="empty-cards">No cards found</p>
+                            {/if}
+                        </div>
+                    {:else}
+                        <p class="empty">Failed to load cards</p>
+                    {/if}
+                {:else}
+                    <p class="empty">Loading cards...</p>
+                {/if}
+            </div>
         </div>
     </ProjectPage>
 {:else}
@@ -60,11 +155,34 @@
 <style lang="scss">
 @use "../../../../overview.scss";
 
+.shell {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
 .content {
     padding: 0 1rem 1rem 1rem;
     overflow-y: auto;
-    min-height: 0;
-    flex: 1;
+    height: 100%;
 }
 
+h2 {
+    margin-bottom: 0.5rem;
+}
+
+.card-list {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+}
+
+.empty-cards {
+    color: var(--text-tertiary);
+    font-size: var(--font-tiny);
+    font-style: italic;
+    text-align: center;
+    padding: 0.5rem 0;
+}
 </style>

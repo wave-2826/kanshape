@@ -12,8 +12,8 @@
         cards
     }: {
         project: ExpandResponse<"projects", "subprojects">,
-        board: ExpandResponse<"boards", "sections">,
-        sections: SectionsRecord[],
+        board?: ExpandResponse<"boards", "sections">,
+        sections?: SectionsRecord[],
         cards: TypedCardPreviewResponse[]
     } = $props();
 
@@ -24,11 +24,13 @@
     }
 </script>
 
-    <menu>
-    <button onclick={() => newCardModal?.open()} disabled={sections.length === 0} class="new">
-        <SquarePlus />
-        New Card
-    </button>
+<menu>
+    {#if sections}
+        <button onclick={() => newCardModal?.open()} disabled={sections.length === 0} class="new">
+            <SquarePlus />
+            New Card
+        </button>
+    {/if}
     <button disabled onclick={() => {
         // todo
     }}>
@@ -44,7 +46,9 @@
     <input type="text" placeholder="Search cards..." disabled />
 </menu>
 
-<NewCardModal bind:this={newCardModal} {sections} boardCards={cards} projectId={project.id} boardId={board.id} />
+{#if board && sections}
+    <NewCardModal bind:this={newCardModal} {sections} boardCards={cards} projectId={project.id} boardId={board.id} />
+{/if}
 
 <style lang="scss">
 menu {

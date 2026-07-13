@@ -8,20 +8,7 @@ export type NonNullValuesExcept<T, K extends keyof T> = {
 export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     CardAssignmentData, // assignment_data
     string[], // assignment_name_cache
-    string, // board
-    IsoAutoDateString, // created
-    string, // created_by
-    string[], // dependencies
     string, // description (truncated)
-    string, // due_by
-    number, // duration_days
-    string, // moved_at
-    number, // position
-    CardsPriorityOptions, // priority
-    string, // section
-    string[], // subprojects
-    string, // title
-    IsoAutoDateString, // updated
     {} // expand
 >, "assignment_data" | "assignment_name_cache">;
 
@@ -128,6 +115,9 @@ export async function moveCard(
             description: fullCard.description ? fullCard.description.substring(0, 100) : "",
             assignment_name_cache: oldNameCache,
             assignment_data: fullCard.assignment_data as CardAssignmentData,
+            section_name: "",
+            section_color: "",
+            board_name: "",
             expand: {}
         };
     }

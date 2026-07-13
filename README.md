@@ -24,12 +24,12 @@ The scope extends a bit beyond Kanban:
 - [x] Documentation/other site linking
   - [ ] And embedded previews
 - [ ] View filtering and search
-- [ ] Manufacturing metadata and sub-tasks for production
-- [ ] Card file uploads for artefacts like drawings, CAM files, etc.
-- [ ] Onshape part detection and linking
+- [x] Manufacturing metadata and sub-tasks for production
+- [x] Card file uploads for artefacts like drawings, CAM files, etc.
+- [x] Onshape part detection and linking
 - [ ] Email (and Slack?) notifications for task updates
-- [ ] Leaderboard/productivity tracking
-- [ ] Customizable per-project metadata
+- [x] Leaderboard/productivity tracking
+- [x] Customizable per-project metadata
 - [ ] Inventory and material stock tracking
 
 > [!NOTE]

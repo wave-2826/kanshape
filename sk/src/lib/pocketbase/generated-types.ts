@@ -14,6 +14,7 @@ export const Collections = {
 	ActivityLog: "activity_log",
 	ActivityLogPreview: "activity_log_preview",
 	AssignedCards: "assigned_cards",
+	BoardOverview: "board_overview",
 	Boards: "boards",
 	CardAssignmentCache: "card_assignment_cache",
 	CardPreview: "card_preview",
@@ -30,6 +31,7 @@ export const Collections = {
 	ProjectOverview: "project_overview",
 	Projects: "projects",
 	Sections: "sections",
+	SubprojectOverview: "subproject_overview",
 	Subprojects: "subprojects",
 	Users: "users",
 } as const
@@ -189,6 +191,16 @@ export type AssignedCardsRecord<Tpriority_number = unknown> = {
 	project_title: string
 	section_color?: string
 	section_title?: string
+	title?: string
+}
+
+export type BoardOverviewRecord<Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown> = {
+	card_count?: null | Tcard_count
+	finished_card_count?: null | Tfinished_card_count
+	id: string
+	next_due?: null | Tnext_due
+	overdue_card_count?: null | Toverdue_card_count
+	project_id?: RecordIdString
 	title?: string
 }
 
@@ -392,6 +404,16 @@ export type SectionsRecord = {
 	updated: IsoAutoDateString
 }
 
+export type SubprojectOverviewRecord<Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown> = {
+	card_count?: null | Tcard_count
+	finished_card_count?: null | Tfinished_card_count
+	id: string
+	name?: string
+	next_due?: null | Tnext_due
+	overdue_card_count?: null | Toverdue_card_count
+	project_id?: RecordIdString
+}
+
 export type SubprojectsRecord<Tlinked_sites = unknown> = {
 	created: IsoAutoDateString
 	description?: string
@@ -429,6 +451,7 @@ export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> &
 export type ActivityLogResponse<Tchanges = unknown, Texpand = unknown> = Required<ActivityLogRecord<Tchanges>> & BaseSystemFields<Texpand>
 export type ActivityLogPreviewResponse<Tchanges = unknown, Texpand = unknown> = Required<ActivityLogPreviewRecord<Tchanges>> & BaseSystemFields<Texpand>
 export type AssignedCardsResponse<Tpriority_number = unknown, Texpand = unknown> = Required<AssignedCardsRecord<Tpriority_number>> & BaseSystemFields<Texpand>
+export type BoardOverviewResponse<Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Texpand = unknown> = Required<BoardOverviewRecord<Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count>> & BaseSystemFields<Texpand>
 export type BoardsResponse<Tcustom_card_fields = unknown, Tlinked_sites = unknown, Texpand = unknown> = Required<BoardsRecord<Tcustom_card_fields, Tlinked_sites>> & BaseSystemFields<Texpand>
 export type CardAssignmentCacheResponse<Texpand = unknown> = Required<CardAssignmentCacheRecord> & BaseSystemFields<Texpand>
 export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tboard = unknown, Tcreated = unknown, Tcreated_by = unknown, Tdependencies = unknown, Tdescription = unknown, Tdue_by = unknown, Tduration_days = unknown, Tmoved_at = unknown, Tposition = unknown, Tpriority = unknown, Tsection = unknown, Tsubprojects = unknown, Ttitle = unknown, Tupdated = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tboard, Tcreated, Tcreated_by, Tdependencies, Tdescription, Tdue_by, Tduration_days, Tmoved_at, Tposition, Tpriority, Tsection, Tsubprojects, Ttitle, Tupdated>> & BaseSystemFields<Texpand>
@@ -445,6 +468,7 @@ export type PartsResponse<Tpart_heuristic_result = unknown, Texpand = unknown> =
 export type ProjectOverviewResponse<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<ProjectOverviewRecord<Tboards, Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count, Tsubprojects>> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>
+export type SubprojectOverviewResponse<Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Texpand = unknown> = Required<SubprojectOverviewRecord<Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count>> & BaseSystemFields<Texpand>
 export type SubprojectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<SubprojectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type UsersResponse<Tmetadata = unknown, Tonshape_oauth = unknown, Texpand = unknown> = Required<UsersRecord<Tmetadata, Tonshape_oauth>> & AuthSystemFields<Texpand>
 
@@ -459,6 +483,7 @@ export type CollectionRecords = {
 	activity_log: ActivityLogRecord
 	activity_log_preview: ActivityLogPreviewRecord
 	assigned_cards: AssignedCardsRecord
+	board_overview: BoardOverviewRecord
 	boards: BoardsRecord
 	card_assignment_cache: CardAssignmentCacheRecord
 	card_preview: CardPreviewRecord
@@ -475,6 +500,7 @@ export type CollectionRecords = {
 	project_overview: ProjectOverviewRecord
 	projects: ProjectsRecord
 	sections: SectionsRecord
+	subproject_overview: SubprojectOverviewRecord
 	subprojects: SubprojectsRecord
 	users: UsersRecord
 }
@@ -488,6 +514,7 @@ export type CollectionResponses = {
 	activity_log: ActivityLogResponse
 	activity_log_preview: ActivityLogPreviewResponse
 	assigned_cards: AssignedCardsResponse
+	board_overview: BoardOverviewResponse
 	boards: BoardsResponse
 	card_assignment_cache: CardAssignmentCacheResponse
 	card_preview: CardPreviewResponse
@@ -504,6 +531,7 @@ export type CollectionResponses = {
 	project_overview: ProjectOverviewResponse
 	projects: ProjectsResponse
 	sections: SectionsResponse
+	subproject_overview: SubprojectOverviewResponse
 	subprojects: SubprojectsResponse
 	users: UsersResponse
 }

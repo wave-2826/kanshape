@@ -1,8 +1,10 @@
 <script lang="ts">
+  import BoardOverviewItems from './BoardOverviewItems.svelte';
+
     import { link } from "$lib/actions";
     import { AlarmClock, Check, CheckCheck, Clock, Kanban, ListCheck, Settings, Square, SquareKanban, Tag } from "lucide-svelte";
     import { getProjectContext } from "./context";
-    import type { ProjectLinkedSite, TypedProjectOverviewResponse } from "$lib/data/project";
+    import type { ProjectLinkedSite, TypedBoardOverviewResponse, TypedProjectOverviewResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
     import ProjectPage from "./ProjectPage.svelte";
     import { deasyncify } from "$lib/util";
     import { watch, watchOne } from "$lib/pocketbase";
@@ -11,6 +13,8 @@
     import ActivityEntry from "../../log/ActivityEntry.svelte";
     import { relativeTime } from "$lib/datetime";
     import { metadata } from "$lib/metadata";
+    import type { ListResult } from "pocketbase";
+    import BoardButtons from "./boards/[boardId]/(kanban)/BoardButtons.svelte";
 
     const project = $derived(getProjectContext().project);
 
@@ -18,6 +22,26 @@
         deasyncify(watchOne(Collections.ProjectOverview, $project.id)) :
         null
     ) as Readable<TypedProjectOverviewResponse | null> | null;
+
+    const boards = $derived($project ?
+        deasyncify(watch(Collections.BoardOverview, {
+            filter: `project_id = "${$project.id}"`,
+            sort: "title"
+        }, 0, 100, {
+            pollOnChange: [Collections.Boards]
+        })) :
+        null
+    ) as Readable<ListResult<TypedBoardOverviewResponse> | null> | null;
+
+    const subprojects = $derived($project ?
+        deasyncify(watch(Collections.SubprojectOverview, {
+            filter: `project_id = "${$project.id}"`,
+            sort: "name"
+        }, 0, 100, {
+            pollOnChange: [Collections.Subprojects]
+        })) :
+        null
+    ) as Readable<ListResult<TypedSubprojectOverviewResponse> | null> | null;
 
     const changes = $derived($project ? deasyncify(watch(Collections.ActivityLogPreview, {
         filter: `project_id = "${$project.id}"`,
@@ -42,40 +66,74 @@
         
         <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">
             {#if projectOverview && $projectOverview}
-                <div class="horizontal-list overview">
-                    <div class="overview-item">
-                        <h3><ListCheck /> Cards</h3>
-                        <p>{$projectOverview.card_count}</p>
-                    </div>
-                    <div class="overview-item">
-                        <h3><CheckCheck /> Finished cards</h3>
-                        <p class="finished">{$projectOverview.finished_card_count}</p>
-                    </div>
-                    <div class="overview-item">
-                        <h3><Clock /> Overdue cards</h3>
-                        <p class:overdue={$projectOverview.overdue_card_count > 0}>{$projectOverview.overdue_card_count}</p>
-                    </div>
-                    {#if $projectOverview.next_due}
-                        <div class="overview-item">
-                            <!-- TODO: should definitely link to the card -->
-                            <h3><Check /> Next due</h3>
-                            <p>{relativeTime(new Date($projectOverview.next_due))}</p>
-                        </div>
-                    {/if}
-                </div>
-                <label class="progress-label">
-                    <progress value={$projectOverview.finished_card_count} max={Math.max(1, $projectOverview.card_count)}></progress>
-                    {$projectOverview.card_count > 0 ? Math.round($projectOverview.finished_card_count / $projectOverview.card_count * 100) : 0}% complete
-                </label>
+                <BoardOverviewItems
+                    cardCount={$projectOverview.card_count}
+                    finishedCardCount={$projectOverview.finished_card_count}
+                    overdueCardCount={$projectOverview.overdue_card_count}
+                    nextDue={$projectOverview.next_due}
+                />
             {:else}
-                <p class="loading">Loading overview...</p>
+                <p class="empty">Loading overview...</p>
             {/if}
 
             <h2><Kanban /> Boards ({$projectOverview?.boards.length ?? 0})</h2>
-            <!-- TODO -->
+            {#if boards && $boards}
+                {#if $boards.items.length > 0}
+                    <div class="list board-list">
+                        {#each $boards.items as board}
+                            <div class="button board" use:link={`/projects/${$project.id}/boards/${board.id}`}>
+                                <h3>{board.title}</h3>
+                                <div class="nav">
+                                    <BoardButtons projectId={$project.id} boardId={board.id} />
+                                </div>
+                                
+                                <div class="info">
+                                    <p><ListCheck /> {board.card_count} cards</p>
+                                    <p class:finished={board.finished_card_count > 0}><CheckCheck /> {board.finished_card_count} done</p>
+                                    {#if board.overdue_card_count > 0}
+                                        <p class="due overdue"><Clock /> {board.overdue_card_count} overdue</p>
+                                    {:else if board.next_due !== null}
+                                        <p class="due"><Clock /> Next due {relativeTime(new Date(board.next_due))}</p>
+                                    {/if}
+                                </div>
+                                
+                                <label class="progress-label">
+                                    {board.card_count > 0 ? Math.round(board.finished_card_count / board.card_count * 100) : 0}%
+                                    <progress value={board.finished_card_count} max={Math.max(1, board.card_count)}></progress>
+                                </label>
+                            </div>
+                        {/each}
+                    </div>
+                {:else}
+                    <p class="empty">No boards</p>
+                {/if}
+            {:else}
+                <p class="empty">Loading boards...</p>
+            {/if}
 
             <h2><Tag /> Subprojects ({$projectOverview?.subprojects.length ?? 0})</h2>
-            <!-- TODO -->
+            {#if subprojects && $subprojects}
+                {#if $subprojects.items.length > 0}
+                    <div class="horizontal-list">
+                        {#each $subprojects.items as subproject}
+                            <button class="subproject" use:link={`/projects/${$project.id}/subprojects/${subproject.id}`}>
+                                <h3>{subproject.name}</h3>
+                                <p><ListCheck /> {subproject.card_count} cards</p>
+                                <p class:finished={subproject.finished_card_count > 0}><CheckCheck /> {subproject.finished_card_count} done</p>
+                                {#if subproject.overdue_card_count > 0}
+                                    <p class="due overdue"><Clock /> {subproject.overdue_card_count} overdue</p>
+                                {:else if subproject.next_due !== null}
+                                    <p class="due"><Clock /> Next due {relativeTime(new Date(subproject.next_due))}</p>
+                                {/if}
+                            </button>
+                        {/each}
+                    </div>
+                {:else}
+                    <p class="empty">No subprojects</p>
+                {/if}
+            {:else}
+                <p class="empty">Loading subprojects...</p>
+            {/if}
 
             <!-- TODO: also link to the full log here with a filter or something -->
             <h2><AlarmClock /> Recent activity</h2>
@@ -86,9 +144,9 @@
                             <ActivityEntry entry={entry} hideProject />
                         {/each}
                     {:else if $changes}
-                        <p class="loading">No recent activity</p>
+                        <p class="empty">No recent activity</p>
                     {:else}
-                        <p class="loading">Loading activity...</p>
+                        <p class="empty">Loading activity...</p>
                     {/if}
                 </div>
             {/if}
@@ -107,29 +165,20 @@
     flex: 1;
 }
 
-.overview {
-    padding-left: 0;
+.board-list {
+    container-type: inline-size;
 }
-.overview-item {
-    background-color: var(--bg-primary);
-    padding: 0.5rem 0.5rem 0.75rem 0.5rem;
-    border-radius: 4px;
-    width: 10rem;
-    text-align: center;
+.board, .subproject {
+    --bg-color: var(--bg-primary);
+    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
 
-    h3 {
+    p {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: var(--font-small);
-        color: var(--text-secondary);
-    }
-
-    p {
-        margin-top: 0.25rem;
-        font-size: var(--font-large);
-        font-weight: bold;
-        color: var(--text-primary);
+        &.due {
+            color: var(--text-secondary);
+        }
 
         &.overdue {
             color: var(--error);
@@ -138,14 +187,91 @@
             color: var(--success);
         }
     }
+
+    :global(svg) {
+        width: 1em;
+        height: 1em;
+    }
+}
+.board {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "title nav"
+        "info progress";
+    gap: 0.25rem 1rem;
+
+    h3 {
+        grid-area: title;
+        align-self: start;
+        color: var(--project-color);
+        word-break: break-word;
+    }
+    .nav {
+        grid-area: nav;
+        display: flex;
+        gap: 0.25rem;
+        font-size: var(--font-small);
+        --bg-color: var(--bg-secondary);
+        justify-self: end;
+        margin-bottom: -0.25rem;
+
+        > :global(button) {
+            padding: 0.25rem 0.5rem;
+        }
+    }
+    .info {
+        grid-area: info;
+        font-size: var(--font-small);
+        display: flex;
+        gap: 0.25rem 1.5rem;
+        flex-wrap: wrap;
+        white-space: nowrap;
+    }
+    
+    .progress-label {
+        grid-area: progress;
+        width: 18rem;
+    }
 }
 
-.progress-label {
-    margin-top: 0.25rem;
-    gap: 1rem;
-    width: min(100%, 30rem);
-    margin-left: 0.125rem; // intentionally misalign for visual balance
-    font-size: var(--font-small);
-    color: var(--text-secondary);
+.subproject {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    min-width: 10rem;
+    max-width: 20rem;
+    text-align: left;
+
+    h3 {
+        color: var(--project-color);
+        margin-bottom: 0.25rem;
+        word-break: break-word;
+    }
+}
+
+@container (max-width: 35rem) {
+    .board {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "title"
+            "nav"
+            "info"
+            "progress";
+        gap: 0.5rem;
+
+        .nav {
+            justify-self: start;
+        }
+        .info {
+            padding: 0 0.5rem;
+        }
+        .progress-label {
+            width: 100%;
+            padding: 0 0.5rem;
+        }
+    }
 }
 </style>

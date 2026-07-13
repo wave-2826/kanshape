@@ -34,12 +34,24 @@ export function openWithLinkBehavior(href: string, event: MouseEvent) {
     nav(href);
 }
 
-export function link(node: HTMLButtonElement, href: string) {
+export function link(node: HTMLElement, href: string) {
     function onClick(event: MouseEvent) {
         openWithLinkBehavior(href, event);
+        event.stopPropagation();
+    }
+    function onKeyPress(event: KeyboardEvent) {
+        if(event.key === "Enter" || event.key === " ") {
+            openWithLinkBehavior(href, event as any);
+        }
     }
 
     node.addEventListener("click", onClick);
+    if(!(node instanceof HTMLButtonElement)) {
+        // accessibility
+        node.setAttribute("role", "link");
+        node.setAttribute("tabindex", "0");
+        node.addEventListener("keypress", onKeyPress);
+    }
 
     return {
         update(newHref: string) {
@@ -47,6 +59,9 @@ export function link(node: HTMLButtonElement, href: string) {
         },
         destroy() {
             node.removeEventListener("click", onClick);
+            if(!(node instanceof HTMLButtonElement)) {
+                node.removeEventListener("keypress", onKeyPress);
+            }
         }
     };
 }

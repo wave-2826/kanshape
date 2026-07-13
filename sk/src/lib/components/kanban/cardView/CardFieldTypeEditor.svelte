@@ -79,7 +79,7 @@ cases where the expected type doesn't match the value type by displaying a reset
         {/each}
         <button
             class="add-item"
-            onclick={() => (value as MetadataValue[]).push(defaultMetadataFieldValue(type.field))}
+            onclick={() => (value as MetadataValue[]) = [...(value as MetadataValue[]), defaultMetadataFieldValue(type.field)]}
         >
             <Plus /> Add {type.fieldName ?? "item"}
         </button>

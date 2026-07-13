@@ -106,7 +106,7 @@
                 </button>
             {/if}
         {:else}
-            <p class="loading">Loading tasks...</p>
+            <p class="empty">Loading tasks...</p>
         {/if}
     {/if}
     
@@ -175,9 +175,9 @@
                     <ActivityEntry entry={entry} />
                 {/each}
             {:else if $changes}
-                <p class="loading">No recent activity</p>
+                <p class="empty">No recent activity</p>
             {:else}
-                <p class="loading">Loading activity...</p>
+                <p class="empty">Loading activity...</p>
             {/if}
         </div>
     {/if}

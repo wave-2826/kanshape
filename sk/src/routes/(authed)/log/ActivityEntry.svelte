@@ -134,7 +134,7 @@
             case "section":
                 return {
                     specialType: "section",
-                    action: definite ? `moved the ${fieldData.label} of` : `moved its ${fieldData.label}`,
+                    action: definite ? `moved` : `moved it`,
                     oldValue:
                         change.old && typeof change.old !== "string" &&
                         "title" in change.old ? change.old.title : null,

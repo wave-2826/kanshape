@@ -261,6 +261,9 @@ ul {
     }
     .label {
         flex: 1;
+        min-width: 0;
+        // force break if needed
+        word-break: break-word;
         padding: 0.25em;
         text-align: left;
     }

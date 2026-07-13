@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { page } from "$app/state";
-    import { ChartNoAxesGantt, Kanban, List, Settings } from "lucide-svelte";
+    import BoardButtons from './BoardButtons.svelte';
+    import { Settings } from "lucide-svelte";
     import type { Snippet } from "svelte";
     import { getProjectContext } from "../../../context";
     import type { ProjectLinkedSite } from "$lib/data/project";
@@ -31,18 +31,7 @@
     >
         {#snippet navItems()}
             <div class="multi-button">
-                <button use:link={`/projects/${$project.id}/boards/${$board.id}/gantt`} class:active={page.route.id?.endsWith("/gantt")}>
-                    <ChartNoAxesGantt />
-                    Gantt
-                </button>
-                <button use:link={`/projects/${$project.id}/boards/${$board.id}/list`} class:active={page.route.id?.endsWith("/list")}>
-                    <List />
-                    List
-                </button>
-                <button use:link={`/projects/${$project.id}/boards/${$board.id}`} class:active={page.route.id?.endsWith("/(kanban)")}>
-                    <Kanban />
-                    Board
-                </button>
+                <BoardButtons projectId={$project.id} boardId={$board.id} />
             </div>
 
             <button use:link={`/projects/${$project.id}/boards/${$board.id}/settings`}>

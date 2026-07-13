@@ -1,5 +1,5 @@
 import type { Component } from "svelte";
-import type { BoardsResponse, ProjectOverviewResponse, ProjectsResponse } from "../pocketbase/generated-types";
+import type { BoardOverviewResponse, BoardsResponse, ProjectOverviewResponse, ProjectsResponse, SubprojectOverviewResponse } from "../pocketbase/generated-types";
 import type { CardMetadata } from "./cards";
 import { CodeXml, Factory, Palette } from "lucide-svelte";
 import type { NonNullValuesExcept } from "./kanban";
@@ -16,6 +16,18 @@ export type TypedProjectOverviewResponse = NonNullValuesExcept<ProjectOverviewRe
     string | null, // next_due
     number, // overdue_card_count
     { id: string; name: string }[] // subprojects
+>, "next_due">;
+export type TypedBoardOverviewResponse = NonNullValuesExcept<BoardOverviewResponse<
+    number, // card_count
+    number, // finished_card_count
+    string | null, // next_due
+    number // overdue_card_count
+>, "next_due">;
+export type TypedSubprojectOverviewResponse = NonNullValuesExcept<SubprojectOverviewResponse<
+    number, // card_count
+    number, // finished_card_count
+    string | null, // next_due
+    number // overdue_card_count
 >, "next_due">;
 
 /** Context object passed to functions that dynamically change metadata */
@@ -199,7 +211,7 @@ export const boardTypes: {
         description: "A board for manufacturing part tasks. Boards of this type are defaulted to when adding parts from Onshape and associate part IDs with all cards.",
         fields: {
             "onshape_part_id": {
-                name: "Onshape Part ID",
+                name: "Linked part",
                 description: "The ID of the associated Onshape part",
                 type: { base: "onshape_part" }
             },

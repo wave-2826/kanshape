@@ -153,12 +153,12 @@
 </script>
 
 <div class="gantt" style="--day-count: {days.length}" bind:this={scrollContainer}>
-    <div class="content">
-        {#if items.length === 0}
-            <div class="empty">
-                <p>No tasks to display.</p>
-            </div>
-        {:else}
+    {#if items.length === 0}
+        <div class="empty">
+            <p>No tasks to display.</p>
+        </div>
+    {:else}
+        <div class="content">
             <div class="header label-col">
                 {@render cornerHeader?.()}
             </div>
@@ -215,8 +215,8 @@
                     </div>
                 {/each}
             </div>
-        {/if}
-    </div>
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -250,7 +250,7 @@
 }
 
 .empty {
-	padding: 2rem;
+	padding: 1rem;
 	text-align: center;
 	color: var(--text-tertiary);
 }

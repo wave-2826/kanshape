@@ -3,10 +3,22 @@
     import LinkOnshapeDocument from "../LinkOnshapeDocument.svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
     import { nav } from "$lib/navigation";
+    import { page } from "$app/state";
 
     $effect(() => {
         $metadata.title = "Onshape Document Redirect";
     });
+
+    if(!page.url.searchParams.has("onshape")) {
+        const params = page.url.searchParams;
+        const documentId = params.get("documentId");
+        const wvmId = params.get("workspaceId");
+        const elementId = params.get("elementId");
+        if(documentId && wvmId && elementId) {
+            console.log("Redirecting to onshape document page with rewritten query params.");
+            nav(`?onshape_documentId=${documentId}&onshape_wvm=w&onshape_wvmId=${wvmId}&onshape_elementId=${elementId}&onshape=tab`);
+        }
+    }
 
     const linkedProject = $derived(getOnshapeContext().linkedProject);
     
@@ -22,6 +34,7 @@
             `/projects/${linkedProject.project}`);
     }
     $effect(() => {
+        if(!page.url.searchParams.has("onshape")) return;
         if(linkedProject?.type !== LinkedProjectType.Unlinked) redirect();
     });
 </script>

@@ -1,6 +1,11 @@
 import { goto } from "$app/navigation";
 
-const alwaysKeepParams = ["documentId"];
+const alwaysKeepParams = ["onshape_documentId", "onshape_wvm", "onshape_wvmId", "onshape_versionId", "onshape_elementId", "onshape"];
+
+let handledNav = 0;
+export function shouldHandleNav() {
+    return handledNav === 0;
+}
 
 export async function nav(path: string, options?: Parameters<typeof goto>[1] & {
     /** Parameters for the navigation target */
@@ -23,5 +28,10 @@ export async function nav(path: string, options?: Parameters<typeof goto>[1] & {
         }
     }
 
-    await goto(url.pathname + url.search, options);
+    handledNav++;
+    try {
+        await goto(url.pathname + url.search, options);
+    } finally {
+        handledNav--;
+    }
 }

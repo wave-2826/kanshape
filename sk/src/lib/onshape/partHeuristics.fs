@@ -612,6 +612,8 @@ function(tl_context is Context, queries) {
             isPlate = (principalDim < 0.5 * nonPrincipalDim) || (faceDistance < 0.3 * inch) || isSheetMetalModelActive(context, body);
         }
 
+        const aabb = evBox3d(context, { "topology": body, "tight": true });
+
         return {
             'partID': partID,
             'name': getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
@@ -625,6 +627,10 @@ function(tl_context is Context, queries) {
                 'size': [size[0] / meter, size[1] / meter],
                 'thickness': thickness / meter,
                 'confidence': best.certainty
+            },
+            'aabb': {
+                'min': [aabb.minCorner[0] / meter, aabb.minCorner[1] / meter, aabb.minCorner[2] / meter],
+                'max': [aabb.maxCorner[0] / meter, aabb.maxCorner[1] / meter, aabb.maxCorner[2] / meter]
             }
         };
     };

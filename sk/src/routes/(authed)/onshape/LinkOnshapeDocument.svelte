@@ -5,18 +5,16 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Kanban, SquareKanban } from "lucide-svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
-    
-    const documentId = page.url.searchParams.get("documentId");
 
     const projects = await query(Collections.Projects, { expand: "subprojects" });
 
     const onshapeCtx = getOnshapeContext();
     async function linkDocumentToProject(projectId: string, subprojectId?: string) {
-        if(!documentId) return;
+        if(!onshapeCtx.documentId) return;
 
         const { data, error } = await onshapeClient.GET("/documents/{did}", {
             params: {
-                path: { did: documentId }
+                path: { did: onshapeCtx.documentId }
             }
         });
         console.log("Fetched document details:", { data, error });
@@ -27,7 +25,7 @@
         }
 
         const record = await save(Collections.OnshapeDocuments, {
-            id: documentId,
+            id: onshapeCtx.documentId,
             workspace_id: onshapeCtx.wvmId ?? "",
             project: projectId,
             subproject: subprojectId || "",

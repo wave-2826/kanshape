@@ -10,6 +10,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     import UrlInput from "./UrlInput.svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
     import { FileIcon, Plus, X } from "lucide-svelte";
+    import CardPartEditor from "./CardPartEditor.svelte";
 
     let {
         type, value = $bindable(),
@@ -47,7 +48,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     <input type="date" bind:value={get, set<string>} />
 {:else if type.base === "onshape_part"}
     <!-- TODO: Better selection for when user is in onshape -->
-    <input type="text" bind:value={get, set<string>} />
+    <CardPartEditor bind:value={get, set<string>} />
 {:else if type.base === "user" || type.base === "group"}
     <div class="select">
         <CachedCollectionSelector

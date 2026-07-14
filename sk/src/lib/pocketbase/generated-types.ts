@@ -365,6 +365,12 @@ export type OnshapeDocumentsRecord = {
 	workspace_id?: string
 }
 
+export const PartsWvmOptions = {
+	"w": "w",
+	"v": "v",
+	"m": "m",
+} as const
+export type PartsWvmOptions = typeof PartsWvmOptions[keyof typeof PartsWvmOptions]
 export type PartsRecord<Tpart_heuristic_result = unknown> = {
 	created: IsoAutoDateString
 	current_card?: RecordIdString
@@ -377,6 +383,8 @@ export type PartsRecord<Tpart_heuristic_result = unknown> = {
 	revision?: number
 	thumbnail?: FileNameString
 	updated: IsoAutoDateString
+	wvm?: PartsWvmOptions
+	wvm_id?: string
 }
 
 export type ProjectOverviewRecord<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown> = {

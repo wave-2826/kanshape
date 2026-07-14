@@ -212,7 +212,7 @@ export const boardTypes: {
         fields: {
             "onshape_part_id": {
                 name: "Linked part",
-                description: "The ID of the associated Onshape part",
+                description: "The associated Onshape part",
                 type: { base: "onshape_part" }
             },
             "steps": {

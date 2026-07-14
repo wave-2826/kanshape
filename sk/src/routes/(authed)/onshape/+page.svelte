@@ -13,22 +13,9 @@
         $metadata.title = "Onshape Side Panel";
     });
 
-    const config = getConfig();
-    let onshape = $state<OnshapeClient | null>(null);
-    const selectedIDs = $derived(onshape?.selectedIDs);
-    $effect(() => {
-        onshape = new OnshapeClient(
-            config,
-            page.url.searchParams.get("documentId") || "",
-            page.url.searchParams.get("workspaceId") || page.url.searchParams.get("versionId") || "",
-            page.url.searchParams.get("elementId") || ""
-        );
-        return () => {
-            onshape?.dispose();
-        };
-    });
-
     const onshapeCtx = getOnshapeContext();
+    const selectedIDs = $derived(onshapeCtx.client?.selectedIDs);
+
     const linkedProject = $derived(onshapeCtx.linkedProject);
 </script>
 
@@ -55,7 +42,10 @@
                 {#if linkedProject.expand.subproject} and subproject "{linkedProject.expand.subproject?.name ?? "Unknown Subproject"}"{/if}
                 .
             </p> -->
-
+            <button class="add" onclick={async () => {
+            }}>
+                Add card {$selectedIDs?.length ?? 0 > 0 ? "for selected part" : ""}
+            </button>
         {/if}
     </div>
 </div>

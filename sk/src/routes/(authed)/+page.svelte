@@ -84,7 +84,7 @@
                             <span style="color: {task.section_color ?? "var(--text-primary)"}">{task.section_title}</span>
                         </span>
                         <span class="title">{task.title}</span>
-                        {#if task.priority}
+                        {#if task.priority && task.priority !== "low"}
                             <span class="priority" style="color: {getPriorityColor(task.priority)}"><Flag /> {task.priority}</span>
                         {/if}
                         {#if task.due_by}

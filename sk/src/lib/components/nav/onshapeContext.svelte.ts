@@ -1,8 +1,10 @@
 import { page } from "$app/state";
+import type { AppConfig } from "$lib/config";
 import { nav } from "$lib/navigation";
+import { OnshapeClient } from "$lib/onshape/client";
 import { watch, type ExpandResponse } from "$lib/pocketbase";
 import { Collections } from "$lib/pocketbase/generated-types";
-import { createContext } from "svelte";
+import { createContext, untrack } from "svelte";
 
 export enum LinkedProjectType {
     /** This document is linked to a project */
@@ -25,6 +27,9 @@ export type OnshapeContext = {
     wvm?: "w" | "v" | "m";
     wvmId?: string;
     partStudioId?: string;
+    client: OnshapeClient | null;
+    location: "right-panel" | "tab" | null;
+    onOnshape: boolean;
 };
 
 export const [getOnshapeContext, setOnshapeContext] = createContext<OnshapeContext>();
@@ -35,30 +40,52 @@ export function addOnshapeContext(): OnshapeContext {
         documentId: null,
         wvm: undefined,
         wvmId: undefined,
-        partStudioId: undefined
+        partStudioId: undefined,
+        client: null,
+        location: null,
+        onOnshape: false // set by the parent layout
     });
     setOnshapeContext(onshapeContext);
     return onshapeContext;
 }
 
 export function watchOnshapeContext(
+    config: AppConfig,
     documentId: string | null,
-    workspaceId: string | null,
+    wvm: string | null,
+    wvmId: string | null,
     elementId: string | null,
+    onshapeLocation: string | null,
     onshapeContext: OnshapeContext
 ) {
     if(!documentId) return;
 
     onshapeContext.documentId = documentId;
-    if(workspaceId && elementId) {
-        onshapeContext.wvm = "w";
-        onshapeContext.wvmId = workspaceId;
+    onshapeContext.location =
+        onshapeLocation === "right-panel" ? "right-panel" :
+        onshapeLocation === "tab" ? "tab" : null;
+    if(wvm && wvmId && elementId) {
+        onshapeContext.wvm = wvm === "v" ? "v" : "w";
+        onshapeContext.wvmId = wvmId;
         onshapeContext.partStudioId = elementId;
     } else {
         onshapeContext.wvm = undefined;
         onshapeContext.wvmId = undefined;
         onshapeContext.partStudioId = undefined;
     }
+
+    untrack(() => {
+        if(onshapeContext.client) {
+            onshapeContext.client.dispose();
+            onshapeContext.client = null;
+        }
+        if(onshapeContext.wvm === "w" && wvmId && elementId) onshapeContext.client = new OnshapeClient(
+            config,
+            documentId,
+            wvmId || "",
+            elementId || ""
+        );
+    });
 
     let unsub: (() => void) | undefined;
 

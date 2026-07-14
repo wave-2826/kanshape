@@ -1,5 +1,5 @@
 <script module lang="ts">
-    import { createContext } from "svelte";
+    import { createContext, untrack } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
     export type LayoutParams = {
         isMobile: boolean;
@@ -15,7 +15,7 @@
     import { onMount } from "svelte";
     import { ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
-    import { setConfig } from "$lib/config";
+    import { getConfig, setConfig } from "$lib/config";
     import NavProfile from "$lib/components/nav/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
@@ -40,14 +40,19 @@
     });
 
     const isMobile = $derived(new MediaQuery("screen and (max-width: 640px)").current);
-    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/onshape") || page.url.searchParams.get("documentId") !== null);
+    const onOnshape = $derived(page.route.id?.startsWith("/(authed)/onshape") || page.url.searchParams.get("onshape") !== null);
     const onshapeContext = addOnshapeContext();
-
-    const documentId = $derived(page.url.searchParams.get("documentId"));
-    const workspaceId = $derived(page.url.searchParams.get("workspaceId"));
-    const elementId = $derived(page.url.searchParams.get("elementId"));
     $effect(() => {
-        return watchOnshapeContext(documentId, workspaceId, elementId, onshapeContext);
+        onshapeContext.onOnshape = onOnshape;
+    });
+
+    const documentId = $derived(page.url.searchParams.get("onshape_documentId"));
+    const wvm = $derived(page.url.searchParams.get("onshape_wvm"));
+    const wvmId = $derived(page.url.searchParams.get("onshape_wvmId"));
+    const elementId = $derived(page.url.searchParams.get("onshape_elementId"));
+    const onshapeLocation = $derived(page.url.searchParams.get("onshape"));
+    $effect(() => {
+        return watchOnshapeContext(config, documentId, wvm, wvmId, elementId, onshapeLocation, onshapeContext);
     });
     
     let layoutParams = $state<LayoutParams>({

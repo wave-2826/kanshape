@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renderer test</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.180.0/examples/jsm/",
+    "three/examples/jsm/": "https://unpkg.com/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+function decodeOnshapeColor(value) {
+    const bytes = atob(value);
+    const hex = (bytes.charCodeAt(0) << 16) | (bytes.charCodeAt(1) << 8) | bytes.charCodeAt(2);
+    return new THREE.Color(hex);
+}
+
+function materialKey(appearance) {
+    if(!appearance) return "default";
+    return `${appearance.color}-${appearance.opacity ?? 255}`;
+}
+
+function createOnshapeMesh(data) {
+    const positions = [];
+    const normals = [];
+
+    // we don't use a true index buffer since we need separate normals per side
+    let materialGroups = [];
+    let currentMaterialData = null;
+    let currentMaterial = null;
+
+    const materialOptions = {
+        side: THREE.FrontSide,
+    };;
+    const defaultMaterial = new THREE.MeshStandardMaterial({
+        color: decodeOnshapeColor(data.bodies[0].appearance.color),
+        opacity: data.bodies[0].appearance.opacity / 255,
+        transparent: data.bodies[0].appearance.opacity < 255,
+        depthWrite: data.bodies[0].appearance.opacity === 255,
+        ...materialOptions,
+    });
+    let materialMap = new Map();
+    materialMap.set("default", defaultMaterial);
+
+    let materialStart = 0;
+    for(const body of data.bodies) {
+        for(const face of body.faces) {
+            const key = materialKey(face.appearance);
+            if(key !== currentMaterial && currentMaterial !== null) {
+                if(!materialMap.has(currentMaterial)) {
+                    materialMap.set(currentMaterial, new THREE.MeshStandardMaterial({
+                        color: decodeOnshapeColor(currentMaterialData.color),
+                        opacity: currentMaterialData.opacity / 255,
+                        transparent: currentMaterialData.opacity < 255,
+                        depthWrite: currentMaterialData.opacity === 255,
+                        ...materialOptions,
+                    }));
+                }
+                const materialIndex = Array.from(materialMap.keys()).indexOf(currentMaterial);
+                materialGroups.push({
+                    start: materialStart,
+                    count: positions.length / 3 - materialStart,
+                    materialIndex,
+                });
+                materialStart = positions.length / 3;
+            }
+
+            currentMaterial = key;
+            currentMaterialData = face.appearance;
+
+            for(const facet of face.facets) {
+                const a = data.facetPoints[facet.indices[0]];
+                const b = data.facetPoints[facet.indices[1]];
+                const c = data.facetPoints[facet.indices[2]];
+
+                positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+
+                // flat normals
+                normals.push(
+                    facet.normal.x,
+                    facet.normal.y,
+                    facet.normal.z,
+
+                    facet.normal.x,
+                    facet.normal.y,
+                    facet.normal.z,
+
+                    facet.normal.x,
+                    facet.normal.y,
+                    facet.normal.z
+                );
+            }
+        }
+    }
+
+    // finalize last material group
+    if(currentMaterial !== null) {
+        const materialIndex = Array.from(materialMap.keys()).indexOf(currentMaterial);
+        materialGroups.push({
+            start: materialStart,
+            count: positions.length / 3 - materialStart,
+            materialIndex,
+        });
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.clearGroups();
+    for(const group of materialGroups) {
+        geometry.addGroup(group.start, group.count, group.materialIndex);
+    }
+
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+
+    geometry.rotateX(-Math.PI / 2);
+
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+
+    // Center model
+    const center = geometry.boundingBox.getCenter(new THREE.Vector3());
+    geometry.translate(-center.x, -center.y, -center.z);
+
+    const materials = Array.from(materialMap.values()).map(m => m || defaultMaterial);
+    // if any materials are transparent, make them all DoubleSide
+    if(materials.some(m => m.transparent)) {
+        for(const material of materials) material.side = THREE.DoubleSide;
+    }
+
+    const mesh = new THREE.Mesh(
+        geometry,
+        materials
+    );
+
+    // Position camera based on size
+    const size = geometry.boundingBox.getSize(new THREE.Vector3()).length();
+
+    return [mesh, size];
+}
+
+function createEdgeOverlay(mesh) {
+    // threshold in degrees (??)
+    const edges = new THREE.EdgesGeometry(mesh.geometry, 40);
+    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
+    return line;
+}
+
+// load data from ./tube-min.json
+const data = await (await fetch("./tube-min.json")).json();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x202020);
+
+const frustumSize = 1;
+const aspect = window.innerWidth / window.innerHeight;
+const camera = new THREE.OrthographicCamera(
+    frustumSize * aspect / -2,
+    frustumSize * aspect / 2,
+    frustumSize / 2,
+    frustumSize / -2,
+    0.001,
+    1000
+);
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    powerPreference: "high-performance",
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(1);
+
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+// auto-rotate camera if reduce motion is not enabled
+controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+controls.autoRotateSpeed = 1.5;
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+const [mesh, size] = await createOnshapeMesh(data, { preview: false });
+scene.add(mesh);
+mesh.add(createEdgeOverlay(mesh));
+
+const directional = new THREE.DirectionalLight(0xffffff, 1);
+directional.position.set(1, 1, 0.5);
+scene.add(directional);
+
+const directional2 = new THREE.DirectionalLight(0xffffff, 1);
+directional2.position.set(-1, -1, -0.5);
+scene.add(directional2);
+
+camera.position.set(size / Math.sqrt(3), size / Math.sqrt(3), size / Math.sqrt(3));
+camera.near = size / 1000;
+camera.far = size * 100;
+camera.zoom = 1 / size;
+camera.updateProjectionMatrix();
+
+controls.target.set(0, 0, 0);
+
+window.addEventListener("resize", () => {
+    const aspect = window.innerWidth / window.innerHeight;
+    camera.left = frustumSize * aspect / -2;
+    camera.right = frustumSize * aspect / 2;
+    camera.top = frustumSize / 2;
+    camera.bottom = frustumSize / -2;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+renderer.setAnimationLoop(() => {
+    controls.update();
+    renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

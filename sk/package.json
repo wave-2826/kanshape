@@ -41,6 +41,7 @@
   "dependencies": {
     "lucide-svelte": "^1.0.1",
     "openapi-fetch": "^0.17.0",
-    "pocketbase": "^0.26.9"
+    "pocketbase": "^0.26.9",
+    "three": "^0.185.1"
   }
 }

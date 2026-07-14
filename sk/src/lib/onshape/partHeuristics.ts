@@ -17,7 +17,11 @@ export type PartHeuristicsResult = {
         size: [number, number];
         thickness: number;
         confidence: number;
-    }
+    };
+    aabb: {
+        min: [number, number, number];
+        max: [number, number, number];
+    };
 };
 
 export async function getPartHeuristics(

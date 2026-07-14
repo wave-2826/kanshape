@@ -30,7 +30,7 @@
                 <button class="remove-dependency" onclick={() => {
                     dependencies = dependencies.filter((id) => id !== depId);
                 }} aria-label="Remove dependency"><Trash /></button>
-                <KanbanListEntry {card} {subprojects} {sections} onclick={() => {
+                <KanbanListEntry {card} {subprojects} onclick={() => {
                     onopendependency?.(card.id);
                 }} />
             </div>

@@ -12,19 +12,89 @@ type OnshapeSelection = {
     workspaceMicroversionId: string;
 }
 
+type RequestSelectionType = "VERTEX" | "EDGE" | "FACE" | "BODY" | "DEGENERATE_EDGE" | "UNKNOWN";
+type RequestEntityType = "VERTEX" | "EDGE" | "FACE" | "BODY" | "DEGENERATE_EDGE" | "UNKNOWN";
+type RequestBodyType = "SOLID" | "SHEET" | "WIRE" | "POINT" | "MATE_CONNECTOR" | "COMPOSITE" | "UNKNOWN";
+type RequestGeometryType = "LINE" | "CIRCLE" | "ARC" | "PLANE" | "CYLINDER" | "CONE" | "SPHERE" | "TORUS" | "SPLINE" | "ELLIPSE" | "MESH" | "CONIC" | "REVOLVED" | "EXTRUDED" | "ALL_MESH" | "MIXED_MESH" | "SPLINE_INTERNAL_POINT" | "SPLINE_CONTROL_POLYGON" | "ELLIPTICAL_ARC" | "UNKNOWN";
+
+type RequestSelectionHighlightItem = {
+    selectionType: "ENTITY";
+    selectionId: string;
+    entityType: RequestEntityType;
+} | {
+    selectionType: "BODY";
+    selectionId: string;
+    bodyType: RequestBodyType;
+} | {
+    selectionType: "GEOMETRY";
+    selectionId: string;
+    geometryType: RequestGeometryType;
+};
+
 /**
  * See https://onshape-public.github.io/docs/app-dev/clientmessaging/ and
- * https://onshape-public.github.io/docs/app-dev/element-right-panel/#applicationinit
+ * https://onshape-public.github.io/docs/app-dev/element-right-panel/#applicationinit.
+ * documentId, workspaceId, and elementId are added by default in sendToOnshape().
  */
 type ClientToOnshapeMessage = {
-    documentId: string,
-    workspaceId: string,
-    elementId: string,
-} & ({
     messageName: "applicationInit"
 } | {
     messageName: "keepAlive"
-});
+} | {
+    messageName: "requestSelectionHighlight";
+    messageId: string;
+    selections: RequestSelectionHighlightItem[];
+} | {
+    messageName: "requestSelection";
+    messageId: string;
+    entityTypeSpecifier: RequestSelectionType[];
+    requiredSelectionCount?: number;
+} | {
+    messageName: "stopRequest";
+} | {
+    messageName: "showMessageBubble";
+    message: string;
+} | {
+    messageName: "openSelectItemDialog";
+    dialogTitle?: string;
+    selectAssemblies?: boolean;
+    selectBlobs?: boolean;
+    selectBlobMimeTypes?: string;
+    selectMultiple?: boolean;
+    selectParts?: boolean;
+    selectPartStudios?: boolean;
+    showBrowseDocuments?: boolean;
+    showStandardContent?: boolean;
+} | {
+    messageName: "closeSelectItemDialog";
+};
+
+type ItemSelectedMessage = {
+    messageName: 'itemSelectedInSelectItemDialog',
+    documentId: string,
+    documentMicroversionId: string,
+    workspaceId: string, // sends workspaceId OR versionId
+    versionId: string,  // sends workspaceId OR versionId
+    elementId: string,
+    elementName: string,
+    elementType: string,
+    elementMicroversionId: string,
+    elementConfiguration: string,
+    itemType: string,
+    partName?: string,
+    idTag?: string,
+    includeSurfaces?: boolean,
+    includeWires?: boolean,
+    isSurface?: boolean,
+    isFlattenedBody?: boolean,
+    isComposite?: boolean,
+    isSketch?: boolean,
+    sketchIds?: string[],
+    partNumber?: string, // only returned if a part is selected
+    revision?: string,
+    context?: string,
+    isConfigurable?: boolean
+};
 
 /**
  * Mostly reverse-engineered types since the documentation is poor
@@ -32,7 +102,13 @@ type ClientToOnshapeMessage = {
 type OnshapeToClientMessage = {
     messageName: "SELECTION",
     selections: OnshapeSelection[]
-};
+} | {
+    messageName: "REQUESTED_SELECTION",
+    status: {
+        statusCode: "PENDING" | "SUCCESS" | "STOPPED";
+    },
+    selections: OnshapeSelection[];
+} | ItemSelectedMessage;
 
 export class OnshapeClient {
     private boundHandleMessage: (event: MessageEvent) => void;
@@ -41,6 +117,8 @@ export class OnshapeClient {
 
     /** The transient entity IDs selected. */
     public selectedIDs: Writable<string[]> = writable([]);
+
+    private messageHandlers: { [message: string]: Set<(message: OnshapeToClientMessage) => void> } = {};
 
     constructor(private config: AppConfig, private docId: string, private wvmId: string, private elementId: string) {
         this.baseDomain = this.config.onshape.baseDomain;
@@ -54,32 +132,148 @@ export class OnshapeClient {
         // and to keep SELECTION events flowing after the initial handshake.
         this.keepAliveInterval = setInterval(() => {
             try {
-                window.parent.postMessage(
-                    {
-                        messageName: "keepAlive",
-                        documentId: docId,
-                        workspaceId: wvmId,
-                        elementId: elementId
-                    },
-                    this.baseDomain,
-                );
+                this.sendToOnshape({
+                    messageName: "keepAlive"
+                });
             } catch (e) {}
         }, 25000); // every 25s, well within OnShape's session timeout
     }
 
     private sendInitMessage() {
-        const initMsg = {
-            messageName: "applicationInit",
-            documentId: this.docId,
-            workspaceId: this.wvmId,
-            elementId: this.elementId
-        };
-        
+        this.sendToOnshape({
+            messageName: "applicationInit"
+        });
+    }
+
+
+    private addMessageHandler<Type extends string>(
+        name: Type,
+        handler: (message: OnshapeToClientMessage & { messageName: Type }) => void
+    ) {
+        if(!this.messageHandlers[name]) this.messageHandlers[name] = new Set();
+        this.messageHandlers[name].add(handler as any);
+    }
+
+    private removeMessageHandler<Type extends string>(
+        name: Type,
+        handler: (message: OnshapeToClientMessage & { messageName: Type }) => void
+    ) {
+        if(!this.messageHandlers[name]) return;
+        this.messageHandlers[name].delete(handler as any);
+    }
+
+    private waitForMessage<Type extends OnshapeToClientMessage["messageName"]>(
+        name: Type,
+        timeoutMs: number = 5000
+    ): Promise<OnshapeToClientMessage & { messageName: Type }> {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                this.removeMessageHandler<Type>(name, handler);
+                reject(new Error(`Timeout waiting for message ${name}`));
+            }, timeoutMs);
+
+            const handler = (message: OnshapeToClientMessage & { messageName: Type }) => {
+                if("status" in message) {
+                    if(message.status.statusCode === "PENDING") {
+                        // keep waiting
+                        return;
+                    } else if(message.status.statusCode === "STOPPED") {
+                        clearTimeout(timeout);
+                        this.removeMessageHandler<Type>(name, handler);
+                        reject(new Error(`Selection request was stopped by user`));
+                        return;
+                    }
+                }
+
+                clearTimeout(timeout);
+                this.removeMessageHandler<Type>(name, handler);
+                resolve(message);
+            };
+
+            this.addMessageHandler<Type>(name, handler);
+        });
+    }
+
+    private sendToOnshape(message: ClientToOnshapeMessage) {
         try {
-            window.parent.postMessage(initMsg, this.baseDomain);
+            window.parent.postMessage({
+                ...message,
+                documentId: this.docId,
+                workspaceId: this.wvmId,
+                elementId: this.elementId
+            }, this.baseDomain);
         } catch (e) {
-            console.warn("applicationInit postMessage failed:", e);
+            console.warn("postMessage failed:", e);
         }
+    }
+
+    public requestSelectionHighlight(selections: RequestSelectionHighlightItem[]) {
+        const messageId = crypto.randomUUID();
+        this.sendToOnshape({
+            messageName: "requestSelectionHighlight",
+            messageId,
+            selections
+        });
+    }
+
+    public showMessageBubble(message: string) {
+        this.sendToOnshape({
+            messageName: "showMessageBubble",
+            message
+        });
+    }
+
+    private selectingPart: boolean = false;
+    /**
+     * Request a user selection. This only works in the context of a right-panel extension!
+     */
+    public async requestSelection(
+        message: string, entityTypeSpecifier: RequestSelectionType[],
+        requiredSelectionCount: number = 1
+    ): Promise<OnshapeSelection[]> {
+        if(this.selectingPart) {
+            throw new Error("Already selecting a part");
+        }
+        this.selectingPart = true;
+
+        try {
+            const messageId = crypto.randomUUID();
+            this.sendToOnshape({
+                messageName: "requestSelection",
+                messageId,
+                entityTypeSpecifier,
+                requiredSelectionCount
+            });
+            this.showMessageBubble(message);
+
+            const response = await this.waitForMessage("REQUESTED_SELECTION", 60_000 * 5);
+            return response.selections;
+        } finally {
+            this.selectingPart = false;
+        }
+    }
+
+    /**
+     * Open the select item dialogue for a selection. This only works in the context of a tab extension!
+     */
+    public async openSelectItemDialog(options: {
+        dialogTitle?: string;
+        selectAssemblies?: boolean;
+        selectBlobs?: boolean;
+        selectBlobMimeTypes?: string;
+        selectMultiple?: boolean;
+        selectParts?: boolean;
+        selectPartStudios?: boolean;
+        showBrowseDocuments?: boolean;
+        showStandardContent?: boolean;
+    }): Promise<ItemSelectedMessage> {
+        this.sendToOnshape({
+            messageName: "openSelectItemDialog",
+            ...options
+        });
+
+        const response = await this.waitForMessage("itemSelectedInSelectItemDialog", 60_000 * 5);
+        return response;
     }
 
     public dispose() {
@@ -111,7 +305,13 @@ export class OnshapeClient {
                     this.selectedIDs.set(selectedIds);
                     break;
                 default:
-                    // Ignore other messages
+                    if(this.messageHandlers[data.messageName]) {
+                        for(const handler of this.messageHandlers[data.messageName]) {
+                            handler(data);
+                        }
+                        break;
+                    }
+                    console.info("Received unhandled message from Onshape:", data);
                     break;
             }
         } else {

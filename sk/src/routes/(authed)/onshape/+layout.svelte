@@ -7,11 +7,11 @@
     const documentId = $derived(getOnshapeContext().documentId);
 </script>
 
+{@render children()}
+
 {#if !documentId}
     <p>No documentId provided in query params</p>
 {/if}
-
-{@render children()}
 
 <style lang="scss">
 </style>

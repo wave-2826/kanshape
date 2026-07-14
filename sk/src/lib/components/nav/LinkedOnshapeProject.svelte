@@ -32,11 +32,11 @@
                         <p>
                             This document, "<span class="name">
                                 {linkedProject.title}
-                            </span>", is linked to the project <span class="name">
+                            </span>", is linked to the project <a class="name" href={`/projects/${linkedProject.project}`}>
                                 {linkedProject.expand.project?.title ?? "Unknown Project"}
-                            </span> {#if linkedProject.expand.subproject} and subproject <span class="name">
+                            </a> {#if linkedProject.expand.subproject} and subproject <a class="name" href={`/projects/${linkedProject.project}/subprojects/${linkedProject.expand.subproject?.id}`}>
                                 {linkedProject.expand.subproject?.name ?? "Unknown Subproject"}
-                            </span>{/if}.
+                            </a>{/if}.
                         </p>
                     {/if}
                     <button onclick={() => {

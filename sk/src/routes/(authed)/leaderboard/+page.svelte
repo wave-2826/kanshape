@@ -99,6 +99,9 @@
                             <span class="name">
                                 {entry.expand?.user?.name || entry.expand?.user?.username || "Unknown"}
                             </span>
+                            <span class="username">
+                                {entry.expand?.user?.username ? `@${entry.expand.user.username}` : ""}
+                            </span>
                             <div class="stat" title="{sortType.name}" style="color: {sortType.color}">
                                 <span class="stat-value">{entry[sortTypeKey] ?? 0}</span>
                                 <span class="stat-label">{sortType.name}</span>
@@ -190,7 +193,7 @@ header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.25rem 1rem;
+    padding: 0.5rem 1rem;
     background-color: var(--bg-primary);
     border-radius: 4px;
     
@@ -220,6 +223,7 @@ header {
         align-self: end;
         margin-top: 2rem;
         padding: 0.5rem;
+        gap: 0.25rem;
 
         .rank {
             position: absolute;
@@ -227,9 +231,9 @@ header {
             top: -2rem;
         }
     }
-    .entry:nth-child(1) { grid-column: 3; --padding: 3rem; }
-    .entry:nth-child(2) { grid-column: 2; --padding: 1.5rem; }
-    .entry:nth-child(3) { grid-column: 4; }
+    .entry:nth-child(1) { grid-column: 3; --padding: 3.5rem; }
+    .entry:nth-child(2) { grid-column: 2; --padding: 2rem; }
+    .entry:nth-child(3) { grid-column: 4; --padding: 0.5rem; }
 }
 
 .rank {
@@ -247,8 +251,13 @@ header {
 }
 
 .name {
-    flex: 1;
     font-size: var(--font-medium);
+}
+.username {
+    flex: 1;
+    margin-left: 0.5rem;
+    font-size: var(--font-tiny);
+    color: var(--text-tertiary);
     padding-bottom: var(--padding);
 }
 
@@ -259,7 +268,7 @@ header {
     gap: 0.15rem;
 
     .stat-value {
-        font-size: var(--font-large);
+        font-size: var(--font-medium);
         font-weight: 700;
         line-height: 1;
     }

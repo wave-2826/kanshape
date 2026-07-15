@@ -180,6 +180,7 @@ export type CardMetadataField<Dynamic extends boolean = true> = {
     name: string;
     description: string;
     type: CardMetadataFieldType<Dynamic>;
+    allowsClearing?: boolean;
     unknown?: boolean;
 };
 
@@ -213,6 +214,7 @@ export const boardTypes: {
             "onshape_part_id": {
                 name: "Linked part",
                 description: "The associated Onshape part",
+                allowsClearing: true,
                 type: { base: "onshape_part" }
             },
             "steps": {

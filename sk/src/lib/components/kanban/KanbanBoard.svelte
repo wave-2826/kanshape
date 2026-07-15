@@ -121,7 +121,7 @@
     let kanbanMenu: KanbanMenu | null = $state(null);
 </script>
 
-<div class="kanban">
+<div class="kanban" data-modal-target>
     <KanbanMenu {project} {board} {sections} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel

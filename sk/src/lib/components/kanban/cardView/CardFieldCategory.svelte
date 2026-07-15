@@ -2,6 +2,7 @@
     import type { CardMetadataSection } from "$lib/data/project";
     import CardFieldEditor from "./CardFieldEditor.svelte";
     import type { TypedCardsResponse } from "$lib/data/cards";
+    import { Trash } from "lucide-svelte";
 
     let {
         fields, card = $bindable()
@@ -14,7 +15,18 @@
 <div class="properties">
     {#each fields as field}
         <div class="property" title={field.description}>
-            <span class="prop-label">{field.name}</span>
+            <span class="prop-label">
+                {field.name}
+                {#if field.allowsClearing && card.metadata && card.metadata[field.id] !== undefined}
+                    <button class="clear" onclick={() => {
+                        if(card.metadata) {
+                            delete card.metadata[field.id];
+                        }
+                    }} title="Clear">
+                        <Trash />
+                    </button>
+                {/if}
+            </span>
             <div class="prop-value">
                 <CardFieldEditor {field} bind:card={card} />
             </div>

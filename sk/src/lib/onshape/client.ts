@@ -67,6 +67,9 @@ type ClientToOnshapeMessage = {
     showStandardContent?: boolean;
 } | {
     messageName: "closeSelectItemDialog";
+} | {
+    messageName: "openAnotherElementInCurrentWorkspace";
+    anotherElementId: string;
 };
 
 type ItemSelectedMessage = {
@@ -145,7 +148,6 @@ export class OnshapeClient {
         });
     }
 
-
     private addMessageHandler<Type extends string>(
         name: Type,
         handler: (message: OnshapeToClientMessage & { messageName: Type }) => void
@@ -169,6 +171,9 @@ export class OnshapeClient {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 this.removeMessageHandler<Type>(name, handler);
+                this.sendToOnshape({
+                    messageName: "stopRequest"
+                });
                 reject(new Error(`Timeout waiting for message ${name}`));
             }, timeoutMs);
 
@@ -220,6 +225,20 @@ export class OnshapeClient {
         this.sendToOnshape({
             messageName: "showMessageBubble",
             message
+        });
+    }
+
+    /**
+     * Open another element in the current workspace. This is useful for opening a part studio or
+     * assembly from a part.  
+     * So Onshape _says_ that this only works with right panel extensions, but it works in tabs too.
+     * it's nice for us, at least!
+     * @param anotherElementId 
+     */
+    public openAnotherElementInCurrentWorkspace(anotherElementId: string) {
+        this.sendToOnshape({
+            messageName: "openAnotherElementInCurrentWorkspace",
+            anotherElementId
         });
     }
 

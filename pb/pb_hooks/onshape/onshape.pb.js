@@ -1,5 +1,5 @@
 // @ts-check
-/// <reference path="../pb_data/types.d.ts" />
+/// <reference path="../../pb_data/types.d.ts" />
 
 /**
  * /api/onshape/oauth handles both the initial OAuth redirect and the callback from Onshape.
@@ -9,7 +9,8 @@
  */
 routerAdd("GET", "/api/onshape/oauth", (e) => {
     /** @type typeof import("./onshape_auth") } */
-    const { createOnshapeTransaction, loadOnshapeTransaction, exchangeAuthorizationCode, setOnshapeMetadata, getCallbackUrl, buildAuthorizeUrl } = require(`${__hooks}/onshape_auth`);
+    const { createOnshapeTransaction, loadOnshapeTransaction, exchangeAuthorizationCode, setOnshapeMetadata, getCallbackUrl, buildAuthorizeUrl } =
+        require(`${__hooks}/onshape/onshape_auth`);
 
     const query = e.request?.url?.query();
     if(!query) throw new BadRequestError("Missing query parameters");
@@ -58,37 +59,31 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
 
 routerUse((e) => {
     if(e.request?.url?.path?.startsWith("/api/onshape/proxy/")) {
+        if(!e.requestInfo().auth) {
+            return e.json(401, { error: "unauthorized", message: "You must be logged in to use the Onshape proxy" });
+        }
         /** @type {typeof import("./onshape_proxy")} */
-        const { handleProxyRequest } = require(`${__hooks}/onshape_proxy`);
+        const { handleProxyRequest } = require(`${__hooks}/onshape/onshape_proxy`);
         return handleProxyRequest(e);
     }
 
     return e.next();
 });
 
-// routerAdd("GET", "/api/onshape/{path...}",
-//     (e) => require(`${__hooks}/onshape_auth`).proxyOnshapeRequest(e, e.requestInfo()), $apis.requireAuth());
-// routerAdd("POST", "/api/onshape/{path...}",
-//     (e) => require(`${__hooks}/onshape_auth`).proxyOnshapeRequest(e, e.requestInfo()), $apis.requireAuth());
-// routerAdd("PUT", "/api/onshape/{path...}",
-//     (e) => require(`${__hooks}/onshape_auth`).proxyOnshapeRequest(e, e.requestInfo()), $apis.requireAuth());
-// routerAdd("DELETE", "/api/onshape/{path...}",
-//     (e) => require(`${__hooks}/onshape_auth`).proxyOnshapeRequest(e, e.requestInfo()), $apis.requireAuth());
-
 
 cronAdd("cleanup_onshape_oauth_transactions", "*/15 * * * *", () => {
-    require(`${__hooks}/onshape_auth`).cleanupExpiredOnshapeTransactions();
+    require(`${__hooks}/onshape/onshape_auth`).cleanupExpiredOnshapeTransactions();
 });
 
 cronAdd("cleanup_onshape_request_cache", "*/15 * * * *", () => {
-    require(`${__hooks}/onshape_proxy`).cleanupRequestCache();
+    require(`${__hooks}/onshape/onshape_proxy`).cleanupRequestCache();
 });
 
 // Enrich users records with their current onshape auth state so we can show it in the UI without sending everything
 // or making extra requests
 onRecordEnrich((e) => {
     /** @type typeof import("./onshape_auth") */
-    const { getOnshapeMetadata } = require(`${__hooks}/onshape_auth`);
+    const { getOnshapeMetadata } = require(`${__hooks}/onshape/onshape_auth`);
 
     if(!e.record) {
         e.next();

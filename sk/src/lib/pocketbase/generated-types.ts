@@ -374,17 +374,17 @@ export type PartsWvmOptions = typeof PartsWvmOptions[keyof typeof PartsWvmOption
 export type PartsRecord<Tpart_heuristic_result = unknown> = {
 	created: IsoAutoDateString
 	current_card?: RecordIdString
-	document_id?: string
-	element_id?: string
+	document_id: string
+	element_id: string
 	id: string
 	part_heuristic_result?: null | Tpart_heuristic_result
-	part_id?: string
+	part_id: string
 	past_revision_cards?: RecordIdString[]
+	preview_model?: FileNameString
 	revision?: number
-	thumbnail?: FileNameString
 	updated: IsoAutoDateString
-	wvm?: PartsWvmOptions
-	wvm_id?: string
+	wvm: PartsWvmOptions
+	wvm_id: string
 }
 
 export type ProjectOverviewRecord<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown> = {

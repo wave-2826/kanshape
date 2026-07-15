@@ -51,7 +51,7 @@
 .backdrop {
     position: absolute;
     inset: 0;
-    z-index: 1000;
+    z-index: 100;
 }
 .panel {
     position: absolute;

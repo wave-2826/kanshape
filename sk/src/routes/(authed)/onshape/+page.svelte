@@ -8,6 +8,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { save } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
+    import { Plus } from "lucide-svelte";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -37,15 +38,28 @@
                 }, { create: true });
             }}>Continue with no linked project</button>
         {:else}
-            <!-- <p>
-                Linked to project "{linkedProject.expand.project?.title ?? "Unknown Project"}"
-                {#if linkedProject.expand.subproject} and subproject "{linkedProject.expand.subproject?.name ?? "Unknown Subproject"}"{/if}
-                .
-            </p> -->
-            <button class="add" onclick={async () => {
-            }}>
-                Add card {$selectedIDs?.length ?? 0 > 0 ? "for selected part" : ""}
-            </button>
+            <!-- <select>
+                <option>Cards in this {onshapeCtx.location === "right-panel-part-studio" ? "part studio" : "assembly"}</option>
+                <option>Cards in this document</option>
+            </select> -->
+
+            <menu>
+                <button class="add" onclick={async () => {
+                }}>
+                    <Plus /> New card {$selectedIDs?.length ?? 0 > 0 ? "for selected part" : ""}
+                </button>
+                
+                <div class="multi-button filter-options">
+                    <button class="selected">{onshapeCtx.location === "right-panel-part-studio" ? "Part studio" : "Assembly"}</button>
+                    <button>Document</button>
+                </div>
+
+                <!-- we could add filter/sort settings here but i don't think it's necessary -->
+            </menu>
+
+            <div class="cards">
+                <p class="empty">No cards found.</p>
+            </div>
         {/if}
     </div>
 </div>
@@ -56,6 +70,34 @@
     grid-template-rows: auto 1fr;
 }
 .content {
-    padding: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.empty {
+    font-size: var(--font-small);
+    color: var(--text-tertiary);
+    font-style: italic;
+    margin: 0.5rem;
+}
+
+menu {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+
+    button {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+.cards {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 </style>

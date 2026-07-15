@@ -10,16 +10,18 @@ cases where the expected type doesn't match the value type by displaying a reset
     import UrlInput from "./UrlInput.svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
     import { FileIcon, Plus, X } from "lucide-svelte";
-    import CardPartEditor from "./CardPartEditor.svelte";
+    import CardPartEditor from "../../parts/CardPartEditor.svelte";
 
     let {
         type, value = $bindable(),
-        addFile, getFileUrl
+        addFile, getFileUrl,
+        cardId
     }: {
         type: CardMetadataFieldType<false>,
         value: CardMetadata[string]["value"],
         addFile: (name: string, file: File) => void,
-        getFileUrl: (file: MetadataFile) => string
+        getFileUrl: (file: MetadataFile) => string,
+        cardId: string
     } = $props();
 
     function get<T>(): T {
@@ -48,7 +50,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     <input type="date" bind:value={get, set<string>} />
 {:else if type.base === "onshape_part"}
     <!-- TODO: Better selection for when user is in onshape -->
-    <CardPartEditor bind:value={get, set<string>} />
+    <CardPartEditor bind:value={get, set<string>} {cardId} />
 {:else if type.base === "user" || type.base === "group"}
     <div class="select">
         <CachedCollectionSelector
@@ -69,7 +71,7 @@ cases where the expected type doesn't match the value type by displaying a reset
                         newValue[index] = v;
                         set(newValue);
                     }}
-                    {addFile} {getFileUrl}
+                    {addFile} {getFileUrl} {cardId}
                 />
                 <button onclick={() => {
                     let newValue = [...(value as MetadataValue[])];
@@ -95,7 +97,7 @@ cases where the expected type doesn't match the value type by displaying a reset
                     newValue[index] = v;
                     set(newValue);
                 }}
-                {addFile} {getFileUrl}
+                {addFile} {getFileUrl} {cardId}
             />
         {/each}
     </div>

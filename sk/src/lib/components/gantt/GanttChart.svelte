@@ -62,7 +62,7 @@
     let openCardId = $state<string | null>(null);
 </script>
 
-<div class="page">
+<div class="page" data-modal-target>
     <CardViewPanel
         {board}
         boardCards={$cards?.items ?? []}

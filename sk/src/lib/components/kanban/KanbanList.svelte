@@ -37,7 +37,7 @@
     });
 </script>
 
-<div class="kanban-list">
+<div class="kanban-list" data-modal-target>
     <KanbanMenu {project} {board} {sections} cards={listCards} />
 
     <CardViewPanel

@@ -1,5 +1,5 @@
 // @ts-check
-/// <reference path="../pb_data/types.d.ts" />
+/// <reference path="../../pb_data/types.d.ts" />
 
 const ONSHAPE_AUTHORIZE_URL = "https://oauth.onshape.com/oauth/authorize";
 const ONSHAPE_TOKEN_URL = "https://oauth.onshape.com/oauth/token";
@@ -45,7 +45,7 @@ function normalizeReturnTo(returnTo) {
  */
 function getCallbackUrl(request, requestInfo) {
     if(!request.url) throw new BadRequestError("Missing request URL");
-    /** @type import('./url') */
+    /** @type import('../url') */
     const { URL } = require(`${__hooks}/url`);
 
     // Unfortunately, we can't get the origin from the request URL - it's relative. Instead,
@@ -132,7 +132,7 @@ function loadOnshapeTransaction(transactionId) {
  * } | null} The user's Onshape metadata, or null if not found
  */
 function getOnshapeMetadata(userRecord) {
-    /** @type import("./util") */
+    /** @type import("../util") */
     const { parseJSON } = require(`${__hooks}/util`);
     const oauthData = userRecord.get("onshape_oauth");
     if(!oauthData) return null;
@@ -188,7 +188,7 @@ function setOnshapeMetadata(record, tokenJson) {
  * @param {string} state The state parameter for XSRF protection and returning to the correct page
  */
 function buildAuthorizeUrl(redirectUri, state) {
-    /** @type import("./url") */
+    /** @type import("../url") */
     const { URL } = require(`${__hooks}/url`);
 
     const url = new URL(ONSHAPE_AUTHORIZE_URL);
@@ -203,7 +203,7 @@ function buildAuthorizeUrl(redirectUri, state) {
 
 /**
  * Send a token request to Onshape and return the parsed response.
- * @param {import("./url").URLSearchParams} body The URL-encoded request body.
+ * @param {import("../url").URLSearchParams} body The URL-encoded request body.
  * @param {string} errorMessage The error message to use if the token request fails.
  * @returns {any} The parsed JSON token response.
  */
@@ -235,7 +235,7 @@ function sendTokenRequest(body, errorMessage) {
  * @returns {any} The parsed token response from Onshape.
  */
 function exchangeAuthorizationCode(code, redirectUri) {
-    /** @type {import("./url")} */
+    /** @type {import("../url")} */
     const { URLSearchParams } = require(`${__hooks}/url`);
 
     const body = new URLSearchParams({
@@ -267,7 +267,7 @@ function exchangeAuthorizationCode(code, redirectUri) {
 function refreshOnshapeToken(userRecord, metadata) {
     if(!metadata?.refresh_token) throw new BadRequestError("Missing Onshape refresh token");
 
-    /** @type {import("./url")} */
+    /** @type {import("../url")} */
     const { URLSearchParams } = require(`${__hooks}/url`);
 
     const body = new URLSearchParams({

@@ -28,7 +28,7 @@ export type OnshapeContext = {
     wvmId?: string;
     partStudioId?: string;
     client: OnshapeClient | null;
-    location: "right-panel" | "tab" | null;
+    location: "right-panel-part-studio" | "right-panel-assembly" | "tab" | null;
     onOnshape: boolean;
 };
 
@@ -62,7 +62,8 @@ export function watchOnshapeContext(
 
     onshapeContext.documentId = documentId;
     onshapeContext.location =
-        onshapeLocation === "right-panel" ? "right-panel" :
+        onshapeLocation === "right-panel-part-studio" ? "right-panel-part-studio" :
+        onshapeLocation === "right-panel-assembly" ? "right-panel-assembly" :
         onshapeLocation === "tab" ? "tab" : null;
     if(wvm && wvmId && elementId) {
         onshapeContext.wvm = wvm === "v" ? "v" : "w";

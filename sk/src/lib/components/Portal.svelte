@@ -17,10 +17,10 @@
         async function update(newTarget: HTMLElement | string) {
             target = newTarget;
             if(typeof target === "string") {
-                targetEl = document.querySelector(target);
+                targetEl = el.closest(target);
                 if(targetEl === null) {
                     await tick();
-                    targetEl = document.querySelector(target);
+                    targetEl = el.closest(target);
                 }
                 if(targetEl === null) throw new Error(`No element found matching css selector: "${target}"`);
             } else if(target instanceof HTMLElement) {

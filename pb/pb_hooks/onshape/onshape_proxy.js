@@ -29,7 +29,7 @@ function checkRequestCache(hash) {
         return null;
     }
 
-    const { parseJSON } = /** @type import("./util") */ (require(`${__hooks}/util`));
+    const { parseJSON } = /** @type import("../util") */ (require(`${__hooks}/util`));
     const statusCode = record.get("statusCode");
     const headers = parseJSON(record.get("headers") ?? "{}");
     const body = parseJSON(record.get("body") ?? "null");
@@ -71,6 +71,44 @@ function saveRequestCache(hash, statusCode, headers, body) {
 }
 
 /**
+ * Make a request to the Onshape API on behalf of a user.
+ * @param {core.Record} authRecord - The authenticated user record
+ * @param {string} method - HTTP method (GET, POST, etc.)
+ * @param {string} path - API path (e.g. "v16/parts/d/123/w/456/e/789"). Should be everything AFTER "/api/".
+ * @param {Record<string, string>} [extraHeaders] - Additional headers to forward
+ * @param {any} [body] - Request body
+ * @returns {{ statusCode: number, headers: Record<string, string | string[]>, body: any }}
+ */
+function onshapeRequest(authRecord, method, path, extraHeaders, body) {
+    /** @type import("../config") */
+    const { getConfigOption } = require(`${__hooks}/config`);
+    /** @type import("./onshape_auth") */
+    const { getValidOnshapeToken } = require(`${__hooks}/onshape/onshape_auth`);
+
+    const metadata = getValidOnshapeToken(authRecord);
+    if(!metadata) throw new BadRequestError("User is missing Onshape OAuth metadata");
+
+    const baseOnshapeUrl = getConfigOption("onshape/baseDomain", "https://cad.onshape.com").replace(/\/+$/, "");
+
+    const res = $http.send({
+        url: `${baseOnshapeUrl}/api/${path}`,
+        method,
+        headers: {
+            "Authorization": `Bearer ${metadata.access_token}`,
+            "Content-Type": extraHeaders?.["Content-Type"] ?? "application/json",
+            "X-XSRF-TOKEN": extraHeaders?.["X-XSRF-TOKEN"] ?? "",
+            "Accept": extraHeaders?.["Accept"] ?? "application/json;charset=UTF-8; qs=0.09"
+        },
+        body,
+        timeout: 10,
+    });
+
+    if(!res) throw new InternalServerError("No response from Onshape");
+
+    return { statusCode: res.statusCode, headers: res.headers, body: res.json };
+}
+
+/**
  * Handle an Onshape API proxy request.
  * @param {core.RequestEvent} e 
  * @returns 
@@ -78,11 +116,6 @@ function saveRequestCache(hash, statusCode, headers, body) {
 function handleProxyRequest(e) {
     if(!e.request?.url?.path.startsWith("/api/onshape/proxy/")) return e.next();
     
-    /** @type import("./config") */
-    const { getConfigOption } = require(`${__hooks}/config`);
-    /** @type import("./onshape_auth") */
-    const { getValidOnshapeToken } = require(`${__hooks}/onshape_auth`);
-
     const authRecord = /** @type core.Record */ (e.requestInfo().auth);
     if(!authRecord) throw new BadRequestError("Authentication required to access Onshape API");
 
@@ -108,31 +141,18 @@ function handleProxyRequest(e) {
     }
 
     const path = e.request.url.path.replace("/api/onshape/proxy/", "") + "?" + (e.request.url.rawQuery ?? ""); // preserve query parameters
-    
-    const metadata = getValidOnshapeToken(authRecord);
-    if(!metadata) throw new BadRequestError("User is missing Onshape OAuth metadata");
-    
-    const baseOnshapeUrl = getConfigOption("onshape/baseDomain", "https://cad.onshape.com").replace(/\/+$/, ""); // remove trailing slashes just in case
 
-    const res = $http.send({
-        url: `${baseOnshapeUrl}/api/${path}`,
-        method: e.request.method,
-        headers: {
-            "Authorization": `Bearer ${metadata.access_token}`,
-            // Forward content-type header if present, otherwise Onshape will reject the request
-            "Content-Type": e.request.header.get("Content-Type") ?? "application/json",
-            "X-XSRF-TOKEN": e.request.header.get("X-XSRF-TOKEN") ?? "",
-            "Accept": e.request.header.get("Accept") ?? "application/json;charset=UTF-8; qs=0.09"
-        },
-        body,
-        timeout: 10,
-    });
+    const extraHeaders = {
+        "Content-Type": e.request.header.get("Content-Type") ?? "application/json",
+        "X-XSRF-TOKEN": e.request.header.get("X-XSRF-TOKEN") ?? "",
+        "Accept": e.request.header.get("Accept") ?? "application/json;charset=UTF-8; qs=0.09"
+    };
 
-    if(!res) throw new InternalServerError("No response from Onshape");
+    const res = onshapeRequest(authRecord, e.request.method, path, extraHeaders, body);
 
     // Save response to cache if hash was provided
     if(cacheHash) {
-        saveRequestCache(cacheHash, res.statusCode, res.headers, res.json);
+        saveRequestCache(cacheHash, res.statusCode, res.headers, res.body);
     }
     
     // Copy headers to response
@@ -143,7 +163,7 @@ function handleProxyRequest(e) {
     }
     e.response.header().add("X-Kanshape-Cached", "false");
 
-    return e.json(res.statusCode, res.json);
+    return e.json(res.statusCode, res.body);
 }
 
 /**
@@ -171,5 +191,6 @@ function cleanupRequestCache() {
 
 module.exports = {
     handleProxyRequest: handleProxyRequest,
-    cleanupRequestCache: cleanupRequestCache
+    cleanupRequestCache: cleanupRequestCache,
+    onshapeRequest: onshapeRequest
 };

@@ -527,8 +527,8 @@ function(tl_context is Context, queries) {
         var isShaft = false;
         var isTube = false;
         var isPlate = false;
-        var size = [0, 0]; // of a tube or shaft
-        var thickness = 0; // of a plate
+        var size = [0 * meter, 0 * meter]; // of a tube or shaft
+        var thickness = 0 * meter; // of a plate
         if(best.certainty > 0.9) {
             const minFace = best.minFace;
             const maxFace = best.maxFace;
@@ -615,7 +615,7 @@ function(tl_context is Context, queries) {
         const aabb = evBox3d(context, { "topology": body, "tight": true });
 
         return {
-            'partID': partID,
+            'partID': partID[0],
             'name': getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
             'material': getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL }),
             'appearance': getProperty(context, { entity: body, propertyType: PropertyType.APPEARANCE }),
@@ -650,6 +650,9 @@ function(tl_context is Context, queries) {
     //     }
     // );
 
-    const body = evaluateQuery(tl_context, qOwnerBody(qTransient('{{selectionID}}')))[0];
+    const results = evaluateQuery(tl_context, qOwnerBody(qTransient('{{selectionID}}')));
+    if(size(results) == 0) return undefined;
+    const body = results[0];
+    if(size(qBodyType(body, BodyType.SOLID)) == 0) return undefined;
     return runHeuristics(tl_context, body);
 }

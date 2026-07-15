@@ -81,6 +81,7 @@ Remove this field?" onclick={() => {
             url.searchParams.set("download", "1");
             return url.toString();
         }}
+        cardId={card.id}
     />
 </div>
 

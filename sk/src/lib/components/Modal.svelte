@@ -1,7 +1,7 @@
 <script lang="ts">
     import { pushState } from "$app/navigation";
     import { page } from "$app/state";
-    import type { Snippet } from "svelte";
+    import { onDestroy, type Snippet } from "svelte";
     import { fade, fly } from "svelte/transition";
 
     const { id, children, forceOpen = false }: {
@@ -13,7 +13,7 @@
         forceOpen?: boolean
     } = $props();
 
-    const openKey = $derived(`modal${id}Open`);
+    const openKey = $derived(`modal-${id}-open`);
 
     export function open() {
         pushState('', { [openKey]: true });
@@ -21,6 +21,14 @@
     export function close() {
         pushState('', { [openKey]: false });
     }
+
+    $effect(() => {
+        return () => {
+            // don't push a history item, just change the state to closed
+            page.state[openKey] = false;
+            console.log(`Modal ${id} destroyed, closing modal`);
+        };
+    });
 
     const isOpen = $derived(page.state[openKey]);
 </script>

@@ -82,7 +82,7 @@
             </button>
         {/snippet}
         
-        <div class="shell">
+        <div class="shell" data-modal-target>
             <CardViewPanel
                 board={$openCardBoard}
                 boardCards={$openCardBoardCards ? $openCardBoardCards.items : []}

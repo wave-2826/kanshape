@@ -144,7 +144,7 @@ function computeChanges(app, original, record, trackedFields) {
     function normalize(type, val) {
         if(type === "json" || type === "assignment") {
             if(typeof val === "string") return { json: JSON.parse(val) };
-            const { parseJSON } = /** @type import("./util") */ (require(`${__hooks}/util`));
+            const { parseJSON } = /** @type typeof import("./util") */ (require(`${__hooks}/util`));
             return { json: parseJSON(val) };
         }
 
@@ -288,7 +288,7 @@ function tryMergeUpdate(app, params) {
     let existing = findRecentActivity(app, params.entityType, params.entityId, "update");
     if(!existing) return false;
 
-    const { parseJSON } = /** @type import("./util") */ (require(`${__hooks}/util`));
+    const { parseJSON } = /** @type typeof import("./util") */ (require(`${__hooks}/util`));
     let existingChanges = parseJSON(existing.get("changes"));
     let newChanges = params.changes ?? {};
 

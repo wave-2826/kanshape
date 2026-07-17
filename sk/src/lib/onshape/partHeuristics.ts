@@ -1,5 +1,6 @@
 import heuristicScript from "./partHeuristics.fs?raw";
 import { evalTemplatedFS } from "./featureScript";
+import type { OnshapeClient } from "./client";
 
 export type PartHeuristicsResult = {
     partID: string;
@@ -25,10 +26,12 @@ export type PartHeuristicsResult = {
 };
 
 export async function getPartHeuristics(
+    client: OnshapeClient,
     documentId: string, wvm: "w" | "v" | "m", wvmId: string, partStudioId: string,
     transientSelectionID: string
 ): Promise<PartHeuristicsResult | null> {
     return await evalTemplatedFS<PartHeuristicsResult>(
+        client,
         heuristicScript, {
             selectionID: transientSelectionID
         },

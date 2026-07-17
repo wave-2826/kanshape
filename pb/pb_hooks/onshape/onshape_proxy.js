@@ -29,7 +29,7 @@ function checkRequestCache(hash) {
         return null;
     }
 
-    const { parseJSON } = /** @type import("../util") */ (require(`${__hooks}/util`));
+    const { parseJSON } = /** @type typeof import("../util") */ (require(`${__hooks}/util`));
     const statusCode = record.get("statusCode");
     const headers = parseJSON(record.get("headers") ?? "{}");
     const body = parseJSON(record.get("body") ?? "null");
@@ -80,9 +80,9 @@ function saveRequestCache(hash, statusCode, headers, body) {
  * @returns {{ statusCode: number, headers: Record<string, string | string[]>, body: any }}
  */
 function onshapeRequest(authRecord, method, path, extraHeaders, body) {
-    /** @type import("../config") */
+    /** @type typeof import("../config") */
     const { getConfigOption } = require(`${__hooks}/config`);
-    /** @type import("./onshape_auth") */
+    /** @type typeof import("./onshape_auth") */
     const { getValidOnshapeToken } = require(`${__hooks}/onshape/onshape_auth`);
 
     const metadata = getValidOnshapeToken(authRecord);

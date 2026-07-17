@@ -1,8 +1,4 @@
 import { loadConfig, type AppConfig } from "$lib/config";
-import createClient from "openapi-fetch";
-
-// Schema generated with "npx openapi-typescript https://api.onshape.com/api/v16/openapi -o ./schema.d.ts"
-import type { paths } from "./schema.d.ts";
 import { dev } from "$app/environment";
 import { client } from "$lib/pocketbase/index.js";
 
@@ -222,8 +218,8 @@ export async function onshapeApiRequest<T>(
     }
 }
 
-let customBody = Symbol("customBody");
-let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?: RequestInit): Promise<Response> => {
+export let ONSHAPE_CUSTOM_BODY_SYMBOL = Symbol("customBody");
+export let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?: RequestInit): Promise<Response> => {
     // Fetch wrapper that uses our custom request logic
     const url = input instanceof URL ? input.toString() : (typeof input === "string" ? input : input.url);
     let method = init?.method ?? "GET";
@@ -231,7 +227,7 @@ let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?:
     let headers = init?.headers ?? {};
     if(input instanceof Request) {
         method = input.method ?? method;
-        body = (input as any)[customBody] as string ?? body;
+        body = (input as any)[ONSHAPE_CUSTOM_BODY_SYMBOL] as string ?? body;
         headers = input.headers ?? headers;
     }
     
@@ -257,15 +253,3 @@ let onshapeApiFetch: typeof fetch = async (input: URL | string | Request, init?:
     console.warn("Attempted to fetch non-Onshape URL through onshapeApiFetch:", input);
     return fetch(input, init);
 };
-
-export let onshapeClient = createClient<paths>({
-    baseUrl: await loadConfig().then(config => config.onshape.baseDomain + "/api/v16"),
-    fetch: onshapeApiFetch,
-    // omg why do i need to mess with my fetch library i'm crashing out 😔
-    Request: class extends Request {
-        constructor(input: URL | string | Request, init?: RequestInit) {
-            super(input, init);
-            (this as any)[customBody] = init?.body ?? null;
-        }
-    }
-});

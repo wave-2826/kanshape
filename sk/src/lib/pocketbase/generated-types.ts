@@ -378,6 +378,7 @@ export const PartsTypeOptions = {
 } as const
 export type PartsTypeOptions = typeof PartsTypeOptions[keyof typeof PartsTypeOptions]
 export type PartsRecord<Tpart_data = unknown> = {
+	configuration?: string
 	created: IsoAutoDateString
 	current_card?: RecordIdString
 	document_id: string
@@ -388,7 +389,7 @@ export type PartsRecord<Tpart_data = unknown> = {
 	past_revision_cards?: RecordIdString[]
 	preview_model?: FileNameString
 	revision?: number
-	type?: PartsTypeOptions
+	type: PartsTypeOptions
 	updated: IsoAutoDateString
 	wvm: PartsWvmOptions
 	wvm_id: string

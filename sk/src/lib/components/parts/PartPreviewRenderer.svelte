@@ -3,7 +3,13 @@
     import { client } from "$lib/pocketbase";
     import { loadScene } from "./renderer";
 
-    const { part }: { part: TypedPartsResponse; } = $props();
+    const {
+        part,
+        stats: showStats = false
+    }: {
+        part: TypedPartsResponse;
+        stats?: boolean
+    } = $props();
     let canvas: HTMLCanvasElement | null = $state(null);
 
     let fileUrl = $derived(part.preview_model ? client.files.getURL(part, part.preview_model) : null);
@@ -11,6 +17,7 @@
     // lazy load three.js to avoid increasing the initial bundle size
     const THREE = await import("three");
     const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
+    const Stats = (await import("three/examples/jsm/libs/stats.module.js")).default;
 
     $effect(() => {
         if(!canvas || !fileUrl) return;
@@ -25,6 +32,11 @@
                 frustumSize / 2, frustumSize / -2,
                 0.001, 1000
             );
+
+            let stats = showStats ? new Stats() : null;
+            if(stats) {
+                canvas.parentElement?.appendChild(stats.dom);
+            }
         
             const renderer = new THREE.WebGLRenderer({
                 antialias: true,
@@ -63,6 +75,7 @@
                             renderer.setAnimationLoop(() => {
                                 controls.update();
                                 renderer.render(scene, camera);
+                                if(stats) stats.update();
                             });
                         } else {
                             renderer.setAnimationLoop(null);

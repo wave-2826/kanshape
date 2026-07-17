@@ -18,7 +18,7 @@ export type BTExportTessellatedFacesResponse = DeepRequired<
 // shared PB -> node types
 
 /**
- * column-major 4x4 affine transformation matrix representation
+ * row-major 4x4 affine transformation matrix representation
  */
 export type TransformMatrix4x4 = [
     number, number, number, number,

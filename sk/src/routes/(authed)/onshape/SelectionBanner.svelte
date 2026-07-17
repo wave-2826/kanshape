@@ -1,6 +1,5 @@
 <script lang="ts">
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
-    import { getPartHeuristics } from "$lib/onshape/partHeuristics";
     import { LoaderCircle } from "lucide-svelte";
 
     const {
@@ -14,15 +13,7 @@
     let loading = $state(false);
 
     async function createCard() {
-        if(onshapeCtx.documentId && onshapeCtx.wvm && onshapeCtx.wvmId && onshapeCtx.partStudioId && selectedIDs && selectedIDs.length > 0) {
-            loading = true;
-            try {
-                const heuristics = await getPartHeuristics(onshapeCtx.documentId, onshapeCtx.wvm, onshapeCtx.wvmId, onshapeCtx.partStudioId, selectedIDs[0]);
-            
-            } finally {
-                loading = false;
-            }
-        }
+        // TODO
     }
 </script>
 

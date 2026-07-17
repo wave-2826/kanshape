@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
-    import type { TypedPartsResponse } from "$lib/data/parts";
-    import { getPartHeuristics } from "$lib/onshape/partHeuristics";
+    import type { AssemblyData, TypedPartsResponse } from "$lib/data/parts";
+    import { getPartHeuristics, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
     import { client, query, save, watchOne } from "$lib/pocketbase";
     import { Collections, type PartsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
@@ -44,6 +44,7 @@
         documentId: string;
         elementId: string;
         partId?: string;
+        configuration: string;
     } | null> {
         if(onshapeCtx.location === "right-panel-part-studio" || onshapeCtx.location === "right-panel-assembly") {
             const selections = await onshapeCtx.client?.requestSelection("Select a part to create a card for.", ["BODY"]);
@@ -53,19 +54,21 @@
                 wvmId: onshapeCtx.wvmId ?? "",
                 documentId: onshapeCtx.documentId ?? "",
                 elementId: onshapeCtx.partStudioId ?? "",
-                partId: selections[0].selectionId
+                partId: selections[0].selectionId,
+                configuration: "default"
             } : null;
         } else if(onshapeCtx.location === "tab") {
             const selection = await onshapeCtx.client?.openSelectItemDialog({
                 dialogTitle: "Select a part to create a card for.",
-                selectParts: true
+                selectParts: true,
+                selectAssemblies: true
             });
             if(!selection) return null;
             console.log("Onshape selection:", selection);
 
             // sanity checks
-            if(selection.includeSurfaces || selection.includeWires || selection.isSurface) {
-                alert("Please select a part, not a surface or wire.");
+            if(selection.isSurface) {
+                alert("Please select a part, not a surface.");
                 return null;
             }
             // meshes are okay
@@ -80,8 +83,8 @@
                 alert("Please select a part from a part studio or assembly.");
                 return null;
             }
-            if(selection.itemType !== "part") {
-                alert("Please select a part, not a part studio.");
+            if(selection.itemType !== "part" && selection.itemType !== "assembly") {
+                alert("Please select a part or assembly, not a part studio.");
                 return null;
             }
 
@@ -114,24 +117,22 @@
             let wvmId = workspaceId || versionId;
             if(wvmId === versionId) wvm = "v";
 
-            if(selection.isConfigurable && selection.elementConfiguration !== "default") {
-                alert("Note that configurable parts aren't directly supported; the part selected will be linked with default options! To add a configured part, create or select an instance of it from a part studio. If you need this use case, let us know.");
-                // still return the part
-            }
-
             return {
                 type: selection.elementType === "partstudio" ? "part" : "assembly",
                 wvm,
                 wvmId,
                 documentId,
                 elementId,
-                partId
+                partId,
+                configuration: selection.elementConfiguration || "default"
             };
         }
         return null;
     }
 
     async function addPart() {
+        if(!onshapeCtx.client) return;
+
         // TOOD: check for an existing part immediately and prompt the user to update it
         // TODO: better feedback for this loading state
         const sel = await getPartSelection();
@@ -140,14 +141,16 @@
         console.log("Selected part:", sel);
 
         let existing = await query(Collections.Parts, {
-            filter: `part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+            filter: sel.type === "part" ?
+                `type="part" && part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}" && configuration="${sel.configuration}"` :
+                `type="assembly" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}" && configuration="${sel.configuration}"`
         }).catch(() => null);
         console.log("Existing parts in database:", existing);
 
         // Run part heuristics
-        let partData;
+        let partData: PartHeuristicsResult | AssemblyData;
         if(sel.type === "part" && sel.partId) {
-            const heuristics = await getPartHeuristics(sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
+            const heuristics = await getPartHeuristics(onshapeCtx.client, sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
             if(!heuristics || "error" in heuristics) {
                 alert(`Failed to gather part heuristics: ${
                     heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
@@ -160,12 +163,42 @@
     
             // check again after heuristic id detection
             if(!existing || existing.length === 0) existing = await query(Collections.Parts, {
-                filter: `part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+                filter: `type="part" && part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
             }).catch(() => null);
     
             console.log("Existing parts in database:", existing);
         } else {
+            const { data, error } = await onshapeCtx.client.requests.GET("/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}", {
+                params: {
+                    path: {
+                        did: sel.documentId,
+                        wvm: sel.wvm,
+                        wvmid: sel.wvmId,
+                        eid: sel.elementId
+                    },
+                    query: {
+                        inferMetadataOwner: false,
+                        depth: "1",
+                        includeComputedProperties: true,
+                        includeComputedAssemblyProperties: false,
+                        thumbnail: false,
+                        configuration: sel.configuration
+                    }
+                }
+            });
 
+            if(!data) {
+                alert(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}. Please try again.`);
+                return;
+            }
+
+            let name = data.properties?.find(p => p.name === "Name" && p.value)?.value as string | undefined;
+            let part_number = data.properties?.find(p => p.name === "Part number" && p.value)?.value as string | undefined;
+
+            partData = {
+                name: name ?? "Unknown assembly",
+                part_number: part_number ?? ""
+            };
         }
 
         let record: PartsResponse | null = null;
@@ -198,7 +231,8 @@
                 current_card: cardId,
                 part_data: partData,
                 past_revision_cards: [],
-                revision: 1
+                revision: 1,
+                type: sel.type
             }, { create: true });
         }
 
@@ -246,7 +280,7 @@
                     {/if}
                 </button>
                 <button class="close" onclick={() => expandedModal?.close()}><X /></button>
-                <PartPreviewRenderer {part} />
+                <PartPreviewRenderer {part} stats />
             {/if}
         </Modal>
     </div>

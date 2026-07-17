@@ -21405,7 +21405,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21428,7 +21428,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21449,12 +21449,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPurchaseIdentityParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPurchaseIdentityParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21479,7 +21479,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21505,7 +21505,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21524,12 +21524,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAliasParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAliasParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21551,7 +21551,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21572,12 +21572,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAliasParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAliasParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21599,7 +21599,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21627,7 +21627,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21654,12 +21654,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21686,12 +21686,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementBulkCreateParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementBulkCreateParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21722,7 +21722,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description File download. */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21752,7 +21752,7 @@ export interface operations {
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21780,7 +21780,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21803,12 +21803,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementParamsArrayBTCopyViewAssociativeDataParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementParamsArrayBTCopyViewAssociativeDataParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21832,7 +21832,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21855,12 +21855,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementStartTransactionParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementStartTransactionParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21887,7 +21887,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21914,12 +21914,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementCommitTransactionParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementCommitTransactionParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21952,7 +21952,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description File download. */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21999,7 +21999,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22023,12 +22023,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22067,7 +22067,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22095,7 +22095,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22126,7 +22126,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22162,7 +22162,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22186,12 +22186,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementUpdateParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementUpdateParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22216,7 +22216,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22244,7 +22244,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22280,7 +22280,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22313,12 +22313,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTGetJsonPaths-1697"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTGetJsonPaths-1697"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22358,7 +22358,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22388,7 +22388,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22418,7 +22418,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22442,12 +22442,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementReferenceParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementReferenceParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22478,7 +22478,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22503,12 +22503,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAppElementReferenceParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAppElementReferenceParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22538,7 +22538,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22574,7 +22574,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22616,7 +22616,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22645,7 +22645,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22667,12 +22667,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUserAppSettingsParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUserAppSettingsParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22697,7 +22697,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22722,7 +22722,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22744,12 +22744,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUserAppSettingsParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUserAppSettingsParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22797,7 +22797,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22826,7 +22826,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22848,12 +22848,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTModelElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTModelElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22877,7 +22877,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22901,12 +22901,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureDefinitionCall-1406"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureDefinitionCall-1406"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22956,7 +22956,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22979,12 +22979,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAssemblyInstanceDefinitionParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAssemblyInstanceDefinitionParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23007,12 +23007,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAssemblyMateValuesInfo"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAssemblyMateValuesInfo"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23041,12 +23041,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAssemblyModificationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAssemblyModificationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23069,12 +23069,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAssemblyTransformDefinitionParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAssemblyTransformDefinitionParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23097,12 +23097,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAssemblyTransformedInstancesDefinitionParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAssemblyTransformedInstancesDefinitionParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23142,7 +23142,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23200,7 +23200,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23240,7 +23240,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23307,7 +23307,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23367,12 +23367,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureDefinitionCall-1406"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureDefinitionCall-1406"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23397,7 +23397,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23431,7 +23431,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23466,7 +23466,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23513,7 +23513,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23541,12 +23541,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBGltfExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBGltfExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23574,12 +23574,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBObjExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBObjExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23607,12 +23607,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBStepExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBStepExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23637,7 +23637,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23661,12 +23661,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTTranslateFormatParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTTranslateFormatParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23718,7 +23718,7 @@ export interface operations {
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23753,7 +23753,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description File download. */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23790,7 +23790,7 @@ export interface operations {
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23819,12 +23819,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUpdateMeshUnitsParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUpdateMeshUnitsParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23855,12 +23855,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTTranslateFormatParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTTranslateFormatParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23891,7 +23891,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23910,12 +23910,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCommentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCommentParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23937,7 +23937,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23958,12 +23958,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCommentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCommentParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23985,7 +23985,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24011,7 +24011,7 @@ export interface operations {
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24033,7 +24033,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24057,7 +24057,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24080,7 +24080,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24102,7 +24102,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24126,7 +24126,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24148,7 +24148,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24172,7 +24172,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24198,12 +24198,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": number[];
+                "application/json;charset=UTF-8; qs=0.09": Partial<number[]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24257,7 +24257,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24299,7 +24299,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24320,12 +24320,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCompanyUserParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCompanyUserParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24349,12 +24349,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCompanyUserParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCompanyUserParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24380,7 +24380,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24442,12 +24442,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDocumentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDocumentParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24498,7 +24498,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24519,12 +24519,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVersionOrWorkspaceParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVersionOrWorkspaceParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24573,7 +24573,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTLinkToLatestDocumentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTLinkToLatestDocumentParams"]>;
             };
         };
         responses: {
@@ -24600,12 +24600,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTMoveElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTMoveElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24627,12 +24627,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTRevertUnchangedParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTRevertUnchangedParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24654,12 +24654,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTSyncAppElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTSyncAppElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24681,7 +24681,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24702,12 +24702,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVersionOrWorkspaceParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVersionOrWorkspaceParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24730,7 +24730,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24754,7 +24754,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24790,7 +24790,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24855,7 +24855,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24879,7 +24879,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24910,12 +24910,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBExportModelParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBExportModelParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24969,7 +24969,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24988,12 +24988,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDocumentSearchParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDocumentSearchParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25036,12 +25036,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDocumentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDocumentParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25065,7 +25065,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25087,7 +25087,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25108,12 +25108,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAclParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAclParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25134,12 +25134,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTAclParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTAclParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25161,12 +25161,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDocumentNotesParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDocumentNotesParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25209,12 +25209,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTShareParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTShareParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25242,7 +25242,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25265,7 +25265,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25288,7 +25288,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25318,7 +25318,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25347,12 +25347,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTRestoreInfo"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTRestoreInfo"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25376,7 +25376,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCopyDocumentParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCopyDocumentParams"]>;
             };
         };
         responses: {
@@ -25403,12 +25403,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVersionOrWorkspaceMergeInfo"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVersionOrWorkspaceMergeInfo"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25432,12 +25432,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDrawingParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDrawingParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25466,12 +25466,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDrawingModificationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTDrawingModificationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25495,7 +25495,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25531,7 +25531,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25571,7 +25571,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25595,12 +25595,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTTranslateFormatParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTTranslateFormatParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25622,7 +25622,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25644,12 +25644,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCopyElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCopyElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25674,12 +25674,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTConfigurationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTConfigurationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25703,7 +25703,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25726,12 +25726,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUpdateReferenceParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUpdateReferenceParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25763,7 +25763,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25787,12 +25787,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTConfigurationUpdateCall-2933"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTConfigurationUpdateCall-2933"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25822,7 +25822,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25856,7 +25856,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25881,7 +25881,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25903,12 +25903,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTModelElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTModelElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25933,7 +25933,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25957,12 +25957,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureStudioContents-2239"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureStudioContents-2239"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25987,7 +25987,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26009,7 +26009,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26030,12 +26030,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTShareParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTShareParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26060,7 +26060,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26107,7 +26107,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26142,7 +26142,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26161,12 +26161,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTItemParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTItemParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26194,7 +26194,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26216,12 +26216,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTItemParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTItemParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26244,7 +26244,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26275,7 +26275,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26313,7 +26313,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26339,12 +26339,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26377,7 +26377,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26415,7 +26415,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26460,7 +26460,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26500,12 +26500,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26536,7 +26536,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26559,12 +26559,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26590,12 +26590,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26627,7 +26627,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26659,7 +26659,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26683,12 +26683,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTNextPartNumbersParam"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTNextPartNumbersParam"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26733,7 +26733,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26754,7 +26754,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26779,12 +26779,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTNextPartNumbersParam"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTNextPartNumbersParam"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26824,7 +26824,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26863,7 +26863,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26904,7 +26904,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26934,7 +26934,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27023,7 +27023,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27089,7 +27089,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27117,7 +27117,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27154,7 +27154,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27198,7 +27198,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27249,7 +27249,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27278,7 +27278,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27302,12 +27302,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTModelElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTModelElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27336,12 +27336,12 @@ export interface operations {
         /** @description feature The serialized feature definition */
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureDefinitionCall-1406"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureDefinitionCall-1406"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27370,7 +27370,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27402,12 +27402,12 @@ export interface operations {
          */
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": string;
+                "application/json;charset=UTF-8; qs=0.09": Partial<string>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27434,12 +27434,12 @@ export interface operations {
         /** @description feature The serialized feature definition */
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUpdateFeaturesCall-1748"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUpdateFeaturesCall-1748"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27485,7 +27485,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27523,7 +27523,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27559,7 +27559,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27603,7 +27603,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27627,12 +27627,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureDefinitionCall-1406"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureDefinitionCall-1406"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27669,12 +27669,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTFeatureScriptEvalCall-2377"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTFeatureScriptEvalCall-2377"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27712,7 +27712,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27741,7 +27741,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27795,7 +27795,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27870,12 +27870,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTIdTranslationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTIdTranslationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -27918,7 +27918,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28031,7 +28031,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28065,7 +28065,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28094,7 +28094,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28126,7 +28126,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28219,7 +28219,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28270,7 +28270,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28298,12 +28298,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBGltfExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBGltfExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28331,12 +28331,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBObjExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBObjExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28364,12 +28364,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTBStepExportParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTBStepExportParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28397,12 +28397,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTTranslateFormatParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTTranslateFormatParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28464,12 +28464,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPublicationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPublicationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28491,12 +28491,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPublicationParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPublicationParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28522,7 +28522,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28544,12 +28544,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPublicationItemParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPublicationItemParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28574,7 +28574,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28597,7 +28597,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28619,12 +28619,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPublicationBulkItemParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPublicationBulkItemParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28651,7 +28651,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28675,12 +28675,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTReleasePackageParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTReleasePackageParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28705,7 +28705,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28742,12 +28742,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUpdateReleasePackageParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUpdateReleasePackageParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28777,7 +28777,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28809,7 +28809,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28853,7 +28853,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28897,7 +28897,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28931,7 +28931,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28961,7 +28961,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -28983,7 +28983,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29008,7 +29008,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29038,7 +29038,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29063,12 +29063,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTStandardContentSetCustomParametersBatchRequest"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTStandardContentSetCustomParametersBatchRequest"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29091,7 +29091,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29114,7 +29114,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29135,12 +29135,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTPropertiesTableTemplateParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTPropertiesTableTemplateParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29168,7 +29168,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29196,7 +29196,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29219,7 +29219,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29242,7 +29242,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29271,7 +29271,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29290,12 +29290,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTCreateTaskParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTCreateTaskParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29317,7 +29317,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29338,12 +29338,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTUpdateTaskParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTUpdateTaskParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29366,7 +29366,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29396,7 +29396,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29418,7 +29418,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29446,7 +29446,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29468,7 +29468,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29493,7 +29493,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29516,7 +29516,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29558,7 +29558,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29592,7 +29592,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29625,7 +29625,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29657,12 +29657,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTApplicationElementThumbnailParamsArray"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTApplicationElementThumbnailParamsArray"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29694,7 +29694,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29736,7 +29736,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29759,7 +29759,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29782,7 +29782,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29807,7 +29807,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29834,7 +29834,7 @@ export interface operations {
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29854,7 +29854,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29876,7 +29876,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29898,7 +29898,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29917,12 +29917,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTLoginParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTLoginParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29942,7 +29942,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29964,7 +29964,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -29988,7 +29988,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30016,12 +30016,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVariableParams"][];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVariableParams"][]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30049,12 +30049,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVariableStudioReferenceListInfo"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVariableStudioReferenceListInfo"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30082,12 +30082,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTVariableStudioScopeInfo"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTVariableStudioScopeInfo"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30114,12 +30114,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTModelElementParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTModelElementParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30154,7 +30154,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30186,7 +30186,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30218,7 +30218,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30238,7 +30238,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30263,7 +30263,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30282,12 +30282,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTWebhookParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTWebhookParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30309,7 +30309,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30330,12 +30330,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTWebhookParams"];
+                "application/json;charset=UTF-8; qs=0.09": Partial<components["schemas"]["BTWebhookParams"]>;
             };
         };
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30359,7 +30359,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30381,7 +30381,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30403,7 +30403,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30430,7 +30430,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30462,7 +30462,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30490,7 +30490,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -30513,7 +30513,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description default response */
-            default: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

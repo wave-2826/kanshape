@@ -1,5 +1,8 @@
 import { writable, type Writable } from "svelte/store";
 import type { AppConfig } from "../config";
+import createClient from "openapi-fetch";
+import { ONSHAPE_CUSTOM_BODY_SYMBOL, onshapeApiFetch } from "./requests";
+import type { paths } from "./schema";
 
 type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE";
 type OnshapeEntityType = "EDGE" | "FACE" | "VERTEX" | "DEGENERATE_EDGE" | "UNKNOWN";
@@ -121,12 +124,26 @@ export class OnshapeClient {
     /** The transient entity IDs selected. */
     public selectedIDs: Writable<string[]> = writable([]);
 
+    public requests;
+
     private messageHandlers: { [message: string]: Set<(message: OnshapeToClientMessage) => void> } = {};
 
     constructor(private config: AppConfig, private docId: string, private wvmId: string, private elementId: string) {
         this.baseDomain = this.config.onshape.baseDomain;
         this.boundHandleMessage = this.handleMessage.bind(this);
         window.addEventListener("message", this.boundHandleMessage);
+
+        this.requests = createClient<paths>({
+            baseUrl: config.onshape.baseDomain + "/api/v16",
+            fetch: onshapeApiFetch,
+            // omg why do i need to mess with my fetch library i'm crashing out 😔
+            Request: class extends Request {
+                constructor(input: URL | string | Request, init?: RequestInit) {
+                    super(input, init);
+                    (this as any)[ONSHAPE_CUSTOM_BODY_SYMBOL] = init?.body ?? null;
+                }
+            }
+        });
 
         this.sendInitMessage();
 

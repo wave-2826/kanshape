@@ -45,7 +45,7 @@ function normalizeReturnTo(returnTo) {
  */
 function getCallbackUrl(request, requestInfo) {
     if(!request.url) throw new BadRequestError("Missing request URL");
-    /** @type import('../url') */
+    /** @type typeof import('../url') */
     const { URL } = require(`${__hooks}/url`);
 
     // Unfortunately, we can't get the origin from the request URL - it's relative. Instead,
@@ -132,7 +132,7 @@ function loadOnshapeTransaction(transactionId) {
  * } | null} The user's Onshape metadata, or null if not found
  */
 function getOnshapeMetadata(userRecord) {
-    /** @type import("../util") */
+    /** @type typeof import("../util") */
     const { parseJSON } = require(`${__hooks}/util`);
     const oauthData = userRecord.get("onshape_oauth");
     if(!oauthData) return null;
@@ -188,7 +188,7 @@ function setOnshapeMetadata(record, tokenJson) {
  * @param {string} state The state parameter for XSRF protection and returning to the correct page
  */
 function buildAuthorizeUrl(redirectUri, state) {
-    /** @type import("../url") */
+    /** @type typeof import("../url") */
     const { URL } = require(`${__hooks}/url`);
 
     const url = new URL(ONSHAPE_AUTHORIZE_URL);

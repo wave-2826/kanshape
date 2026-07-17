@@ -1,7 +1,5 @@
-import { onshapeClient } from "./requests";
+import type { OnshapeClient } from "./client";
 import type { components } from "./schema";
-
-type EvalResponse = components["schemas"]["BTFeatureScriptEvalResponse-1859"];
 
 type FeatureScriptValue = (
     ({ btType: "com.belmonttech.serialize.fsvalue.BTFSValueArray" } & Omit<components["schemas"]["BTFSValueArray-1499"], "btType">) |
@@ -56,6 +54,7 @@ function parseFSValue(value: FeatureScriptValue): any {
 }
 
 export async function evalFeatureScript<T = any>(
+    client: OnshapeClient,
     did: string,
     wvm: "w" | "v" | "m",
     wvmid: string,
@@ -63,7 +62,7 @@ export async function evalFeatureScript<T = any>(
     script: string
 ): Promise<T | null> {
     // Not sure why this typing doesn't work; oh well
-    const { data: data_ } = await onshapeClient.POST(
+    const { data } = await client.requests.POST(
         "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/featurescript",
         {
             params: {
@@ -82,8 +81,7 @@ export async function evalFeatureScript<T = any>(
         }
     );
 
-    if(data_) {
-        let data = data_ as EvalResponse;
+    if(data) {
         if(!data.result) {
             console.error("FeatureScript evaluation failed", data);
             for(const notice of data.notices ?? []) {
@@ -104,6 +102,7 @@ export async function evalFeatureScript<T = any>(
  * use is passing an imported .fs file.
  */
 export async function evalTemplatedFS<T = any>(
+    client: OnshapeClient,
     script: string,
     params: Record<string, string>,
     did: string, wvm: "w" | "v" | "m", wvmid: string, eid: string
@@ -119,6 +118,7 @@ export async function evalTemplatedFS<T = any>(
 
     // For testing, we can use dummy values since the script will likely fail to evaluate anyway
     return evalFeatureScript(
+        client,
         did, wvm, wvmid, eid,
         stripCommentsAndWhitespace(templatedScript)
     );

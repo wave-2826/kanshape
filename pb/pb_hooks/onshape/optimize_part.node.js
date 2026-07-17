@@ -1,7 +1,6 @@
 // @ts-check
 import fs from 'fs';
 import { WriteStream } from 'fs';
-import { createHash } from 'crypto';
 import path from 'path';
 /**
  * @import { BTExportTessellatedFacesResponse, AssemblyData, PartModelHeader, AssemblyModelHeader } from "./part_types";
@@ -54,7 +53,9 @@ function encodeOct8(x, y, z) {
  * Converts Onshape data to binary format and writes to the specified stream
  * @param {WriteStream} stream
  * @param {BTExportTessellatedFacesResponse} data
- * @returns {{ encodeScale: number }} the scale factor used for encoding positions
+ * @returns {{
+ *      centerTranslation: { x: number, y: number, z: number }
+ * }}
  */
 function writePartBinary(stream, data) {
     if(!data || !data.bodies || !data.facetPoints) {
@@ -169,7 +170,7 @@ function writePartBinary(stream, data) {
     const sizeX = maxX - minX;
     const sizeY = maxY - minY;
     const sizeZ = maxZ - minZ;
-    const boundingBoxSize = Math.sqrt(sizeX * sizeX + sizeY * sizeY + sizeZ * sizeZ);
+    const boundingBoxSize = Math.hypot(sizeX, sizeY, sizeZ);
 
     // quantize positions to int16 (-32768 to 32767)
     // we map the max distance to 32767 to use the full integer range
@@ -207,7 +208,8 @@ function writePartBinary(stream, data) {
         decodeScale,
         vertexCount: positions.length / 3,
         hasNormals: normals.length > 0,
-        maxDistance: Math.sqrt(maxEuclideanSq)
+        maxDistance: Math.sqrt(maxEuclideanSq),
+        pivot: { x: -centerX, y: -centerY, z: -centerZ }
     };
 
     let headerString = JSON.stringify(header);
@@ -230,14 +232,16 @@ function writePartBinary(stream, data) {
     stream.write(Buffer.from(quantizedPositions.buffer));
     stream.write(Buffer.from(quantizedNormals.buffer));
 
-    console.log(`Element: ${data.elementId}`)
-    console.log("- Header size:", headerBuffer.length, "bytes");
-    console.log("- Positions size:", quantizedPositions.byteLength, "bytes");
-    console.log("- Normals size:", quantizedNormals.byteLength, "bytes");
-    console.log("- Materials count:", materialsArray.length);
-    console.log("- Groups count:", materialGroups.length);
+    console.log(`  Element: ${data.elementId}`)
+    console.log("  - Header size:", headerBuffer.length, "bytes");
+    console.log("  - Positions size:", quantizedPositions.byteLength, "bytes");
+    console.log("  - Normals size:", quantizedNormals.byteLength, "bytes");
+    console.log("  - Materials count:", materialsArray.length);
+    console.log("  - Groups count:", materialGroups.length);
 
-    return { encodeScale };
+    return {
+        centerTranslation: { x: centerX, y: centerY, z: centerZ }
+    };
 }
 
 /**
@@ -255,25 +259,84 @@ function getPartFile(dir, file) {
 }
 
 /**
- * Encode a column-major 4x4 matrix representing a rigid transformation matrix as a
+ * Encode a row-major 4x4 matrix representing a rigid transformation matrix as a
  * compact 7-number representation. Since Onshape only uses rigid transformations,
  * a full 4x4 matrix stores a lot of unnecessary data.
  * @param {WriteStream} stream
  * @param {number[]} transform
- * @param {number} encodeScale
+ * @param { { x: number, y: number, z: number } } centerTranslation Since we center parts,
+ * we need to account for that shift when encoding positions.
  */
-function encodeTransformation(stream, transform, encodeScale) {
+function encodeTransformation(stream, transform, centerTranslation) {
     if(!transform || transform.length !== 16) {
         throw new Error("Invalid transform matrix: must be a 4x4 matrix");
     }
+    // if det(transform) !== 1, it's not a rigid transform. onshape should never output that
+    // (and rightly doesn't allow setting instances to non-rigid trasnforms) but it's worth checking anyway
+    const det = transform[0] * (transform[5] * transform[10] - transform[6] * transform[9]) -
+                transform[1] * (transform[4] * transform[10] - transform[6] * transform[8]) +
+                transform[2] * (transform[4] * transform[9]  - transform[5] * transform[8]);
+    if(Math.abs(det - 1) > 1e-6) {
+        throw new Error("Invalid transform matrix: must be a rigid transformation");
+    }
 
-    // encode translation as fixed-point int16
-    const quantizedTx = Math.round(transform[12] * encodeScale);
-    const quantizedTy = Math.round(transform[13] * encodeScale);
-    const quantizedTz = Math.round(transform[14] * encodeScale);
+    // encode translation as half precision f16 and write
+    const tx = transform[3], ty = transform[7], tz = transform[11];
+    const translationBuffer = Buffer.alloc(6);
+    const tlbView = new DataView(translationBuffer.buffer);
+    // we transform (x, y, z) -> (x, z, -y)
+    tlbView.setFloat16(0, tx + centerTranslation.x, true);
+    tlbView.setFloat16(2, tz + centerTranslation.y, true);
+    tlbView.setFloat16(4, -ty + centerTranslation.z, true);
+    stream.write(translationBuffer);
 
     // encode rotation as single precision quaternion
-    
+    // matrix
+    const m00 = transform[0], m01 = transform[1], m02 = transform[2];
+    const m10 = transform[4], m11 = transform[5], m12 = transform[6];
+    const m20 = transform[8], m21 = transform[9], m22 = transform[10];
+
+    // see https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+    let qx, qy, qz, qw;
+
+    const trace = m00 + m11 + m22;
+    if(trace > 0) { 
+        const s = Math.sqrt(trace+1.0) * 2; // S=4*qw 
+        qw = 0.25 * s;
+        qx = (m21 - m12) / s;
+        qy = (m02 - m20) / s; 
+        qz = (m10 - m01) / s; 
+    } else if(m00 > m11 && m00 > m22) { 
+        const s = Math.sqrt(1.0 + m00 - m11 - m22) * 2; // S=4*qx 
+        qw = (m21 - m12) / s;
+        qx = 0.25 * s;
+        qy = (m01 + m10) / s; 
+        qz = (m02 + m20) / s; 
+    } else if(m11 > m22) { 
+        const s = Math.sqrt(1.0 + m11 - m00 - m22) * 2; // S=4*qy
+        qw = (m02 - m20) / s;
+        qx = (m01 + m10) / s; 
+        qy = 0.25 * s;
+        qz = (m12 + m21) / s; 
+    } else { 
+        const s = Math.sqrt(1.0 + m22 - m00 - m11) * 2; // S=4*qz
+        qw = (m10 - m01) / s;
+        qx = (m02 + m20) / s;
+        qy = (m12 + m21) / s;
+        qz = 0.25 * s;
+    }
+
+    // normalize and write half-precision quaternion
+    const invNorm = Math.hypot(qw, qx, qy, qz);
+    qw *= invNorm; qx *= invNorm; qy *= invNorm; qz *= invNorm;
+
+    const quaternionBuffer = Buffer.alloc(8);
+    const dataView = new DataView(quaternionBuffer.buffer);
+    dataView.setFloat16(0, qw, true);
+    dataView.setFloat16(2, qx, true);
+    dataView.setFloat16(4, qy, true);
+    dataView.setFloat16(6, qz, true);
+    stream.write(quaternionBuffer);
 }
 
 /**
@@ -319,7 +382,7 @@ function writeAssemblyBinary(stream, inputFile, data) {
 
     console.log(`Assembly: ${inputFile}`)
     console.log("- Header size:", headerBuffer.length, "bytes");
-    console.log("- Parts count:", data.parts.length);
+    console.log("- Part count:", data.parts.length);
 
     // Write each individual part as:
     // - normal part data
@@ -328,9 +391,12 @@ function writeAssemblyBinary(stream, inputFile, data) {
     for(const part of data.parts) {
         if(!part.file) throw new Error(`Part ${part.partId} is missing file reference`);
         const partData = getPartFile(directory, part.file);
-        const { encodeScale } = writePartBinary(stream, partData);
+        const { centerTranslation } = writePartBinary(stream, partData);
 
         // write transformations
+        for(const transform of part.transformations) {
+            encodeTransformation(stream, transform, centerTranslation);
+        }
     }
 }
 

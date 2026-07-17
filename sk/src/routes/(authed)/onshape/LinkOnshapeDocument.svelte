@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { page } from "$app/state";
-    import { onshapeClient } from "$lib/onshape/requests";
     import { query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Kanban, SquareKanban } from "lucide-svelte";
@@ -10,9 +8,9 @@
 
     const onshapeCtx = getOnshapeContext();
     async function linkDocumentToProject(projectId: string, subprojectId?: string) {
-        if(!onshapeCtx.documentId) return;
+        if(!onshapeCtx.documentId || !onshapeCtx.client) return;
 
-        const { data, error } = await onshapeClient.GET("/documents/{did}", {
+        const { data, error } = await onshapeCtx.client.requests.GET("/documents/{did}", {
             params: {
                 path: { did: onshapeCtx.documentId }
             }

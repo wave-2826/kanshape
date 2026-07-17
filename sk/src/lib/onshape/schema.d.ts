@@ -1294,7 +1294,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Add an attachment to a comment. */
+        /**
+         * Add an attachment to a comment.
+         * @description Attach a file to the comment. The file must be in JPEG, PNG, or GIF format
+         */
         post: operations["addAttachment"];
         /** Delete all attachments from a comment. */
         delete: operations["deleteAttachments"];
@@ -1841,7 +1844,10 @@ export interface paths {
         /** Retrieve document by document ID. */
         get: operations["getDocument"];
         put?: never;
-        /** Update document attributes by document ID. */
+        /**
+         * Update document attributes by document ID.
+         * @description Use [updateDocumentNotes](#/Document/updateDocumentNotes) to update document notes.
+         */
         post: operations["updateDocumentAttributes"];
         /** Delete document by document ID. */
         delete: operations["deleteDocument"];
@@ -1902,6 +1908,26 @@ export interface paths {
          *      * The `documentId` provided in the URL must match the one provided in the request body exactly.
          */
         post: operations["updatePublicAccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{did}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update document notes by document ID.
+         * @description Use this endpoint to update documents notes. Use [updateDocumentAttributes](#/Document/updateDocumentAttributes) to update other document attributes.
+         */
+        post: operations["updateDocumentNotes"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3720,6 +3746,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/productstructure/whereused": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find where a part or assembly is used.
+         * @description Only supported for Enterprise and Professional plans. See [Dev Docs: Where Used](https://onshape-public.github.io/docs/api-adv/relmgmt/#where-used) for a tutorial on using this endpoint.
+         */
+        get: operations["getWhereUsed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/publications": {
         parameters: {
             query?: never;
@@ -4970,209 +5016,209 @@ export interface components {
     schemas: {
         Accessor: {
             /** Format: int32 */
-            bufferView?: number;
+            bufferView: number;
             /** Format: int32 */
-            byteOffset?: number;
+            byteOffset: number;
             /** Format: int32 */
-            componentType?: number;
+            componentType: number;
             /** Format: int32 */
-            count?: number;
-            extensions?: {
+            count: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            max?: number[];
-            min?: number[];
-            name?: string;
-            normalized?: boolean;
-            sparse?: components["schemas"]["AccessorSparse"];
-            type?: string;
+            extras: Record<string, never>;
+            max: number[];
+            min: number[];
+            name: string;
+            normalized: boolean;
+            sparse: components["schemas"]["AccessorSparse"];
+            type: string;
         };
         AccessorData: {
             /** Format: int32 */
-            numComponentsPerElement?: number;
+            numComponentsPerElement: number;
             /** Format: int32 */
-            numElements?: number;
+            numElements: number;
             /** Format: int32 */
-            totalNumComponents?: number;
+            totalNumComponents: number;
         };
         AccessorModel: {
-            accessorData?: components["schemas"]["AccessorData"];
-            bufferViewModel?: components["schemas"]["BufferViewModel"];
+            accessorData: components["schemas"]["AccessorData"];
+            bufferViewModel: components["schemas"]["BufferViewModel"];
             /** Format: int32 */
-            byteOffset?: number;
+            byteOffset: number;
             /** Format: int32 */
-            byteStride?: number;
+            byteStride: number;
             /** Format: int32 */
-            componentSizeInBytes?: number;
+            componentSizeInBytes: number;
             /** Format: int32 */
-            componentType?: number;
+            componentType: number;
             /** Format: int32 */
-            count?: number;
+            count: number;
             /** Format: int32 */
-            elementSizeInBytes?: number;
-            elementType?: components["schemas"]["ElementType"];
-            max?: number[];
-            min?: number[];
-            name?: string;
+            elementSizeInBytes: number;
+            elementType: components["schemas"]["ElementType"];
+            max: number[];
+            min: number[];
+            name: string;
         };
         AccessorSparse: {
             /** Format: int32 */
-            count?: number;
-            extensions?: {
+            count: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            indices?: components["schemas"]["AccessorSparseIndices"];
-            values?: components["schemas"]["AccessorSparseValues"];
+            extras: Record<string, never>;
+            indices: components["schemas"]["AccessorSparseIndices"];
+            values: components["schemas"]["AccessorSparseValues"];
         };
         AccessorSparseIndices: {
             /** Format: int32 */
-            bufferView?: number;
+            bufferView: number;
             /** Format: int32 */
-            byteOffset?: number;
+            byteOffset: number;
             /** Format: int32 */
-            componentType?: number;
-            extensions?: {
+            componentType: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
         };
         AccessorSparseValues: {
             /** Format: int32 */
-            bufferView?: number;
+            bufferView: number;
             /** Format: int32 */
-            byteOffset?: number;
-            extensions?: {
+            byteOffset: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
         };
         Animation: {
-            channels?: components["schemas"]["AnimationChannel"][];
-            extensions?: {
+            channels: components["schemas"]["AnimationChannel"][];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            samplers?: components["schemas"]["AnimationSampler"][];
+            extras: Record<string, never>;
+            name: string;
+            samplers: components["schemas"]["AnimationSampler"][];
         };
         AnimationChannel: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            sampler?: number;
-            target?: components["schemas"]["AnimationChannelTarget"];
+            sampler: number;
+            target: components["schemas"]["AnimationChannelTarget"];
         };
         AnimationChannelTarget: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            node?: number;
-            path?: string;
+            node: number;
+            path: string;
         };
         AnimationSampler: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            input?: number;
-            interpolation?: string;
+            input: number;
+            interpolation: string;
             /** Format: int32 */
-            output?: number;
+            output: number;
         };
         ApiResponse: {
-            content?: {
-                empty?: boolean;
+            content: {
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["MediaType"];
             };
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
-            headers?: {
+            get$ref: string;
+            headers: {
                 [key: string]: components["schemas"]["Header"];
             };
-            links?: {
+            links: {
                 [key: string]: components["schemas"]["Link"];
             };
         };
         Asset: {
-            copyright?: string;
-            extensions?: {
+            copyright: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            generator?: string;
-            minVersion?: string;
-            version?: string;
+            extras: Record<string, never>;
+            generator: string;
+            minVersion: string;
+            version: string;
         };
         BTAPIApplicationExtensionInfo: {
-            actionBody?: string;
+            actionBody: string;
             /** Format: int32 */
-            actionType?: number;
-            actionUrl?: string;
-            applicationId?: string;
-            clientId?: string;
-            description?: string;
+            actionType: number;
+            actionUrl: string;
+            applicationId: string;
+            clientId: string;
+            description: string;
             /** Format: int64 */
-            extensionContext?: number;
+            extensionContext: number;
             /** Format: int64 */
-            extensionLocation?: number;
-            hasIcon?: boolean;
-            hasPendingIcon?: boolean;
+            extensionLocation: number;
+            hasIcon: boolean;
+            hasPendingIcon: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
-            iconUrl?: string;
+            href: string;
+            iconUrl: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            parentAppPrimaryFormat?: string;
-            plusMenuApp?: boolean;
-            showBetaLabel?: boolean;
-            showResponse?: boolean;
-            showUpgradeLabel?: boolean;
-            systemAppExtension?: boolean;
-            systemAppIconName?: string;
+            name: string;
+            parentAppPrimaryFormat: string;
+            plusMenuApp: boolean;
+            showBetaLabel: boolean;
+            showResponse: boolean;
+            showUpgradeLabel: boolean;
+            systemAppExtension: boolean;
+            systemAppIconName: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            visibilityRule?: string;
+            viewRef: string;
+            visibilityRule: string;
         };
         BTAPIApplicationSummaryInfo: {
             /** Format: int32 */
-            applicationOwnerType?: number;
-            clientId?: string;
-            description?: string;
+            applicationOwnerType: number;
+            clientId: string;
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            state?: number;
+            state: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         /**
          * @description All workflowable types that can be enumerated.
@@ -5180,71 +5226,71 @@ export interface components {
          */
         BTAPIWorkflowableType: "RELEASE" | "TASK" | "ASSIGNMENT" | "OBSOLETION";
         BTAclEntryInfo: {
-            acceptOwnerTransfer?: boolean;
-            canConnectionUserEdit?: boolean;
-            companyName?: string;
-            connectionId?: string;
-            connectionName?: string;
-            connectionUser?: boolean;
-            email?: string;
-            enterpriseMember?: boolean;
-            entryId?: string;
-            entryState?: components["schemas"]["BTUserState"];
+            acceptOwnerTransfer: boolean;
+            canConnectionUserEdit: boolean;
+            companyName: string;
+            connectionId: string;
+            connectionName: string;
+            connectionUser: boolean;
+            email: string;
+            enterpriseMember: boolean;
+            entryId: string;
+            entryState: components["schemas"]["BTUserState"];
             /** Format: int32 */
-            entryType?: number;
-            folderInaccessible?: boolean;
-            folderName?: string;
-            image?: string;
-            name?: string;
-            objectId?: string;
-            pendingOwnerTransfer?: boolean;
+            entryType: number;
+            folderInaccessible: boolean;
+            folderName: string;
+            image: string;
+            name: string;
+            objectId: string;
+            pendingOwnerTransfer: boolean;
             /** Format: int64 */
-            permission?: number;
-            permissionSet?: string[];
+            permission: number;
+            permissionSet: string[];
             /** Format: int32 */
-            proCompanySubtype?: number;
-            teamName?: string;
+            proCompanySubtype: number;
+            teamName: string;
         };
         BTAclInfo: {
-            admin?: boolean;
-            entries?: components["schemas"]["BTAclEntryInfo"][];
+            admin: boolean;
+            entries: components["schemas"]["BTAclEntryInfo"][];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            inheritedAcls?: components["schemas"]["BTInheritedAclInfo"][];
+            id: string;
+            inheritedAcls: components["schemas"]["BTInheritedAclInfo"][];
             /** @description Name of the resource. */
-            name?: string;
-            objectId?: string;
+            name: string;
+            objectId: string;
             /** Format: int64 */
-            objectType?: number;
-            owner?: components["schemas"]["BTOwnerInfo"];
-            public?: boolean;
-            sharedWithSupport?: boolean;
+            objectType: number;
+            owner: components["schemas"]["BTOwnerInfo"];
+            public: boolean;
+            sharedWithSupport: boolean;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            visibility?: string;
+            viewRef: string;
+            visibility: string;
         };
         BTAclParams: {
-            anonymousAccessAllowed?: boolean;
-            anonymousAllowsExport?: boolean;
-            docStateParams?: {
+            anonymousAccessAllowed: boolean;
+            anonymousAllowsExport: boolean;
+            docStateParams: {
                 [key: string]: string;
             };
-            documentId?: string;
-            elementId?: string;
-            public?: boolean;
-            workspaceId?: string;
+            documentId: string;
+            elementId: string;
+            public: boolean;
+            workspaceId: string;
         };
         "BTActiveSheetMetalFilter-2944": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isFromActiveSheetMetal?: boolean;
@@ -5256,135 +5302,135 @@ export interface components {
             btType: "BTActiveSheetMetalFilter-2944";
         });
         BTActiveWorkflowInfo: {
-            allowReleaseItemsFromOtherDocuments?: boolean;
-            canCurrentUserCreateReleases?: boolean;
-            canCurrentUserEditStandardContent?: boolean;
-            canCurrentUserManageWorkflows?: boolean;
+            allowReleaseItemsFromOtherDocuments: boolean;
+            canCurrentUserCreateReleases: boolean;
+            canCurrentUserEditStandardContent: boolean;
+            canCurrentUserManageWorkflows: boolean;
             /** @description Deprecated, use canCurrentUserSeePLMItemLink */
-            canCurrentUserSeeArenaItemLink?: boolean;
-            canCurrentUserSeePLMItemLink?: boolean;
+            canCurrentUserSeeArenaItemLink: boolean;
+            canCurrentUserSeePLMItemLink: boolean;
             /** @description Deprecated, use canCurrentUserSyncBomToPLM */
-            canCurrentUserSyncBomToArena?: boolean;
-            canCurrentUserSyncBomToPLM?: boolean;
-            canCurrentUserSyncDrawingToPLM?: boolean;
+            canCurrentUserSyncBomToArena: boolean;
+            canCurrentUserSyncBomToPLM: boolean;
+            canCurrentUserSyncDrawingToPLM: boolean;
             /** @description Deprecated, use canCurrentUserSyncRevisionsToPLM */
-            canCurrentUserSyncRevisionsToArena?: boolean;
-            canCurrentUserSyncRevisionsToPLM?: boolean;
+            canCurrentUserSyncRevisionsToArena: boolean;
+            canCurrentUserSyncRevisionsToPLM: boolean;
             /** @description Deprecated, use canCurrentUserSyncStandardContentToPLM */
-            canCurrentUserSyncStandardContentToArena?: boolean;
-            canCurrentUserSyncStandardContentToPLM?: boolean;
+            canCurrentUserSyncStandardContentToArena: boolean;
+            canCurrentUserSyncStandardContentToPLM: boolean;
             /** @description Deprecated, use canCurrentUserSyncToPLM */
-            canCurrentUserSyncToArena?: boolean;
-            canCurrentUserSyncToPLM?: boolean;
-            companyId?: string;
-            documentId?: string;
-            drawingCanDuplicatePartNumber?: boolean;
+            canCurrentUserSyncToArena: boolean;
+            canCurrentUserSyncToPLM: boolean;
+            companyId: string;
+            documentId: string;
+            drawingCanDuplicatePartNumber: boolean;
             /** @description Deprecated, can be determined by checking if the length of releaseWorkflowInfo.pickableWorkflows > 1 */
-            enabledActiveMultipleWorkflows?: boolean;
+            enabledActiveMultipleWorkflows: boolean;
             /** @description Deprecated, use hasInactiveCustomWorkflows field on the workflowInfo object */
-            hasInactiveCustomWorkflows?: boolean;
+            hasInactiveCustomWorkflows: boolean;
             /** @description Whether user has even authenticated against PLM. Used to trigger OAuth handshake */
-            isCurrentUserLoggedIntoToPLM?: boolean;
-            obsoletionWorkflow?: components["schemas"]["BTPublishedWorkflowInfo"];
+            isCurrentUserLoggedIntoToPLM: boolean;
+            obsoletionWorkflow: components["schemas"]["BTPublishedWorkflowInfo"];
             /** @description Deprecated, use obsoletionWorkflowInfo.workflow.id instead */
-            obsoletionWorkflowId?: string;
-            obsoletionWorkflowInfo?: components["schemas"]["BTActiveWorkflowTypeInfo"];
+            obsoletionWorkflowId: string;
+            obsoletionWorkflowInfo: components["schemas"]["BTActiveWorkflowTypeInfo"];
             /** @description Deprecated, no current alternative */
-            osCategoryIdToArenaNumberFormatId?: {
+            osCategoryIdToArenaNumberFormatId: {
                 [key: string]: string;
             };
             /** Format: int32 */
-            pLMIntegrationType?: number;
-            pLMName?: string;
-            partNumberingSchemeId?: string;
+            pLMIntegrationType: number;
+            pLMName: string;
+            partNumberingSchemeId: string;
             /** @description Deprecated, use the pickableWorkflows field on the workflowInfo object */
-            pickableWorkflows?: components["schemas"]["BTPublishedWorkflowInfo"][];
-            releaseWorkflow?: components["schemas"]["BTPublishedWorkflowInfo"];
+            pickableWorkflows: components["schemas"]["BTPublishedWorkflowInfo"][];
+            releaseWorkflow: components["schemas"]["BTPublishedWorkflowInfo"];
             /** @description Deprecated, use releaseWorkflowInfo.workflow.id instead */
-            releaseWorkflowId?: string;
-            releaseWorkflowInfo?: components["schemas"]["BTActiveWorkflowTypeInfo"];
+            releaseWorkflowId: string;
+            releaseWorkflowInfo: components["schemas"]["BTActiveWorkflowTypeInfo"];
             /** @description Deprecated, no current alternative */
-            releaseableApplications?: string[];
-            standardContentNumberingSchemeId?: string;
-            standardContentUsingAutoNumbering?: boolean;
-            standardContentUsingThirdPartyPartNumbering?: boolean;
-            taskWorkflow?: components["schemas"]["BTPublishedWorkflowInfo"];
-            taskWorkflowInfo?: components["schemas"]["BTActiveWorkflowTypeInfo"];
-            usingAutoPartNumbering?: boolean;
-            usingManagedWorkflow?: boolean;
-            usingThirdPartyPartNumbering?: boolean;
+            releaseableApplications: string[];
+            standardContentNumberingSchemeId: string;
+            standardContentUsingAutoNumbering: boolean;
+            standardContentUsingThirdPartyPartNumbering: boolean;
+            taskWorkflow: components["schemas"]["BTPublishedWorkflowInfo"];
+            taskWorkflowInfo: components["schemas"]["BTActiveWorkflowTypeInfo"];
+            usingAutoPartNumbering: boolean;
+            usingManagedWorkflow: boolean;
+            usingThirdPartyPartNumbering: boolean;
         };
         BTActiveWorkflowTypeInfo: {
-            hasInactiveCustomWorkflows?: boolean;
-            pickableWorkflows?: components["schemas"]["BTPublishedWorkflowInfo"][];
-            workflow?: components["schemas"]["BTPublishedWorkflowInfo"];
+            hasInactiveCustomWorkflows: boolean;
+            pickableWorkflows: components["schemas"]["BTPublishedWorkflowInfo"][];
+            workflow: components["schemas"]["BTPublishedWorkflowInfo"];
         };
         BTAddressInfo: {
-            address?: string;
-            city?: string;
-            country?: string;
-            countryCode?: string;
-            id?: string;
-            state?: string;
-            stateCode?: string;
-            zip?: string;
+            address: string;
+            city: string;
+            country: string;
+            countryCode: string;
+            id: string;
+            state: string;
+            stateCode: string;
+            zip: string;
         };
         BTAliasEntryInfo: {
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            identity?: components["schemas"]["BTIdentityInfo"];
+            id: string;
+            identity: components["schemas"]["BTIdentityInfo"];
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTAliasEntryParams: {
-            email?: string;
-            teamId?: string;
-            userId?: string;
+            email: string;
+            teamId: string;
+            userId: string;
         };
         BTAliasInfo: {
-            companyId?: string;
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            description?: string;
-            entries?: components["schemas"]["BTAliasEntryInfo"][];
+            createdAt: string;
+            description: string;
+            entries: components["schemas"]["BTAliasEntryInfo"][];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            identities?: components["schemas"]["BTIdentityInfo"][];
+            id: string;
+            identities: components["schemas"]["BTIdentityInfo"][];
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTAliasParams: {
-            additions?: components["schemas"]["BTAliasEntryParams"][];
-            description?: string;
-            entries?: components["schemas"]["BTAliasEntryParams"][];
-            name?: string;
-            removals?: components["schemas"]["BTAliasEntryParams"][];
+            additions: components["schemas"]["BTAliasEntryParams"][];
+            description: string;
+            entries: components["schemas"]["BTAliasEntryParams"][];
+            name: string;
+            removals: components["schemas"]["BTAliasEntryParams"][];
         };
         "BTAllowEdgePointFilter-2371": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsEdgePoint?: boolean;
             btType?: string;
@@ -5397,7 +5443,7 @@ export interface components {
         });
         "BTAllowFlattenedGeometryFilter-2140": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsFlattenedGeometry?: boolean;
             btType?: string;
@@ -5410,7 +5456,7 @@ export interface components {
         });
         "BTAllowMeshGeometryFilter-1026": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsMeshGeometry?: boolean;
             btType?: string;
@@ -5423,7 +5469,7 @@ export interface components {
         });
         "BTAllowedMateTypeFilter-1511": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMateFilter-162"], "btType"> & {
             allowedMateTypes?: components["schemas"]["GBTMateType"][];
             btType?: string;
@@ -5436,7 +5482,7 @@ export interface components {
         });
         "BTAndFilter-110": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             operand1?: components["schemas"]["BTQueryFilter-183"];
@@ -5450,10 +5496,11 @@ export interface components {
         });
         "BTAngularDimensionDisplayData-320": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             clockwise?: boolean;
+            isConjugateAngle?: boolean;
             /** Format: double */
             positionR?: number;
             /** Format: double */
@@ -5483,7 +5530,7 @@ export interface components {
         });
         "BTAnnotationDeleteDisplayData-1815": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             btType?: string;
         } & {
@@ -5494,37 +5541,40 @@ export interface components {
             btType: "BTAnnotationDeleteDisplayData-1815";
         });
         "BTAnnotationDisplayData-3225": {
-            allReferences?: string[];
-            allReferencesPopulated?: boolean;
-            annotationId?: string;
-            annotationPlane?: components["schemas"]["BTCoordinateSystem-387"];
-            basePlane?: components["schemas"]["BTCoordinateSystem-387"];
+            allReferences: string[];
+            allReferencesPopulated: boolean;
+            annotationId: string;
+            annotationPlane: components["schemas"]["BTCoordinateSystem-387"];
+            attachmentLocation: components["schemas"]["GBTAnnotationAttachmentLocation"];
+            basePlane: components["schemas"]["BTCoordinateSystem-387"];
             /** @description Type of JSON object. */
-            btType?: string;
-            characteristicId?: string;
-            deterministicId?: string;
-            dxdySegments?: components["schemas"]["BTVector2d-1812"][];
-            isConstrainedToPlane?: boolean;
-            isDeletion?: boolean;
-            isDerived?: boolean;
-            mainConstraintId?: string;
-            mainFeatureId?: string;
-            mainParameterId?: string;
-            mainPartId?: string;
-            parentCharacteristicId?: string;
+            btType: string;
+            characteristicId: string;
+            deterministicId: string;
+            dxdySegments: components["schemas"]["BTVector2d-1812"][];
+            isConstrainedToPlane: boolean;
+            isDeletion: boolean;
+            isDerived: boolean;
+            mainAnnotationId: string;
+            mainConstraintId: string;
+            mainFeatureId: string;
+            mainParameterId: string;
+            mainPartId: string;
+            parentCharacteristicId: string;
         };
         "BTAnnotationElementDisplayData-894": {
-            annotationIdToDisplayObject?: {
+            annotationIdToDisplayObject: {
                 [key: string]: components["schemas"]["BTAnnotationDisplayData-3225"];
             };
-            annotationIds?: string[];
+            annotationIds: string[];
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTAnnotationFilter-4841": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
+            annotationType?: components["schemas"]["GBTAnnotationType"];
             btType?: string;
         } & {
             /**
@@ -5535,7 +5585,7 @@ export interface components {
         });
         "BTAnnotationGTolDisplayData-4887": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             btType?: string;
             lower?: string;
@@ -5550,20 +5600,20 @@ export interface components {
         });
         "BTAnnotationGTolRowDisplayData-4397": {
             /** @description Type of JSON object. */
-            btType?: string;
-            constraintType?: components["schemas"]["GBTGTolConstraintType"];
-            extendedConstraintType?: components["schemas"]["GBTGTolExtendedConstraintType"];
-            prefix?: string;
-            references?: string[];
-            suffix?: string;
+            btType: string;
+            constraintType: components["schemas"]["GBTGTolConstraintType"];
+            extendedConstraintType: components["schemas"]["GBTGTolExtendedConstraintType"];
+            prefix: string;
+            references: string[];
+            suffix: string;
             /** Format: double */
-            tolerance?: number;
-            toleranceSymbol0?: string;
-            toleranceSymbol1?: string;
+            tolerance: number;
+            toleranceSymbol0: string;
+            toleranceSymbol1: string;
         };
         "BTAnnotationWeldDisplayData-4919": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             allAround?: boolean;
             btType?: string;
@@ -5612,155 +5662,155 @@ export interface components {
             btType: "BTAnnotationWeldDisplayData-4919";
         });
         BTApiConfiguration: {
-            current?: boolean;
-            default?: boolean;
-            null?: boolean;
-            parameterMap?: {
+            current: boolean;
+            default: boolean;
+            null: boolean;
+            parameterMap: {
                 [key: string]: string;
             };
-            standardContent?: boolean;
-            standardContentParametersId?: string;
+            standardContent: boolean;
+            standardContentParametersId: string;
         };
         "BTApiTable-2300": {
             /** @description Type of JSON object. */
-            btType?: string;
-            columns?: components["schemas"]["BTApiTableColumn-3141"][];
-            entityIds?: string[];
-            id?: string;
-            rows?: components["schemas"]["BTApiTableRow-2915"][];
-            title?: string;
+            btType: string;
+            columns: components["schemas"]["BTApiTableColumn-3141"][];
+            entityIds: string[];
+            id: string;
+            rows: components["schemas"]["BTApiTableRow-2915"][];
+            title: string;
         };
         "BTApiTableColumn-3141": {
             /** @description Type of JSON object. */
-            btType?: string;
-            header?: string;
-            id?: string;
-            textAlignment?: components["schemas"]["GBTTableTextAlignment"];
+            btType: string;
+            header: string;
+            id: string;
+            textAlignment: components["schemas"]["GBTTableTextAlignment"];
         };
         "BTApiTableList-1223": {
             /** @description Type of JSON object. */
-            btType?: string;
-            tables?: components["schemas"]["BTApiTable-2300"][];
+            btType: string;
+            tables: components["schemas"]["BTApiTable-2300"][];
         };
         "BTApiTableRow-2915": {
             /** @description Type of JSON object. */
-            btType?: string;
-            callout?: string;
-            columnIdToValue?: {
+            btType: string;
+            callout: string;
+            columnIdToValue: {
                 [key: string]: string;
             };
-            entityIds?: string[];
+            entityIds: string[];
         };
         /** @enum {string} */
-        BTApiVersion: "UNDEFINED" | "V1_START" | "V2_SERIALIZATION_UNIFICATION" | "V3_NEW_BOM_FORMAT" | "V4_TRANSACTIONS_NO_NEW" | "V5_BODY_DETAILS_COMPOSITE_REFERENCE" | "V6_JSON_EDIT_RESPONSE_BUGFIX" | "V7_SKETCH_ENDPOINT_INCLUDES_SOLVE_STATUS" | "V8_RESTORE_NOOP_NO_NEW_MICROVERSION" | "V9_INCLUDE_DETERMINISTIC_IDS_TO_QUERY_RESPONSES" | "V10_VALIDATE_VISIBILTY_CONDITIONS_FOR_PS_CONFIG_PARAMS" | "V11_EXCLUDE_ZIP_CONTENTS_BY_DEFAULT" | "V12_VALIDATE_ELEMENT_TYPE_FOR_TRANSLATIONS" | "V13_SOURCE_TARGET_DOCUMENT_VERSIONS_TO_MOVE" | "V14_FIX_REFERENCE_TYPE" | "V15_ADD_SKETCH_CHECK" | "V16_ASSEMBLY_CONFIGURE_INSTANCE_SUPPRESSION";
+        BTApiVersion: "UNDEFINED" | "V1_START" | "V2_SERIALIZATION_UNIFICATION" | "V3_NEW_BOM_FORMAT" | "V4_TRANSACTIONS_NO_NEW" | "V5_BODY_DETAILS_COMPOSITE_REFERENCE" | "V6_JSON_EDIT_RESPONSE_BUGFIX" | "V7_SKETCH_ENDPOINT_INCLUDES_SOLVE_STATUS" | "V8_RESTORE_NOOP_NO_NEW_MICROVERSION" | "V9_INCLUDE_DETERMINISTIC_IDS_TO_QUERY_RESPONSES" | "V10_VALIDATE_VISIBILITY_CONDITIONS_FOR_PS_CONFIG_PARAMS" | "V11_EXCLUDE_ZIP_CONTENTS_BY_DEFAULT" | "V12_VALIDATE_ELEMENT_TYPE_FOR_TRANSLATIONS" | "V13_SOURCE_TARGET_DOCUMENT_VERSIONS_TO_MOVE" | "V14_FIX_REFERENCE_TYPE" | "V15_ADD_SKETCH_CHECK" | "V16_ASSEMBLY_CONFIGURE_INSTANCE_SUPPRESSION";
         BTAppArrayInfoBTAppDrawingViewInfo: {
-            changeId?: string;
+            changeId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            items?: components["schemas"]["BTAppDrawingViewInfo"][];
-            parentChangeId?: string;
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            items: components["schemas"]["BTAppDrawingViewInfo"][];
+            parentChangeId: string;
         };
         BTAppAssociativeDataArrayInfo: {
-            changeId?: string;
+            changeId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            items?: components["schemas"]["BTAssociativeDataInfo"][];
-            parentChangeId?: string;
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            items: components["schemas"]["BTAssociativeDataInfo"][];
+            parentChangeId: string;
         };
         BTAppDrawingViewInfo: {
-            associativityChangeId?: string;
-            bomReferenceId?: string;
-            brokenOutBBoxes?: {
+            associativityChangeId: string;
+            bomReferenceId: string;
+            brokenOutBBoxes: {
                 [key: string]: components["schemas"]["BTBoundingBox-1052"];
             };
-            brokenOutEndConditions?: {
+            brokenOutEndConditions: {
                 [key: string]: components["schemas"]["BTBrokenOutEndCondition-1107"];
             };
-            brokenOutPointNumbers?: number[];
-            changeId?: string;
-            computeIntersection?: boolean;
-            cutPoint?: number[];
-            depthSectionEndCondition?: components["schemas"]["BTBrokenOutEndCondition-1107"];
-            displayStateId?: string;
+            brokenOutPointNumbers: number[];
+            changeId: string;
+            computeIntersection: boolean;
+            cutPoint: number[];
+            depthSectionEndCondition: components["schemas"]["BTBrokenOutEndCondition-1107"];
+            displayStateId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            explodedViewId?: string;
-            hasSecondaryViewDefinition?: boolean;
-            hiddenLines?: string;
-            ignoreFaultyParts?: boolean;
-            includeHiddenInstances?: boolean;
-            includeSurfaces?: boolean;
-            includeWires?: boolean;
-            isAlignedSection?: boolean;
-            isBrokenOutSection?: boolean;
-            isCopiedView?: boolean;
-            isCropView?: boolean;
-            isPartialSection?: boolean;
-            isSectionOfAlignedSection?: boolean;
-            isSectionOfSectionOnBase?: boolean;
-            isSurface?: boolean;
-            modelReferenceId?: string;
-            modificationId?: string;
-            namedPositionId?: string;
-            occurrenceOrQueryToGeometryProperties?: {
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            explodedViewId: string;
+            hasSecondaryViewDefinition: boolean;
+            hiddenLines: string;
+            ignoreFaultyParts: boolean;
+            includeHiddenInstances: boolean;
+            includeSurfaces: boolean;
+            includeWires: boolean;
+            isAlignedSection: boolean;
+            isBrokenOutSection: boolean;
+            isCopiedView: boolean;
+            isCropView: boolean;
+            isPartialSection: boolean;
+            isSectionOfAlignedSection: boolean;
+            isSectionOfSectionOnBase: boolean;
+            isSurface: boolean;
+            modelReferenceId: string;
+            modificationId: string;
+            namedPositionId: string;
+            occurrenceOrQueryToGeometryProperties: {
                 [key: string]: components["schemas"]["BTAppElementViewGeometryProperties-1100"];
             };
-            offsetSectionPoints?: number[];
-            parentChangeId?: string;
-            parentViewId?: string;
-            perspective?: boolean;
-            projectionAngle?: string;
+            offsetSectionPoints: number[];
+            parentChangeId: string;
+            parentViewId: string;
+            perspective: boolean;
+            projectionAngle: string;
             /** Format: int32 */
-            qualityOption?: number;
-            renderSketches?: boolean;
-            sectionId?: string;
-            sectionPlanes?: number[];
-            showAutoCenterlines?: boolean;
-            showAutoCentermarks?: boolean;
-            showCutGeomOnly?: boolean;
-            showTangentLines?: boolean;
-            showThreads?: boolean;
-            showViewingPlane?: boolean;
+            qualityOption: number;
+            renderSketches: boolean;
+            sectionId: string;
+            sectionPlanes: number[];
+            showAutoCenterlines: boolean;
+            showAutoCentermarks: boolean;
+            showCutGeomOnly: boolean;
+            showTangentLines: boolean;
+            showThreads: boolean;
+            showViewingPlane: boolean;
             /** Format: int32 */
-            simplificationOption?: number;
+            simplificationOption: number;
             /** Format: double */
-            simplificationThreshold?: number;
-            useParentViewSectionData?: boolean;
-            viewDirection?: number[];
-            viewId?: string;
-            viewMatrix?: number[];
+            simplificationThreshold: number;
+            useParentViewSectionData: boolean;
+            viewDirection: number[];
+            viewId: string;
+            viewMatrix: number[];
             /** Format: int32 */
-            viewVersion?: number;
+            viewVersion: number;
         };
         BTAppElementBasicInfo: {
-            changeId?: string;
+            changeId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            parentChangeId?: string;
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            parentChangeId: string;
         };
         BTAppElementBulkCreateInfo: {
             /** @description The latest document microversion, after the edit was committed. */
@@ -5792,46 +5842,46 @@ export interface components {
              * @deprecated
              * @description The latest change id for the element, after the edit was committed. Deprecated in favor of elementChangeResults.
              */
-            changeId?: string;
+            changeId: string;
             /** @description The latest change id for the document, after the edit was committed. */
-            documentMicroversionId?: string;
+            documentMicroversionId: string;
             /** @description The results of editing each element affected by the edit. */
-            elementChangeResults?: components["schemas"]["BTAppElementModifyInfo"][];
+            elementChangeResults: components["schemas"]["BTAppElementModifyInfo"][];
             /**
              * @deprecated
              * @description The id of the edited element, if a single element was edited. Deprecated in favor of elementChangeResults.
              */
-            elementId?: string;
+            elementId: string;
             /**
              * @deprecated
              * @description The ids of the edited elements. Deprecated in favor of elementChangeResults.
              */
-            elementIds?: string[];
+            elementIds: string[];
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
             /**
              * @deprecated
              * @description The latest change id for the element, before the edit was made. Deprecated in favor of elementChangeResults.
              */
-            parentChangeId?: string;
+            parentChangeId: string;
             /** @description The latest change id for the document, before the edit was made. */
-            parentDocumentMicroversionId?: string;
+            parentDocumentMicroversionId: string;
             /**
              * @deprecated
              * @description Whether the properties of any edited application element were changed after the transaction was created. Deprecated in favor of elementChangeResults.
              */
-            propertyEditsMerged?: boolean;
+            propertyEditsMerged: boolean;
             /**
              * @deprecated
              * @description The id of the transaction in which the edit was applied. Deprecated in favor of elementChangeResults.
              */
-            transactionId?: string;
+            transactionId: string;
         };
         BTAppElementChangeParams: {
             /**
@@ -5848,62 +5898,62 @@ export interface components {
             subelementId: string;
         };
         BTAppElementCommitTransactionParams: {
-            allowMerge?: boolean;
+            allowMerge: boolean;
             /** @description The label that will appear in the document's edit history for this operation. If blank, a value will be auto-generated. */
-            description?: string;
-            returnError?: boolean;
-            transactionIds?: string[];
+            description: string;
+            returnError: boolean;
+            transactionIds: string[];
         };
         BTAppElementContentDeltaInfo: {
-            delta?: string;
+            delta: string;
         };
         BTAppElementContentEntryInfo: {
-            baseContent?: string;
-            deltas?: components["schemas"]["BTAppElementContentDeltaInfo"][];
-            subelementId?: string;
+            baseContent: string;
+            deltas: components["schemas"]["BTAppElementContentDeltaInfo"][];
+            subelementId: string;
         };
         BTAppElementContentInfo: {
-            changeId?: string;
-            data?: components["schemas"]["BTAppElementContentEntryInfo"][];
+            changeId: string;
+            data: components["schemas"]["BTAppElementContentEntryInfo"][];
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
         };
         /** @enum {string} */
         BTAppElementErrorCode: "OK" | "TRANSACTION_CONFLICT" | "NOT_FOUND" | "INCONSISTENT_CHANGES";
         BTAppElementHistoryEntryInfo: {
-            changeId?: string;
+            changeId: string;
             /** Format: date-time */
-            createdAt?: string;
-            description?: string;
+            createdAt: string;
+            description: string;
         };
         BTAppElementHistoryInfo: {
-            changes?: components["schemas"]["BTAppElementHistoryEntryInfo"][];
+            changes: components["schemas"]["BTAppElementHistoryEntryInfo"][];
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
         };
         BTAppElementIdsInfo: {
-            changeId?: string;
+            changeId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            subelementIds?: string[];
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            subelementIds: string[];
         };
         BTAppElementModifyInfo: {
             /** @description The latest change id for the element, after the edit was committed. */
@@ -5945,10 +5995,10 @@ export interface components {
             subelements?: components["schemas"]["BTAppElementChangeParams"][];
         };
         BTAppElementParamsArrayBTCopyViewAssociativeDataParams: {
-            description?: string;
-            items?: components["schemas"]["BTCopyViewAssociativeDataParams"][];
-            parentChangeId?: string;
-            transactionId?: string;
+            description: string;
+            items: components["schemas"]["BTCopyViewAssociativeDataParams"][];
+            parentChangeId: string;
+            transactionId: string;
         };
         BTAppElementReferenceInfo: {
             /** @description The latest change id for the element, after the edit was committed. */
@@ -5968,218 +6018,219 @@ export interface components {
             transactionId?: string;
         };
         BTAppElementReferenceParams: {
-            hasDocumentMicroversions?: boolean;
-            idTag?: string;
-            idTagMicroversionId?: string;
-            isLocked?: boolean;
-            isSketchOnly?: boolean;
-            parentChangeId?: string;
-            parentViewId?: string;
-            partNumber?: string;
-            pureSketch?: boolean;
+            hasDocumentMicroversions: boolean;
+            idTag: string;
+            idTagMicroversionId: string;
+            isLocked: boolean;
+            isSketchOnly: boolean;
+            parentChangeId: string;
+            parentViewId: string;
+            partNumber: string;
+            pureSketch: boolean;
             /** Format: int32 */
-            referenceType?: number;
-            returnError?: boolean;
-            revision?: string;
-            sketchIds?: string[];
-            targetConfiguration?: string;
-            targetDocumentId?: string;
-            targetElementId?: string;
-            targetMicroversionId?: string;
-            targetVersionId?: string;
-            trackNewVersions?: boolean;
-            transactionId?: string;
-            updateSketchInfo?: boolean;
+            referenceType: number;
+            returnError: boolean;
+            revision: string;
+            sketchIds: string[];
+            targetConfiguration: string;
+            targetDocumentId: string;
+            targetElementId: string;
+            targetMicroversionId: string;
+            targetVersionId: string;
+            trackNewVersions: boolean;
+            transactionId: string;
+            updateSketchInfo: boolean;
         };
         BTAppElementReferenceResolveInfo: {
-            changeId?: string;
+            changeId: string;
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
-            idTag?: string;
-            idTagIsValid?: boolean;
-            isConfigurable?: boolean;
-            isFlattenedPart?: boolean;
-            isLocked?: boolean;
-            isSketchOnly?: boolean;
-            isSurface?: boolean;
-            latestElementMicroversionId?: string;
-            partIdentity?: string;
-            partNumber?: string;
-            referenceId?: string;
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
+            idTag: string;
+            idTagIsValid: boolean;
+            isConfigurable: boolean;
+            isFlattenedPart: boolean;
+            isLocked: boolean;
+            isSketchOnly: boolean;
+            isSurface: boolean;
+            latestElementMicroversionId: string;
+            partIdentity: string;
+            partNumber: string;
+            referenceId: string;
             /** Format: int32 */
-            referenceType?: number;
-            resolvedConfiguration?: string;
-            resolvedDocumentMicroversionId?: string;
-            resolvedElementMicroversionId?: string;
-            revision?: string;
-            sketchIds?: string[];
-            sourceElementId?: string;
-            targetConfiguration?: string;
-            targetDocumentId?: string;
-            targetDocumentMicroversionId?: string;
-            targetElementId?: string;
-            targetElementMicroversionId?: string;
+            referenceType: number;
+            resolvedConfiguration: string;
+            resolvedDocumentMicroversionId: string;
+            resolvedElementMicroversionId: string;
+            revision: string;
+            sketchIds: string[];
+            sourceElementId: string;
+            targetConfiguration: string;
+            targetDocumentId: string;
+            targetDocumentMicroversionId: string;
+            targetElementId: string;
+            targetElementMicroversionId: string;
             /** @description Reference to a part or assembly in a version; `NULL` when reference is in a workspace. */
-            targetVersionId?: string;
-            trackNewVersions?: boolean;
+            targetVersionId: string;
+            trackNewVersions: boolean;
         };
         BTAppElementReferencesResolveInfo: {
-            resolvedReferences?: components["schemas"]["BTAppElementReferenceResolveInfo"][];
-            unresolvedReferenceIds?: string[];
+            resolvedReferences: components["schemas"]["BTAppElementReferenceResolveInfo"][];
+            unresolvedReferenceIds: string[];
         };
         BTAppElementStartTransactionParams: {
             /** @description The label that will appear in the document's edit history for this operation. If blank, a value will be auto-generated. */
-            description?: string;
-            parentChangeId?: string;
-            returnError?: boolean;
+            description: string;
+            parentChangeId: string;
+            returnError: boolean;
         };
         BTAppElementTransactionsInfo: {
-            elementTransactions?: components["schemas"]["BTElementTransaction"][];
+            elementTransactions: components["schemas"]["BTElementTransaction"][];
             /**
              * Format: int32
              * @description `0: OK (healthy) | 1: INFO | 2: WARNING | 3: ERROR (dangling or view generation call failed) | 4: UNKNOWN`
              */
-            errorCode?: number;
+            errorCode: number;
             /** @description A human-readable value for the error that occurred, if one occurred. */
-            errorDescription?: string;
-            errorValue?: components["schemas"]["BTAppElementErrorCode"];
+            errorDescription: string;
+            errorValue: components["schemas"]["BTAppElementErrorCode"];
         };
         BTAppElementUpdateParams: {
             /** @description The label that will appear in the document's edit history for this operation. If blank, a value will be auto-generated. */
-            description?: string;
+            description: string;
             /** @description A json patch that will be applied to the application element's json data. The JSON patch format is as specified in RFC 6902 from the IETF. */
-            jsonPatch?: string;
-            jsonTreeEdit?: components["schemas"]["BTJEdit-3734"];
+            jsonPatch: string;
+            jsonTreeEdit: components["schemas"]["BTJEdit-3734"];
             /** @description The id of the last change made to this application element. This can be retrieved from the response for any app element modification endpoint. */
-            parentChangeId?: string;
+            parentChangeId: string;
             /** @description Edits to be applied to the element's metadata. */
-            propertyUpdates?: components["schemas"]["BTMetadataPropertyUpdateParams"][];
+            propertyUpdates: components["schemas"]["BTMetadataPropertyUpdateParams"][];
             /** @description If true, errors in request processing will be returned in a 200 response with a meaningful description. Otherwise, errors will result in a relevant HTTP error response. */
-            returnError?: boolean;
+            returnError: boolean;
             /**
              * @description If specified, and jsonTreeEdit is non-empty, the json difference will be returned in this format, otherwise no json difference will be returned.
              * @enum {string}
              */
-            returnJsonDifferenceFormat?: "default" | "full_path" | "json_patch";
+            returnJsonDifferenceFormat: "default" | "full_path" | "json_patch";
             /** @description The id of the transaction in which this operation should take place. Transaction ids can be generated through the AppElement startTransaction API. */
-            transactionId?: string;
+            transactionId: string;
         };
         "BTAppElementViewGeometryProperties-1100": {
             /** @description Type of JSON object. */
-            btType?: string;
-            propertyToValue?: {
+            btType: string;
+            propertyToValue: {
                 [key: string]: string;
             };
         };
         BTAppModificationRequestInfo: {
-            documentId?: string;
-            elementId?: string;
-            failureReason?: string;
+            documentId: string;
+            elementId: string;
+            failureReason: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            output?: string;
+            name: string;
+            output: string;
             /** Format: int32 */
-            outputStatusCode?: number;
-            parentDocumentMicroversionId?: string;
-            parentElementMicroversionId?: string;
-            requestState?: components["schemas"]["BTAppModificationRequestState"];
-            resultDocumentMicroversionId?: string;
-            resultElementMicroversionId?: string;
+            outputStatusCode: number;
+            parentDocumentMicroversionId: string;
+            parentElementMicroversionId: string;
+            requestState: components["schemas"]["BTAppModificationRequestState"];
+            resultDocumentMicroversionId: string;
+            resultElementMicroversionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         /** @enum {string} */
         BTAppModificationRequestState: "ACTIVE" | "DONE" | "FAILED";
         "BTAppearanceOverride-2517": {
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
-            appearanceReset?: boolean;
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearanceReset: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            copyWithoutEntities?: components["schemas"]["BTAppearanceOverride-2517"];
-            entityDeterministicIds?: string[];
-            isDeletion?: boolean;
+            btType: string;
+            copyWithoutEntities: components["schemas"]["BTAppearanceOverride-2517"];
+            entityDeterministicIds: string[];
+            isDeletion: boolean;
         };
         BTApplicationElementThumbnailParams: {
-            base64EncodedImage?: string;
-            description?: string;
+            base64EncodedImage: string;
+            description: string;
             /** Format: int32 */
-            imageHeight?: number;
+            imageHeight: number;
             /** Format: int32 */
-            imageWidth?: number;
-            isPrimary?: boolean;
-            uniqueId?: string;
+            imageWidth: number;
+            isPrimary: boolean;
+            uniqueId: string;
         };
         BTApplicationElementThumbnailParamsArray: {
-            thumbnails?: components["schemas"]["BTApplicationElementThumbnailParams"][];
+            thumbnails: components["schemas"]["BTApplicationElementThumbnailParams"][];
         };
         /** @enum {string} */
         BTApplicationSettingsType: "USER" | "COMPANY" | "TEAM";
         BTApplicationTargetInfo: {
             /** Format: uri */
-            baseHref?: string;
-            clientId?: string;
-            supportsCollaboration?: boolean;
+            baseHref: string;
+            clientId: string;
+            supportsCollaboration: boolean;
             /** Format: uri */
-            tabIconHref?: string;
+            tabIconHref: string;
         };
         "BTArcLengthDimensionDisplayData-1018": {
             btType: "BTArcLengthDimensionDisplayData-1018";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAngularDimensionDisplayData-320"], "btType"> & {
             btType?: string;
         });
         "BTAssemblyContextNamedPositionInfo-3801": {
             /** @description Type of JSON object. */
-            btType?: string;
-            name?: string;
-            nodeId?: string;
+            btType: string;
+            name: string;
+            nodeId: string;
         };
         BTAssemblyDefinitionInfo: {
-            partStudioFeatures?: components["schemas"]["BTAssemblyPsFeatureInfo"][];
-            parts?: components["schemas"]["BTAssemblyPartInfo"][];
-            rootAssembly?: components["schemas"]["BTRootAssemblyInfo"];
-            subAssemblies?: components["schemas"]["BTSubAssemblyInfo"][];
+            partStudioFeatures: components["schemas"]["BTAssemblyPsFeatureInfo"][];
+            parts: components["schemas"]["BTAssemblyPartInfo"][];
+            rootAssembly: components["schemas"]["BTRootAssemblyInfo"];
+            subAssemblies: components["schemas"]["BTSubAssemblyInfo"][];
         };
         BTAssemblyFeatureDataInfo: {
-            name?: string;
+            name: string;
         };
         "BTAssemblyFeatureDisplayData-1783": {
             /** @description Type of JSON object. */
-            btType?: string;
-            hidden?: boolean;
-            isDerivedFeature?: boolean;
-            nodeId?: string;
-            ownerOccurrence?: components["schemas"]["BTOccurrence-74"];
-            status?: components["schemas"]["GBTAssemblyFeatureDisplayStatus"];
+            btType: string;
+            hidden: boolean;
+            isDerivedFeature: boolean;
+            nodeId: string;
+            ownerOccurrence: components["schemas"]["BTOccurrence-74"];
+            status: components["schemas"]["GBTAssemblyFeatureDisplayStatus"];
         };
         /** @description List of Assembly features including those are created by replicates. */
         BTAssemblyFeatureInfo: {
-            featureData?: components["schemas"]["BTAssemblyFeatureDataInfo"];
-            featureType?: string;
-            id?: string;
-            suppressed?: boolean;
+            featureData: components["schemas"]["BTAssemblyFeatureDataInfo"];
+            featureType: string;
+            id: string;
+            status: components["schemas"]["GBTNodeStatusType"];
+            suppressed: boolean;
         };
         "BTAssemblyFeatureListResponse-1174": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureApiBase-1430"], "btType"> & {
             btType?: string;
             featureStates?: {
@@ -6195,12 +6246,12 @@ export interface components {
             btType: "BTAssemblyFeatureListResponse-1174";
         });
         BTAssemblyInsertTransformedInstancesResponse: {
-            insertInstanceResponses?: components["schemas"]["BTAssemblyInstanceOccurrenceInfo"][];
-            insertResponses?: components["schemas"]["BTAssemblyOccurrenceInfo"][];
+            insertInstanceResponses: components["schemas"]["BTAssemblyInstanceOccurrenceInfo"][];
+            insertResponses: components["schemas"]["BTAssemblyOccurrenceInfo"][];
         };
         "BTAssemblyInstance-947": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstance-642"], "btType"> & {
             btType?: string;
         } & {
@@ -6228,62 +6279,63 @@ export interface components {
         };
         /** @description List of instances including those created by patterns and replicates. */
         BTAssemblyInstanceInfo: {
-            configuration?: string;
-            documentId?: string;
-            documentMicroversion?: string;
-            documentVersion?: string;
-            elementId?: string;
-            featureId?: string;
-            fullConfiguration?: string;
-            id?: string;
-            isStandardContent?: boolean;
-            name?: string;
-            partId?: string;
-            partNumber?: string;
-            revision?: string;
-            status?: components["schemas"]["BTAssemblyInstanceStatus"];
-            suppressed?: boolean;
-            type?: components["schemas"]["BTAssemblyInstanceType"];
+            configuration: string;
+            documentId: string;
+            documentMicroversion: string;
+            documentVersion: string;
+            elementId: string;
+            errorStatus: components["schemas"]["GBTNodeStatusType"];
+            featureId: string;
+            fullConfiguration: string;
+            id: string;
+            isStandardContent: boolean;
+            name: string;
+            partId: string;
+            partNumber: string;
+            revision: string;
+            status: components["schemas"]["BTAssemblyInstanceStatus"];
+            suppressed: boolean;
+            type: components["schemas"]["BTAssemblyInstanceType"];
         };
         BTAssemblyInstanceOccurrenceInfo: {
-            occurrences?: components["schemas"]["BTAssemblyOccurrenceInfo"][];
+            occurrences: components["schemas"]["BTAssemblyOccurrenceInfo"][];
         };
         /** @enum {string} */
         BTAssemblyInstanceStatus: "DeletedElement";
         /** @enum {string} */
         BTAssemblyInstanceType: "Assembly" | "Feature" | "Part" | "Unknown";
         BTAssemblyItemMetadataInfo: {
-            children?: components["schemas"]["BTAssemblyItemMetadataInfo"][];
-            propertyIdToError?: {
+            children: components["schemas"]["BTAssemblyItemMetadataInfo"][];
+            propertyIdToError: {
                 [key: string]: string;
             };
-            propertyIdToEvalInfo?: {
+            propertyIdToEvalInfo: {
                 [key: string]: string;
             };
-            propertyIdToOverrideStatus?: {
+            propertyIdToOverrideStatus: {
                 [key: string]: string;
             };
-            propertyIdToSourceType?: {
+            propertyIdToSourceType: {
                 [key: string]: string;
             };
-            propertyIdToValue?: {
+            propertyIdToValue: {
                 [key: string]: string;
             };
-            requestInfo?: components["schemas"]["BTAssemblyItemMetadataRequestInfo"];
+            requestInfo: components["schemas"]["BTAssemblyItemMetadataRequestInfo"];
         };
         BTAssemblyItemMetadataRequestInfo: {
-            apiConfig?: string;
-            documentId?: string;
-            elementId?: string;
-            itemId?: string;
-            linkedDocumentId?: string;
-            partId?: string;
-            wvmId?: string;
-            wvmType?: string;
+            apiConfig: string;
+            documentId: string;
+            elementId: string;
+            itemId: string;
+            linkedDocumentId: string;
+            partId: string;
+            wvmId: string;
+            wvmType: string;
         };
         BTAssemblyMateConnectorInfo: {
-            featureId?: string;
-            mateConnectorCS?: components["schemas"]["BTMateConnectorCSInfo"];
+            featureId: string;
+            mateConnectorCS: components["schemas"]["BTMateConnectorCSInfo"];
         };
         /** @description Quantities for length are specified in meters, and quantities for angles are specified in radians. */
         BTAssemblyMateValueInfo: {
@@ -6298,11 +6350,11 @@ export interface components {
         /** @description Get a list of mate values for all the mates of a specified assembly. */
         BTAssemblyMateValuesInfo: {
             /** @description Describes the relative position of the first mate connector with respect to the second along the designated degrees of freedom (DOF) for mates in the specified assembly. */
-            mateValues?: components["schemas"]["BTAssemblyMateValueInfo"][];
+            mateValues: components["schemas"]["BTAssemblyMateValueInfo"][];
         };
         "BTAssemblyMirror-2996": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricInstance-2641"], "btType"> & {
             btType?: string;
             mirrorFeature?: components["schemas"]["BTMAssemblyMirrorFeature-3037"];
@@ -6316,77 +6368,81 @@ export interface components {
             btType: "BTAssemblyMirror-2996";
         });
         BTAssemblyMirrorFeatureInterface: {
-            arrayParameterFromFeature?: components["schemas"]["BTMParameterArray-2025"];
-            feature?: components["schemas"]["BTMAssemblyFeature-887"];
-            nodeId?: string;
+            arrayParameterFromFeature: components["schemas"]["BTMParameterArray-2025"];
+            feature: components["schemas"]["BTMAssemblyFeature-887"];
+            nodeId: string;
         };
         BTAssemblyModificationParams: {
             /** @description Node ids of the instances to delete. */
-            deleteInstances?: string[];
+            deleteInstances: string[];
             /** @description Short description of the modification. */
-            editDescription?: string;
+            editDescription: string;
             /**
              * @deprecated
              * @description Deprecated in API v16. Use `suppressionStates` instead.Node ids of the instances to suppress.
              */
-            suppressInstances?: string[];
+            suppressInstances: string[];
             /** @description Suppression states keyed by node id. Each value is either a plain suppression state (`value`: `"true"` or `"false"`) or a configuration-controlled suppression state (`configuredValue`: a configuration parameter id and a map from configuration option id to `"true"` or `"false"`). */
-            suppressionStates?: {
+            suppressionStates: {
                 [key: string]: components["schemas"]["BTOptionallyConfiguredValue"];
             };
             /** @description Occurrence transform definitions. */
-            transformDefinitions?: components["schemas"]["BTAssemblyTransformDefinitionParams"][];
+            transformDefinitions: components["schemas"]["BTAssemblyTransformDefinitionParams"][];
             /**
              * @deprecated
              * @description Deprecated in API v16. Use `suppressionStates` instead.Node ids of the instances to unsuppress.
              */
-            unsuppressInstances?: string[];
+            unsuppressInstances: string[];
         };
         BTAssemblyOccurrenceInfo: {
-            fixed?: boolean;
-            hidden?: boolean;
-            path?: string[];
-            transform?: number[];
+            fixed: boolean;
+            hidden: boolean;
+            mateStatuses: {
+                [key: string]: components["schemas"]["GBTNodeStatusType"];
+            };
+            path: string[];
+            transform: number[];
         };
         /** @description Children instance description of parametric instance. */
         BTAssemblyParametricInstanceChildInfo: {
             /** @description Children instance ids. */
-            instanceIds?: string[];
+            instanceIds: string[];
             /** @description Seed occurrence id. Unspecified if there is no seed. */
-            seedOccurrence?: string;
+            seedOccurrence: string;
         };
         /** @description Parametric instance description. */
         BTAssemblyParametricInstanceInfo: {
             /** @description Child instances. */
-            children?: components["schemas"]["BTAssemblyParametricInstanceChildInfo"][];
+            children: components["schemas"]["BTAssemblyParametricInstanceChildInfo"][];
             /** @description Id of the Part Studio instance. */
-            id?: string;
+            id: string;
             /** @description Name of the parametric instance. */
-            name?: string;
+            name: string;
+            status: components["schemas"]["GBTNodeStatusType"];
             /** @description If the parametric is suppressed. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description Type of parametric instance. */
-            type?: string;
+            type: string;
         };
         /** @enum {string} */
         BTAssemblyPartBodyType: "solid" | "sheet" | "composite";
         BTAssemblyPartInfo: {
-            bodyType?: components["schemas"]["BTAssemblyPartBodyType"];
-            configuration?: string;
-            documentId?: string;
-            documentMicroversion?: string;
-            documentVersion?: string;
-            elementId?: string;
-            fullConfiguration?: string;
-            isStandardContent?: boolean;
-            mateConnectors?: components["schemas"]["BTAssemblyMateConnectorInfo"][];
-            partId?: string;
-            partNumber?: string;
-            revision?: string;
+            bodyType: components["schemas"]["BTAssemblyPartBodyType"];
+            configuration: string;
+            documentId: string;
+            documentMicroversion: string;
+            documentVersion: string;
+            elementId: string;
+            fullConfiguration: string;
+            isStandardContent: boolean;
+            mateConnectors: components["schemas"]["BTAssemblyMateConnectorInfo"][];
+            partId: string;
+            partNumber: string;
+            revision: string;
         };
         "BTAssemblyPattern-1974": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricInstance-2641"], "btType"> & {
             btType?: string;
             patternFeature?: components["schemas"]["BTMAssemblyPatternFeature-2241"];
@@ -6400,49 +6456,50 @@ export interface components {
         /** @description Pattern description. */
         BTAssemblyPatternInfo: {
             /** @description Id of the pattern. */
-            id?: string;
+            id: string;
             /** @description Name of the pattern. */
-            name?: string;
+            name: string;
             /** @description Mapping of seed to pattern instance ids. */
-            seedToPatternInstances?: {
+            seedToPatternInstances: {
                 [key: string]: string[];
             };
+            status: components["schemas"]["GBTNodeStatusType"];
             /** @description If pattern is suppressed. */
-            suppressed?: boolean;
-            type?: components["schemas"]["GBTPatternType"];
+            suppressed: boolean;
+            type: components["schemas"]["GBTPatternType"];
         };
         BTAssemblyPsFeatureInfo: {
-            configuration?: string;
-            documentId?: string;
-            documentMicroversion?: string;
-            documentVersion?: string;
-            elementId?: string;
-            featureId?: string;
-            featureType?: string;
-            fullConfiguration?: string;
-            partNumber?: string;
-            revision?: string;
+            configuration: string;
+            documentId: string;
+            documentMicroversion: string;
+            documentVersion: string;
+            elementId: string;
+            featureId: string;
+            featureType: string;
+            fullConfiguration: string;
+            partNumber: string;
+            revision: string;
         };
         "BTAssemblyReferencesDisplayData-1562": {
-            annotationsForElement?: components["schemas"]["BTAnnotationElementDisplayData-894"];
-            assemblyReferences?: components["schemas"]["BTSingleReferenceDisplayData-1943"][];
+            annotationsForElement: components["schemas"]["BTAnnotationElementDisplayData-894"];
+            assemblyReferences: components["schemas"]["BTSingleReferenceDisplayData-1943"][];
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            fromFullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            incremental?: boolean;
+            btType: string;
+            elementId: string;
+            fromFullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            incremental: boolean;
             /** Format: int32 */
-            instanceCount?: number;
-            keepFromMicroversion?: boolean;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfigurationInterval?: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
-            microversionInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
-            versionForRasterization?: components["schemas"]["BTElementDisplayData-326"];
+            instanceCount: number;
+            keepFromMicroversion: boolean;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfigurationInterval: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
+            microversionInterval: components["schemas"]["BTMicroversionIdInterval-367"];
+            versionForRasterization: components["schemas"]["BTElementDisplayData-326"];
         };
         "BTAssemblyReplicate-2774": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricInstance-2641"], "btType"> & {
             btType?: string;
             replicateFeature?: components["schemas"]["BTMAssemblyReplicateFeature-1351"];
@@ -6454,55 +6511,55 @@ export interface components {
             btType: "BTAssemblyReplicate-2774";
         });
         "BTAssemblySimulation-2246": {
-            auxiliaryTreeFeature?: boolean;
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            featureFolder?: boolean;
+            btType: string;
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            inertialRelief?: boolean;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
-            modal?: boolean;
+            importMicroversion: string;
+            inertialRelief: boolean;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
+            modal: boolean;
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
+            nodeId: string;
             /** Format: double */
-            numberOfModes?: number;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
+            numberOfModes: number;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
-            type?: components["schemas"]["GBTAssemblySimulationType"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
+            type: components["schemas"]["GBTAssemblySimulationType"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTAssemblySimulationData-978": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             contactBehavior?: components["schemas"]["GBTSimulationContactBehavior"];
@@ -6522,7 +6579,7 @@ export interface components {
         });
         "BTAssemblySimulationHistoryTable-5453": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
         } & {
@@ -6534,7 +6591,7 @@ export interface components {
         });
         "BTAssemblySimulationStructuralLoadsTable-3867": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
         } & {
@@ -6546,7 +6603,7 @@ export interface components {
         });
         "BTAssemblySimulationTable-3236": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
         } & {
@@ -6557,42 +6614,42 @@ export interface components {
             btType: "BTAssemblySimulationTable-3236";
         });
         BTAssemblyTransformDefinitionParams: {
-            isRelative?: boolean;
-            occurrences?: components["schemas"]["BTOccurrence-74"][];
-            transform?: number[];
+            isRelative: boolean;
+            occurrences: components["schemas"]["BTOccurrence-74"][];
+            transform: number[];
         };
         BTAssemblyTransformedInstancesDefinitionParams: {
-            transformGroups?: components["schemas"]["TransformGroup"][];
+            transformGroups: components["schemas"]["TransformGroup"][];
         };
         BTAssociativeDataInfo: {
-            associativeDataId?: string;
-            data?: components["schemas"]["BTNameValuePair"][];
-            documentId?: string;
-            documentMicroversion?: string;
-            elementId?: string;
-            error?: string;
-            idTag?: string;
-            microversionId?: string;
-            occurrenceId?: string;
-            type?: components["schemas"]["GBTAppElementAssociativeDataType"];
-            versionId?: string;
+            associativeDataId: string;
+            data: components["schemas"]["BTNameValuePair"][];
+            documentId: string;
+            documentMicroversion: string;
+            elementId: string;
+            error: string;
+            idTag: string;
+            microversionId: string;
+            occurrenceId: string;
+            type: components["schemas"]["GBTAppElementAssociativeDataType"];
+            versionId: string;
         };
         BTBAppElementBlobUploadParams: {
-            description?: string;
+            description: string;
             /**
              * Format: binary
              * @description File to upload.
              */
-            file?: string;
+            file: string;
             /** Format: int64 */
-            fileContentLength?: number;
-            parentChangeId?: string;
-            transactionId?: string;
+            fileContentLength: number;
+            parentChangeId: string;
+            transactionId: string;
         };
         /** @description Options for exporting assemblies. */
         BTBAssemblyExportParams: {
             /** @description IDs of the occurrences to retrieve. Use comma-separated IDs for multiple instances (example: occurrencesToExport=JHK,JHD). */
-            occurrencesToExport?: string;
+            occurrencesToExport: string;
         };
         /** @description Options for exporting elements to cloud storage. */
         BTBCloudStorageOptions: {
@@ -6665,11 +6722,11 @@ export interface components {
         };
         /** @description Advanced element export options. */
         BTBExportAdvancedParams: {
-            assemblyExportParams?: components["schemas"]["BTBAssemblyExportParams"];
+            assemblyExportParams: components["schemas"]["BTBAssemblyExportParams"];
             /** @description URL-encoded string of configuration values (separated by `;`). See the [Configurations API Guide](https://onshape-public.github.io/docs/api-adv/configs/) for details. */
-            configuration?: string;
+            configuration: string;
             /** @description An array of element ids for multi-element export. */
-            elementIds?: string[];
+            elementIds: string[];
             /**
              * @description Set to `true` to evaluate the export rule for the given `formatName` and to include an `exportRuleFileName` value in the response.
              * @default false
@@ -6681,12 +6738,12 @@ export interface components {
              */
             ignoreExportRulesForContents: boolean;
             /** @description The id of the document through which the above document should be accessed; only applicable when accessing a version of the document. This allows a user who has access to document a to see data from document b, as long as document b has been linked to document a by a user who has permission to both. */
-            linkDocumentId?: string;
+            linkDocumentId: string;
             /** @description The id of the workspace through which the above document should be accessed; only applicable when accessing a version of the document. This allows a user who has access to document a to see data from document b, as long as document b has been linked to document a by a user who has permission to both. */
-            linkDocumentWorkspaceId?: string;
+            linkDocumentWorkspaceId: string;
             /** @description IDs of the parts to retrieve. Use comma-separated IDs for multiple parts (example: partIds=JHK,JHD). */
-            partIds?: string;
-            partsExportFilter?: components["schemas"]["BTPartsExportFilter-4308"];
+            partIds: string;
+            partsExportFilter: components["schemas"]["BTPartsExportFilter-4308"];
         };
         /** @description Options for an element export to mesh format. */
         BTBExportMeshParams: {
@@ -6708,8 +6765,8 @@ export interface components {
              * @default 0.01
              */
             maximumChordLength: number;
-            resolution?: components["schemas"]["GBTExportResolution"];
-            unit?: components["schemas"]["GBTExportUnit"];
+            resolution: components["schemas"]["GBTExportResolution"];
+            unit: components["schemas"]["GBTExportUnit"];
         };
         /** @description Onshape document export schema */
         BTBExportModelParams: {
@@ -6788,18 +6845,18 @@ export interface components {
              * Format: binary
              * @description The file to upload.
              */
-            file?: string;
+            file: string;
         };
         /** @description Options for exporting elements to GLTF. */
         BTBGltfExportParams: {
-            advancedParams?: components["schemas"]["BTBExportAdvancedParams"];
-            cloudStorageOptions?: components["schemas"]["BTBCloudStorageOptions"];
+            advancedParams: components["schemas"]["BTBExportAdvancedParams"];
+            cloudStorageOptions: components["schemas"]["BTBCloudStorageOptions"];
             /**
              * @description The name of the exported file.
              * @default Untitled
              */
             destinationName: string;
-            emailExportOptions?: components["schemas"]["BTBEmailExportOptions"];
+            emailExportOptions: components["schemas"]["BTBEmailExportOptions"];
             /**
              * @description Whether or not to exclude hidden parts from export.
              * @default false
@@ -6820,7 +6877,7 @@ export interface components {
              * @default false
              */
             isYAxisUp: boolean;
-            meshParams?: components["schemas"]["BTBExportMeshParams"];
+            meshParams: components["schemas"]["BTBExportMeshParams"];
             /**
              * @description Send notification to the user client.
              * @default true
@@ -6839,14 +6896,14 @@ export interface components {
         };
         /** @description Options for exporting elements to OBJ. */
         BTBObjExportParams: {
-            advancedParams?: components["schemas"]["BTBExportAdvancedParams"];
-            cloudStorageOptions?: components["schemas"]["BTBCloudStorageOptions"];
+            advancedParams: components["schemas"]["BTBExportAdvancedParams"];
+            cloudStorageOptions: components["schemas"]["BTBCloudStorageOptions"];
             /**
              * @description The name of the exported file.
              * @default Untitled
              */
             destinationName: string;
-            emailExportOptions?: components["schemas"]["BTBEmailExportOptions"];
+            emailExportOptions: components["schemas"]["BTBEmailExportOptions"];
             /**
              * @description Whether or not to exclude hidden parts from export.
              * @default false
@@ -6867,7 +6924,7 @@ export interface components {
              * @default false
              */
             isYAxisUp: boolean;
-            meshParams?: components["schemas"]["BTBExportMeshParams"];
+            meshParams: components["schemas"]["BTBExportMeshParams"];
             /**
              * @description Send notification to the user client.
              * @default true
@@ -6886,47 +6943,47 @@ export interface components {
         };
         "BTBSMatrix-386": {
             /** @description Type of JSON object. */
-            btType?: string;
-            fullTransformation?: number[];
-            isNormalized?: boolean;
+            btType: string;
+            fullTransformation: number[];
+            isNormalized: boolean;
             /** Format: double */
-            m00?: number;
+            m00: number;
             /** Format: double */
-            m01?: number;
+            m01: number;
             /** Format: double */
-            m02?: number;
+            m02: number;
             /** Format: double */
-            m03?: number;
+            m03: number;
             /** Format: double */
-            m10?: number;
+            m10: number;
             /** Format: double */
-            m11?: number;
+            m11: number;
             /** Format: double */
-            m12?: number;
+            m12: number;
             /** Format: double */
-            m13?: number;
+            m13: number;
             /** Format: double */
-            m20?: number;
+            m20: number;
             /** Format: double */
-            m21?: number;
+            m21: number;
             /** Format: double */
-            m22?: number;
+            m22: number;
             /** Format: double */
-            m23?: number;
-            rigid?: boolean;
-            rigidWithinTransformTolerance?: boolean;
-            translation?: components["schemas"]["BTVector3d-389"];
+            m23: number;
+            rigid: boolean;
+            rigidWithinTransformTolerance: boolean;
+            translation: components["schemas"]["BTVector3d-389"];
         };
         /** @description Options for exporting elements to STEP. */
         BTBStepExportParams: {
-            advancedParams?: components["schemas"]["BTBExportAdvancedParams"];
-            cloudStorageOptions?: components["schemas"]["BTBCloudStorageOptions"];
+            advancedParams: components["schemas"]["BTBExportAdvancedParams"];
+            cloudStorageOptions: components["schemas"]["BTBCloudStorageOptions"];
             /**
              * @description The name of the exported file.
              * @default Untitled
              */
             destinationName: string;
-            emailExportOptions?: components["schemas"]["BTBEmailExportOptions"];
+            emailExportOptions: components["schemas"]["BTBEmailExportOptions"];
             /**
              * @description Whether or not to exclude hidden parts from export.
              * @default false
@@ -6952,8 +7009,8 @@ export interface components {
              * @default true
              */
             notifyUser: boolean;
-            stepParasolidPreprocessingOption?: components["schemas"]["GBTPreProcessParasolidOption"];
-            stepUnit?: components["schemas"]["GBTExportUnit"];
+            stepParasolidPreprocessingOption: components["schemas"]["GBTPreProcessParasolidOption"];
+            stepUnit: components["schemas"]["GBTExportUnit"];
             /**
              * @description Export STEP in version: `AP242` | `AP203` | `AP214`
              * @default AP242
@@ -6971,93 +7028,93 @@ export interface components {
             triggerAutoDownload: boolean;
         };
         BTBTranslationRequestParams: {
-            allowFaultyParts?: boolean;
-            createComposite?: boolean;
-            createDrawingIfPossible?: boolean;
-            encodedFilename?: string;
-            extractAssemblyHierarchy?: boolean;
+            allowFaultyParts: boolean;
+            createComposite: boolean;
+            createDrawingIfPossible: boolean;
+            encodedFilename: string;
+            extractAssemblyHierarchy: boolean;
             /**
              * Format: binary
              * @description The file to upload.
              */
-            file?: string;
-            flattenAssemblies?: boolean;
-            formatName?: string;
-            importAppearances?: boolean;
-            importMaterialDensity?: boolean;
-            importWithinDocument?: boolean;
-            joinAdjacentSurfaces?: boolean;
-            locationElementId?: string;
-            locationGroupId?: string;
+            file: string;
+            flattenAssemblies: boolean;
+            formatName: string;
+            importAppearances: boolean;
+            importMaterialDensity: boolean;
+            importWithinDocument: boolean;
+            joinAdjacentSurfaces: boolean;
+            locationElementId: string;
+            locationGroupId: string;
             /** Format: int32 */
-            locationPosition?: number;
-            makePublic?: boolean;
-            notifyUser?: boolean;
-            onePartPerDoc?: boolean;
-            ownerId?: string;
-            parentId?: string;
-            projectId?: string;
-            repointAppElementVersionRefs?: boolean;
-            splitAssembliesIntoMultipleDocuments?: boolean;
-            storeInDocument?: boolean;
-            translate?: boolean;
-            unit?: string;
-            uploadId?: string;
-            useIGESImportPostProcessing?: boolean;
-            versionString?: string;
-            yAxisIsUp?: boolean;
+            locationPosition: number;
+            makePublic: boolean;
+            notifyUser: boolean;
+            onePartPerDoc: boolean;
+            ownerId: string;
+            parentId: string;
+            projectId: string;
+            repointAppElementVersionRefs: boolean;
+            splitAssembliesIntoMultipleDocuments: boolean;
+            storeInDocument: boolean;
+            translate: boolean;
+            unit: string;
+            uploadId: string;
+            useIGESImportPostProcessing: boolean;
+            versionString: string;
+            yAxisIsUp: boolean;
         };
         "BTBaseEntityAppearanceEntry-3607": {
-            affectedDeterministicIds?: string[];
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
+            affectedDeterministicIds: string[];
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
             /** @description Type of JSON object. */
-            btType?: string;
-            source?: components["schemas"]["BTPartMetadataSource-2895"];
+            btType: string;
+            source: components["schemas"]["BTPartMetadataSource-2895"];
         };
         "BTBaseEntityAppearanceSettings-1391": {
             /** @description Type of JSON object. */
-            btType?: string;
-            colorIdToBaseEntityAppearanceEntry?: {
+            btType: string;
+            colorIdToBaseEntityAppearanceEntry: {
                 [key: string]: components["schemas"]["BTBaseEntityAppearanceEntry-3607"];
             };
-            isNoop?: boolean;
+            isNoop: boolean;
         };
         "BTBaseEntityData-33": {
             /** @description Type of JSON object. */
-            btType?: string;
-            constructionPlane?: boolean;
-            copyWithoutGeometry?: components["schemas"]["BTBaseEntityData-33"];
-            decompressed?: components["schemas"]["BTBaseEntityData-33"];
-            defaultPane?: boolean;
-            deletion?: boolean;
-            featureIds?: string[];
-            fromSketch?: boolean;
-            geometries?: components["schemas"]["BTEntityGeometry-35"][];
-            origin?: boolean;
+            btType: string;
+            constructionPlane: boolean;
+            copyWithoutGeometry: components["schemas"]["BTBaseEntityData-33"];
+            decompressed: components["schemas"]["BTBaseEntityData-33"];
+            defaultPane: boolean;
+            deletion: boolean;
+            featureIds: string[];
+            fromSketch: boolean;
+            geometries: components["schemas"]["BTEntityGeometry-35"][];
+            origin: boolean;
         };
         BTBaseInfo: {
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTBasePartColorCycle-2614": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTBaseSMJointTableRowMetadata-2232": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableCrossHighlightData-1753"];
@@ -7071,7 +7128,7 @@ export interface components {
         });
         "BTBezierDegreeDimensionDisplayData-2597": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -7086,152 +7143,152 @@ export interface components {
             btType: "BTBezierDegreeDimensionDisplayData-2597";
         });
         BTBillOfMaterialsElementInfo: {
-            configuration?: string;
-            headerIdToValue?: {
+            configuration: string;
+            headerIdToValue: {
                 [key: string]: Record<string, never>;
             };
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            selectedMetadataEnumValues?: {
+            name: string;
+            selectedMetadataEnumValues: {
                 [key: string]: components["schemas"]["BTSelectedMetadataEnumValue"];
             };
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTBillOfMaterialsHeaderInfo: {
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            propertyName?: string;
-            valueType?: string;
+            name: string;
+            propertyName: string;
+            valueType: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            visible?: boolean;
+            viewRef: string;
+            visible: boolean;
         };
         BTBillOfMaterialsInfo: {
-            bomSource?: components["schemas"]["BTBillOfMaterialsSourceInfo"];
-            createdAt?: string;
-            formatVersion?: string;
-            headers?: components["schemas"]["BTBillOfMaterialsHeaderInfo"][];
+            bomSource: components["schemas"]["BTBillOfMaterialsSourceInfo"];
+            createdAt: string;
+            formatVersion: string;
+            headers: components["schemas"]["BTBillOfMaterialsHeaderInfo"][];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            rows?: components["schemas"]["BTBillOfMaterialsRowInfo"][];
-            templateId?: string;
-            topLevelAssemblyRow?: components["schemas"]["BTBillOfMaterialsRowInfo"];
-            type?: string;
+            name: string;
+            rows: components["schemas"]["BTBillOfMaterialsRowInfo"][];
+            templateId: string;
+            topLevelAssemblyRow: components["schemas"]["BTBillOfMaterialsRowInfo"];
+            type: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTBillOfMaterialsItemSourceInfo: {
-            configuration?: string;
-            distinctConfigurations?: string[];
-            documentId?: string;
-            elementId?: string;
-            fullConfiguration?: string;
-            href?: string;
-            isStandardContent?: boolean;
-            nonGeometricItemId?: string;
-            partId?: string;
-            partIdentity?: string;
-            sourceElementMicroversionId?: string;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
-            versionMetadataWorkspaceMicroversionId?: string;
-            viewHref?: string;
-            wvmId?: string;
-            wvmType?: string;
+            configuration: string;
+            distinctConfigurations: string[];
+            documentId: string;
+            elementId: string;
+            fullConfiguration: string;
+            href: string;
+            isStandardContent: boolean;
+            nonGeometricItemId: string;
+            partId: string;
+            partIdentity: string;
+            sourceElementMicroversionId: string;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
+            versionMetadataWorkspaceMicroversionId: string;
+            viewHref: string;
+            wvmId: string;
+            wvmType: string;
         };
         BTBillOfMaterialsObjectWithPropertiesInfo: {
-            headerIdToValue?: {
+            headerIdToValue: {
                 [key: string]: Record<string, never>;
             };
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            selectedMetadataEnumValues?: {
+            name: string;
+            selectedMetadataEnumValues: {
                 [key: string]: components["schemas"]["BTSelectedMetadataEnumValue"];
             };
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTBillOfMaterialsRowInfo: {
-            headerIdToValue?: {
+            headerIdToValue: {
                 [key: string]: Record<string, never>;
             };
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: int32 */
-            indentLevel?: number;
-            itemSource?: components["schemas"]["BTBillOfMaterialsItemSourceInfo"];
+            indentLevel: number;
+            itemSource: components["schemas"]["BTBillOfMaterialsItemSourceInfo"];
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** @description Occurrence IDs in the assembly that refer to the part described by this BOM row. */
-            relatedOccurrences?: string[];
-            rowId?: string;
-            selectedMetadataEnumValues?: {
+            relatedOccurrences: string[];
+            rowId: string;
+            selectedMetadataEnumValues: {
                 [key: string]: components["schemas"]["BTSelectedMetadataEnumValue"];
             };
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTBillOfMaterialsSourceInfo: {
-            document?: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
-            documentMicroversion?: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
-            element?: components["schemas"]["BTBillOfMaterialsElementInfo"];
-            href?: string;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
-            version?: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
-            viewHref?: string;
-            workspace?: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
+            document: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
+            documentMicroversion: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
+            element: components["schemas"]["BTBillOfMaterialsElementInfo"];
+            href: string;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
+            version: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
+            viewHref: string;
+            workspace: components["schemas"]["BTBillOfMaterialsObjectWithPropertiesInfo"];
         };
         "BTBillOfMaterialsTable-1073": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
             failedMetadataRepresentativeOccurrences?: string[];
@@ -7251,7 +7308,7 @@ export interface components {
         });
         "BTBillOfMaterialsTableRow-1425": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableRow-1054"], "btType"> & {
             btType?: string;
             excludeIsEditable?: boolean;
@@ -7278,7 +7335,7 @@ export interface components {
         });
         "BTBillOfMaterialsTableRowMetadata-1300": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableAssemblyCrossHighlightData-2675"];
@@ -7291,55 +7348,55 @@ export interface components {
             btType: "BTBillOfMaterialsTableRowMetadata-1300";
         });
         "BTBillOfMaterialsUniqueItemId-2029": {
-            apiConfiguration?: string;
+            apiConfiguration: string;
             /** @description Type of JSON object. */
-            btType?: string;
-            isStandardContent?: boolean;
-            itemDefinitionId?: string;
-            metadataObjectType?: components["schemas"]["BTMetadataObjectType"];
-            partId?: string;
-            partIdentity?: components["schemas"]["BTPSOIdentity-2741"];
-            sourceElement?: components["schemas"]["BTElementReference-725"];
-            versionMetadataWorkspaceId?: string;
-            versionMetadataWorkspaceMicroversionId?: string;
+            btType: string;
+            isStandardContent: boolean;
+            itemDefinitionId: string;
+            metadataObjectType: components["schemas"]["BTMetadataObjectType"];
+            partId: string;
+            partIdentity: components["schemas"]["BTPSOIdentity-2741"];
+            sourceElement: components["schemas"]["BTElementReference-725"];
+            versionMetadataWorkspaceId: string;
+            versionMetadataWorkspaceMicroversionId: string;
         };
         BTBillingPlanInfo: {
             /** Format: int32 */
-            amountCents?: number;
-            applicationId?: string;
-            clientId?: string;
-            companyPlan?: boolean;
+            amountCents: number;
+            applicationId: string;
+            clientId: string;
+            companyPlan: boolean;
             /** Format: int32 */
-            consumableQuantity?: number;
-            deprecated?: boolean;
-            description?: string;
-            discountInfo?: components["schemas"]["BTDiscountInfo"];
-            group?: string;
-            hidden?: boolean;
+            consumableQuantity: number;
+            deprecated: boolean;
+            description: string;
+            discountInfo: components["schemas"]["BTDiscountInfo"];
+            group: string;
+            hidden: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            interval?: string;
+            id: string;
+            interval: string;
             /** @description Name of the resource. */
-            name?: string;
-            onshapePlan?: boolean;
+            name: string;
+            onshapePlan: boolean;
             /** Format: int32 */
-            planType?: number;
+            planType: number;
             /** Format: int32 */
-            trialPeriodDays?: number;
+            trialPeriodDays: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTBodyEntity-26": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
             doesNotUseLevelsOfDetail?: boolean;
@@ -7352,7 +7409,7 @@ export interface components {
         });
         "BTBodyTypeFilter-112": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             bodyType?: components["schemas"]["GBTBodyType"];
             btType?: string;
@@ -7365,7 +7422,7 @@ export interface components {
         });
         "BTBoundaryConditionDisplayData-2478": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             directionMateConnectorId?: string;
@@ -7381,143 +7438,143 @@ export interface components {
         /** @description An axis-aligned bounding box indicated by two opposite corners. */
         "BTBoundingBox-1052": {
             /** @description Type of JSON object. */
-            btType?: string;
-            maxCorner?: components["schemas"]["BTVector3d-389"];
-            minCorner?: components["schemas"]["BTVector3d-389"];
-            valid?: boolean;
+            btType: string;
+            maxCorner: components["schemas"]["BTVector3d-389"];
+            minCorner: components["schemas"]["BTVector3d-389"];
+            valid: boolean;
         };
         BTBoundingBoxInfo: {
             /** Format: double */
-            highX?: number;
+            highX: number;
             /** Format: double */
-            highY?: number;
+            highY: number;
             /** Format: double */
-            highZ?: number;
+            highZ: number;
             /** Format: double */
-            lowX?: number;
+            lowX: number;
             /** Format: double */
-            lowY?: number;
+            lowY: number;
             /** Format: double */
-            lowZ?: number;
+            lowZ: number;
         };
         "BTBrokenOutEndCondition-1107": {
             /** @description Type of JSON object. */
-            btType?: string;
-            hasOffset?: boolean;
-            hasUptoPoint?: boolean;
+            btType: string;
+            hasOffset: boolean;
+            hasUptoPoint: boolean;
             /** Format: double */
-            offsetDistance?: number;
-            offsetOppositeDirection?: boolean;
-            uptoPoint?: number[];
-            uptoPoint3d?: components["schemas"]["BTVector3d-389"];
+            offsetDistance: number;
+            offsetOppositeDirection: boolean;
+            uptoPoint: number[];
+            uptoPoint3d: components["schemas"]["BTVector3d-389"];
         };
         "BTCacheDataPath-191": {
             /** @description Type of JSON object. */
-            btType?: string;
-            canAcceptNewContext?: boolean;
-            documentId?: string;
-            elementId?: string;
-            immutableContextVersion?: string;
-            immutablePathContentsShouldExist?: boolean;
-            isImmutableContextPath?: boolean;
-            key?: string;
-            keyContainsConfiguration?: boolean;
-            region?: string;
-            useLocalFileCache?: boolean;
+            btType: string;
+            canAcceptNewContext: boolean;
+            documentId: string;
+            elementId: string;
+            immutableContextVersion: string;
+            immutablePathContentsShouldExist: boolean;
+            isImmutableContextPath: boolean;
+            key: string;
+            keyContainsConfiguration: boolean;
+            region: string;
+            useLocalFileCache: boolean;
         };
         BTCardInfo: {
-            billingAddress?: components["schemas"]["BTAddressInfo"];
+            billingAddress: components["schemas"]["BTAddressInfo"];
             /** Format: int32 */
-            expMonth?: number;
+            expMonth: number;
             /** Format: int32 */
-            expYear?: number;
-            last4?: string;
-            name?: string;
-            type?: string;
+            expYear: number;
+            last4: string;
+            name: string;
+            type: string;
         };
         BTCategoryParam: {
-            id?: string;
-            name?: string;
+            id: string;
+            name: string;
         };
         BTCategoryPropertyConfigInfo: {
-            computedAssemblyPropertyAggregatedPropertyId?: string;
+            computedAssemblyPropertyAggregatedPropertyId: string;
             /** Format: int32 */
-            computedAssemblyPropertyAggregationOperator?: number;
-            computedAssemblyPropertyConfig?: components["schemas"]["BTComputedAssemblyPropertyConfig"];
+            computedAssemblyPropertyAggregationOperator: number;
+            computedAssemblyPropertyConfig: components["schemas"]["BTComputedAssemblyPropertyConfig"];
             /** Format: int32 */
-            computedAssemblyPropertyErrorValuePolicy?: number;
-            computedAssemblyPropertyFilterInverted?: boolean;
-            computedAssemblyPropertyFilterPropertyId?: string;
+            computedAssemblyPropertyErrorValuePolicy: number;
+            computedAssemblyPropertyFilterInverted: boolean;
+            computedAssemblyPropertyFilterPropertyId: string;
             /** Format: int32 */
-            computedAssemblyPropertyMissingValuePolicy?: number;
-            computedAssemblyPropertySecondaryPropertyId?: string;
-            computedPartPropertyConfig?: components["schemas"]["BTComputedPartPropertyConfig"];
-            computedPropertyFunctionName?: string;
-            computedPropertyFunctionNamespace?: string;
-            computedPropertyFunctionURL?: string;
-            defaultValue?: string;
-            displayName?: string;
-            enumValues?: components["schemas"]["BTMetadataEnumValue"][];
+            computedAssemblyPropertyMissingValuePolicy: number;
+            computedAssemblyPropertySecondaryPropertyId: string;
+            computedPartPropertyConfig: components["schemas"]["BTComputedPartPropertyConfig"];
+            computedPropertyFunctionName: string;
+            computedPropertyFunctionNamespace: string;
+            computedPropertyFunctionURL: string;
+            defaultValue: string;
+            displayName: string;
+            enumValues: components["schemas"]["BTMetadataEnumValue"][];
             /** Format: int32 */
-            maxCount?: number;
+            maxCount: number;
             /** Format: date-time */
-            maxDate?: string;
+            maxDate: string;
             /** Format: int32 */
-            maxLength?: number;
+            maxLength: number;
             /** Format: double */
-            maxValue?: number;
+            maxValue: number;
             /** Format: int32 */
-            minCount?: number;
+            minCount: number;
             /** Format: date-time */
-            minDate?: string;
+            minDate: string;
             /** Format: int32 */
-            minLength?: number;
+            minLength: number;
             /** Format: double */
-            minValue?: number;
-            multiline?: boolean;
-            multivalued?: boolean;
-            pattern?: string;
+            minValue: number;
+            multiline: boolean;
+            multivalued: boolean;
+            pattern: string;
             /** Format: int32 */
-            publishState?: number;
+            publishState: number;
             /** Format: int32 */
-            quantityType?: number;
-            required?: boolean;
+            quantityType: number;
+            required: boolean;
         };
         BTCategoryPropertyInfo: {
-            array?: boolean;
-            assignable?: boolean;
-            blobMimeType?: string;
-            categoryPropertyConfigInfo?: components["schemas"]["BTCategoryPropertyConfigInfo"];
-            categorySummaryInfoList?: components["schemas"]["BTMetadataCategorySummaryInfo"][];
-            description?: string;
-            editableInMicroversion?: boolean;
-            editableInVersion?: boolean;
+            array: boolean;
+            assignable: boolean;
+            blobMimeType: string;
+            categoryPropertyConfigInfo: components["schemas"]["BTCategoryPropertyConfigInfo"];
+            categorySummaryInfoList: components["schemas"]["BTMetadataCategorySummaryInfo"][];
+            description: string;
+            editableInMicroversion: boolean;
+            editableInVersion: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            objectDefName?: string;
-            ownerId?: string;
+            name: string;
+            objectDefName: string;
+            ownerId: string;
             /** Format: int32 */
-            ownerType?: number;
-            uiReadonlyInMicroversion?: boolean;
-            uiReadonlyInVersion?: boolean;
+            ownerType: number;
+            uiReadonlyInMicroversion: boolean;
+            uiReadonlyInVersion: boolean;
             /** Format: int32 */
-            valueType?: number;
+            valueType: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTCenterlineDimensionDisplayData-1798": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTLinearDimensionDisplayData-330"], "btType"> & {
             btType?: string;
         } & {
@@ -7529,7 +7586,7 @@ export interface components {
         });
         "BTChamferCalloutDisplayData-4471": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             allChamferFaces?: string[];
             angle?: components["schemas"]["BTTolerantValueDisplayData-3483"];
@@ -7549,7 +7606,7 @@ export interface components {
         });
         "BTCircleDescription-1145": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveDescription-1583"], "btType"> & {
             btType?: string;
             normal?: components["schemas"]["BTVector3d-389"];
@@ -7584,7 +7641,7 @@ export interface components {
         };
         "BTClonedInstance-2505": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricOutputInstance-2288"], "btType"> & {
             btType?: string;
             seedOccurrence?: components["schemas"]["BTOccurrence-74"];
@@ -7597,7 +7654,7 @@ export interface components {
         });
         "BTClosedCompositeConstituentFilter-2804": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
         } & {
@@ -7608,16 +7665,16 @@ export interface components {
             btType: "BTClosedCompositeConstituentFilter-2804";
         });
         "BTClosedConstituentPartData-2911": {
-            bodyType?: components["schemas"]["GBTBodyType"];
+            bodyType: components["schemas"]["GBTBodyType"];
             /** @description Type of JSON object. */
-            btType?: string;
-            isActiveSheetMetal?: boolean;
-            isMesh?: boolean;
-            meshState?: components["schemas"]["GBTMeshState"];
+            btType: string;
+            isActiveSheetMetal: boolean;
+            isMesh: boolean;
+            meshState: components["schemas"]["GBTMeshState"];
         };
         "BTClosedCurveFilter-1206": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isClosed?: boolean;
@@ -7645,286 +7702,291 @@ export interface components {
             jsonType: "cloudstorageaccount";
         };
         BTCloudStorageObjectInfo: {
-            canMove?: boolean;
-            cloudStorageAccountId?: string;
-            cloudStorageObjectId?: string;
+            canMove: boolean;
+            cloudStorageAccountId: string;
+            cloudStorageObjectId: string;
             /** Format: int32 */
-            cloudStorageProvider?: number;
-            connectionName?: string;
-            connectionNames?: string[];
+            cloudStorageProvider: number;
+            connectionName: string;
+            connectionNames: string[];
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            createdById?: string;
-            description?: string;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            createdById: string;
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
-            iconLink?: string;
+            href: string;
+            iconLink: string;
             /** @description Id of the resource. */
-            id?: string;
-            isContainer?: boolean;
-            isEnterpriseOwned?: boolean;
-            isExternalConnectionResource?: boolean;
-            isMutable?: boolean;
-            mimeType?: string;
+            id: string;
+            isContainer: boolean;
+            isEnterpriseOwned: boolean;
+            isExternalConnectionResource: boolean;
+            isMutable: boolean;
+            mimeType: string;
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            modifiedById?: string;
+            modifiedAt: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            modifiedById: string;
             /** @description Name of the resource. */
-            name?: string;
-            owner?: components["schemas"]["BTOwnerInfo"];
-            parentId?: string;
-            projectId?: string;
-            resourceType?: string;
+            name: string;
+            owner: components["schemas"]["BTOwnerInfo"];
+            parentId: string;
+            projectId: string;
+            resourceType: string;
             /** Format: int64 */
-            sizeBytes?: number;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
-            treeHref?: string;
-            unparentHref?: string;
+            sizeBytes: number;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
+            treeHref: string;
+            unparentHref: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            webViewLink?: string;
+            viewRef: string;
+            webViewLink: string;
         };
         BTColorInfo: {
             /** Format: int32 */
-            blue?: number;
+            blue: number;
             /** Format: int32 */
-            green?: number;
+            green: number;
             /** Format: int32 */
-            red?: number;
+            red: number;
         };
         BTCommentAttachmentInfo: {
-            fileName?: string;
+            fileName: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            mimeType?: string;
+            id: string;
+            mimeType: string;
             /** @description Name of the resource. */
-            name?: string;
-            thumbnailFor?: string;
+            name: string;
+            thumbnailFor: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTCommentInfo: {
-            annotationId?: string;
+            annotationId: string;
             /** Format: int32 */
-            annotationType?: number;
-            assemblyFeatures?: string[];
+            annotationType: number;
+            appEntity: string;
+            assemblyFeatures: string[];
             /** Format: date-time */
-            assignedAt?: string;
-            assignee?: components["schemas"]["BTUserSummaryInfo"];
-            attachment?: components["schemas"]["BTCommentAttachmentInfo"];
-            calloutInstanceId?: string;
-            canDelete?: boolean;
-            canResolveOrReopen?: boolean;
-            coordinates?: components["schemas"]["CoordinatesInfo"];
+            assignedAt: string;
+            assignee: components["schemas"]["BTUserSummaryInfo"];
+            attachment: components["schemas"]["BTCommentAttachmentInfo"];
+            calloutInstanceId: string;
+            canDelete: boolean;
+            canResolveOrReopen: boolean;
+            coordinates: components["schemas"]["CoordinatesInfo"];
             /** Format: date-time */
-            createdAt?: string;
-            dimensionConstraintId?: string;
-            dimensionFeatureId?: string;
-            dimensionParameterId?: string;
-            dimensionPartQuery?: string;
-            documentId?: string;
-            elementFeature?: string;
-            elementId?: string;
-            elementOccurrences?: string[];
-            elementQuery?: string;
+            createdAt: string;
+            dimensionConstraintId: string;
+            dimensionFeatureId: string;
+            dimensionParameterId: string;
+            dimensionPartQuery: string;
+            documentId: string;
+            elementFeature: string;
+            elementId: string;
+            elementOccurrences: string[];
+            elementQuery: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            message?: string;
+            id: string;
+            message: string;
             /** @description Name of the resource. */
-            name?: string;
-            objectId?: string;
+            name: string;
+            objectId: string;
             /** Format: int32 */
-            objectType?: number;
-            parentId?: string;
-            releasePackageId?: string;
+            objectType: number;
+            parentId: string;
+            releasePackageId: string;
             /** Format: date-time */
-            reopenedAt?: string;
-            reopenedBy?: components["schemas"]["BTUserSummaryInfo"];
+            reopenedAt: string;
+            reopenedBy: components["schemas"]["BTUserSummaryInfo"];
             /** Format: int64 */
-            replyCount?: number;
+            replyCount: number;
             /** Format: date-time */
-            resolvedAt?: string;
-            resolvedBy?: components["schemas"]["BTUserSummaryInfo"];
+            resolvedAt: string;
+            resolvedBy: components["schemas"]["BTUserSummaryInfo"];
             /** Format: int32 */
-            state?: number;
-            thumbnail?: components["schemas"]["BTCommentAttachmentInfo"];
-            topLevel?: boolean;
-            user?: components["schemas"]["BTUserSummaryInfo"];
-            userCompany?: string;
-            versionId?: string;
-            viewData?: components["schemas"]["BTViewDataInfo"];
+            state: number;
+            thumbnail: components["schemas"]["BTCommentAttachmentInfo"];
+            topLevel: boolean;
+            user: components["schemas"]["BTUserSummaryInfo"];
+            userCompany: string;
+            versionId: string;
+            viewData: components["schemas"]["BTViewDataInfo"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         BTCommentParams: {
-            annotationId?: string;
+            annotationId: string;
             /** Format: int32 */
-            annotationType?: number;
-            assemblyFeature?: string;
+            annotationType: number;
+            appEntity: string;
+            assemblyFeature: string;
             /** @description Assign the comment during creation. Comments cannot be reassigned during an update at this time. */
-            assignee?: string;
-            calloutInstanceId?: string;
-            coordinates?: components["schemas"]["CoordinatesParams"];
-            dimensionConstraintId?: string;
-            dimensionFeatureId?: string;
-            dimensionParameterId?: string;
-            dimensionPartQuery?: string;
-            documentId?: string;
-            elementFeature?: string;
-            elementId?: string;
-            elementOccurrence?: string;
-            elementQuery?: string;
-            id?: string;
-            message?: string;
-            objectId?: string;
+            assignee: string;
+            calloutInstanceId: string;
+            coordinates: components["schemas"]["CoordinatesParams"];
+            dimensionConstraintId: string;
+            dimensionFeatureId: string;
+            dimensionParameterId: string;
+            dimensionPartQuery: string;
+            documentId: string;
+            elementFeature: string;
+            elementId: string;
+            elementOccurrence: string;
+            elementQuery: string;
+            id: string;
+            message: string;
+            objectId: string;
             /** Format: int32 */
-            objectType?: number;
-            parentId?: string;
-            versionId?: string;
-            viewData?: components["schemas"]["BTViewDataParams"];
-            workspaceId?: string;
+            objectType: number;
+            parentId: string;
+            versionId: string;
+            viewData: components["schemas"]["BTViewDataParams"];
+            workspaceId: string;
         };
         BTCommonUnitInfo: {
-            abbreviation?: string;
-            unit?: string;
-            unitName?: string;
-            unitType?: string;
+            abbreviation: string;
+            unit: string;
+            unitName: string;
+            unitType: string;
             /** Format: double */
-            valueInBaseUnits?: number;
+            valueInBaseUnits: number;
         };
         BTCommonUnitsInfo: {
-            quantityTypeToBaseUnits?: {
+            quantityTypeToBaseUnits: {
                 [key: string]: {
                     [key: string]: number;
                 };
             };
-            units?: components["schemas"]["BTCommonUnitInfo"][];
+            units: components["schemas"]["BTCommonUnitInfo"][];
         };
         BTCompanyInfo: {
-            address?: components["schemas"]["BTAddressInfo"];
-            admin?: boolean;
-            description?: string;
-            domainPrefix?: string;
-            enterpriseBaseUrl?: string;
+            address: components["schemas"]["BTAddressInfo"];
+            admin: boolean;
+            description: string;
+            domainPrefix: string;
+            enterpriseBaseUrl: string;
             /** Format: int32 */
-            enterpriseSubtype?: number;
+            enterpriseSubtype: number;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            image?: string;
+            id: string;
+            image: string;
             /** @description Name of the resource. */
-            name?: string;
-            noPublicDocuments?: boolean;
-            ownerId?: string;
-            purchase?: components["schemas"]["BTPurchaseInfo"];
-            secondaryDomainPrefixes?: string[];
+            name: string;
+            noPublicDocuments: boolean;
+            ownerId: string;
+            purchase: components["schemas"]["BTPurchaseInfo"];
+            secondaryDomainPrefixes: string[];
             /** Format: int32 */
-            state?: number;
+            state: number;
             /** Format: int32 */
-            type?: number;
+            type: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTCompanySummaryInfo: {
-            admin?: boolean;
-            description?: string;
-            domainPrefix?: string;
-            enterpriseBaseUrl?: string;
+            admin: boolean;
+            description: string;
+            domainPrefix: string;
+            enterpriseBaseUrl: string;
             /** Format: int32 */
-            enterpriseSubtype?: number;
+            enterpriseSubtype: number;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            image?: string;
+            id: string;
+            image: string;
             /** @description Name of the resource. */
-            name?: string;
-            noPublicDocuments?: boolean;
-            ownerId?: string;
-            secondaryDomainPrefixes?: string[];
+            name: string;
+            noPublicDocuments: boolean;
+            ownerId: string;
+            secondaryDomainPrefixes: string[];
             /** Format: int32 */
-            state?: number;
+            state: number;
             /** Format: int32 */
-            type?: number;
+            type: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTCompanyUserInfo: {
-            admin?: boolean;
-            company?: components["schemas"]["BTCompanySummaryInfo"];
+            admin: boolean;
+            company: components["schemas"]["BTCompanySummaryInfo"];
             /** Format: date-time */
-            dateAdded_?: string;
-            documentationNameOverride?: string;
-            guest?: boolean;
+            dateAdded_: string;
+            documentationNameOverride: string;
+            guest: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: date-time */
-            lastLoginTime?: string;
-            light?: boolean;
+            lastLoginTime: string;
+            light: boolean;
+            makePersonalCopies: boolean;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
+            /** Format: date-time */
+            scheduledRemovalDate: string;
             /** Format: int32 */
-            state?: number;
-            user?: components["schemas"]["BTUserBasicSummaryInfo"];
-            userRolePriority?: components["schemas"]["UserRolePriority"];
+            state: number;
+            user: components["schemas"]["BTUserBasicSummaryInfo"];
+            userRolePriority: components["schemas"]["UserRolePriority"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTCompanyUserParams: {
             /** @description Indicates the user is an admin if true. */
-            admin?: boolean;
+            admin: boolean;
             /** @description Company ID of the user. */
-            companyId?: string;
+            companyId: string;
             /** @description String to override documentation name. */
-            documentationNameOverride?: string;
+            documentationNameOverride: string;
             /** @description Email ID of the company user. */
-            email?: string;
+            email: string;
             /**
              * @description List of global permissions to grant. See [Onshape Help: Global Permissions](https://cad.onshape.com/help/Content/Plans/global_permissions.htm#Assignin) for details on each of the available permissions.
              *      * `0`: Manage role based access control
@@ -7950,11 +8012,11 @@ export interface components {
              *      * `24`: Import files
              *      * `25`: Use revision tools  * `26`: Export files
              */
-            globalPermissions?: number[];
+            globalPermissions: number[];
             /** @description Indicates the user is a guest user if true. */
-            guest?: boolean;
+            guest: boolean;
             /** @description Indicates the user is a light user if true. */
-            light?: boolean;
+            light: boolean;
         };
         BTCompanyUserSummaryAdminInfo: Omit<components["schemas"]["BTCompanyUserSummaryInfo"], "jsonType"> & {
             totpEnabled?: boolean;
@@ -7968,8 +8030,6 @@ export interface components {
         BTCompanyUserSummaryInfo: Omit<components["schemas"]["BTUserSummaryInfo"], "jsonType"> & {
             admin?: boolean;
             cls?: string;
-            /** Format: int32 */
-            companyUserState?: number;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -7980,31 +8040,31 @@ export interface components {
         /** @enum {string} */
         BTComputedAssemblyPropertyAggregationOperator: "SUM" | "MINIMUM" | "MAXIMUM" | "AVERAGE" | "WEIGHTED_SUM" | "WEIGHTED_AVERAGE" | "ANY" | "ALL" | "NOT_ANY" | "NOT_ALL";
         BTComputedAssemblyPropertyConfig: {
-            aggregatedPropertyId?: string;
-            aggregationOperator?: components["schemas"]["BTComputedAssemblyPropertyAggregationOperator"];
-            errorValuePolicy?: components["schemas"]["BTComputedAssemblyPropertyErrorPolicy"];
-            filterPropertyId?: string;
-            isFilterPropertyInverted?: boolean;
-            missingValuePolicy?: components["schemas"]["BTComputedAssemblyPropertyErrorPolicy"];
-            secondaryPropertyId?: string;
+            aggregatedPropertyId: string;
+            aggregationOperator: components["schemas"]["BTComputedAssemblyPropertyAggregationOperator"];
+            errorValuePolicy: components["schemas"]["BTComputedAssemblyPropertyErrorPolicy"];
+            filterPropertyId: string;
+            isFilterPropertyInverted: boolean;
+            missingValuePolicy: components["schemas"]["BTComputedAssemblyPropertyErrorPolicy"];
+            secondaryPropertyId: string;
         };
         /** @enum {string} */
         BTComputedAssemblyPropertyErrorPolicy: "ExcludeFromComputation" | "TreatAsZero" | "TreatAsTrue" | "TreatAsFalse" | "PropagateError";
         "BTComputedConfigurationInputSpec-2525": {
             /** @description Type of JSON object. */
-            btType?: string;
-            inputId?: string;
+            btType: string;
+            inputId: string;
         };
         BTComputedPartPropertyConfig: {
-            computedPartPropertySpecFunction?: string;
-            computedPartPropertySpecNamespace?: string;
+            computedPartPropertySpecFunction: string;
+            computedPartPropertySpecNamespace: string;
             /** Format: int32 */
-            computedPropertyFunctionReturnType?: number;
-            propertyFunctionDocumentId?: string;
+            computedPropertyFunctionReturnType: number;
+            propertyFunctionDocumentId: string;
         };
         "BTComputedPartPropertySpec-1746": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureSpec-129"], "btType"> & {
             btType?: string;
             computedPartPropertySpecId?: string;
@@ -8018,7 +8078,7 @@ export interface components {
         });
         "BTConeDescription-860": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             axis?: components["schemas"]["BTVector3d-389"];
             btType?: string;
@@ -8034,61 +8094,61 @@ export interface components {
             btType: "BTConeDescription-860";
         });
         BTConfigurableTreeNode: {
-            name?: string;
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parameters?: components["schemas"]["BTMParameter-1"][];
-            suppressed?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            name: string;
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parameters: components["schemas"]["BTMParameter-1"][];
+            suppressed: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
         };
         BTConfigurationInfo: {
-            isStandardContent?: boolean;
-            parameters?: components["schemas"]["ConfigurationInfoEntry"][];
+            isStandardContent: boolean;
+            parameters: components["schemas"]["ConfigurationInfoEntry"][];
         };
         BTConfigurationParams: {
-            parameters?: components["schemas"]["ConfigurationEntry"][];
-            standardContentParametersId?: string;
+            parameters: components["schemas"]["ConfigurationEntry"][];
+            standardContentParametersId: string;
         };
         "BTConfigurationResponse-2019": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configurationParameters?: components["schemas"]["BTMConfigurationParameter-819"][];
-            currentConfiguration?: components["schemas"]["BTMParameter-1"][];
+            btType: string;
+            configurationParameters: components["schemas"]["BTMConfigurationParameter-819"][];
+            currentConfiguration: components["schemas"]["BTMParameter-1"][];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTConfigurationUpdateCall-2933": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configurationParameters?: components["schemas"]["BTMConfigurationParameter-819"][];
-            currentConfiguration?: components["schemas"]["BTMParameter-1"][];
+            btType: string;
+            configurationParameters: components["schemas"]["BTMConfigurationParameter-819"][];
+            currentConfiguration: components["schemas"]["BTMParameter-1"][];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTConfiguredDimensionColumnInfo-2168": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTConfiguredValuesColumnInfo-1025"], "btType"> & {
             btType?: string;
             dimensionId?: string;
@@ -8102,7 +8162,7 @@ export interface components {
         });
         "BTConfiguredFeatureColumnInfo-1014": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTConfiguredValuesColumnInfo-1025"], "btType"> & {
             btType?: string;
         } & {
@@ -8114,7 +8174,7 @@ export interface components {
         });
         "BTConfiguredParameterColumnInfo-2900": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTConfiguredValuesColumnInfo-1025"], "btType"> & {
             btType?: string;
             innerParameterLocation?: components["schemas"]["BTInnerParameterLocation-1715"];
@@ -8128,17 +8188,17 @@ export interface components {
         });
         "BTConfiguredPartProperties-2645": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
-            parts?: components["schemas"]["BTPartWithConfiguredProperties-2163"][];
-            propertyIdToConfiguredTable?: {
+            btType: string;
+            nodeId: string;
+            parts: components["schemas"]["BTPartWithConfiguredProperties-2163"][];
+            propertyIdToConfiguredTable: {
                 [key: string]: components["schemas"]["BTPartWithConfiguredProperties-2163"];
             };
-            synchronizeToSingleEnumInput?: boolean;
+            synchronizeToSingleEnumInput: boolean;
         };
         "BTConfiguredPartPropertiesTable-2740": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
             partDeterministicId?: string;
@@ -8153,7 +8213,7 @@ export interface components {
         });
         "BTConfiguredSuppressionColumnInfo-2498": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTConfiguredValuesColumnInfo-1025"], "btType"> & {
             btType?: string;
             parameterId?: string;
@@ -8167,15 +8227,15 @@ export interface components {
         /** @description A value that varies per option of a configuration input. */
         BTConfiguredValue: {
             /** @description The id of the configuration input that drives this value. */
-            configurationParameterId?: string;
+            configurationParameterId: string;
             /** @description Map from configuration option id to string value. */
-            configurationToValue?: {
+            configurationToValue: {
                 [key: string]: string;
             };
         };
         "BTConfiguredValuesColumnInfo-1025": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableColumnInfo-1222"], "btType"> & {
             btType?: string;
             parentId?: string;
@@ -8190,7 +8250,7 @@ export interface components {
         });
         "BTConstructionObjectFilter-113": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isConstruction?: boolean;
@@ -8203,7 +8263,7 @@ export interface components {
         });
         "BTConstructionPlaneEntity-27": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
             isDefault?: boolean;
@@ -8216,57 +8276,57 @@ export interface components {
         });
         "BTCoordinateSystem-387": {
             /** @description Type of JSON object. */
-            btType?: string;
-            matrix?: components["schemas"]["BTBSMatrix-386"];
-            origin?: components["schemas"]["BTVector3d-389"];
-            xAxis?: components["schemas"]["BTVector3d-389"];
-            yAxis?: components["schemas"]["BTVector3d-389"];
-            zAxis?: components["schemas"]["BTVector3d-389"];
+            btType: string;
+            matrix: components["schemas"]["BTBSMatrix-386"];
+            origin: components["schemas"]["BTVector3d-389"];
+            xAxis: components["schemas"]["BTVector3d-389"];
+            yAxis: components["schemas"]["BTVector3d-389"];
+            zAxis: components["schemas"]["BTVector3d-389"];
         };
         BTCopyDocumentInfo: {
-            newDocumentId?: string;
-            newDocumentName?: string;
-            newOwner?: components["schemas"]["BTOwnerInfo"];
-            newParentId?: string;
-            newProjectId?: string;
-            newWorkspaceId?: string;
+            newDocumentId: string;
+            newDocumentName: string;
+            newOwner: components["schemas"]["BTOwnerInfo"];
+            newParentId: string;
+            newProjectId: string;
+            newWorkspaceId: string;
         };
         /** @description Options for the new copied document. */
         BTCopyDocumentParams: {
             /** @description `true` to make the new document public. */
-            isPublic?: boolean;
+            isPublic: boolean;
             /** @description Name for the new document. */
-            newName?: string;
+            newName: string;
             /** @description Owner of the new document. Can be a [user ID](#/User/sessionInfo) or [company ID](#/Company/findCompany), depending on `ownerTypeIndex`. */
-            ownerId?: string;
+            ownerId: string;
             /**
              * Format: int32
              * @description Type of owner. `0: User, 1: Company`
              */
-            ownerTypeIndex?: number;
+            ownerTypeIndex: number;
             /** @description Optionally add the new document to the specified folder. Provide the folder ID as the parent ID. */
-            parentId?: string;
+            parentId: string;
             /** @description Optionally add the new document to the specified project. */
-            projectId?: string;
+            projectId: string;
             /** @description `true` to re-point version references in application elements to the initial version in the new document. */
-            repointAppElementVersionRefs?: boolean;
+            repointAppElementVersionRefs: boolean;
         };
         BTCopyElementParams: {
-            anchorElementId?: string;
-            documentIdSource?: string;
-            elementIdSource?: string;
-            isGroupAnchor?: boolean;
-            workspaceIdSource?: string;
+            anchorElementId: string;
+            documentIdSource: string;
+            elementIdSource: string;
+            isGroupAnchor: boolean;
+            workspaceIdSource: string;
         };
         BTCopyViewAssociativeDataParams: {
-            associativeDataIds?: string[];
-            destinationViewId?: string;
-            sourceElementId?: string;
-            sourceViewId?: string;
+            associativeDataIds: string[];
+            destinationViewId: string;
+            sourceElementId: string;
+            sourceViewId: string;
         };
         "BTCosmeticThreadMetadata-3248": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDomainSpecificMetadata-961"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -8285,7 +8345,7 @@ export interface components {
         });
         "BTCountDimensionDisplayData-1778": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -8317,24 +8377,24 @@ export interface components {
         };
         "BTCurveDescription-1583": {
             /** @description Type of JSON object. */
-            btType?: string;
-            direction?: components["schemas"]["BTVector3d-389"];
-            directionOrientedWithFace?: components["schemas"]["BTVector3d-389"];
-            origin?: components["schemas"]["BTVector3d-389"];
-            type?: components["schemas"]["GBTCurveTypeEnum"];
+            btType: string;
+            direction: components["schemas"]["BTVector3d-389"];
+            directionOrientedWithFace: components["schemas"]["BTVector3d-389"];
+            origin: components["schemas"]["BTVector3d-389"];
+            type: components["schemas"]["GBTCurveTypeEnum"];
         };
         "BTCurveDisplayData-4722": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTCurveGeometry-114": {
             /** @description Type of JSON object. */
-            btType?: string;
-            entityType?: components["schemas"]["GBTSketchEntityType"];
+            btType: string;
+            entityType: components["schemas"]["GBTSketchEntityType"];
         };
         "BTCurveGeometryCircle-115": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometry-114"], "btType"> & {
             btType?: string;
             clockwise?: boolean;
@@ -8357,7 +8417,7 @@ export interface components {
         });
         "BTCurveGeometryConic-2284": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometry-114"], "btType"> & {
             btType?: string;
             points?: number[];
@@ -8372,7 +8432,7 @@ export interface components {
         });
         "BTCurveGeometryControlPointSpline-2197": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometrySpline-118"], "btType"> & {
             btType?: string;
             isBezier?: boolean;
@@ -8386,7 +8446,7 @@ export interface components {
         "BTCurveGeometryEllipse-1189": {
             btType: "BTCurveGeometryEllipse-1189";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometryCircle-115"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -8394,7 +8454,7 @@ export interface components {
         });
         "BTCurveGeometryInterpolatedSpline-116": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometry-114"], "btType"> & {
             btType?: string;
             derivatives?: {
@@ -8427,7 +8487,7 @@ export interface components {
         });
         "BTCurveGeometryLine-117": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometry-114"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -8447,7 +8507,7 @@ export interface components {
         });
         "BTCurveGeometrySpline-118": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveGeometry-114"], "btType"> & {
             btType?: string;
             /** Format: int32 */
@@ -8467,7 +8527,7 @@ export interface components {
         });
         "BTCurveLengthDimensionDisplayData-322": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -8483,7 +8543,7 @@ export interface components {
         });
         "BTCurvedTextObjectFilter-5114": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isCurvedText?: boolean;
@@ -8496,7 +8556,7 @@ export interface components {
         });
         "BTCylinderDescription-686": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             axis?: components["schemas"]["BTVector3d-389"];
             btType?: string;
@@ -8511,7 +8571,7 @@ export interface components {
         });
         "BTCylindricalImageMapping-1640": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTImageMapping-3821"], "btType"> & {
             btType?: string;
             cylinderSystem?: components["schemas"]["BTCoordinateSystem-387"];
@@ -8526,7 +8586,7 @@ export interface components {
         });
         "BTDatumDisplayData-3408": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             btType?: string;
             name?: string;
@@ -8539,12 +8599,13 @@ export interface components {
         });
         "BTDatumTableRowMetadata-3060": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             annotationId?: string;
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableCrossHighlightData-1753"];
             isDerived?: boolean;
+            partId?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -8554,7 +8615,7 @@ export interface components {
         });
         "BTDebugGeometry-2059": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTEntityGeometry-35"], "btType"> & {
             appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
             belongsToFlattenedSheetMetalBody?: boolean;
@@ -8574,29 +8635,29 @@ export interface components {
         });
         "BTDecal-2404": {
             /** @description Type of JSON object. */
-            btType?: string;
-            imageSourceId?: string;
-            mappings?: components["schemas"]["BTImageMapping-3821"][];
+            btType: string;
+            imageSourceId: string;
+            mappings: components["schemas"]["BTImageMapping-3821"][];
         };
         "BTDefaultFeatures-119": {
             /** @description Type of JSON object. */
-            btType?: string;
-            children?: components["schemas"]["BTMFeature-134"][];
+            btType: string;
+            children: components["schemas"]["BTMFeature-134"][];
         };
         /** @description Specifies which unit should be used for each supported quantity type. */
         BTDefaultUnitInfo: {
             /** @description The quantity type. */
-            key?: string;
+            key: string;
             /** @description The unit that should be used. */
-            value?: string;
+            value: string;
         };
         BTDefaultUnitsInfo: {
-            nodeId?: string;
-            units?: components["schemas"]["BTDefaultUnitInfo"][];
+            nodeId: string;
+            units: components["schemas"]["BTDefaultUnitInfo"][];
         };
         "BTDerivedAssemblyMirror-4204": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricInstance-2641"], "btType"> & {
             assemblyReferenceParameter?: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
             btType?: string;
@@ -8623,230 +8684,255 @@ export interface components {
         });
         BTDeviceLoginSecretInfo: {
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            modifiedAt?: string;
-            randomToken?: string;
+            modifiedAt: string;
+            randomToken: string;
         };
         BTDiffInfo: {
-            collectionChanges?: {
-                [key: string]: components["schemas"]["BTDiffInfo"][];
+            changes: {
+                [key: string]: components["schemas"]["BTDiffInfo"];
             };
-            entityType?: components["schemas"]["BTDiffInfoCollectionType"];
-            geometryChangeMessages?: string[];
-            sourceId?: string;
-            sourceValue?: string;
-            targetId?: string;
-            targetValue?: string;
-            type?: components["schemas"]["GBTNodeChange"];
+            entityType: components["schemas"]["BTDiffInfoCollectionType"];
+            geometryChangeMessages: string[];
+            sourceId: string;
+            sourceValue: string;
+            targetId: string;
+            targetValue: string;
+            type: components["schemas"]["GBTNodeChange"];
         };
         /** @enum {string} */
         BTDiffInfoCollectionType: "parts" | "sketches" | "points" | "mateConnectors" | "planes" | "curves" | "surfaces";
         "BTDiffJsonResponse-2725": {
             /** @description Type of JSON object. */
-            btType?: string;
-            change?: components["schemas"]["BTJEdit-3734"];
-            patch?: {
-                btType?: string;
+            btType: string;
+            change: components["schemas"]["BTJEdit-3734"];
+            patch: {
+                btType: string;
             };
-            sourceChangeId?: string;
-            targetChangeId?: string;
+            sourceChangeId: string;
+            targetChangeId: string;
         };
         "BTDimensionDisplayData-323": {
-            allReferences?: string[];
-            allReferencesPopulated?: boolean;
+            allReferences: string[];
+            allReferencesPopulated: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            characteristicId?: string;
-            coordinateSystem?: components["schemas"]["BTMatrix3x3-340"];
-            featureId?: string;
-            fitClass?: string;
-            hasMaximumLimit?: boolean;
-            hasMinimumLimit?: boolean;
-            id?: string;
-            isAnnotationDimension?: boolean;
-            isAssociatedWithFlat?: boolean;
-            isDerived?: boolean;
-            isDriven?: boolean;
-            isOverDefined?: boolean;
+            btType: string;
+            characteristicId: string;
+            coordinateSystem: components["schemas"]["BTMatrix3x3-340"];
+            featureId: string;
+            fitClass: string;
+            hasMaximumLimit: boolean;
+            hasMinimumLimit: boolean;
+            id: string;
+            isAnnotationDimension: boolean;
+            isAssociatedWithFlat: boolean;
+            isDerived: boolean;
+            isDriven: boolean;
+            isOverDefined: boolean;
             /** Format: double */
-            lowerTolerance?: number;
+            lowerTolerance: number;
             /** Format: double */
-            maximumLimit?: number;
+            maximumLimit: number;
             /** Format: double */
-            minimumLimit?: number;
-            parameterId?: string;
-            partId?: string;
-            planeMatrix?: components["schemas"]["BTBSMatrix-386"];
-            precision?: components["schemas"]["GBTTolerancePrecision"];
-            toleranceType?: components["schemas"]["GBTToleranceType"];
+            minimumLimit: number;
+            parameterId: string;
+            partId: string;
+            planeMatrix: components["schemas"]["BTBSMatrix-386"];
+            precision: components["schemas"]["GBTTolerancePrecision"];
+            toleranceType: components["schemas"]["GBTToleranceType"];
             /** Format: double */
-            upperTolerance?: number;
+            upperTolerance: number;
             /** Format: double */
-            value?: number;
+            value: number;
         };
         BTDiscount: {
             /** Format: int32 */
-            accountBalance?: number;
+            accountBalance: number;
             /** Format: int32 */
-            amountOff?: number;
-            amountOffCurrency?: string;
+            amountOff: number;
+            amountOffCurrency: string;
             /** Format: int32 */
-            couponType?: number;
+            couponType: number;
             /** Format: int32 */
-            couponValidMonths?: number;
+            couponValidMonths: number;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: string;
-            description?: string;
+            createdAt: string;
+            createdBy: string;
+            description: string;
             /** Format: date-time */
-            expiresAt?: string;
-            id?: components["schemas"]["BTDiscountOwnerIdPlanId"];
-            metadata?: {
+            expiresAt: string;
+            id: components["schemas"]["BTDiscountOwnerIdPlanId"];
+            metadata: {
                 [key: string]: Record<string, never>;
             };
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: string;
-            name?: string;
-            new?: boolean;
+            modifiedAt: string;
+            modifiedBy: string;
+            name: string;
+            new: boolean;
             /** Format: int32 */
-            percentOff?: number;
-            trialEndDate?: string;
+            percentOff: number;
+            trialEndDate: string;
             /** Format: date-time */
-            usedAt?: string;
+            usedAt: string;
         };
         BTDiscountInfo: {
             /** Format: int32 */
-            accountBalance?: number;
+            accountBalance: number;
             /** Format: int32 */
-            amountOff?: number;
+            amountOff: number;
             /** Format: int32 */
-            couponType?: number;
+            couponType: number;
             /** Format: int32 */
-            couponValidMonths?: number;
+            couponValidMonths: number;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserSummaryInfo"];
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserSummaryInfo"];
             /** Format: date-time */
-            expiresAt?: string;
+            expiresAt: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            ownerId?: string;
+            name: string;
+            ownerId: string;
             /** Format: int32 */
-            percentOff?: number;
-            planId?: string;
-            trialEndDate?: string;
+            percentOff: number;
+            planId: string;
+            trialEndDate: string;
             /** Format: date-time */
-            usedAt?: string;
+            usedAt: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTDiscountOwnerIdPlanId: {
-            ownerId?: string;
-            planId?: string;
+            ownerId: string;
+            planId: string;
         };
         /** @description Describes a display state. */
         BTDisplayStateInfo: {
             /** @description The ID of the view feature. */
-            id?: string;
+            id: string;
             /** @description `True` if this display state is in all assemblies by default; `false` if the display state is user-created. */
-            isOnshapeDefault?: boolean;
+            isOnshapeDefault: boolean;
             /** @description The name of the view feature. */
-            name?: string;
+            name: string;
+        };
+        /** @description Summary information about the document containing the reference. */
+        BTDocumentBaseSummaryInfo: {
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            /**
+             * Format: uri
+             * @description URI to fetch complete information of the resource.
+             */
+            href: string;
+            /** @description Id of the resource. */
+            id: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            /** @description Name of the resource. */
+            name: string;
+            /** Format: int32 */
+            state: number;
+            /** Format: int64 */
+            storageSize: number;
+            /**
+             * Format: uri
+             * @description URI to visualize the resource in a webclient if applicable.
+             */
+            viewRef: string;
         };
         BTDocumentContentsInfo: {
             /** @description The elements (tabs) in the document. This does not include folders. */
-            elements?: components["schemas"]["BTDocumentElementInfo"][];
-            folders?: components["schemas"]["BTElementGroup-1458"];
+            elements: components["schemas"]["BTDocumentElementInfo"][];
+            folders: components["schemas"]["BTElementGroup-1458"];
         };
         /** @description List of element IDs to include in the document. */
         BTDocumentElementCreationDescriptor: {
-            elementParams?: components["schemas"]["BTAppElementParams"];
+            elementParams: components["schemas"]["BTAppElementParams"];
             /** Format: int32 */
-            elementType?: number;
+            elementType: number;
         };
         BTDocumentElementInfo: {
-            accelerationUnits?: string;
-            angleUnits?: string;
-            angularVelocityUnits?: string;
-            applicationTarget?: components["schemas"]["BTApplicationTargetInfo"];
-            areaUnits?: string;
-            dataType?: string;
-            deleted?: boolean;
-            densityUnits?: string;
-            elementType?: components["schemas"]["GBTElementType"];
-            energyUnits?: string;
-            filename?: string;
-            forceUnits?: string;
-            foreignDataId?: string;
-            id?: string;
-            lengthUnits?: string;
-            massUnits?: string;
-            microversionId?: string;
-            momentUnits?: string;
-            name?: string;
-            pressureUnits?: string;
-            prettyType?: string;
-            safeToShow?: boolean;
-            specifiedUnit?: string;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
+            accelerationUnits: string;
+            angleUnits: string;
+            angularVelocityUnits: string;
+            applicationTarget: components["schemas"]["BTApplicationTargetInfo"];
+            areaUnits: string;
+            dataType: string;
+            deleted: boolean;
+            densityUnits: string;
+            elementType: components["schemas"]["GBTElementType"];
+            energyUnits: string;
+            filename: string;
+            forceUnits: string;
+            foreignDataId: string;
+            frequencyUnits: string;
+            id: string;
+            lengthUnits: string;
+            massUnits: string;
+            microversionId: string;
+            momentUnits: string;
+            name: string;
+            pressureUnits: string;
+            prettyType: string;
+            safeToShow: boolean;
+            specifiedUnit: string;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
             /** Format: uri */
-            thumbnails?: string;
-            timeUnits?: string;
-            type?: string;
-            unupdatable?: boolean;
-            volumeUnits?: string;
-            zip?: components["schemas"]["BTZipFileInfo"];
+            thumbnails: string;
+            timeUnits: string;
+            type: string;
+            unupdatable: boolean;
+            volumeUnits: string;
+            zip: components["schemas"]["BTZipFileInfo"];
         };
         BTDocumentElementProcessingInfo: {
-            accelerationUnits?: string;
-            angleUnits?: string;
-            angularVelocityUnits?: string;
-            applicationTarget?: components["schemas"]["BTApplicationTargetInfo"];
-            areaUnits?: string;
-            dataType?: string;
-            deleted?: boolean;
-            densityUnits?: string;
-            elementType?: components["schemas"]["GBTElementType"];
-            energyUnits?: string;
-            filename?: string;
-            forceUnits?: string;
-            foreignDataId?: string;
-            id?: string;
-            lengthUnits?: string;
-            massUnits?: string;
-            microversionId?: string;
-            momentUnits?: string;
-            name?: string;
-            pressureUnits?: string;
-            prettyType?: string;
-            safeToShow?: boolean;
-            specifiedUnit?: string;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
+            accelerationUnits: string;
+            angleUnits: string;
+            angularVelocityUnits: string;
+            applicationTarget: components["schemas"]["BTApplicationTargetInfo"];
+            areaUnits: string;
+            dataType: string;
+            deleted: boolean;
+            densityUnits: string;
+            elementType: components["schemas"]["GBTElementType"];
+            energyUnits: string;
+            filename: string;
+            forceUnits: string;
+            foreignDataId: string;
+            frequencyUnits: string;
+            id: string;
+            lengthUnits: string;
+            massUnits: string;
+            microversionId: string;
+            momentUnits: string;
+            name: string;
+            pressureUnits: string;
+            prettyType: string;
+            safeToShow: boolean;
+            specifiedUnit: string;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
             /** Format: uri */
-            thumbnails?: string;
-            timeUnits?: string;
-            translationEventKey?: string;
-            translationId?: string;
-            type?: string;
-            unupdatable?: boolean;
-            volumeUnits?: string;
-            zip?: components["schemas"]["BTZipFileInfo"];
+            thumbnails: string;
+            timeUnits: string;
+            translationEventKey: string;
+            translationId: string;
+            type: string;
+            unupdatable: boolean;
+            volumeUnits: string;
+            zip: components["schemas"]["BTZipFileInfo"];
         };
         "BTDocumentElementReference-2484": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTGroupOrElementReference-2205"], "btType"> & {
             btType?: string;
             elementId?: string;
@@ -8858,23 +8944,20 @@ export interface components {
             btType: "BTDocumentElementReference-2484";
         });
         BTDocumentHistoryInfo: {
-            canBeRestored?: boolean;
+            canBeRestored: boolean;
             /** Format: date-time */
-            date?: string;
-            description?: string;
-            microversionId?: string;
-            nextMicroversionId?: string;
+            date: string;
+            description: string;
+            microversionId: string;
+            nextMicroversionId: string;
             /** @description If this microversion is the result of a restore from another microversion, the restoreId will be the microversion Id of the original microversion that was restored. Otherwise this id will not be included within the response. */
-            restoreId?: string;
-            userId?: string;
-            username?: string;
+            restoreId: string;
+            userId: string;
+            username: string;
         };
         BTDocumentInfo: Omit<components["schemas"]["BTGlobalTreeNodeSummaryInfo"], "jsonType"> & {
             anonymousAccessAllowed?: boolean;
             anonymousAllowsExport?: boolean;
-            canCreateTaskViaConnectionGlobalPermission?: boolean;
-            canExportViaConnectionGlobalPermisison?: boolean;
-            canImportViaConnectionGlobalPermission?: boolean;
             canMove?: boolean;
             canUnshare?: boolean;
             connectionName?: string;
@@ -8884,9 +8967,6 @@ export interface components {
             createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
             createdWithEducationPlan?: boolean;
             defaultElementId?: string;
-            defaultVersionGraphMode?: components["schemas"]["BTVersionGraphMode"];
-            defaultVersionGraphShowAutoVersions?: boolean;
-            defaultVersionGraphShowMerges?: boolean;
             defaultWorkspace?: components["schemas"]["BTWorkspaceInfo"];
             description?: string;
             documentLabels?: components["schemas"]["BTDocumentLabelInfo"][];
@@ -8894,7 +8974,6 @@ export interface components {
             /** Format: int32 */
             documentType?: number;
             duplicateNameViolationError?: string;
-            elementLibrarySummaryInfo?: components["schemas"]["BTElementLibrarySummaryInfo"][];
             forceExportRules?: boolean;
             hasReleaseRevisionableObjects?: boolean;
             hasRelevantInsertables?: boolean;
@@ -8909,7 +8988,6 @@ export interface components {
             isEnterpriseOwned?: boolean;
             isExternalConnectionResource?: boolean;
             isMutable?: boolean;
-            isOrphaned?: boolean;
             isUpgradedToLatestVersion?: boolean;
             isUsingManagedWorkflow?: boolean;
             likedByCurrentUser?: boolean;
@@ -8940,11 +9018,6 @@ export interface components {
             supportTeamUserAndShared?: boolean;
             tags?: string[];
             thumbnail?: components["schemas"]["BTThumbnailInfo"];
-            /** Format: int32 */
-            totalWorkspacesScheduledForUpdate?: number;
-            /** Format: int32 */
-            totalWorkspacesUpdating?: number;
-            tracingEnabled?: boolean;
             trash?: boolean;
             /** Format: date-time */
             trashedAt?: string;
@@ -8974,67 +9047,80 @@ export interface components {
             jsonType: "label";
         };
         BTDocumentMergeInfo: {
-            libraryVersionMismatch?: boolean;
-            overwrittenElements?: components["schemas"]["BTDocumentElementInfo"][];
-            parentDocumentMicroversionId?: string;
-            resultDocumentMicroversionId?: string;
-            sourceDocumentMicroversionId?: string;
+            libraryVersionMismatch: boolean;
+            overwrittenElements: components["schemas"]["BTDocumentElementInfo"][];
+            parentDocumentMicroversionId: string;
+            resultDocumentMicroversionId: string;
+            sourceDocumentMicroversionId: string;
         };
         BTDocumentMessageBody: {
-            appElementSessionId?: string;
-            commentId?: string;
-            data?: string;
-            documentId?: string;
-            documentState?: string;
+            appElementSessionId: string;
+            commentId: string;
+            data: string;
+            documentId: string;
+            documentState: string;
             /** Format: int32 */
-            documentType?: number;
-            elementId?: string;
-            entryId?: string;
-            entryType?: string;
-            event?: string;
-            messageId?: string;
-            metadataObjectType?: string;
-            newPermissionSet?: string[];
-            oldPermissionSet?: string[];
-            partId?: string;
-            partIdentity?: string;
-            partNumber?: string;
-            resourceType?: string;
-            shareAction?: string;
+            documentType: number;
+            elementId: string;
+            entryId: string;
+            entryType: string;
+            event: string;
+            messageId: string;
+            metadataObjectType: string;
+            newPermissionSet: string[];
+            oldPermissionSet: string[];
+            partId: string;
+            partIdentity: string;
+            partNumber: string;
+            resourceType: string;
+            shareAction: string;
             /** Format: date-time */
-            timestamp?: string;
-            translationId?: string;
-            userId?: string;
-            versionId?: string;
-            webhookId?: string;
-            workspaceId?: string;
+            timestamp: string;
+            translationId: string;
+            userId: string;
+            versionId: string;
+            webhookId: string;
+            workspaceId: string;
+        };
+        /** @description Parameters for updating document notes. */
+        BTDocumentNotesParams: {
+            /** @description Document notes. */
+            notes: string;
+            /** @description Historical document notes. */
+            oldClientNotes: string;
         };
         /** @description Parameters for creating and updating documents. */
         BTDocumentParams: {
             /** @description Document description. */
-            description?: string;
+            description: string;
             /** @description List of element IDs to include in the document. */
-            elements?: components["schemas"]["BTDocumentElementCreationDescriptor"][];
+            elements: components["schemas"]["BTDocumentElementCreationDescriptor"][];
             /** @description `true` if the current user can toggle the Force Export Rule flag on a document. */
-            forceExportRules?: boolean;
+            forceExportRules: boolean;
             /** @description Set to `true` for debugging. */
-            generateUnknownMessages?: boolean;
+            generateUnknownMessages: boolean;
             /** @description Set to `true` to generate an empty document. */
-            isEmptyContent?: boolean;
+            isEmptyContent: boolean;
             /** @description Set to `true` to make the document public. */
-            isPublic?: boolean;
+            isPublic: boolean;
             /** @description Document name. */
-            name?: string;
+            name: string;
             /** @description Set to `true` to indicate that revisions are not managed for this document. */
-            notRevisionManaged?: boolean;
-            /** @description Document notes. */
-            notes?: string;
-            /** @description Historical document notes. */
-            oldClientNotes?: string;
+            notRevisionManaged: boolean;
+            /**
+             * @deprecated
+             * @description Deprecated. Use the /documents/{did}/notes endpoint instead.
+             */
+            notes: string;
+            /**
+             * @deprecated
+             * @description Deprecated. Use the /documents/{did}/notes endpoint instead.
+             */
+            oldClientNotes: string;
             /** @description The document owner's email address. */
-            ownerEmail?: string;
+            ownerEmail: string;
             /** @description If `ownerType=USER`, this is the user ID. If `ownerType=COMPANY`, this is the company ID. */
-            ownerId?: string;
+            ownerId: string;
             /**
              * Format: int32
              * @description The document's owner type. `USER=0` | `COMPANY=1` | `ONSHAPE=2`
@@ -9042,11 +9128,11 @@ export interface components {
              */
             ownerType: number;
             /** @description Document ID of this document's parent. */
-            parentId?: string;
+            parentId: string;
             /** @description ID of the project this document belongs to. */
-            projectId?: string;
+            projectId: string;
             /** @description Array of strings to set as tags for the document. */
-            tags?: string[];
+            tags: string[];
         };
         BTDocumentProcessingInfo: {
             jsonType: "BTDocumentProcessingInfo";
@@ -9056,31 +9142,31 @@ export interface components {
             translationId?: string;
         });
         BTDocumentSearchHitInfo: {
-            documentId?: string;
-            elementName?: string;
-            folderId?: string;
-            highlightedFields?: {
+            documentId: string;
+            elementName: string;
+            folderId: string;
+            highlightedFields: {
                 [key: string]: string[];
             };
-            hit?: components["schemas"]["BTLegacySearchHit"];
-            hitId?: string;
+            hit: components["schemas"]["BTLegacySearchHit"];
+            hitId: string;
             /** Format: int32 */
-            meshState?: number;
-            name?: string;
-            projectId?: string;
-            sourceMap?: {
+            meshState: number;
+            name: string;
+            projectId: string;
+            sourceMap: {
                 [key: string]: Record<string, never>;
             };
-            type?: components["schemas"]["BTSearchEntityType"];
-            versionOrWorkspaceName?: string;
+            type: components["schemas"]["BTSearchEntityType"];
+            versionOrWorkspaceName: string;
         };
         BTDocumentSearchParams: {
             /**
              * Format: int32
              * @description Type of documents to search: `0: My Documents | 1: Created | 2: Shared | 3: Trash | 4: Public | 5: Recent | 6: By Owner | 7: By Company | 9: By Team`
              */
-            documentFilter?: number;
-            foundIn?: components["schemas"]["BTESVersionWorkspaceChoice"];
+            documentFilter: number;
+            foundIn: components["schemas"]["BTESVersionWorkspaceChoice"];
             /**
              * Format: int32
              * @description Number of results to return per page. Default value is 20 (also the maximum).
@@ -9095,14 +9181,14 @@ export interface components {
              */
             offset: number;
             /** @description Owner ID. Can be a user ID, company ID, or team ID, depending on `ownerType`. */
-            ownerId?: string;
+            ownerId: string;
             /**
              * @description Search document parent Id
              * @example ALL
              */
-            parentId?: string;
+            parentId: string;
             /** @description Search for documents that contain the given string in the name. Search is not case-sensitive. */
-            rawQuery?: string;
+            rawQuery: string;
             /**
              * @description Column by which to sort search results. `name | modifiedAt | createdAt (default) | email | modifiedBy | promotedAt`
              * @default createdAt
@@ -9114,12 +9200,12 @@ export interface components {
              */
             sortOrder: string;
             /** @description Type of owner. `0: User | 1: Company | 2: Onshape`. If the owner is a teamId, leave this unspecified. */
-            type?: string;
-            when?: components["schemas"]["BTESResultsFilter"];
+            type: string;
+            when: components["schemas"]["BTESResultsFilter"];
         };
         BTDocumentSelectorInfo: {
-            parameters?: components["schemas"]["BTDocumentSelectorParametersInfo"];
-            selectorId?: string;
+            parameters: components["schemas"]["BTDocumentSelectorParametersInfo"];
+            selectorId: string;
         };
         BTDocumentSelectorParametersInfo: {
             jsonType: string;
@@ -9135,38 +9221,38 @@ export interface components {
         };
         "BTDocumentVersionElementIds-1897": {
             /** @description Type of JSON object. */
-            btType?: string;
-            documentId?: string;
-            elementId?: string;
-            versionId?: string;
+            btType: string;
+            documentId: string;
+            elementId: string;
+            versionId: string;
         };
         BTDocumentWithVersionAndElementId: {
-            documentId?: string;
-            documentVersionId?: string;
-            elementId?: string;
-            elementLibraryId?: components["schemas"]["ObjectId"];
-            elementLibraryVersion?: components["schemas"]["ObjectId"];
-            partNumber?: string;
-            revision?: string;
-            uniqueVersionId?: string;
-            validElementLibraryReference?: boolean;
-            validRevisionReference?: boolean;
+            documentId: string;
+            documentVersionId: string;
+            elementId: string;
+            elementLibraryId: components["schemas"]["ObjectId"];
+            elementLibraryVersion: components["schemas"]["ObjectId"];
+            partNumber: string;
+            revision: string;
+            uniqueVersionId: string;
+            validElementLibraryReference: boolean;
+            validRevisionReference: boolean;
         };
         BTDocumentWithVersionId: {
-            documentId?: string;
-            documentVersionId?: string;
+            documentId: string;
+            documentVersionId: string;
         };
         "BTDomainSpecificMetadata-961": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         /** @enum {string} */
         BTDrawingHiddenLineOption: "drafting" | "excluded" | "marked";
         BTDrawingModificationParams: {
             /** @description The label that will appear in the document's edit history for this operation. If blank, a value will be auto-generated. */
-            description?: string;
+            description: string;
             /** @description Array of drawing modification operations. */
-            jsonRequests?: components["schemas"]["BTBDrawingOperationParams"][];
+            jsonRequests: components["schemas"]["BTBDrawingOperationParams"][];
         };
         /** @description JSON schema for creating or updating a drawing. */
         BTDrawingParams: {
@@ -9186,26 +9272,26 @@ export interface components {
              */
             decimalSeparator: string;
             /** @description Apply this display state's properties to the drawing. */
-            displayStateId?: string;
+            displayStateId: string;
             /** @description The document in which to create the drawing. If used, this value must match the document ID (`did`) value provided in the URL. */
-            documentId?: string;
+            documentId: string;
             /** @description Create a drawing of a part or assembly from this microversion. */
-            documentMicroversionId?: string;
+            documentMicroversionId: string;
             /** @description Provide a name for the drawing. */
-            drawingName?: string;
+            drawingName: string;
             /** @description Apply this configuration from the source element to the drawing. */
-            elementConfiguration?: string;
+            elementConfiguration: string;
             /** @description The id of the element in which to perform the operation. */
-            elementId?: string;
+            elementId: string;
             /** @description The id of the element microversion in which to perform the operation. */
-            elementMicroversionId?: string;
+            elementMicroversionId: string;
             /** @description Apply this exploded view to the drawing. */
-            explosionId?: string;
+            explosionId: string;
             /** @description Create a drawing of an element from this external document. */
-            externalDocumentId?: string;
+            externalDocumentId: string;
             /** @description Create a drawing of an element from this external document version. */
-            externalDocumentVersionId?: string;
-            hiddenLines?: components["schemas"]["BTDrawingHiddenLineOption"];
+            externalDocumentVersionId: string;
+            hiddenLines: components["schemas"]["BTDrawingHiddenLineOption"];
             /**
              * @description Set to `true` to include surfaces in the drawing.
              * @default false
@@ -9236,11 +9322,11 @@ export interface components {
              * @default en-us
              */
             language: string;
-            location?: components["schemas"]["BTElementLocationParams"];
+            location: components["schemas"]["BTElementLocationParams"];
             /** @description The type of model to include in the drawing: `partstudio` | `assembly` */
-            modelType?: string;
+            modelType: string;
             /** @description Apply this named view to the drawing. */
-            namedPositionId?: string;
+            namedPositionId: string;
             /**
              * Format: int32
              * @description The number of horizontal zones to include in the drawing's graphics area.
@@ -9256,28 +9342,28 @@ export interface components {
              */
             numberVerticalZones: number;
             /** @description Include this part in the drawing. */
-            partId?: string;
+            partId: string;
             /** @description Include this part in the drawing. */
-            partNumber?: string;
+            partNumber: string;
             /** @description Include all parts found by the query in the drawing. */
-            partQuery?: string;
+            partQuery: string;
             /** @description Apply this projection to the drawing. */
-            projection?: string;
+            projection: string;
             /**
              * @description Set to `true` if creating the drawing of an empty sketch.
              * @default false
              */
             pureSketch: boolean;
             /** @description `BEST_PERFORMANCE` | `BEST_QUALITY` | `BALANCED` | `ADAPTIVE` */
-            qualityOption?: string;
+            qualityOption: string;
             /**
              * Format: int32
              * @description Specify the type of element to create the drawing from. `0: UNKNOWN` | `1: PARTSTUDIO` | `2: ASSEMBLY` | `3: PART` | `4: FLATTENED_PART` | `5: COMPOSITE_PART` | `6: MESH_PART` | `7: SURFACE` | `8: SKETCH` | `9: CURVE`
              */
-            referenceType?: number;
-            referenceTypeEnum?: components["schemas"]["GBTAppElementReferenceType"];
+            referenceType: number;
+            referenceTypeEnum: components["schemas"]["GBTAppElementReferenceType"];
             /** @description Create the drawing from this specific revision. */
-            revision?: string;
+            revision: string;
             /**
              * @description Set to `true` to show only cut geometry in the drawing.
              * @default false
@@ -9289,49 +9375,49 @@ export interface components {
              */
             showMbdAnnotations: boolean;
             /** @description `NONE` | `ABSOLUTE` | `RATIO_TO_MODEL` | `RATIO_TO_BODY` | `AUTOMATIC` */
-            simplificationOption?: string;
+            simplificationOption: string;
             /**
              * Format: double
              * @description `NONE` | `UNKNOWN` | `SMOOTH` | `DRAFTING`
              */
-            simplificationThreshold?: number;
+            simplificationThreshold: number;
             /** @description Provide a size for the drawing. */
-            size?: string;
+            size: string;
             /** @description Include these sketches in the drawing. */
-            sketchIds?: string[];
+            sketchIds: string[];
             /**
              * @description Provide the Standard to use in the drawing.
              * @example ANSI
              */
-            standard?: string;
+            standard: string;
             /**
              * @description The zone in which to start the drawing.
              * @example A1
              */
-            startZones?: string;
+            startZones: string;
             /** @description Provide any additional arguments for the template being used for this drawing. */
-            templateArgs?: string[];
+            templateArgs: string[];
             /** @description Apply the template from this document to the drawing. */
-            templateDocumentId?: string;
+            templateDocumentId: string;
             /** @description Apply the template from this element to the drawing. */
-            templateElementId?: string;
+            templateElementId: string;
             /** @description Apply this template to the drawing. */
-            templateName?: string;
+            templateName: string;
             /** @description Apply the template from this version to the drawing. */
-            templateVersionId?: string;
+            templateVersionId: string;
             /** @description Apply the template from this workspace to the drawing. */
-            templateWorkspaceId?: string;
+            templateWorkspaceId: string;
             /**
              * @description Set to `true` to include a title block in the drawing.
              * @default false
              */
             titleblock: boolean;
             /** @description Units for the element: `METER` | `CENTIMETER` | `MILLIMETER` | `INCH` | `FOOT` | `YARD` */
-            units?: string;
+            units: string;
             /** @description Add these views to the drawing. */
-            views?: string;
+            views: string;
             /** @description Create a drawing of a part or assembly from this workspace. */
-            workspaceId?: string;
+            workspaceId: string;
         };
         /**
          * @description Search result when
@@ -9347,7 +9433,7 @@ export interface components {
         BTESVersionWorkspaceChoice: "ALL" | "WORKSPACES" | "VERSIONS";
         "BTEdgeTopologyFilter-122": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             edgeTopology?: components["schemas"]["GBTEdgeTopology"];
@@ -9361,142 +9447,146 @@ export interface components {
         });
         "BTEditingLogic-2350": {
             /** @description Type of JSON object. */
-            btType?: string;
-            functionName?: string;
-            wantsClickedButton?: boolean;
-            wantsHiddenBodies?: boolean;
-            wantsIsCreating?: boolean;
-            wantsSpecifiedParameters?: boolean;
+            btType: string;
+            functionName: string;
+            wantsClickedButton: boolean;
+            wantsHiddenBodies: boolean;
+            wantsIsCreating: boolean;
+            wantsSpecifiedParameters: boolean;
         };
         "BTElementDisplayData-326": {
-            annotationsForElement?: components["schemas"]["BTAnnotationElementDisplayData-894"];
+            annotationsForElement: components["schemas"]["BTAnnotationElementDisplayData-894"];
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            fromFullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            incremental?: boolean;
+            btType: string;
+            elementId: string;
+            fromFullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            incremental: boolean;
             /** Format: int32 */
-            instanceCount?: number;
-            keepFromMicroversion?: boolean;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfigurationInterval?: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
-            microversionInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
-            versionForRasterization?: components["schemas"]["BTElementDisplayData-326"];
+            instanceCount: number;
+            keepFromMicroversion: boolean;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfigurationInterval: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
+            microversionInterval: components["schemas"]["BTMicroversionIdInterval-367"];
+            versionForRasterization: components["schemas"]["BTElementDisplayData-326"];
         };
         "BTElementGroup-1458": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description The name of the group (folder). */
-            groupName?: string;
+            groupName: string;
             /** @description List of folders or elements in this group (folder). */
-            groups?: components["schemas"]["BTGroupOrElementReference-2205"][];
+            groups: components["schemas"]["BTGroupOrElementReference-2205"][];
             /** @description A unique identifier for this folder. */
-            nodeId?: string;
+            nodeId: string;
         };
         "BTElementLibraryReferenceData-3133": {
             /** @description Type of JSON object. */
-            btType?: string;
-            elementLibraryId?: string;
-            elementLibraryIdRaw?: components["schemas"]["BTObjectId"];
-            elementLibrarySelectionPath?: components["schemas"]["BTObjectId"][];
-            elementLibraryVersion?: string;
-            elementLibraryVersionRaw?: components["schemas"]["BTObjectId"];
+            btType: string;
+            elementLibraryId: string;
+            elementLibraryIdRaw: components["schemas"]["BTObjectId"];
+            elementLibrarySelectionPath: components["schemas"]["BTObjectId"][];
+            elementLibraryVersion: string;
+            elementLibraryVersionRaw: components["schemas"]["BTObjectId"];
         };
         /** @description Element library metadata */
         BTElementLibrarySummaryInfo: {
+            /** @description If present, this library is public and this field contains the version Id of the current public version. If not present, this library is not public. */
+            currentPublicVersion: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description The ID of the definition of the element library. */
-            libraryDefinitionId?: string;
+            libraryDefinitionId: string;
             /** @description The Id of the library -- unique across Onshape. */
-            libraryId?: string;
+            libraryId: string;
             /** @description The current version Id of the library. */
-            libraryVersion?: string;
+            libraryVersion: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** @description The owner Id of an element library (either Onshape, company, or user). */
-            ownerId?: string;
+            ownerId: string;
             /**
              * Format: int32
              * @description The type of library owner, Onshape, user, or company
              */
-            ownerType?: number;
+            ownerType: number;
             /** @description The id of the root folder of the library */
-            sourceFolderId?: string;
+            sourceFolderId: string;
+            /** @description If true, the current user is subscribed to this library. Applies only to public libraries. */
+            subscribed: boolean;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         /** @description The location at which the new element should be inserted. */
         BTElementLocationParams: {
             /** @description The id of an element which provides context for the position value specified. */
-            elementId?: string;
+            elementId: string;
             /**
              * Format: int32
              * @description An indicator for the relative placement of the new element. If elementId is specified, a negative number indicates insertion prior to the element and a non-negative number indicates insertion following the element. If no elementId is specified, a negative value indicates insertion at the end of the element list and a non-negative number indicates insertion at the start of the element list.
              */
-            position?: number;
+            position: number;
         };
         BTElementMergeInfo: {
-            branchPointElementName?: string;
-            branchPointElementPath?: string[];
-            dependentElementMergeInfo?: components["schemas"]["BTElementMergeInfo"];
-            elementDataType?: string;
-            elementId?: string;
-            elementType?: components["schemas"]["GBTElementType"];
-            mergeable?: boolean;
-            sourceElementName?: string;
-            sourceElementPath?: string[];
-            sourceElementStatus?: components["schemas"]["GBTElementBranchStatus"];
+            branchPointElementName: string;
+            branchPointElementPath: string[];
+            dependentElementMergeInfo: components["schemas"]["BTElementMergeInfo"];
+            elementDataType: string;
+            elementId: string;
+            elementType: components["schemas"]["GBTElementType"];
+            mergeable: boolean;
+            sourceElementName: string;
+            sourceElementPath: string[];
+            sourceElementStatus: components["schemas"]["GBTElementBranchStatus"];
             /** Format: int32 */
-            sourceLibraryVersion?: number;
+            sourceLibraryVersion: number;
             /** Format: date-time */
-            sourceModifiedAt?: string;
-            sourceModifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            sourceOutOfDate?: boolean;
-            targetElementName?: string;
-            targetElementPath?: string[];
-            targetElementStatus?: components["schemas"]["GBTElementBranchStatus"];
+            sourceModifiedAt: string;
+            sourceModifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            sourceOutOfDate: boolean;
+            targetElementName: string;
+            targetElementPath: string[];
+            targetElementStatus: components["schemas"]["GBTElementBranchStatus"];
             /** Format: int32 */
-            targetLibraryVersion?: number;
+            targetLibraryVersion: number;
             /** Format: date-time */
-            targetModifiedAt?: string;
-            targetModifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            targetOutOfDate?: boolean;
-            versionCompatible?: boolean;
+            targetModifiedAt: string;
+            targetModifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            targetOutOfDate: boolean;
+            versionCompatible: boolean;
         };
         "BTElementReference-725": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configured?: boolean;
-            documentVersionId?: string;
-            elementId?: string;
-            externalDocumentWithVersion?: components["schemas"]["BTDocumentWithVersionId"];
-            externalDocumentWithVersionAndElementId?: components["schemas"]["BTDocumentWithVersionAndElementId"];
-            externalReference?: boolean;
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            microversionIdAndConfiguration?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
-            nodeId?: string;
+            btType: string;
+            configured: boolean;
+            documentVersionId: string;
+            elementId: string;
+            externalDocumentWithVersion: components["schemas"]["BTDocumentWithVersionId"];
+            externalDocumentWithVersionAndElementId: components["schemas"]["BTDocumentWithVersionAndElementId"];
+            externalReference: boolean;
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            microversionIdAndConfiguration: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            nodeId: string;
         };
         BTElementTransaction: {
-            description?: string;
-            documentId?: string;
-            elementId?: string;
-            id?: string;
-            microbranchId?: string;
-            workspaceId?: string;
+            description: string;
+            documentId: string;
+            elementId: string;
+            id: string;
+            microbranchId: string;
+            workspaceId: string;
         };
         "BTEllipseDescription-866": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveDescription-1583"], "btType"> & {
             btType?: string;
             majorAxis?: components["schemas"]["BTVector3d-389"];
@@ -9514,7 +9604,7 @@ export interface components {
         });
         "BTEllipseDiameterDimensionDisplayData-1301": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTLinearDimensionDisplayData-330"], "btType"> & {
             btType?: string;
         } & {
@@ -9525,12 +9615,12 @@ export interface components {
             btType: "BTEllipseDiameterDimensionDisplayData-1301";
         });
         BTEncodedConfigurationInfo: {
-            encodedId?: string;
-            queryParam?: string;
+            encodedId: string;
+            queryParam: string;
         };
         "BTEntityDegenerateEdge-1129": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTessellatedGeometry-2576"], "btType"> & {
             btType?: string;
             point?: number[];
@@ -9543,7 +9633,7 @@ export interface components {
         });
         "BTEntityDeletion-24": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBaseEntityData-33"], "btType"> & {
             btType?: string;
         } & {
@@ -9555,7 +9645,7 @@ export interface components {
         });
         "BTEntityEdge-30": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTessellatedGeometry-2576"], "btType"> & {
             btType?: string;
             compressedPoints?: components["schemas"]["BTImmutableByteArray"];
@@ -9574,7 +9664,7 @@ export interface components {
         });
         "BTEntityFace-31": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTessellatedGeometry-2576"], "btType"> & {
             btType?: string;
             compressedUvs?: components["schemas"]["BTImmutableByteArray"];
@@ -9600,20 +9690,20 @@ export interface components {
         });
         "BTEntityGeometry-35": {
             /** @description Type of JSON object. */
-            btType?: string;
-            compressed?: boolean;
-            decompressed?: components["schemas"]["BTEntityGeometry-35"];
+            btType: string;
+            compressed: boolean;
+            decompressed: components["schemas"]["BTEntityGeometry-35"];
             /** Format: int32 */
-            errorCode?: number;
+            errorCode: number;
             /** Format: int32 */
-            estimatedMemoryUsageInBytes?: number;
-            hasTessellationError?: boolean;
+            estimatedMemoryUsageInBytes: number;
+            hasTessellationError: boolean;
             /** Format: int32 */
-            settingIndex?: number;
+            settingIndex: number;
         };
         "BTEntityPoint-29": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTessellatedGeometry-2576"], "btType"> & {
             btType?: string;
             point?: number[];
@@ -9626,7 +9716,7 @@ export interface components {
         });
         "BTEntityTypeFilter-124": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             entityType?: components["schemas"]["GBTEntityType"];
@@ -9639,23 +9729,23 @@ export interface components {
         });
         "BTEnumOptionRange-3741": {
             /** @description Type of JSON object. */
-            btType?: string;
-            end?: string;
-            start?: string;
+            btType: string;
+            end: string;
+            start: string;
         };
         "BTEnumOptionVisibilityCondition-3455": {
             /** @description Type of JSON object. */
-            btType?: string;
-            condition?: components["schemas"]["BTParameterVisibilityCondition-177"];
+            btType: string;
+            condition: components["schemas"]["BTParameterVisibilityCondition-177"];
         };
         "BTEnumOptionVisibilityConditionList-2936": {
             /** @description Type of JSON object. */
-            btType?: string;
-            visibilityConditions?: components["schemas"]["BTEnumOptionVisibilityCondition-3455"][];
+            btType: string;
+            visibilityConditions: components["schemas"]["BTEnumOptionVisibilityCondition-3455"][];
         };
         "BTEnumOptionVisibilityForList-1613": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTEnumOptionVisibilityCondition-3455"], "btType"> & {
             btType?: string;
             controlledOptions?: string[];
@@ -9668,7 +9758,7 @@ export interface components {
         });
         "BTEnumOptionVisibilityForRange-4297": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTEnumOptionVisibilityCondition-3455"], "btType"> & {
             btType?: string;
             controlledRange?: components["schemas"]["BTEnumOptionRange-3741"];
@@ -9681,7 +9771,7 @@ export interface components {
         });
         "BTExplosion-2754": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             explodeSteps?: components["schemas"]["BTExplosionStepFeature-3008"][];
@@ -9695,7 +9785,7 @@ export interface components {
         });
         "BTExplosionStepFeature-3008": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         } & {
@@ -9707,7 +9797,7 @@ export interface components {
         });
         "BTExportBodyProperties-3559": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTExportModelProperties-3216"], "btType"> & {
             btType?: string;
             material?: components["schemas"]["BTPartMaterial-1445"];
@@ -9721,7 +9811,7 @@ export interface components {
         });
         "BTExportModelArcEdgeGeometry-1257": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTExportModelEdgeGeometry-1125"], "btType"> & {
             arcIsClockwise?: boolean;
             /** Format: double */
@@ -9735,118 +9825,118 @@ export interface components {
             btType: "BTExportModelArcEdgeGeometry-1257";
         });
         "BTExportModelBodiesResponse-734": {
-            bodies?: components["schemas"]["BTExportModelBody-1272"][];
+            bodies: components["schemas"]["BTExportModelBody-1272"][];
             /** @description Type of JSON object. */
-            btType?: string;
-            errorEnum?: components["schemas"]["GBTErrorStringEnum"];
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            nodeIdToReferencedProperty?: {
+            btType: string;
+            errorEnum: components["schemas"]["GBTErrorStringEnum"];
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            nodeIdToReferencedProperty: {
                 [key: string]: components["schemas"]["BTExportModelProperties-3216"];
             };
         };
         "BTExportModelBody-1272": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description If type == COMPOSITE, indicates whether it is open or closed. */
-            closed?: boolean;
-            constituentBodyIds?: string[];
+            closed: boolean;
+            constituentBodyIds: string[];
             /** @description Indicates if there is a closed composite that consumes this body. */
-            consumedByComposite?: boolean;
-            edges?: components["schemas"]["BTExportModelEdge-1782"][];
-            faces?: components["schemas"]["BTExportModelFace-1363"][];
-            id?: string;
-            properties?: components["schemas"]["BTExportBodyProperties-3559"];
-            type?: components["schemas"]["GBTBodyType"];
-            vertices?: components["schemas"]["BTExportModelVertex-858"][];
+            consumedByComposite: boolean;
+            edges: components["schemas"]["BTExportModelEdge-1782"][];
+            faces: components["schemas"]["BTExportModelFace-1363"][];
+            id: string;
+            properties: components["schemas"]["BTExportBodyProperties-3559"];
+            type: components["schemas"]["GBTBodyType"];
+            vertices: components["schemas"]["BTExportModelVertex-858"][];
         };
         "BTExportModelCoedge-1342": {
             /** @description Type of JSON object. */
-            btType?: string;
-            edgeId?: string;
-            orientation?: boolean;
+            btType: string;
+            edgeId: string;
+            orientation: boolean;
         };
         "BTExportModelEdge-1782": {
             /** @description Type of JSON object. */
-            btType?: string;
-            curve?: components["schemas"]["BTCurveDescription-1583"];
-            geometry?: components["schemas"]["BTExportModelEdgeGeometry-1125"];
-            id?: string;
-            vertices?: string[];
+            btType: string;
+            curve: components["schemas"]["BTCurveDescription-1583"];
+            geometry: components["schemas"]["BTExportModelEdgeGeometry-1125"];
+            id: string;
+            vertices: string[];
         };
         "BTExportModelEdgeGeometry-1125": {
             /** @description Type of JSON object. */
-            btType?: string;
-            endPoint?: components["schemas"]["BTVector3d-389"];
-            endVector?: components["schemas"]["BTVector3d-389"];
+            btType: string;
+            endPoint: components["schemas"]["BTVector3d-389"];
+            endVector: components["schemas"]["BTVector3d-389"];
             /** Format: double */
-            length?: number;
-            midPoint?: components["schemas"]["BTVector3d-389"];
-            quarterPoint?: components["schemas"]["BTVector3d-389"];
-            startPoint?: components["schemas"]["BTVector3d-389"];
-            startVector?: components["schemas"]["BTVector3d-389"];
+            length: number;
+            midPoint: components["schemas"]["BTVector3d-389"];
+            quarterPoint: components["schemas"]["BTVector3d-389"];
+            startPoint: components["schemas"]["BTVector3d-389"];
+            startVector: components["schemas"]["BTVector3d-389"];
         };
         "BTExportModelFace-1363": {
             /** @description Identifies the application of the appearance. Faces that share a value were assigned an appearance together. */
-            appearancePropertyNodeId?: string;
+            appearancePropertyNodeId: string;
             /** Format: double */
-            area?: number;
-            box?: components["schemas"]["BTBoundingBox-1052"];
+            area: number;
+            box: components["schemas"]["BTBoundingBox-1052"];
             /** @description Type of JSON object. */
-            btType?: string;
-            cosmeticThreadMetadata?: components["schemas"]["BTCosmeticThreadMetadata-3248"];
-            decalIdToDecal?: {
+            btType: string;
+            cosmeticThreadMetadata: components["schemas"]["BTCosmeticThreadMetadata-3248"];
+            decalIdToDecal: {
                 [key: string]: components["schemas"]["BTDecal-2404"];
             };
-            faceProperties?: components["schemas"]["BTExportModelProperties-3216"];
-            id?: string;
-            loops?: components["schemas"]["BTExportModelLoop-1182"][];
-            orientation?: boolean;
-            surface?: components["schemas"]["BTSurfaceDescription-1564"];
+            faceProperties: components["schemas"]["BTExportModelProperties-3216"];
+            id: string;
+            loops: components["schemas"]["BTExportModelLoop-1182"][];
+            orientation: boolean;
+            surface: components["schemas"]["BTSurfaceDescription-1564"];
         };
         "BTExportModelLoop-1182": {
             /** @description Type of JSON object. */
-            btType?: string;
-            coedges?: components["schemas"]["BTExportModelCoedge-1342"][];
-            isInner?: boolean;
-            isOuter?: boolean;
+            btType: string;
+            coedges: components["schemas"]["BTExportModelCoedge-1342"][];
+            isInner: boolean;
+            isOuter: boolean;
         };
         "BTExportModelProperties-3216": {
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
             /** @description Type of JSON object. */
-            btType?: string;
-            name?: string;
+            btType: string;
+            name: string;
         };
         "BTExportModelVertex-858": {
             /** @description Type of JSON object. */
-            btType?: string;
-            id?: string;
-            point?: components["schemas"]["BTVector3d-389"];
+            btType: string;
+            id: string;
+            point: components["schemas"]["BTVector3d-389"];
         };
         BTExportRuleHardcodedPropertyInfo: {
             /** Format: int32 */
-            context?: number;
-            id?: string;
-            name?: string;
-            objectTypes?: number[];
+            context: number;
+            id: string;
+            name: string;
+            objectTypes: number[];
         };
         BTExportRuleValidOptionsInfo: {
-            conventionPlaceholder?: string;
-            hardcodedProperties?: components["schemas"]["BTExportRuleHardcodedPropertyInfo"][];
-            propertyContextDisplayMap?: {
+            conventionPlaceholder: string;
+            hardcodedProperties: components["schemas"]["BTExportRuleHardcodedPropertyInfo"][];
+            propertyContextDisplayMap: {
                 [key: string]: string;
             };
-            validObjectTypes?: number[];
+            validObjectTypes: number[];
         };
         "BTExportTessellatedBody-3398": {
             /** @description Type of JSON object. */
-            btType?: string;
-            constituents?: string[];
-            id?: string;
-            name?: string;
+            btType: string;
+            constituents: string[];
+            id: string;
+            name: string;
         };
         "BTExportTessellatedEdgesBody-890": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTExportTessellatedBody-3398"], "btType"> & {
             btType?: string;
             edges?: components["schemas"]["BTExportTessellatedEdgesEdge-1364"][];
@@ -9859,19 +9949,19 @@ export interface components {
         });
         "BTExportTessellatedEdgesEdge-1364": {
             /** @description Type of JSON object. */
-            btType?: string;
-            id?: string;
-            vertices?: components["schemas"]["BTVector3d-389"][];
+            btType: string;
+            id: string;
+            vertices: components["schemas"]["BTVector3d-389"][];
         };
         "BTExportTessellatedEdgesResponse-327": {
-            bodies?: components["schemas"]["BTExportTessellatedBody-3398"][];
+            bodies: components["schemas"]["BTExportTessellatedBody-3398"][];
             /** @description Type of JSON object. */
-            btType?: string;
-            errorEnum?: components["schemas"]["GBTErrorStringEnum"];
+            btType: string;
+            errorEnum: components["schemas"]["GBTErrorStringEnum"];
         };
         "BTExportTessellatedFacesBody-1321": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTExportTessellatedBody-3398"], "btType"> & {
             appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
             bodyType?: components["schemas"]["GBTBodyType"];
@@ -9886,38 +9976,38 @@ export interface components {
             btType: "BTExportTessellatedFacesBody-1321";
         });
         "BTExportTessellatedFacesFace-1192": {
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
-            appearanceSourceId?: string;
-            appearanceSourceName?: string;
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearanceSourceId: string;
+            appearanceSourceName: string;
             /** @description Type of JSON object. */
-            btType?: string;
-            errorMessage?: string;
-            facets?: components["schemas"]["BTExportTessellatedFacesFacet-1417"][];
-            id?: string;
+            btType: string;
+            errorMessage: string;
+            facets: components["schemas"]["BTExportTessellatedFacesFacet-1417"][];
+            id: string;
         };
         "BTExportTessellatedFacesFacet-1417": {
             /** @description Type of JSON object. */
-            btType?: string;
-            indices?: number[];
-            normal?: components["schemas"]["BTVector3d-389"];
-            normals?: components["schemas"]["BTVector3d-389"][];
-            textureCoordinates?: components["schemas"]["BTVector2d-1812"][];
-            vertices?: components["schemas"]["BTVector3d-389"][];
+            btType: string;
+            indices: number[];
+            normal: components["schemas"]["BTVector3d-389"];
+            normals: components["schemas"]["BTVector3d-389"][];
+            textureCoordinates: components["schemas"]["BTVector2d-1812"][];
+            vertices: components["schemas"]["BTVector3d-389"][];
         };
         "BTExportTessellatedFacesResponse-898": {
-            bodies?: components["schemas"]["BTExportTessellatedBody-3398"][];
-            bodiesInfo?: components["schemas"]["BTExportModelBodiesResponse-734"];
+            bodies: components["schemas"]["BTExportTessellatedBody-3398"][];
+            bodiesInfo: components["schemas"]["BTExportModelBodiesResponse-734"];
             /** @description Type of JSON object. */
-            btType?: string;
-            combineCompositePartConstituents?: boolean;
-            displayData?: components["schemas"]["BTPartStudioDisplayData-346"];
-            documentId?: string;
-            elementId?: string;
-            errorEnum?: components["schemas"]["GBTErrorStringEnum"];
-            facetPoints?: components["schemas"]["BTVector3d-389"][];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            outputFaceAppearances?: boolean;
-            outputSeparateFaceNodes?: boolean;
+            btType: string;
+            combineCompositePartConstituents: boolean;
+            displayData: components["schemas"]["BTPartStudioDisplayData-346"];
+            documentId: string;
+            elementId: string;
+            errorEnum: components["schemas"]["GBTErrorStringEnum"];
+            facetPoints: components["schemas"]["BTVector3d-389"][];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            outputFaceAppearances: boolean;
+            outputSeparateFaceNodes: boolean;
         };
         BTExternalConnectionInfo: Omit<components["schemas"]["BTGlobalTreeNodeInfo"], "jsonType"> & {
             approvedBy?: components["schemas"]["BTUserSummaryInfo"];
@@ -9938,14 +10028,14 @@ export interface components {
             jsonType: "external-connection";
         };
         BTExternalElementReferenceInfo: {
-            documentId?: string;
-            elementId?: string;
-            elementMicroversionId?: string;
-            versionId?: string;
+            documentId: string;
+            elementId: string;
+            elementMicroversionId: string;
+            versionId: string;
         };
         "BTExternalReference-1936": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTElementReference-725"], "btType"> & {
             btType?: string;
         } & {
@@ -9957,7 +10047,7 @@ export interface components {
         });
         "BTFSTable-953": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTable-1825"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableBaseCrossHighlightData-2609"];
@@ -9974,7 +10064,7 @@ export interface components {
         });
         "BTFSTableColumnInfo-623": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableColumnInfo-1222"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableBaseCrossHighlightData-2609"];
@@ -9987,7 +10077,7 @@ export interface components {
         });
         "BTFSTableRowMetadata-2262": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             btType?: string;
             callout?: string;
@@ -10038,9 +10128,9 @@ export interface components {
         };
         "BTFSValueMapEntry-2077": {
             /** @description Type of JSON object. */
-            btType?: string;
-            key?: components["schemas"]["BTFSValue-1888"];
-            value?: components["schemas"]["BTFSValue-1888"];
+            btType: string;
+            key: components["schemas"]["BTFSValue-1888"];
+            value: components["schemas"]["BTFSValue-1888"];
         };
         "BTFSValueNumber-772": {
             /** @description Type of JSON object. */
@@ -10125,61 +10215,61 @@ export interface components {
         });
         "BTFeatureApiBase-1430": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureDefinitionCall-1406": {
             /** @description Type of JSON object. */
-            btType?: string;
-            feature?: components["schemas"]["BTMFeature-134"];
+            btType: string;
+            feature: components["schemas"]["BTMFeature-134"];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureDefinitionResponse-1617": {
             /** @description Type of JSON object. */
-            btType?: string;
-            feature?: components["schemas"]["BTMFeature-134"];
-            featureState?: components["schemas"]["BTFeatureState-1688"];
+            btType: string;
+            feature: components["schemas"]["BTMFeature-134"];
+            featureState: components["schemas"]["BTFeatureState-1688"];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureEntity-34": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBaseEntityData-33"], "btType"> & {
             btType?: string;
             domainSpecificMetadata?: components["schemas"]["BTDomainSpecificMetadata-961"][];
@@ -10193,7 +10283,7 @@ export interface components {
         });
         "BTFeatureFilter-127": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             exclusion?: components["schemas"]["GBTFeatureFilterExclusion"];
@@ -10208,153 +10298,153 @@ export interface components {
         /** @description List of features instantiated within the Part Studio. */
         "BTFeatureListResponse-2457": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description List of Onshape-defined features instantiated within the Part Studio. */
-            defaultFeatures?: components["schemas"]["BTMFeature-134"][];
+            defaultFeatures: components["schemas"]["BTMFeature-134"][];
             /** @description State of each feature, indicating if the feature is valid. Incorrectly defined features will still appear in the Feature list. */
-            featureStates?: {
+            featureStates: {
                 [key: string]: components["schemas"]["BTFeatureState-1688"];
             };
             /** @description List of user-defined features instantiated within the Part Studio. */
-            features?: components["schemas"]["BTMFeature-134"][];
+            features: components["schemas"]["BTMFeature-134"][];
             /** @description Internal only. Do not modify. */
-            imports?: components["schemas"]["BTMImport-136"][];
+            imports: components["schemas"]["BTMImport-136"][];
             /** @description `true` if the features represent the entire part studio or `false` for a filtered subset. */
-            isComplete?: boolean;
+            isComplete: boolean;
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /**
              * Format: int32
              * @description Index of the rollback bar location. `-1` indicates the bar is at the end of the Feature List.
              */
-            rollbackIndex?: number;
+            rollbackIndex: number;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The document microversion from which the result was extracted. Part, face, edge, and vertex IDs are only valid for the same microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureOccurrenceData-775": {
             /** @description Type of JSON object. */
-            btType?: string;
-            visibility?: components["schemas"]["GBTBSFeatureVisibility"];
+            btType: string;
+            visibility: components["schemas"]["GBTBSFeatureVisibility"];
         };
         "BTFeatureScriptEvalCall-2377": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
-            queries?: {
+            microversionSkew: boolean;
+            queries: {
                 [key: string]: string[];
             };
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
-            script?: string;
+            rejectMicroversionSkew: boolean;
+            script: string;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureScriptEvalResponse-1859": {
             /** @description Type of JSON object. */
-            btType?: string;
-            console?: string;
+            btType: string;
+            console: string;
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
-            notices?: components["schemas"]["BTNotice-227"][];
+            microversionSkew: boolean;
+            notices: components["schemas"]["BTNotice-227"][];
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
-            result?: components["schemas"]["BTFSValue-1888"];
+            rejectMicroversionSkew: boolean;
+            result: components["schemas"]["BTFSValue-1888"];
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureSpec-129": {
             /** Format: int32 */
-            additionalLocalizedStrings?: number;
-            allParameters?: components["schemas"]["BTParameterSpec-6"][];
+            additionalLocalizedStrings: number;
+            allParameters: components["schemas"]["BTParameterSpec-6"][];
             /** @description Type of JSON object. */
-            btType?: string;
-            computedPartPropertySpec?: boolean;
-            descriptionImageUri?: string;
-            editingLogic?: components["schemas"]["BTEditingLogic-2350"];
-            featureNameTemplate?: string;
-            featureType?: string;
-            featureTypeDescription?: string;
-            featureTypeName?: string;
-            filterSelectors?: string[];
-            fullFeatureType?: string;
-            groups?: components["schemas"]["BTParameterGroupSpec-3469"][];
-            iconUri?: string;
+            btType: string;
+            computedPartPropertySpec: boolean;
+            descriptionImageUri: string;
+            editingLogic: components["schemas"]["BTEditingLogic-2350"];
+            featureNameTemplate: string;
+            featureType: string;
+            featureTypeDescription: string;
+            featureTypeName: string;
+            filterSelectors: string[];
+            fullFeatureType: string;
+            groups: components["schemas"]["BTParameterGroupSpec-3469"][];
+            iconUri: string;
             /** Format: int32 */
-            languageVersion?: number;
-            linkedLocationName?: string;
-            localizableName?: string;
-            localizedName?: string;
-            locationInfos?: components["schemas"]["BTLocationInfo-226"][];
-            manipulatorChangeFunction?: string;
-            namespace?: string;
-            namespaceIncludingEnums?: string;
-            namespaceTheSource?: boolean;
-            parameterIdToSpec?: {
+            languageVersion: number;
+            linkedLocationName: string;
+            localizableName: string;
+            localizedName: string;
+            locationInfos: components["schemas"]["BTLocationInfo-226"][];
+            manipulatorChangeFunction: string;
+            namespace: string;
+            namespaceIncludingEnums: string;
+            namespaceTheSource: boolean;
+            parameterIdToSpec: {
                 [key: string]: components["schemas"]["BTParameterSpec-6"];
             };
-            parameterLibraryDefinitionIds?: string[];
-            parameters?: components["schemas"]["BTParameterSpec-6"][];
-            signature?: string;
-            sourceLocation?: components["schemas"]["BTLocationInfo-226"];
-            sourceMicroversionId?: string;
-            stringsToLocalize?: string[];
-            tableSpec?: boolean;
-            toleranceSpec?: boolean;
-            tooltipTemplate?: string;
-            uiHints?: components["schemas"]["GBTUIHint"][];
-            variableStudioReferenceSpec?: boolean;
+            parameterLibraryDefinitionIds: string[];
+            parameters: components["schemas"]["BTParameterSpec-6"][];
+            signature: string;
+            sourceLocation: components["schemas"]["BTLocationInfo-226"];
+            sourceMicroversionId: string;
+            stringsToLocalize: string[];
+            tableSpec: boolean;
+            toleranceSpec: boolean;
+            tooltipTemplate: string;
+            uiHints: components["schemas"]["GBTUIHint"][];
+            variableStudioReferenceSpec: boolean;
         };
         "BTFeatureSpecsResponse-664": {
             /** @description Type of JSON object. */
-            btType?: string;
-            featureSpecs?: components["schemas"]["BTFeatureSpec-129"][];
+            btType: string;
+            featureSpecs: components["schemas"]["BTFeatureSpec-129"][];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         "BTFeatureState-1688": {
             /** @description Type of JSON object. */
-            btType?: string;
-            featureStatus?: components["schemas"]["GBTNodeStatusType"];
-            inactive?: boolean;
+            btType: string;
+            featureStatus: components["schemas"]["GBTNodeStatusType"];
+            inactive: boolean;
         };
         "BTFeatureStudioContents-2239": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureApiBase-1430"], "btType"> & {
             btType?: string;
             contents?: string;
@@ -10367,7 +10457,7 @@ export interface components {
         });
         "BTFeatureTypeFilter-962": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             featureType?: string;
@@ -10380,7 +10470,7 @@ export interface components {
         });
         "BTFlatSheetMetalFilter-3018": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allows?: components["schemas"]["GBTFilterFlattenedGeometryOptions"];
             btType?: string;
@@ -10408,36 +10498,36 @@ export interface components {
             jsonType: "folder";
         };
         BTFolderStateInfo: {
-            name?: string;
-            treeHref?: string;
+            name: string;
+            treeHref: string;
         };
         "BTForeignDataResponse-1070": {
             /** @description Type of JSON object. */
-            btType?: string;
-            bucketName?: string;
-            bucketPath?: string;
-            cacheChunkList?: string[];
-            dataId?: string;
-            format?: components["schemas"]["GBTDataItemFormat"];
-            name?: string;
-            region?: string;
+            btType: string;
+            bucketName: string;
+            bucketPath: string;
+            cacheChunkList: string[];
+            dataId: string;
+            format: components["schemas"]["GBTDataItemFormat"];
+            name: string;
+            region: string;
             /** Format: int32 */
-            size?: number;
-            storageType?: string;
-            useLocalStorage?: boolean;
+            size: number;
+            storageType: string;
+            useLocalStorage: boolean;
         };
         "BTFullElementId-756": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configured?: boolean;
-            elementId?: string;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfiguration?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
-            target?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            btType: string;
+            configured: boolean;
+            elementId: string;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfiguration: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            target: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
         };
         "BTFullElementIdAndPartId-643": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFullElementIdWithDocument-1729"], "btType"> & {
             btType?: string;
             partId?: string;
@@ -10450,17 +10540,17 @@ export interface components {
         });
         "BTFullElementIdWithDocument-1729": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configured?: boolean;
-            documentId?: string;
-            elementId?: string;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfiguration?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
-            target?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            btType: string;
+            configured: boolean;
+            documentId: string;
+            elementId: string;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfiguration: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            target: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
         };
         "BTGeneratedGraphicsAppearance-4159": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTGraphicsAppearance-1152"], "btType"> & {
             btType?: string;
         } & {
@@ -10472,7 +10562,7 @@ export interface components {
         });
         "BTGeometryFilter-130": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             geometryType?: components["schemas"]["GBTGeometryType"];
@@ -10485,7 +10575,7 @@ export interface components {
         });
         "BTGeometryMateDisplayData-1050": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             firstDeterministicId?: string;
@@ -10502,34 +10592,34 @@ export interface components {
         });
         "BTGetJsonPaths-1697": {
             /** @description Type of JSON object. */
-            btType?: string;
-            paths?: string[];
+            btType: string;
+            paths: string[];
         };
         "BTGetJsonPathsResponse-1544": {
             /** @description Type of JSON object. */
-            btType?: string;
-            changeId?: string;
-            results?: components["schemas"]["BTJsonMatch-2290"][][];
+            btType: string;
+            changeId: string;
+            results: components["schemas"]["BTJsonMatch-2290"][][];
         };
         "BTGetJsonResponse-2137": {
             /** @description Type of JSON object. */
-            btType?: string;
-            changeId?: string;
-            tree?: {
-                btType?: string;
+            btType: string;
+            changeId: string;
+            tree: {
+                btType: string;
             } & {
                 [key: string]: {
-                    btType?: string;
+                    btType: string;
                 };
             };
         };
         BTGlobalPermissionInfo: {
-            items?: components["schemas"]["BTGlobalPermissionInfoItem"][];
+            items: components["schemas"]["BTGlobalPermissionInfoItem"][];
         };
         BTGlobalPermissionInfoItem: {
             /** Format: int32 */
-            code?: number;
-            identities?: components["schemas"]["BTIdentityInfo"][];
+            code: number;
+            identities: components["schemas"]["BTIdentityInfo"][];
         };
         BTGlobalTreeMagicNodeInfo: Omit<components["schemas"]["BTGlobalTreeNodeInfo"], "jsonType"> & {
             /** Format: int32 */
@@ -10583,38 +10673,38 @@ export interface components {
              * Format: uri
              * @description Requested Document URL
              */
-            href?: string;
+            href: string;
             /** @description Document Items array. Array entries are the same as that returned from "/api/documents/{did}". */
-            items?: components["schemas"]["BTGlobalTreeNodeInfo"][];
+            items: components["schemas"]["BTGlobalTreeNodeInfo"][];
             /**
              * Format: uri
              * @description The URL for the next page of items. Responses are limited to 20 items per page.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description The URL for the previous page of items. Responses are limited to 20 items per page.
              */
-            previous?: string;
+            previous: string;
         };
         BTGlobalTreeNodeListResponseBTTeamInfo: {
             /**
              * Format: uri
              * @description Requested Document URL
              */
-            href?: string;
+            href: string;
             /** @description Document Items array. Array entries are the same as that returned from "/api/documents/{did}". */
-            items?: components["schemas"]["BTTeamInfo"][];
+            items: components["schemas"]["BTTeamInfo"][];
             /**
              * Format: uri
              * @description The URL for the next page of items. Responses are limited to 20 items per page.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description The URL for the previous page of items. Responses are limited to 20 items per page.
              */
-            previous?: string;
+            previous: string;
         };
         BTGlobalTreeNodeSummaryInfo: Omit<components["schemas"]["BTGlobalTreeNodeInfo"], "jsonType"> & {
             anonymousAccessAllowed?: boolean;
@@ -10622,18 +10712,13 @@ export interface components {
             canUnshare?: boolean;
             createdWithEducationPlan?: boolean;
             defaultElementId?: string;
-            defaultVersionGraphMode?: components["schemas"]["BTVersionGraphMode"];
-            defaultVersionGraphShowAutoVersions?: boolean;
-            defaultVersionGraphShowMerges?: boolean;
             defaultWorkspace?: components["schemas"]["BTWorkspaceInfo"];
             documentLabels?: components["schemas"]["BTDocumentLabelInfo"][];
             /** Format: int32 */
             documentType?: number;
-            elementLibrarySummaryInfo?: components["schemas"]["BTElementLibrarySummaryInfo"][];
             forceExportRules?: boolean;
             hasReleaseRevisionableObjects?: boolean;
             hasRelevantInsertables?: boolean;
-            isOrphaned?: boolean;
             isUsingManagedWorkflow?: boolean;
             likedByCurrentUser?: boolean;
             /** Format: int64 */
@@ -10653,10 +10738,6 @@ export interface components {
             supportTeamUserAndShared?: boolean;
             tags?: string[];
             thumbnail?: components["schemas"]["BTThumbnailInfo"];
-            /** Format: int32 */
-            totalWorkspacesScheduledForUpdate?: number;
-            /** Format: int32 */
-            totalWorkspacesUpdating?: number;
             trash?: boolean;
             /** Format: date-time */
             trashedAt?: string;
@@ -10670,54 +10751,54 @@ export interface components {
         };
         "BTGraphicsAppearance-1152": {
             /** @description Type of JSON object. */
-            btType?: string;
-            color?: string[];
-            nonTrivial?: boolean;
+            btType: string;
+            color: string[];
+            nonTrivial: boolean;
             /** Format: int32 */
-            opacity?: number;
-            reset?: boolean;
-            rgbaColor?: string[];
-            type?: components["schemas"]["GBTAppearanceType"];
-            usableAppearance?: boolean;
+            opacity: number;
+            reset: boolean;
+            rgbaColor: string[];
+            type: components["schemas"]["GBTAppearanceType"];
+            usableAppearance: boolean;
         };
         "BTGraphicsBuffer-2668": {
             /** @description Type of JSON object. */
-            btType?: string;
-            bufferData?: components["schemas"]["BTImmutableByteArray"];
-            groupTypeOffsetAndCount?: number[];
-            mapGraphicsAttributeToComponentCount?: {
+            btType: string;
+            bufferData: components["schemas"]["BTImmutableByteArray"];
+            groupTypeOffsetAndCount: number[];
+            mapGraphicsAttributeToComponentCount: {
                 [key: string]: number;
             };
-            primitiveType?: components["schemas"]["GBTGraphicsPrimitiveType"];
-            target?: components["schemas"]["GBTGraphicsBufferTarget"];
-            targetByteOffsetAndCount?: number[];
-            targets?: components["schemas"]["GBTGraphicsBufferTarget"][];
+            primitiveType: components["schemas"]["GBTGraphicsPrimitiveType"];
+            target: components["schemas"]["GBTGraphicsBufferTarget"];
+            targetByteOffsetAndCount: number[];
+            targets: components["schemas"]["GBTGraphicsBufferTarget"][];
         };
         "BTGraphicsSectionPlaneData-1429": {
             /** @description Type of JSON object. */
-            btType?: string;
-            center?: components["schemas"]["BTVector3d-389"];
-            normal?: components["schemas"]["BTVector3d-389"];
-            tangent?: components["schemas"]["BTVector3d-389"];
+            btType: string;
+            center: components["schemas"]["BTVector3d-389"];
+            normal: components["schemas"]["BTVector3d-389"];
+            tangent: components["schemas"]["BTVector3d-389"];
         };
         "BTGraphicsSectionViewStateData-4379": {
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            isExcluding?: boolean;
-            sectionPlanes?: components["schemas"]["BTGraphicsSectionPlaneData-1429"][];
-            selectionsToExclude?: components["schemas"]["BTUiSelection-1185"][];
-            selectionsToInclude?: components["schemas"]["BTUiSelection-1185"][];
+            btType: string;
+            elementId: string;
+            isExcluding: boolean;
+            sectionPlanes: components["schemas"]["BTGraphicsSectionPlaneData-1429"][];
+            selectionsToExclude: components["schemas"]["BTUiSelection-1185"][];
+            selectionsToInclude: components["schemas"]["BTUiSelection-1185"][];
         };
         /** @description List of folders or elements in this group (folder). */
         "BTGroupOrElementReference-2205": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
+            btType: string;
+            nodeId: string;
         };
         "BTHoleCalloutDisplayData-3452": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAnnotationDisplayData-3225"], "btType"> & {
             allHoleFaces?: string[];
             btType?: string;
@@ -10748,46 +10829,46 @@ export interface components {
             btType: "BTHoleCalloutDisplayData-3452";
         });
         BTIdTranslationInfo: {
-            documentId?: string;
-            elementId?: string;
-            ids?: components["schemas"]["BTIdTranslationResultInfo"][];
-            sourceDocumentMicroversion?: string;
-            targetDocumentMicroversion?: string;
+            documentId: string;
+            elementId: string;
+            ids: components["schemas"]["BTIdTranslationResultInfo"][];
+            sourceDocumentMicroversion: string;
+            targetDocumentMicroversion: string;
         };
         BTIdTranslationParams: {
-            ids?: string[];
-            linkDocumentId?: string;
-            sourceConfiguration?: string;
-            sourceDocumentMicroversion?: string;
-            targetConfiguration?: string;
+            ids: string[];
+            linkDocumentId: string;
+            sourceConfiguration: string;
+            sourceDocumentMicroversion: string;
+            targetConfiguration: string;
         };
         BTIdTranslationResultInfo: {
-            source?: string;
-            status?: string;
-            target?: string[];
+            source: string;
+            status: string;
+            target: string[];
         };
         BTIdentityInfo: {
-            company?: components["schemas"]["BTCompanySummaryInfo"];
+            company: components["schemas"]["BTCompanySummaryInfo"];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: int32 */
-            identityType?: number;
-            team?: components["schemas"]["BTTeamSummaryInfo"];
-            user?: components["schemas"]["BTUserSummaryInfo"];
+            identityType: number;
+            team: components["schemas"]["BTTeamSummaryInfo"];
+            user: components["schemas"]["BTUserSummaryInfo"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTImageFilter-853": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isImage?: boolean;
@@ -10800,30 +10881,30 @@ export interface components {
         });
         "BTImageMapping-3821": {
             /** @description Type of JSON object. */
-            btType?: string;
-            deterministicIds?: string[];
-            uvTransform?: components["schemas"]["BTMatrix3x3-340"];
+            btType: string;
+            deterministicIds: string[];
+            uvTransform: components["schemas"]["BTMatrix3x3-340"];
         };
         BTImmutableByteArray: {
-            empty?: boolean;
+            empty: boolean;
         };
         BTImmutableDoubleArray: {
-            empty?: boolean;
+            empty: boolean;
         };
         BTImmutableFloatArray: {
-            empty?: boolean;
+            empty: boolean;
         };
         BTImmutableIntArray: {
-            empty?: boolean;
+            empty: boolean;
         };
         BTImport: {
-            forExport?: boolean;
+            forExport: boolean;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
+            importMicroversion: string;
         };
         "BTInContextObjectFilter-3810": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isInContext?: boolean;
@@ -10836,40 +10917,40 @@ export interface components {
         });
         "BTIndividualTableProperties-3760": {
             /** @description Type of JSON object. */
-            btType?: string;
-            hiddenColumns?: components["schemas"]["BTStringNodeWrapper-4224"][];
-            nodeId?: string;
-            order?: components["schemas"]["BTStringNodeWrapper-4224"][];
-            tableNodeId?: string;
+            btType: string;
+            hiddenColumns: components["schemas"]["BTStringNodeWrapper-4224"][];
+            nodeId: string;
+            order: components["schemas"]["BTStringNodeWrapper-4224"][];
+            tableNodeId: string;
         };
         BTInheritedAclInfo: {
-            entries?: components["schemas"]["BTAclEntryInfo"][];
+            entries: components["schemas"]["BTAclEntryInfo"][];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            objectId?: string;
-            objectName?: string;
+            name: string;
+            objectId: string;
+            objectName: string;
             /** Format: int64 */
-            objectType?: number;
-            owner?: components["schemas"]["BTOwnerInfo"];
-            public?: boolean;
-            sharedWithSupport?: boolean;
+            objectType: number;
+            owner: components["schemas"]["BTOwnerInfo"];
+            public: boolean;
+            sharedWithSupport: boolean;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            visibility?: string;
+            viewRef: string;
+            visibility: string;
         };
         "BTInnerArrayParameterLocation-2368": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInnerParameterLocation-1715"], "btType"> & {
             btType?: string;
             /** Format: int32 */
@@ -10884,7 +10965,7 @@ export interface components {
         });
         "BTInnerDerivedParameterLocation-591": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInnerParameterLocation-1715"], "btType"> & {
             btType?: string;
             outerParameterId?: string;
@@ -10897,81 +10978,82 @@ export interface components {
         });
         "BTInnerParameterLocation-1715": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTInsertableDisplayData-2405": {
             /** @description Type of JSON object. */
-            btType?: string;
-            buffers?: components["schemas"]["BTGraphicsBuffer-2668"][];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            graphicsBuffers?: {
+            btType: string;
+            buffers: components["schemas"]["BTGraphicsBuffer-2668"][];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            graphicsBuffers: {
                 [key: string]: {
                     [key: string]: components["schemas"]["BTGraphicsBuffer-2668"];
                 };
             };
-            id?: string;
-            insertableEntityData?: components["schemas"]["BTImmutableByteArray"];
-            part?: boolean;
-            sketchFeature?: boolean;
+            id: string;
+            insertableEntityData: components["schemas"]["BTImmutableByteArray"];
+            part: boolean;
+            sketchFeature: boolean;
             /** Format: int32 */
-            tessellationSettingIndex?: number;
+            tessellationSettingIndex: number;
         };
         /** @description Array of items in the current page. */
         BTInsertableInfo: {
-            bodyType?: components["schemas"]["GBTBodyType"];
+            areFaultsIgnored: boolean;
+            bodyType: components["schemas"]["GBTBodyType"];
             /** Format: int32 */
-            classType?: number;
-            configuration?: string;
-            configurationParameterValues?: string[];
-            configurationParameters?: string[];
-            dataType?: string;
-            deterministicId?: string;
-            documentId?: string;
-            elementId?: string;
-            elementName?: string;
-            elementType?: components["schemas"]["GBTElementType"];
-            featureId?: string;
-            featureName?: string;
-            featureSpec?: string[];
-            featureType?: string;
-            fsComputedPartPropertySpec?: string[];
-            fsTableSpec?: string[];
-            hasFaults?: boolean;
+            classType: number;
+            configuration: string;
+            configurationParameterValues: string[];
+            configurationParameters: string[];
+            dataType: string;
+            deterministicId: string;
+            documentId: string;
+            elementId: string;
+            elementName: string;
+            elementType: components["schemas"]["GBTElementType"];
+            featureId: string;
+            featureName: string;
+            featureSpec: string[];
+            featureType: string;
+            fsComputedPartPropertySpec: string[];
+            fsTableSpec: string[];
+            hasFaults: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            insertableQuery?: string;
-            isFlattenedBody?: boolean;
-            isMesh?: boolean;
-            meshState?: components["schemas"]["GBTMeshState"];
-            microversionId?: string;
+            id: string;
+            insertableQuery: string;
+            isFlattenedBody: boolean;
+            isMesh: boolean;
+            meshState: components["schemas"]["GBTMeshState"];
+            microversionId: string;
             /** @description Name of the resource. */
-            name?: string;
-            parentId?: string;
-            partIdentity?: string;
-            partName?: string;
-            predictableThumbnailId?: string;
-            sourceFileExtension?: string;
-            thumbnailUri?: string;
-            unflattenedPartDeterministicId?: string;
-            variableName?: string;
-            versionId?: string;
-            versionName?: string;
+            name: string;
+            parentId: string;
+            partIdentity: string;
+            partName: string;
+            predictableThumbnailId: string;
+            sourceFileExtension: string;
+            thumbnailUri: string;
+            unflattenedPartDeterministicId: string;
+            variableName: string;
+            versionId: string;
+            versionName: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
-            workspaceName?: string;
+            viewRef: string;
+            workspaceId: string;
+            workspaceName: string;
         };
         "BTInsertablePartDisplayData-3103": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInsertableDisplayData-2405"], "btType"> & {
             btType?: string;
             partData?: components["schemas"]["BTPartData-16"];
@@ -10988,7 +11070,7 @@ export interface components {
         });
         "BTInsertableSketchDisplayData-3775": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInsertableDisplayData-2405"], "btType"> & {
             bodyDIdList?: string[];
             bodyIdToPartData?: {
@@ -11005,36 +11087,36 @@ export interface components {
             btType: "BTInsertableSketchDisplayData-3775";
         });
         BTInsertablesListResponse: {
-            canSaveVersion?: boolean;
+            canSaveVersion: boolean;
             /** Format: int32 */
-            changesSinceVersionSave?: number;
-            configuration?: {
+            changesSinceVersionSave: number;
+            configuration: {
                 [key: string]: components["schemas"]["BTFSValue-1888"];
             };
-            configurationKey?: string;
-            hasMultipleVersions?: boolean;
+            configurationKey: string;
+            hasMultipleVersions: boolean;
             /**
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTInsertableInfo"][];
+            items: components["schemas"]["BTInsertableInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
-            updatedThumbnailUri?: string;
+            previous: string;
+            updatedThumbnailUri: string;
         };
         "BTInspectionTableCrossHighlightData-4177": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCrossHighlightData-1753"], "btType"> & {
             annotationIdList?: string[];
             btType?: string;
@@ -11047,7 +11129,7 @@ export interface components {
         });
         "BTInspectionTableRowMetadata-2485": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             annotationId?: string;
             annotationType?: components["schemas"]["GBTAnnotationType"];
@@ -11074,7 +11156,7 @@ export interface components {
         });
         "BTInstance-642": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstanceBase-2263"], "btType"> & {
             btType?: string;
             configuration?: components["schemas"]["BTMParameter-1"][];
@@ -11090,6 +11172,7 @@ export interface components {
             nodeWithReferenceList?: components["schemas"]["BTNodeWithReference"][];
             parameterLibraries?: components["schemas"]["BTMParameter-1"][];
             parameters?: components["schemas"]["BTMParameter-1"][];
+            properties?: components["schemas"]["BTInstanceProperties-4828"];
             referenceParameter?: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
             versionId?: string;
             versionIdIfExternal?: string;
@@ -11102,7 +11185,7 @@ export interface components {
         });
         "BTInstanceBase-2263": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             assemblyInstance?: boolean;
             assemblyMirror?: boolean;
@@ -11148,10 +11231,11 @@ export interface components {
         });
         "BTInstanceControlNode-750": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             parentSuppressed?: boolean;
+            properties?: components["schemas"]["BTInstanceProperties-4828"];
             suppressed?: boolean;
             /** Format: int32 */
             suppressedFieldIndex?: number;
@@ -11170,7 +11254,7 @@ export interface components {
         "BTInstanceFolder-3627": {
             btType: "BTInstanceFolder-3627";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstanceBase-2263"], "btType"> & {
             btType?: string;
             featureFolder?: boolean;
@@ -11182,9 +11266,20 @@ export interface components {
             startNodeId?: string;
             startNodeIdRaw?: components["schemas"]["BTObjectId"];
         });
+        "BTInstanceProperties-4828": {
+            /** @description Type of JSON object. */
+            btType: string;
+            configurationProperties: components["schemas"]["BTOneConfigurationProperties-1900"][];
+            configuredPropertyIds: string[];
+            isInMicroversion: boolean;
+            nodeId: string;
+            propertyValues: {
+                [key: string]: string;
+            };
+        };
         "BTInstanceStandardContentData-2081": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReferenceCustomData-1551"], "btType"> & {
             btType?: string;
             parametersId?: string;
@@ -11196,66 +11291,66 @@ export interface components {
             btType: "BTInstanceStandardContentData-2081";
         });
         BTInstanceWithReference: {
-            configuration?: components["schemas"]["BTMParameter-1"][];
-            customData?: {
+            configuration: components["schemas"]["BTMParameter-1"][];
+            customData: {
                 [key: string]: components["schemas"]["BTReferenceCustomData-1551"];
             };
-            derivedAssemblyMirror?: boolean;
-            documentId?: string;
-            elementId?: string;
-            elementReference?: components["schemas"]["BTElementReference-725"];
-            externalDocumentWithVersion?: components["schemas"]["BTDocumentWithVersionId"];
-            externalDocumentWithVersionAndElementId?: components["schemas"]["BTDocumentWithVersionAndElementId"];
-            locked?: boolean;
-            lockedState?: components["schemas"]["BTInstanceWithReference"];
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            nodeId?: string;
-            nodeWithReferenceList?: components["schemas"]["BTNodeWithReference"][];
-            referenceParameter?: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
-            standardContent?: boolean;
-            standardContentParametersId?: string;
-            validRevisionReference?: boolean;
-            versionId?: string;
-            versionIdIfExternal?: string;
+            derivedAssemblyMirror: boolean;
+            documentId: string;
+            elementId: string;
+            elementReference: components["schemas"]["BTElementReference-725"];
+            externalDocumentWithVersion: components["schemas"]["BTDocumentWithVersionId"];
+            externalDocumentWithVersionAndElementId: components["schemas"]["BTDocumentWithVersionAndElementId"];
+            locked: boolean;
+            lockedState: components["schemas"]["BTInstanceWithReference"];
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            nodeId: string;
+            nodeWithReferenceList: components["schemas"]["BTNodeWithReference"][];
+            referenceParameter: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
+            standardContent: boolean;
+            standardContentParametersId: string;
+            validRevisionReference: boolean;
+            versionId: string;
+            versionIdIfExternal: string;
         };
         /** @description Information for non-geometric items. */
         BTItemInfo: {
             /** @description ID of the company, classroom, or enterprise that owns this item. */
-            companyId?: string;
+            companyId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** @description Map of the item's properties and their values. */
-            properties?: {
+            properties: {
                 [key: string]: string;
             };
             /**
              * Format: int32
              * @description `0: PENDING | 1: ACTIVE | 2: INACTIVE`
              */
-            publishState?: number;
+            publishState: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTItemParams: {
             /** @description ID of the company, classroom, or enterprise that owns this item. */
-            companyId?: string;
+            companyId: string;
             /** @description Item name. */
-            name?: string;
+            name: string;
             /**
              * Format: int32
              * @description `0: PENDING | 1: ACTIVE | 2: INACTIVE`
              */
-            publishState?: number;
+            publishState: number;
         };
         /** @description An edit that will be applied to the application element's json data. */
         "BTJEdit-3734": {
@@ -11273,7 +11368,7 @@ export interface components {
             btType: string;
             path?: components["schemas"]["BTJPath-3073"];
             value: {
-                btType?: string;
+                btType: string;
             };
         } & {
             /**
@@ -11311,7 +11406,7 @@ export interface components {
             path?: components["schemas"]["BTJPath-3073"];
             upsert?: boolean;
             value?: {
-                btType?: string;
+                btType: string;
             };
         } & {
             /**
@@ -11396,51 +11491,51 @@ export interface components {
         });
         "BTJsonMatch-2290": {
             /** @description Type of JSON object. */
-            btType?: string;
-            definiteJsonPath?: string;
-            node?: {
-                btType?: string;
+            btType: string;
+            definiteJsonPath: string;
+            node: {
+                btType: string;
             };
         };
         BTKeyMouseValuesInfo: {
-            keys?: string[];
-            mouseButtons?: string[];
+            keys: string[];
+            mouseButtons: string[];
         };
         BTLazilyParsedFeatureScript: {
-            checksum?: components["schemas"]["BTUiFeatureStudioChecksum-2438"];
+            checksum: components["schemas"]["BTUiFeatureStudioChecksum-2438"];
             /** Format: int32 */
-            languageVersion?: number;
-            lines?: components["schemas"]["Lines"];
-            model?: components["schemas"]["BTMModel-141"];
-            module?: components["schemas"]["BTPModule-234"];
-            moduleId?: components["schemas"]["BTPModuleId-235"];
-            noticeModuleIds?: components["schemas"]["BTPModuleId-235"];
+            languageVersion: number;
+            lines: components["schemas"]["Lines"];
+            model: components["schemas"]["BTMModel-141"];
+            module: components["schemas"]["BTPModule-234"];
+            moduleId: components["schemas"]["BTPModuleId-235"];
+            noticeModuleIds: components["schemas"]["BTPModuleId-235"];
             /** Format: int32 */
-            parentLanguageVersion?: number;
-            references?: {
+            parentLanguageVersion: number;
+            references: {
                 [key: string]: components["schemas"]["BTMicroversionId-366"];
             };
             /** Format: int32 */
-            sizeInKBEstimate?: number;
-            source?: string;
+            sizeInKBEstimate: number;
+            source: string;
         };
         BTLegacySearchHit: {
-            documentId?: string;
-            folderId?: string;
-            highlightedFields?: {
+            documentId: string;
+            folderId: string;
+            highlightedFields: {
                 [key: string]: string[];
             };
-            hitId?: string;
-            name?: string;
-            projectId?: string;
-            sourceMap?: {
+            hitId: string;
+            name: string;
+            projectId: string;
+            sourceMap: {
                 [key: string]: Record<string, never>;
             };
-            type?: components["schemas"]["BTSearchEntityType"];
+            type: components["schemas"]["BTSearchEntityType"];
         };
         "BTLineDescription-1559": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveDescription-1583"], "btType"> & {
             btType?: string;
         } & {
@@ -11452,7 +11547,7 @@ export interface components {
         });
         "BTLinearDimensionDisplayData-330": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             hasExtension?: boolean;
@@ -11481,10 +11576,10 @@ export interface components {
             btType: "BTLinearDimensionDisplayData-330";
         });
         BTLinkToLatestDocumentInfo: {
-            changedElements?: string[];
+            changedElements: string[];
         };
         BTLinkToLatestDocumentParams: {
-            elements?: string[];
+            elements: string[];
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTAliasEntryInfo: {
@@ -11492,19 +11587,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTAliasEntryInfo"][];
+            items: components["schemas"]["BTAliasEntryInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTAliasInfo: {
@@ -11512,19 +11607,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTAliasInfo"][];
+            items: components["schemas"]["BTAliasInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTCategoryPropertyInfo: {
@@ -11532,19 +11627,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTCategoryPropertyInfo"][];
+            items: components["schemas"]["BTCategoryPropertyInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTCommentInfo: {
@@ -11552,19 +11647,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTCommentInfo"][];
+            items: components["schemas"]["BTCommentInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTCompanyInfo: {
@@ -11572,19 +11667,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTCompanyInfo"][];
+            items: components["schemas"]["BTCompanyInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTCompanyUserInfo: {
@@ -11592,19 +11687,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTCompanyUserInfo"][];
+            items: components["schemas"]["BTCompanyUserInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTInsertableInfo: {
@@ -11612,19 +11707,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTInsertableInfo"][];
+            items: components["schemas"]["BTInsertableInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTItemInfo: {
@@ -11632,19 +11727,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTItemInfo"][];
+            items: components["schemas"]["BTItemInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTObjectWorkflowInfo: {
@@ -11652,19 +11747,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTObjectWorkflowInfo"][];
+            items: components["schemas"]["BTObjectWorkflowInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTPurchaseInfo: {
@@ -11672,19 +11767,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTPurchaseInfo"][];
+            items: components["schemas"]["BTPurchaseInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTRevisionInfo: {
@@ -11692,19 +11787,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTRevisionInfo"][];
+            items: components["schemas"]["BTRevisionInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTTeamMemberInfo: {
@@ -11712,19 +11807,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTTeamMemberInfo"][];
+            items: components["schemas"]["BTTeamMemberInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTTranslationRequestInfo: {
@@ -11732,19 +11827,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTTranslationRequestInfo"][];
+            items: components["schemas"]["BTTranslationRequestInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTWebhookInfo: {
@@ -11752,19 +11847,19 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTWebhookInfo"][];
+            items: components["schemas"]["BTWebhookInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         /** @description A list of resources that typically supports paging. */
         BTListResponseBTWorkflowObserverOptionInfo: {
@@ -11772,23 +11867,23 @@ export interface components {
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTWorkflowObserverOptionInfo"][];
+            items: components["schemas"]["BTWorkflowObserverOptionInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         "BTLoadDisplayData-837": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             componentValues?: components["schemas"]["BTVector3d-389"];
@@ -11806,35 +11901,35 @@ export interface components {
         });
         "BTLocationInfo-226": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: int32 */
-            character?: number;
+            character: number;
             /** Format: int32 */
-            column?: number;
-            document?: string;
-            elementMicroversion?: string;
+            column: number;
+            document: string;
+            elementMicroversion: string;
             /** Format: int32 */
-            endCharacter?: number;
+            endCharacter: number;
             /** Format: int32 */
-            endColumn?: number;
+            endColumn: number;
             /** Format: int32 */
-            endLine?: number;
-            fromNode?: components["schemas"]["BTPNode-7"];
-            fromTemplate?: components["schemas"]["BTLocationInfo-226"];
+            endLine: number;
+            fromNode: components["schemas"]["BTPNode-7"];
+            fromTemplate: components["schemas"]["BTLocationInfo-226"];
             /** Format: int32 */
-            languageVersion?: number;
+            languageVersion: number;
             /** Format: int32 */
-            line?: number;
-            moduleIds?: components["schemas"]["BTDocumentVersionElementIds-1897"];
-            nodeId?: string;
-            parseNodeId?: string;
-            parseNodeIdRaw?: components["schemas"]["BTObjectId"];
-            topLevel?: string;
-            version?: string;
+            line: number;
+            moduleIds: components["schemas"]["BTDocumentVersionElementIds-1897"];
+            nodeId: string;
+            parseNodeId: string;
+            parseNodeIdRaw: components["schemas"]["BTObjectId"];
+            topLevel: string;
+            version: string;
         };
         "BTLockedAtCurrentPosition-4006": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTLockedSubAssembly-4590"], "btType"> & {
             btType?: string;
         } & {
@@ -11846,7 +11941,7 @@ export interface components {
         });
         "BTLockedAtNamedPosition-3201": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTLockedSubAssembly-4590"], "btType"> & {
             btType?: string;
             namedPositionId?: string;
@@ -11859,7 +11954,7 @@ export interface components {
         });
         "BTLockedAtSubAssemblyPosition-3885": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTLockedSubAssembly-4590"], "btType"> & {
             btType?: string;
         } & {
@@ -11871,13 +11966,13 @@ export interface components {
         });
         "BTLockedSubAssembly-4590": {
             /** @description Type of JSON object. */
-            btType?: string;
-            lockType?: components["schemas"]["GBTSubAssemblyLockType"];
-            lockedSubAssemblyOutputInfo?: components["schemas"]["BTRigidOrLockedSubAssemblyOutputInfo-3860"];
+            btType: string;
+            lockType: components["schemas"]["GBTSubAssemblyLockType"];
+            lockedSubAssemblyOutputInfo: components["schemas"]["BTRigidOrLockedSubAssemblyOutputInfo-3860"];
         };
         "BTLockedSubAssemblyOutputInfo-3511": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTRigidOrLockedSubAssemblyOutputInfo-3860"], "btType"> & {
             btType?: string;
             lockInfo?: components["schemas"]["BTLockedSubAssembly-4590"];
@@ -11890,21 +11985,21 @@ export interface components {
             btType: "BTLockedSubAssemblyOutputInfo-3511";
         });
         BTLoginParams: {
-            deviceId?: string;
-            email?: string;
-            enableTotp?: boolean;
-            isRecaptchaV3?: boolean;
-            password?: string;
-            randomToken?: string;
-            recaptchaToken?: string;
-            rememberTotp?: boolean;
-            rendererPerformanceMeasurement?: components["schemas"]["BTWebRendererPerformanceMeasurementParams"];
-            totp?: string;
-            webClientCapabilities?: components["schemas"]["BTWebClientCapabilitiesParams"];
+            deviceId: string;
+            email: string;
+            enableTotp: boolean;
+            isRecaptchaV3: boolean;
+            password: string;
+            randomToken: string;
+            recaptchaToken: string;
+            rememberTotp: boolean;
+            rendererPerformanceMeasurement: components["schemas"]["BTWebRendererPerformanceMeasurementParams"];
+            totp: string;
+            webClientCapabilities: components["schemas"]["BTWebClientCapabilitiesParams"];
         };
         "BTMAnnotation-4664": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             annotationType?: components["schemas"]["GBTAnnotationType"];
             parameters?: components["schemas"]["BTMParameter-1"][];
@@ -11917,7 +12012,7 @@ export interface components {
         });
         "BTMArrayParameterItem-1843": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             parameters?: components["schemas"]["BTMParameter-1"][];
         } & {
@@ -11929,7 +12024,7 @@ export interface components {
         });
         "BTMAssemblyFeature-887": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMFeature-134"], "btType"> & {
             auxiliaryTreeFeature?: boolean;
             btType?: string;
@@ -11954,21 +12049,21 @@ export interface components {
         "BTMAssemblyFeature1-2218": {
             btType: "BTMAssemblyFeature1-2218";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMAssemblyFeature2-1022": {
             btType: "BTMAssemblyFeature2-1022";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMAssemblyFeatureFolder-2543": {
             btType: "BTMAssemblyFeatureFolder-2543";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             folderEnd?: boolean;
@@ -11977,137 +12072,137 @@ export interface components {
             startNodeIdRaw?: components["schemas"]["BTObjectId"];
         });
         "BTMAssemblyMirrorFeature-3037": {
-            arrayParameterFromFeature?: components["schemas"]["BTMParameterArray-2025"];
-            auxiliaryTreeFeature?: boolean;
+            arrayParameterFromFeature: components["schemas"]["BTMParameterArray-2025"];
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            feature?: components["schemas"]["BTMAssemblyFeature-887"];
-            featureFolder?: boolean;
+            btType: string;
+            feature: components["schemas"]["BTMAssemblyFeature-887"];
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMAssemblyPatternFeature-2241": {
-            auxiliaryTreeFeature?: boolean;
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            featureFolder?: boolean;
+            btType: string;
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
-            patternType?: components["schemas"]["GBTPatternType"];
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
+            patternType: components["schemas"]["GBTPatternType"];
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMAssemblyReplicateFeature-1351": {
-            auxiliaryTreeFeature?: boolean;
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            featureFolder?: boolean;
+            btType: string;
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMBoundaryCondition-5556": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSimulationFeature-5034"], "btType"> & {
             btType?: string;
             constraintsParameters?: components["schemas"]["BTMParameterBoolean-144"][];
@@ -12120,7 +12215,7 @@ export interface components {
         });
         "BTMConfigurationData-1560": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             configurationParameters?: components["schemas"]["BTMConfigurationParameter-819"][];
@@ -12142,7 +12237,7 @@ export interface components {
         });
         "BTMConfigurationParameter-819": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             enumOptionIds?: string[];
@@ -12163,7 +12258,7 @@ export interface components {
         "BTMConfigurationParameterBoolean-2550": {
             btType: "BTMConfigurationParameterBoolean-2550";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfigurationParameter-819"], "btType"> & {
             btType?: string;
             defaultValue?: boolean;
@@ -12171,7 +12266,7 @@ export interface components {
         "BTMConfigurationParameterEnum-105": {
             btType: "BTMConfigurationParameterEnum-105";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfigurationParameter-819"], "btType"> & {
             btType?: string;
             defaultValue?: string;
@@ -12184,7 +12279,7 @@ export interface components {
         });
         "BTMConfigurationParameterList-5548": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
         } & {
@@ -12197,7 +12292,7 @@ export interface components {
         "BTMConfigurationParameterQuantity-1826": {
             btType: "BTMConfigurationParameterQuantity-1826";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfigurationParameter-819"], "btType"> & {
             btType?: string;
             quantityType?: components["schemas"]["GBTQuantityType"];
@@ -12206,14 +12301,14 @@ export interface components {
         "BTMConfigurationParameterString-872": {
             btType: "BTMConfigurationParameterString-872";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfigurationParameter-819"], "btType"> & {
             btType?: string;
             defaultValue?: string;
         });
         "BTMConfiguredValue-1341": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             configurationValueString?: string;
@@ -12228,7 +12323,7 @@ export interface components {
         "BTMConfiguredValueByBoolean-1501": {
             btType: "BTMConfiguredValueByBoolean-1501";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfiguredValue-1341"], "btType"> & {
             booleanValue?: boolean;
             btType?: string;
@@ -12236,7 +12331,7 @@ export interface components {
         "BTMConfiguredValueByEnum-1923": {
             btType: "BTMConfiguredValueByEnum-1923";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMConfiguredValue-1341"], "btType"> & {
             btType?: string;
             enumName?: string;
@@ -12247,7 +12342,7 @@ export interface components {
         });
         "BTMDatabaseParameter-2229": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             databaseId?: string;
@@ -12259,53 +12354,53 @@ export interface components {
             btType: "BTMDatabaseParameter-2229";
         });
         "BTMDerivedAssemblyMirrorFeature-5094": {
-            arrayParameterFromFeature?: components["schemas"]["BTMParameterArray-2025"];
-            auxiliaryTreeFeature?: boolean;
+            arrayParameterFromFeature: components["schemas"]["BTMParameterArray-2025"];
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            feature?: components["schemas"]["BTMAssemblyFeature-887"];
-            featureFolder?: boolean;
+            btType: string;
+            feature: components["schemas"]["BTMAssemblyFeature-887"];
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
-            referenceParameter?: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
+            referenceParameter: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMEnumOption-592": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             option?: string;
@@ -12319,39 +12414,39 @@ export interface components {
         });
         "BTMFeature-134": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
+            nodeId: string;
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
             /** @description A list of parameter values for instantiation of the feature spec. Parameters are present for all defined parameters, even if not used in a specific instantiation. */
-            parameters?: components["schemas"]["BTMParameter-1"][];
-            parentSuppressed?: boolean;
+            parameters: components["schemas"]["BTMParameter-1"][];
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
         };
         "BTMFeatureInvalid-1031": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMFeature-134"], "btType"> & {
             btType?: string;
         } & {
@@ -12363,7 +12458,7 @@ export interface components {
         });
         "BTMFeatureQueryWithOccurrence-157": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"], "btType"> & {
             btType?: string;
             featureId?: string;
@@ -12379,7 +12474,7 @@ export interface components {
         });
         "BTMFolder-3208": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             folderId?: string;
@@ -12395,20 +12490,20 @@ export interface components {
         "BTMGenerativeDesignFeature-3195": {
             btType: "BTMGenerativeDesignFeature-3195";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMGeometryMate-1260": {
             btType: "BTMGeometryMate-1260";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMImport-136": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             elementImport?: boolean;
@@ -12427,7 +12522,7 @@ export interface components {
         });
         "BTMInContextQuery-2254": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryBase-139"], "btType"> & {
             btType?: string;
             featureId?: string;
@@ -12442,7 +12537,7 @@ export interface components {
         });
         "BTMIndividualCoEdgeQuery-1332": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQuery-138"], "btType"> & {
             btType?: string;
             edgeQuery?: components["schemas"]["BTMIndividualQuery-138"];
@@ -12456,7 +12551,7 @@ export interface components {
         });
         "BTMIndividualCreatedByQuery-137": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQuery-138"], "btType"> & {
             bodyType?: components["schemas"]["GBTBodyType"];
             btType?: string;
@@ -12472,7 +12567,7 @@ export interface components {
         });
         "BTMIndividualOccurrenceQuery-626": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"], "btType"> & {
             btType?: string;
         } & {
@@ -12484,7 +12579,7 @@ export interface components {
         });
         "BTMIndividualParametricQuery-3477": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQuery-138"], "btType"> & {
             btType?: string;
             escapedQueryVariableName?: string;
@@ -12498,23 +12593,23 @@ export interface components {
         });
         "BTMIndividualQuery-138": {
             /** @description Type of JSON object. */
-            btType?: string;
-            deterministicIdList?: components["schemas"]["BTMIndividualQueryBase-139"];
-            deterministicIds?: string[];
-            generateSectionEntityQuery?: boolean;
-            generatedSectionQueryId?: string;
+            btType: string;
+            deterministicIdList: components["schemas"]["BTMIndividualQueryBase-139"];
+            deterministicIds: string[];
+            generateSectionEntityQuery: boolean;
+            generatedSectionQueryId: string;
             /** @description Microversion that resulted from the import. */
-            importMicroversion?: string;
-            nodeId?: string;
-            persistentQuery?: components["schemas"]["BTPStatement-269"];
-            query?: components["schemas"]["BTMIndividualQueryBase-139"];
-            queryStatement?: components["schemas"]["BTPStatement-269"];
-            queryString?: string;
-            variableName?: components["schemas"]["BTMIndividualQuery-138"];
+            importMicroversion: string;
+            nodeId: string;
+            persistentQuery: components["schemas"]["BTPStatement-269"];
+            query: components["schemas"]["BTMIndividualQueryBase-139"];
+            queryStatement: components["schemas"]["BTPStatement-269"];
+            queryString: string;
+            variableName: components["schemas"]["BTMIndividualQuery-138"];
         };
         "BTMIndividualQueryBase-139": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             deterministicIdList?: components["schemas"]["BTMIndividualQueryBase-139"];
@@ -12532,7 +12627,7 @@ export interface components {
         });
         "BTMIndividualQueryWithOccurrence-811": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"], "btType"> & {
             btType?: string;
             entityQuery?: string;
@@ -12545,7 +12640,7 @@ export interface components {
         });
         "BTMIndividualQueryWithOccurrenceBase-904": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryBase-139"], "btType"> & {
             btType?: string;
             fullPathAsString?: string;
@@ -12556,7 +12651,7 @@ export interface components {
         });
         "BTMIndividualSketchRegionQuery-140": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQuery-138"], "btType"> & {
             btType?: string;
             featureId?: string;
@@ -12570,7 +12665,7 @@ export interface components {
         });
         "BTMIndividualSketchUniqueVerticesQuery-1472": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQuery-138"], "btType"> & {
             btType?: string;
             featureId?: string;
@@ -12584,7 +12679,7 @@ export interface components {
         "BTMInferenceQueryWithOccurrence-1083": {
             btType: "BTMInferenceQueryWithOccurrence-1083";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryWithOccurrence-811"], "btType"> & {
             btType?: string;
             inferenceType?: components["schemas"]["GBTEntityInferenceType"];
@@ -12593,12 +12688,12 @@ export interface components {
         });
         "BTMLoad-3538": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             definedByComponents?: boolean;
             directionFlipped?: boolean;
-            fgsBaseUnits?: string;
+            fgsUnits?: string;
             loadComponentParameterIds?: {
                 [key: string]: string;
             };
@@ -12620,7 +12715,7 @@ export interface components {
         "BTMMate-64": {
             btType: "BTMMate-64";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             mateConnectorQueryList?: components["schemas"]["BTMParameterQueryWithOccurrenceList-67"];
@@ -12629,7 +12724,7 @@ export interface components {
         "BTMMateConnector-66": {
             btType: "BTMMateConnector-66";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             implicit?: boolean;
@@ -12640,28 +12735,28 @@ export interface components {
         "BTMMateGroup-65": {
             btType: "BTMMateGroup-65";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMMateRelation-1412": {
             btType: "BTMMateRelation-1412";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
         });
         "BTMMeshPointQuery-1183": {
             btType: "BTMMeshPointQuery-1183";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"], "btType"> & {
             btType?: string;
             origin?: components["schemas"]["BTVector3d-389"];
         });
         "BTMModel-141": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             allFeatures?: components["schemas"]["BTMFeature-134"][];
             allFeaturesAndOtherReferences?: components["schemas"]["BTMFeature-134"][];
@@ -12705,14 +12800,14 @@ export interface components {
         });
         "BTMNode-19": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description Microversion that resulted from the import. */
-            importMicroversion?: string;
-            nodeId?: string;
+            importMicroversion: string;
+            nodeId: string;
         };
         "BTMNodeInvalid-1772": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
         } & {
@@ -12725,7 +12820,7 @@ export interface components {
         "BTMNonGeometricItem-1864": {
             btType: "BTMNonGeometricItem-1864";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             itemDefinitionId?: string;
@@ -12733,20 +12828,20 @@ export interface components {
         /** @description A list of parameter values for instantiation of the feature spec. Parameters are present for all defined parameters, even if not used in a specific instantiation. */
         "BTMParameter-1": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** @description Microversion that resulted from the import. */
-            importMicroversion?: string;
-            libraryRelationType?: components["schemas"]["GBTParameterLibraryRelationType"];
+            importMicroversion: string;
+            libraryRelationType: components["schemas"]["GBTParameterLibraryRelationType"];
             /** @description ID of the parameter's node. */
-            nodeId?: string;
+            nodeId: string;
             /** @description Unique ID of the parameter. */
-            parameterId?: string;
-            parameterName?: string;
-            valueString?: string;
+            parameterId: string;
+            parameterName: string;
+            valueString: string;
         };
         "BTMParameterAppearance-627": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
             btType?: string;
@@ -12759,7 +12854,7 @@ export interface components {
         });
         "BTMParameterArray-2025": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             items?: components["schemas"]["BTMArrayParameterItem-1843"][];
@@ -12772,7 +12867,7 @@ export interface components {
         });
         "BTMParameterBlobReference-1679": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             blobImport?: components["schemas"]["BTMImport-136"];
             btType?: string;
@@ -12788,7 +12883,7 @@ export interface components {
         });
         "BTMParameterBoolean-144": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             value?: boolean;
@@ -12801,7 +12896,7 @@ export interface components {
         });
         "BTMParameterButton-5169": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
         } & {
@@ -12813,12 +12908,13 @@ export interface components {
         });
         "BTMParameterConfigured-2222": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             configurationParameterId?: string;
             /** Format: int32 */
             configurationParameterIdFieldIndex?: number;
+            passThroughBoolean?: boolean;
             values?: components["schemas"]["BTMConfiguredValue-1341"][];
             /** Format: int32 */
             valuesFieldIndex?: number;
@@ -12831,7 +12927,7 @@ export interface components {
         });
         "BTMParameterDerived-864": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             /** @description Element microversion that is being imported. */
@@ -12848,7 +12944,7 @@ export interface components {
         });
         "BTMParameterEnum-145": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             enumName?: string;
@@ -12865,7 +12961,7 @@ export interface components {
         });
         "BTMParameterFeatureList-1749": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             featureIds?: string[];
@@ -12878,7 +12974,7 @@ export interface components {
         });
         "BTMParameterForeignId-146": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             foreignId?: string;
@@ -12893,7 +12989,7 @@ export interface components {
         });
         "BTMParameterIcon-460": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMReadOnlyParameter-3800"], "btType"> & {
             btType?: string;
             hasError?: boolean;
@@ -12911,7 +13007,7 @@ export interface components {
         });
         "BTMParameterInvalid-1664": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
         } & {
@@ -12923,7 +13019,7 @@ export interface components {
         });
         "BTMParameterLookupTablePath-1419": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             value?: {
@@ -12938,7 +13034,7 @@ export interface components {
         });
         "BTMParameterMaterial-1388": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             material?: components["schemas"]["BTPartMaterial-1445"];
@@ -12951,7 +13047,7 @@ export interface components {
         });
         "BTMParameterMultiEnum-3411": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             enumName?: string;
@@ -12966,7 +13062,7 @@ export interface components {
         });
         "BTMParameterNotice-4455": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMReadOnlyParameter-3800"], "btType"> & {
             btType?: string;
             level?: components["schemas"]["GBTNoticeLevel"];
@@ -12980,7 +13076,7 @@ export interface components {
         });
         "BTMParameterNullableQuantity-807": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterQuantity-147"], "btType"> & {
             btType?: string;
             isNull?: boolean;
@@ -12994,13 +13090,14 @@ export interface components {
         });
         "BTMParameterProgress-3232": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMReadOnlyParameter-3800"], "btType"> & {
             btType?: string;
             /** Format: double */
             percentDone?: number;
             status?: components["schemas"]["GBTComputeStatus"];
             statusMessage?: string;
+            statusMessages?: string[];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -13010,7 +13107,7 @@ export interface components {
         });
         "BTMParameterQuantity-147": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             expression?: string;
@@ -13027,7 +13124,7 @@ export interface components {
         });
         "BTMParameterQueryList-148": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             filter?: components["schemas"]["BTQueryFilter-183"];
@@ -13041,7 +13138,7 @@ export interface components {
         });
         "BTMParameterQueryWithOccurrenceList-67": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             occurrences?: components["schemas"]["BTOccurrence-74"][];
@@ -13055,7 +13152,7 @@ export interface components {
         });
         "BTMParameterReference-2434": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             documentId?: string;
@@ -13077,7 +13174,7 @@ export interface components {
         });
         "BTMParameterReferenceAssembly-938": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceWithConfiguration-3028"], "btType"> & {
             btType?: string;
         } & {
@@ -13089,75 +13186,75 @@ export interface components {
         });
         "BTMParameterReferenceBlob-3281": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReference-2434"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferenceCADImport-2016": {
             btType: "BTMParameterReferenceCADImport-2016";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceBlob-3281"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferenceImage-2014": {
             btType: "BTMParameterReferenceImage-2014";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceBlob-3281"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferenceJSON-790": {
             btType: "BTMParameterReferenceJSON-790";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceBlob-3281"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferencePartStudio-3302": {
-            blockBuildFunctionAccess?: boolean;
+            blockBuildFunctionAccess: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            configuration?: components["schemas"]["BTMParameter-1"][];
-            documentId?: string;
-            documentVersionId?: string;
-            elementId?: string;
-            elementLibraryData?: components["schemas"]["BTElementLibraryReferenceData-3133"];
-            featureScriptType?: string;
-            ids?: string[];
+            btType: string;
+            configuration: components["schemas"]["BTMParameter-1"][];
+            documentId: string;
+            documentVersionId: string;
+            elementId: string;
+            elementLibraryData: components["schemas"]["BTElementLibraryReferenceData-3133"];
+            featureScriptType: string;
+            ids: string[];
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            libraryRelationType?: components["schemas"]["GBTParameterLibraryRelationType"];
-            microversionId?: string;
-            namespace?: string;
+            importMicroversion: string;
+            libraryRelationType: components["schemas"]["GBTParameterLibraryRelationType"];
+            microversionId: string;
+            namespace: string;
             /** @description ID of the parameter's node. */
-            nodeId?: string;
+            nodeId: string;
             /** @description Unique ID of the parameter. */
-            parameterId?: string;
-            parameterName?: string;
-            partIdentity?: components["schemas"]["BTPSOIdentity-2741"];
-            partQuery?: components["schemas"]["BTMParameterQueryList-148"];
-            queryDataKey?: string;
-            standardContentParametersId?: string;
-            valueString?: string;
+            parameterId: string;
+            parameterName: string;
+            partIdentity: components["schemas"]["BTPSOIdentity-2741"];
+            partQuery: components["schemas"]["BTMParameterQueryList-148"];
+            queryDataKey: string;
+            standardContentParametersId: string;
+            valueString: string;
         };
         "BTMParameterReferenceTable-917": {
             btType: "BTMParameterReferenceTable-917";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceBlob-3281"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferenceText-2115": {
             btType: "BTMParameterReferenceText-2115";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceBlob-3281"], "btType"> & {
             btType?: string;
         });
         "BTMParameterReferenceVariableStudio-3550": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterReferenceWithConfiguration-3028"], "btType"> & {
             btType?: string;
         } & {
@@ -13169,29 +13266,29 @@ export interface components {
         });
         "BTMParameterReferenceWithConfiguration-3028": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configuration?: components["schemas"]["BTMParameter-1"][];
-            documentId?: string;
-            documentVersionId?: string;
-            elementId?: string;
-            elementLibraryData?: components["schemas"]["BTElementLibraryReferenceData-3133"];
-            featureScriptType?: string;
-            ids?: string[];
+            btType: string;
+            configuration: components["schemas"]["BTMParameter-1"][];
+            documentId: string;
+            documentVersionId: string;
+            elementId: string;
+            elementLibraryData: components["schemas"]["BTElementLibraryReferenceData-3133"];
+            featureScriptType: string;
+            ids: string[];
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            libraryRelationType?: components["schemas"]["GBTParameterLibraryRelationType"];
-            microversionId?: string;
-            namespace?: string;
+            importMicroversion: string;
+            libraryRelationType: components["schemas"]["GBTParameterLibraryRelationType"];
+            microversionId: string;
+            namespace: string;
             /** @description ID of the parameter's node. */
-            nodeId?: string;
+            nodeId: string;
             /** @description Unique ID of the parameter. */
-            parameterId?: string;
-            parameterName?: string;
-            valueString?: string;
+            parameterId: string;
+            parameterName: string;
+            valueString: string;
         };
         "BTMParameterString-149": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
             value?: string;
@@ -13204,7 +13301,7 @@ export interface components {
         });
         "BTMParameterStringWithTolerances-4286": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMReadOnlyParameter-3800"], "btType"> & {
             btType?: string;
             components?: components["schemas"]["BTToleranceString-3274"][];
@@ -13218,62 +13315,62 @@ export interface components {
         "BTMParameterTolerantQuantity-2579": {
             btType: "BTMParameterTolerantQuantity-2579";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameterQuantity-147"], "btType"> & {
             btType?: string;
         });
         "BTMParametricPartStudioFeature-3883": {
-            auxiliaryTreeFeature?: boolean;
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            featureFolder?: boolean;
+            btType: string;
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMPartStudioMateConnectorQuery-1324": {
             btType: "BTMPartStudioMateConnectorQuery-1324";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMFeatureQueryWithOccurrence-157"], "btType"> & {
             btType?: string;
         });
         "BTMReadOnlyParameter-3800": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMParameter-1"], "btType"> & {
             btType?: string;
         } & {
@@ -13285,7 +13382,7 @@ export interface components {
         });
         "BTMRecordMetrics-1169": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             doBodyValidation?: boolean;
@@ -13301,7 +13398,7 @@ export interface components {
         });
         "BTMRollback-150": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
         } & {
@@ -13312,50 +13409,50 @@ export interface components {
             btType: "BTMRollback-150";
         });
         "BTMSimulationFeature-5034": {
-            auxiliaryTreeFeature?: boolean;
+            auxiliaryTreeFeature: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            featureFolder?: boolean;
+            btType: string;
+            featureFolder: boolean;
             /** @description Unique ID of the feature instance within this Part Studio. */
-            featureId?: string;
+            featureId: string;
             /** Format: int32 */
-            featureListFieldIndex?: number;
+            featureListFieldIndex: number;
             /** @description The name of the feature spec that this feature instantiates. */
-            featureType?: string;
+            featureType: string;
             /** Format: int32 */
-            fieldIndexForOwnedMateConnectors?: number;
+            fieldIndexForOwnedMateConnectors: number;
             /** @description Element microversion that is being imported. */
-            importMicroversion?: string;
-            mateConnectorFeature?: boolean;
-            mateConnectors?: components["schemas"]["BTMMateConnector-66"][];
+            importMicroversion: string;
+            mateConnectorFeature: boolean;
+            mateConnectors: components["schemas"]["BTMMateConnector-66"][];
             /** @description User-visible name of the feature. */
-            name?: string;
+            name: string;
             /** @description Indicates where the feature definition lives. Features in the FeatureScript standard library have a namespace value of `""`. Custom features identify the Feature Studio that contains the definition. */
-            namespace?: string;
+            namespace: string;
             /** @description ID for the feature node. */
-            nodeId?: string;
-            occurrenceQueriesFromAllConfigurations?: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
-            parameterLibraries?: components["schemas"]["BTMParameter-1"][];
-            parametricInstanceFeature?: boolean;
-            parentSuppressed?: boolean;
+            nodeId: string;
+            occurrenceQueriesFromAllConfigurations: components["schemas"]["BTMIndividualQueryWithOccurrenceBase-904"][];
+            parameterLibraries: components["schemas"]["BTMParameter-1"][];
+            parametricInstanceFeature: boolean;
+            parentSuppressed: boolean;
             /** @description For internal use only. Should always be `false`. */
-            returnAfterSubfeatures?: boolean;
+            returnAfterSubfeatures: boolean;
             /** @description List of subfeatures belonging to the feature. */
-            subFeatures?: components["schemas"]["BTMFeature-134"][];
-            subFeaturesNotUsedInQuery?: components["schemas"]["BTMFeature-134"][];
+            subFeatures: components["schemas"]["BTMFeature-134"][];
+            subFeaturesNotUsedInQuery: components["schemas"]["BTMFeature-134"][];
             /** @description If `true`, the feature is suppressed. It will skip regeneration, denoted by a line through the name in the Feature list. */
-            suppressed?: boolean;
+            suppressed: boolean;
             /** @description `true` if the suppression is configured in the Part Studio. */
-            suppressionConfigured?: boolean;
-            suppressionState?: components["schemas"]["BTMSuppressionState-1924"];
+            suppressionConfigured: boolean;
+            suppressionState: components["schemas"]["BTMSuppressionState-1924"];
             /** @description If `true`, the feature references a Variable Studio. */
-            variableStudioReference?: boolean;
+            variableStudioReference: boolean;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         "BTMSketch-151": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMFeature-134"], "btType"> & {
             btType?: string;
             constraints?: components["schemas"]["BTMSketchConstraint-2"][];
@@ -13369,7 +13466,7 @@ export interface components {
         });
         "BTMSketchCompositeEntity-893": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchEntity-3"], "btType"> & {
             btType?: string;
             subEntities?: components["schemas"]["BTMSketchEntity-3"][];
@@ -13382,7 +13479,7 @@ export interface components {
         });
         "BTMSketchConstraint-2": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchEntity-3"], "btType"> & {
             btType?: string;
             constraintType?: components["schemas"]["GBTConstraintType"];
@@ -13408,7 +13505,7 @@ export interface components {
         });
         "BTMSketchCurve-4": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchGeomEntity-5"], "btType"> & {
             btType?: string;
             centerId?: string;
@@ -13425,7 +13522,7 @@ export interface components {
         "BTMSketchCurveSegment-155": {
             btType: "BTMSketchCurveSegment-155";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchCurve-4"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -13438,7 +13535,7 @@ export interface components {
         });
         "BTMSketchCurvedTextEntity-5708": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchGeomEntity-5"], "btType"> & {
             btType?: string;
         } & {
@@ -13450,7 +13547,7 @@ export interface components {
         });
         "BTMSketchEntity-3": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             combinedSketchEntityType?: components["schemas"]["CombinedSketchEntityType"];
@@ -13472,7 +13569,7 @@ export interface components {
         });
         "BTMSketchGeomEntity-5": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchEntity-3"], "btType"> & {
             btType?: string;
             controlBoxIds?: string[];
@@ -13486,7 +13583,7 @@ export interface components {
         "BTMSketchImageEntity-763": {
             btType: "BTMSketchImageEntity-763";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchGeomEntity-5"], "btType"> & {
             /** Format: double */
             aspectRatio?: number;
@@ -13503,14 +13600,14 @@ export interface components {
         "BTMSketchInvalid-1601": {
             btType: "BTMSketchInvalid-1601";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchEntity-3"], "btType"> & {
             btType?: string;
         });
         "BTMSketchPoint-158": {
             btType: "BTMSketchPoint-158";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchGeomEntity-5"], "btType"> & {
             btType?: string;
             isUserPoint?: boolean;
@@ -13522,7 +13619,7 @@ export interface components {
         "BTMSketchTextEntity-1761": {
             btType: "BTMSketchTextEntity-1761";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSketchGeomEntity-5"], "btType"> & {
             /** Format: double */
             ascent?: number;
@@ -13540,7 +13637,7 @@ export interface components {
         });
         "BTMSuppressionState-1924": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             suppressionConfigured?: boolean;
@@ -13554,7 +13651,7 @@ export interface components {
         "BTMSuppressionStateConfigured-2598": {
             btType: "BTMSuppressionStateConfigured-2598";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSuppressionState-1924"], "btType"> & {
             btType?: string;
             configurationParameterId?: string;
@@ -13567,7 +13664,7 @@ export interface components {
         "BTMSuppressionStateExpression-1811": {
             btType: "BTMSuppressionStateExpression-1811";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSuppressionState-1924"], "btType"> & {
             btType?: string;
             value?: components["schemas"]["BTMParameterQuantity-147"];
@@ -13575,13 +13672,13 @@ export interface components {
         "BTMSuppressionStateParentSuppressed-5404": {
             btType: "BTMSuppressionStateParentSuppressed-5404";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMSuppressionState-1924"], "btType"> & {
             btType?: string;
         });
         "BTMUnitsDefault-160": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             units?: {
@@ -13596,7 +13693,7 @@ export interface components {
         });
         "BTMUserCode-161": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             parsed?: components["schemas"]["BTPStatement-269"];
@@ -13610,7 +13707,7 @@ export interface components {
         });
         "BTMVariableStudioReference-2764": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMFeature-134"], "btType"> & {
             apiConfiguration?: components["schemas"]["BTApiConfiguration"];
             btType?: string;
@@ -13639,7 +13736,7 @@ export interface components {
         "BTMWidthMate-1011": {
             btType: "BTMWidthMate-1011";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMAssemblyFeature-887"], "btType"> & {
             btType?: string;
             mateConnectorsNotUsedInQuery?: components["schemas"]["BTMMateConnector-66"][];
@@ -13647,59 +13744,59 @@ export interface components {
             widthMateConnectorQueryList?: components["schemas"]["BTMParameterQueryWithOccurrenceList-67"];
         });
         BTMassPropertiesBulkInfo: {
-            bodies?: {
+            bodies: {
                 [key: string]: components["schemas"]["BTMassPropertiesInfo"];
             };
-            microversionId?: string;
+            microversionId: string;
         };
         /** @description Mass properties information. */
         BTMassPropertiesInfo: {
             /** @description Centroid, center of gravity, center of mass */
-            centroid?: number[];
+            centroid: number[];
             /** @description `true` if the part has mass. */
-            hasMass?: boolean;
+            hasMass: boolean;
             /** @description Mass moments of inertia */
-            inertia?: number[];
+            inertia: number[];
             /** @description Mass */
-            mass?: number[];
+            mass: number[];
             /**
              * Format: int32
              * @description Number of parts without mass.
              */
-            massMissingCount?: number;
+            massMissingCount: number;
             /** @description Surface area */
-            periphery?: number[];
+            periphery: number[];
             /** @description Vector coordinates of the principal axes. Use `BTVector3d-389` as the `btType`. */
-            principalAxes?: components["schemas"]["BTVector3d-389"][];
+            principalAxes: components["schemas"]["BTVector3d-389"][];
             /** @description Principal moments of inertia */
-            principalInertia?: number[];
+            principalInertia: number[];
             /** @description Volume */
-            volume?: number[];
+            volume: number[];
         };
         BTMateConnectorCSInfo: {
-            getxAxis?: number[];
-            getyAxis?: number[];
-            getzAxis?: number[];
-            origin?: number[];
+            getxAxis: number[];
+            getyAxis: number[];
+            getzAxis: number[];
+            origin: number[];
         };
         "BTMateConnectorDisplayData-94": {
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            entityIds?: string[];
-            hidden?: boolean;
-            implicit?: boolean;
-            isDerivedFeature?: boolean;
-            location?: components["schemas"]["BTCoordinateSystem-387"];
-            nodeId?: string;
-            occurrence?: components["schemas"]["BTOccurrence-74"];
-            ownerOccurrence?: components["schemas"]["BTOccurrence-74"];
-            partId?: string;
+            btType: string;
+            elementId: string;
+            entityIds: string[];
+            hidden: boolean;
+            implicit: boolean;
+            isDerivedFeature: boolean;
+            location: components["schemas"]["BTCoordinateSystem-387"];
+            nodeId: string;
+            occurrence: components["schemas"]["BTOccurrence-74"];
+            ownerOccurrence: components["schemas"]["BTOccurrence-74"];
+            partId: string;
         };
         "BTMateConnectorEntity-28": {
             btType: "BTMateConnectorEntity-28";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
             coordinateSystem?: components["schemas"]["BTCoordinateSystem-387"];
@@ -13707,7 +13804,7 @@ export interface components {
         });
         "BTMateConnectorFilter-163": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowImplicitMateConnector?: boolean;
             btType?: string;
@@ -13722,7 +13819,7 @@ export interface components {
         });
         "BTMateDisplayData-1358": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             mateConnectorIds?: string[];
@@ -13736,7 +13833,7 @@ export interface components {
         });
         "BTMateFilter-162": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             requireMateQueryData?: boolean;
@@ -13750,7 +13847,7 @@ export interface components {
         });
         "BTMateGroupDisplayData-1990": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             occurrenceIds?: string[];
@@ -13763,7 +13860,7 @@ export interface components {
         });
         "BTMateOccurrenceData-1671": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureOccurrenceData-775"], "btType"> & {
             btType?: string;
             valueMap?: {
@@ -13778,86 +13875,86 @@ export interface components {
             btType: "BTMateOccurrenceData-1671";
         });
         BTMaterialLibraryMetadataInfo: {
-            documentId?: string;
-            documentName?: string;
-            elementId?: string;
-            isPublic?: boolean;
-            libraryName?: string;
-            ownerName?: string;
-            versionId?: string;
-            workspaceId?: string;
+            documentId: string;
+            documentName: string;
+            elementId: string;
+            isPublic: boolean;
+            libraryName: string;
+            ownerName: string;
+            versionId: string;
+            workspaceId: string;
         };
         BTMaterialLibrarySettingsInfo: {
-            companyLibraries?: components["schemas"]["BTMaterialLibraryMetadataInfo"][];
-            libraries?: components["schemas"]["BTMaterialLibraryMetadataInfo"][];
+            companyLibraries: components["schemas"]["BTMaterialLibraryMetadataInfo"][];
+            libraries: components["schemas"]["BTMaterialLibraryMetadataInfo"][];
         };
         "BTMatrix3x3-340": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            m00?: number;
+            m00: number;
             /** Format: double */
-            m01?: number;
+            m01: number;
             /** Format: double */
-            m02?: number;
+            m02: number;
             /** Format: double */
-            m10?: number;
+            m10: number;
             /** Format: double */
-            m11?: number;
+            m11: number;
             /** Format: double */
-            m12?: number;
+            m12: number;
             /** Format: double */
-            m20?: number;
+            m20: number;
             /** Format: double */
-            m21?: number;
+            m21: number;
             /** Format: double */
-            m22?: number;
+            m22: number;
         };
         BTMergePreviewInfo: {
-            branchPointMicroversionId?: string;
-            branchPointVersionId?: string;
-            branchPointWorkspaceId?: string;
-            changes?: components["schemas"]["BTElementMergeInfo"][];
-            isBranchPointAtStart?: boolean;
-            sourceMicroversionId?: string;
-            targetMicroversionId?: string;
-            upgradeInfo?: components["schemas"]["BTMergeUpgradeInfo"];
+            branchPointMicroversionId: string;
+            branchPointVersionId: string;
+            branchPointWorkspaceId: string;
+            changes: components["schemas"]["BTElementMergeInfo"][];
+            isBranchPointAtStart: boolean;
+            sourceMicroversionId: string;
+            targetMicroversionId: string;
+            upgradeInfo: components["schemas"]["BTMergeUpgradeInfo"];
         };
         /** @enum {string} */
         BTMergeStrategy: "MERGE" | "KEEP" | "REPLACE";
         BTMergeUpgradeInfo: {
-            pendingSourceUpgrade?: components["schemas"]["BTPendingUpgradeInfo"];
-            pendingTargetUpgrade?: components["schemas"]["BTPendingUpgradeInfo"];
+            pendingSourceUpgrade: components["schemas"]["BTPendingUpgradeInfo"];
+            pendingTargetUpgrade: components["schemas"]["BTPendingUpgradeInfo"];
             /** Format: int32 */
-            recommendedVersion?: number;
-            type?: components["schemas"]["BTMergeUpgradeType"];
+            recommendedVersion: number;
+            type: components["schemas"]["BTMergeUpgradeType"];
         };
         /** @enum {string} */
         BTMergeUpgradeType: "SOURCE" | "TARGET" | "SOURCE_AND_TARGET";
         BTMetadataCategorySummaryInfo: {
             /** Format: int32 */
-            defaultObjectType?: number;
-            description?: string;
+            defaultObjectType: number;
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            objectTypes?: number[];
-            ownerId?: string;
+            name: string;
+            objectTypes: number[];
+            ownerId: string;
             /** Format: int32 */
-            ownerType?: number;
+            ownerType: number;
             /** Format: int32 */
-            publishState?: number;
+            publishState: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTMetadataElementInfo: {
             jsonType: "BTMetadataElementInfo";
@@ -13869,16 +13966,16 @@ export interface components {
             parts?: components["schemas"]["BTMetadataObjectListInfoBTMetadataPartInfo"];
         });
         BTMetadataEnumValue: {
-            label?: string;
+            label: string;
             /** Format: int32 */
-            state?: number;
-            value?: string;
+            state: number;
+            value: string;
         };
         BTMetadataEnumValueInfo: {
-            label?: string;
+            label: string;
             /** Format: int32 */
-            state?: number;
-            value?: string;
+            state: number;
+            value: string;
         };
         BTMetadataObjectInfo: {
             href?: string;
@@ -13888,16 +13985,16 @@ export interface components {
             thumbnail?: components["schemas"]["BTThumbnailInfo"];
         };
         BTMetadataObjectListInfoBTMetadataElementInfo: {
-            href?: string;
-            items?: components["schemas"]["BTMetadataElementInfo"][];
-            next?: string;
-            prev?: string;
+            href: string;
+            items: components["schemas"]["BTMetadataElementInfo"][];
+            next: string;
+            prev: string;
         };
         BTMetadataObjectListInfoBTMetadataPartInfo: {
-            href?: string;
-            items?: components["schemas"]["BTMetadataPartInfo"][];
-            next?: string;
-            prev?: string;
+            href: string;
+            items: components["schemas"]["BTMetadataPartInfo"][];
+            next: string;
+            prev: string;
         };
         /** @enum {string} */
         BTMetadataObjectType: "GLOBAL" | "DOCUMENT" | "PART" | "ASSEMBLY" | "DRAWING" | "PART_STUDIO" | "BLOB_ELEMENT" | "APP_ELEMENT" | "VERSION" | "WORKSPACE" | "PROJECT" | "ITEM" | "FEATURE_STUDIO" | "CHANGE_REQUEST" | "TASK" | "CHANGE_ORDER" | "CHANGE_TASK" | "VARIABLE_STUDIO" | "DRAWING_ANNOTATIONS" | "FOLDER";
@@ -13914,110 +14011,116 @@ export interface components {
             unflattenedPartId?: string;
         });
         BTMetadataPropertyInfo: {
-            aggregationSkippedFilteredOutValues?: boolean;
-            computedAssemblyProperty?: boolean;
-            computedProperty?: boolean;
-            computedPropertyError?: string;
-            computedPropertyEvalInfo?: string;
-            dateFormat?: string;
-            defaultValue?: Record<string, never>;
-            dirty?: boolean;
-            editable?: boolean;
-            editableInUi?: boolean;
-            enumValues?: components["schemas"]["BTMetadataEnumValueInfo"][];
-            initialValue?: Record<string, never>;
-            multivalued?: boolean;
-            name?: string;
-            propertyId?: string;
+            aggregationSkippedFilteredOutValues: boolean;
+            computedAssemblyProperty: boolean;
+            computedProperty: boolean;
+            computedPropertyError: string;
+            computedPropertyEvalInfo: string;
+            dateFormat: string;
+            defaultValue: Record<string, never>;
+            dirty: boolean;
+            editable: boolean;
+            editableInUi: boolean;
+            enumValues: components["schemas"]["BTMetadataEnumValueInfo"][];
+            initialValue: Record<string, never>;
+            multivalued: boolean;
+            name: string;
+            propertyId: string;
             /**
              * Format: int32
              * @description 0: Unknown | 1: Not computed | 2: Computed without override | 3: Computed with override | 4: Computed with subassembly overrides | 5: Overridden
              */
-            propertyOverrideStatus?: number;
+            propertyOverrideStatus: number;
             /** Format: int32 */
-            propertySource?: number;
-            publicPartOverridable?: boolean;
-            required?: boolean;
-            schemaId?: string;
-            uiHints?: components["schemas"]["BTMetadataPropertyUiHintsInfo"];
-            validator?: components["schemas"]["BTMetadataPropertyValidatorInfo"];
-            value?: Record<string, never>;
-            valueType?: string;
+            propertySource: number;
+            publicPartOverridable: boolean;
+            required: boolean;
+            schemaId: string;
+            uiHints: components["schemas"]["BTMetadataPropertyUiHintsInfo"];
+            validator: components["schemas"]["BTMetadataPropertyValidatorInfo"];
+            value: Record<string, never>;
+            valueType: string;
         };
         BTMetadataPropertyUiHintsInfo: {
-            multiline?: boolean;
+            multiline: boolean;
         };
         BTMetadataPropertyUpdateParams: {
             /** @description The id of the property that should be edited. This can be retrieved from MetadataCategory:getCategoryProperties. */
-            propertyId?: string;
+            propertyId: string;
             /** @description The new value for the property. */
-            value?: Record<string, never>;
+            value: Record<string, never>;
         };
         BTMetadataPropertyValidatorInfo: {
-            max?: number;
+            max: number;
             /** Format: int32 */
-            maxCount?: number;
+            maxCount: number;
             /** Format: date-time */
-            maxDate?: string;
+            maxDate: string;
             /** Format: int32 */
-            maxLength?: number;
-            min?: number;
+            maxLength: number;
+            min: number;
             /** Format: int32 */
-            minCount?: number;
+            minCount: number;
             /** Format: date-time */
-            minDate?: string;
+            minDate: string;
             /** Format: int32 */
-            minLength?: number;
-            pattern?: string;
+            minLength: number;
+            pattern: string;
             /** Format: int32 */
-            quantityType?: number;
+            quantityType: number;
         };
         /**
          * @description The current state metadata values if applicable.
          * @enum {string}
          */
         BTMetadataStateType: "IN_PROGRESS" | "PENDING" | "RELEASED" | "OBSOLETE" | "REJECTED" | "DISCARDED";
+        /** @description Custom metadata properties of the item. Only populated when includeProperties is true. */
+        BTMetadataValueInfo: {
+            jsonType: string;
+            propertyId?: string;
+            value?: string;
+        };
         /** @enum {string} */
         BTMetadataValueType: "STRING" | "BOOL" | "INT" | "DOUBLE" | "DATE" | "ENUM" | "OBJECT" | "BLOB" | "USER" | "LIST" | "FOREIGN" | "CATEGORY" | "COMPUTED" | "VALUE_WITH_UNITS";
         "BTMicroversionId-366": {
-            ambiguous?: boolean;
+            ambiguous: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            deleted?: boolean;
-            theId?: string;
+            btType: string;
+            deleted: boolean;
+            theId: string;
         };
         "BTMicroversionIdAndConfiguration-2338": {
             /** @description Type of JSON object. */
-            btType?: string;
-            cacheKey?: string;
-            configurationParameterIdToValue?: {
+            btType: string;
+            cacheKey: string;
+            configurationParameterIdToValue: {
                 [key: string]: components["schemas"]["BTFSValue-1888"];
             };
-            deleted?: boolean;
-            description?: string;
-            microversion?: components["schemas"]["BTMicroversionId-366"];
+            deleted: boolean;
+            description: string;
+            microversion: components["schemas"]["BTMicroversionId-366"];
         };
         "BTMicroversionIdAndConfigurationInterval-2364": {
             /** @description Type of JSON object. */
-            btType?: string;
-            from?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
-            fromToEqual?: boolean;
-            microversionIdInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
-            to?: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            btType: string;
+            from: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
+            fromToEqual: boolean;
+            microversionIdInterval: components["schemas"]["BTMicroversionIdInterval-367"];
+            to: components["schemas"]["BTMicroversionIdAndConfiguration-2338"];
         };
         "BTMicroversionIdInterval-367": {
             /** @description Type of JSON object. */
-            btType?: string;
-            from?: components["schemas"]["BTMicroversionId-366"];
-            to?: components["schemas"]["BTMicroversionId-366"];
-            trivial?: boolean;
+            btType: string;
+            from: components["schemas"]["BTMicroversionId-366"];
+            to: components["schemas"]["BTMicroversionId-366"];
+            trivial: boolean;
         };
         BTMicroversionInfo: {
-            microversion?: string;
+            microversion: string;
         };
         "BTMirrorTableRowMetaData-5463": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableAssemblyCrossHighlightData-2675"];
@@ -14031,7 +14134,7 @@ export interface components {
         });
         "BTModelAnnotations-3945": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             annotations?: components["schemas"]["BTMAnnotation-4664"][];
             btType?: string;
@@ -14044,19 +14147,19 @@ export interface components {
             btType: "BTModelAnnotations-3945";
         });
         BTModelElementParams: {
-            name?: string;
+            name: string;
         };
         BTModelFormatFullInfo: {
             /**
              * @description Content-Type for this file format.
              * @example text/csv
              */
-            contentType?: string;
+            contentType: string;
             /**
              * @description Indicates if this format could be an assembly.
              * @example true
              */
-            couldBeAssembly?: boolean;
+            couldBeAssembly: boolean;
             /**
              * @description Supported file extensions for this format.
              * @example [
@@ -14066,54 +14169,54 @@ export interface components {
              *       "xmt_bin"
              *     ]
              */
-            fileExtensions?: string[];
+            fileExtensions: string[];
             /**
              * @description Name of the format.
              * @example STEP
              */
-            name?: string;
+            name: string;
             /**
              * @description The name of the translator for the format.
              * @example step
              */
-            translatorName?: string;
+            translatorName: string;
             /**
              * @description Indicates if this format is a valid destination format for translation.
              * @example true
              */
-            validDestinationFormat?: boolean;
+            validDestinationFormat: boolean;
             /**
              * @description Indicates if this format is a valid source format for translation.
              * @example true
              */
-            validSourceFormat?: boolean;
+            validSourceFormat: boolean;
         };
         BTModelFormatInfo: {
             /**
              * @description Indicates if this format could be an assembly.
              * @example true
              */
-            couldBeAssembly?: boolean;
+            couldBeAssembly: boolean;
             /**
              * @description Name of the format.
              * @example STEP
              */
-            name?: string;
+            name: string;
             /**
              * @description The name of the translator for the format.
              * @example step
              */
-            translatorName?: string;
+            translatorName: string;
         };
         "BTModelProperties-1258": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
-            subPartProperties?: components["schemas"]["BTOnePartProperties-230"][];
+            btType: string;
+            nodeId: string;
+            subPartProperties: components["schemas"]["BTOnePartProperties-230"][];
         };
         "BTModifiableEntityOnlyFilter-1593": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             modifiableOnly?: boolean;
@@ -14125,59 +14228,59 @@ export interface components {
             btType: "BTModifiableEntityOnlyFilter-1593";
         });
         BTMoveElementInfo: {
-            elementOriginalToNewMap?: {
+            elementOriginalToNewMap: {
                 [key: string]: string;
             };
-            errorMessage?: string;
-            isNewDocument?: boolean;
-            newDocumentId?: string;
-            newDocumentName?: string;
-            newDocumentVersionId?: string;
-            newWorkspaceId?: string;
+            errorMessage: string;
+            isNewDocument: boolean;
+            newDocumentId: string;
+            newDocumentName: string;
+            newDocumentVersionId: string;
+            newWorkspaceId: string;
         };
         BTMoveElementParams: {
-            anchorElementId?: string;
-            description?: string;
-            elementOriginalToNewMap?: {
+            anchorElementId: string;
+            description: string;
+            elementOriginalToNewMap: {
                 [key: string]: string;
             };
-            elements?: string[];
-            generateUnknownMessages?: boolean;
-            importData?: string[];
-            isCopy?: boolean;
-            isDeepCopy?: boolean;
-            isGroupAnchor?: boolean;
-            isNewDocument?: boolean;
-            isPublic?: boolean;
-            isSelectivePartOut?: boolean;
-            name?: string;
-            needNewVersion?: boolean;
-            ownerEmail?: string;
-            ownerId?: string;
+            elements: string[];
+            generateUnknownMessages: boolean;
+            importData: string[];
+            isCopy: boolean;
+            isDeepCopy: boolean;
+            isGroupAnchor: boolean;
+            isNewDocument: boolean;
+            isPublic: boolean;
+            isSelectivePartOut: boolean;
+            name: string;
+            needNewVersion: boolean;
+            ownerEmail: string;
+            ownerId: string;
             /** Format: int32 */
-            ownerType?: number;
-            parentId?: string;
-            projectId?: string;
-            selectedGroupIds?: string[];
-            sourceDocumentId?: string;
-            sourceVersionId?: string;
+            ownerType: number;
+            parentId: string;
+            projectId: string;
+            selectedGroupIds: string[];
+            sourceDocumentId: string;
+            sourceVersionId: string;
             /** @description Name of version to move elements from (source). */
-            sourceVersionName?: string;
-            sourceWorkspaceId?: string;
-            tags?: string[];
-            targetDocumentId?: string;
+            sourceVersionName: string;
+            sourceWorkspaceId: string;
+            tags: string[];
+            targetDocumentId: string;
             /** @description Name of version to move elements to (target). */
-            targetVersionName?: string;
-            targetWorkspaceId?: string;
-            versionName?: string;
+            targetVersionName: string;
+            targetWorkspaceId: string;
+            versionName: string;
         };
         BTNameValuePair: {
-            name?: string;
-            value?: string;
+            name: string;
+            value: string;
         };
         "BTNamedPositionValuesColumnInfo-816": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableColumnInfo-1222"], "btType"> & {
             btType?: string;
             columnHasError?: boolean;
@@ -14194,87 +14297,87 @@ export interface components {
         });
         BTNamedViewInfo: {
             /** Format: double */
-            angle?: number;
-            cameraViewport?: number[];
-            perspective?: boolean;
-            sectionPlanes?: components["schemas"]["BTSectionPlaneInfo"][];
-            sectionViewData?: components["schemas"]["BTGraphicsSectionViewStateData-4379"];
-            viewMatrix?: number[];
+            angle: number;
+            cameraViewport: number[];
+            perspective: boolean;
+            sectionPlanes: components["schemas"]["BTSectionPlaneInfo"][];
+            sectionViewData: components["schemas"]["BTGraphicsSectionViewStateData-4379"];
+            viewMatrix: number[];
         };
         BTNamedViewsInfo: {
-            namedViews?: {
+            namedViews: {
                 [key: string]: components["schemas"]["BTNamedViewInfo"];
             };
         };
         BTNextPartNumber: {
-            categories?: components["schemas"]["Category"][];
-            configuration?: string;
-            documentId?: string;
-            elementId?: string;
+            categories: components["schemas"]["Category"][];
+            configuration: string;
+            documentId: string;
+            elementId: string;
             /** Format: int32 */
-            elementType?: number;
-            errorMessage?: string;
-            id?: string;
-            mimeType?: string;
-            partId?: string;
-            partNumber?: string;
-            prefix?: string;
+            elementType: number;
+            errorMessage: string;
+            id: string;
+            mimeType: string;
+            partId: string;
+            partNumber: string;
+            prefix: string;
             /** Format: int32 */
-            resourceType?: number;
-            versionId?: string;
-            workspaceId?: string;
+            resourceType: number;
+            versionId: string;
+            workspaceId: string;
         };
         /** @description Parameters for creating a part number. */
         BTNextPartNumberParam: {
-            categories?: components["schemas"]["BTCategoryParam"][];
+            categories: components["schemas"]["BTCategoryParam"][];
             /** @description URL-encoded string of configuration values (separated by `;`). See the [Configurations API Guide](https://onshape-public.github.io/docs/api-adv/configs/) for details. */
-            configuration?: string;
+            configuration: string;
             /** @description Document ID */
-            documentId?: string;
+            documentId: string;
             /** @description Element (tab) ID */
-            elementId?: string;
+            elementId: string;
             /**
              * Format: int32
              * @description Element Type. Must be one of: `-1`: Unknown, `0`: Part Studio, `1`: Assembly, `2`: Drawing. `4` : Blob, `8`: Variable Studio
              */
-            elementType?: number;
-            id?: string;
-            mimeType?: string;
+            elementType: number;
+            id: string;
+            mimeType: string;
             /** @description Must be one of: `8c96700620f77935a0b2cddc`: Part Studio, assembly, or drawing, `29cd738cc6a8819fe84864e0`: Non-geometric items, `10f29fc285510ebc648108e6`: Standard content */
-            numberSchemeResourceTypeId?: string;
+            numberSchemeResourceTypeId: string;
             /** @description Part ID */
-            partId?: string;
+            partId: string;
             /** @description Current part number */
-            partNumber?: string;
+            partNumber: string;
             /** @description Version ID */
-            versionId?: string;
+            versionId: string;
             /** @description Workspace ID */
-            workspaceId?: string;
+            workspaceId: string;
         };
         BTNextPartNumbersParam: {
-            itemPartNumbers?: components["schemas"]["BTNextPartNumberParam"][];
+            itemPartNumbers: components["schemas"]["BTNextPartNumberParam"][];
             /** @description Comma-separated list of part numbers to skip creating new part numbers for. */
-            skipPartNumbers?: string[];
+            skipPartNumbers: string[];
         };
         "BTNodeReference-21": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
-            nodeIdRaw?: components["schemas"]["BTObjectId"];
+            btType: string;
+            nodeId: string;
+            nodeIdRaw: components["schemas"]["BTObjectId"];
         };
         BTNodeWithReference: {
-            configuration?: components["schemas"]["BTMParameter-1"][];
-            documentId?: string;
-            elementId?: string;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            nodeId?: string;
-            referenceParameter?: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
-            validRevisionReference?: boolean;
-            versionId?: string;
+            configuration: components["schemas"]["BTMParameter-1"][];
+            documentId: string;
+            elementId: string;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            nodeId: string;
+            referenceParameter: components["schemas"]["BTMParameterReferenceWithConfiguration-3028"];
+            validRevisionReference: boolean;
+            versionId: string;
         };
         "BTNonAlignedBoundingBox-4180": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBoundingBox-1052"], "btType"> & {
             btType?: string;
             coordinateSystem?: components["schemas"]["BTCoordinateSystem-387"];
@@ -14287,7 +14390,7 @@ export interface components {
         });
         "BTNotFilter-165": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             operand?: components["schemas"]["BTQueryFilter-183"];
@@ -14300,20 +14403,20 @@ export interface components {
         });
         "BTNotice-227": {
             /** @description Type of JSON object. */
-            btType?: string;
-            expressionErrorInfo?: components["schemas"]["BTParameterExpressionErrorInfo-2037"];
-            level?: components["schemas"]["GBTNoticeLevel"];
-            locationInfos?: components["schemas"]["BTLocationInfo-226"][];
-            message?: string;
-            nodeId?: string;
-            parameterId?: string;
-            stackTrace?: components["schemas"]["BTLocationInfo-226"][];
-            tryNode?: components["schemas"]["BTNodeReference-21"];
-            type?: components["schemas"]["GBTNoticeType"];
+            btType: string;
+            expressionErrorInfo: components["schemas"]["BTParameterExpressionErrorInfo-2037"];
+            level: components["schemas"]["GBTNoticeLevel"];
+            locationInfos: components["schemas"]["BTLocationInfo-226"][];
+            message: string;
+            nodeId: string;
+            parameterId: string;
+            stackTrace: components["schemas"]["BTLocationInfo-226"][];
+            tryNode: components["schemas"]["BTNodeReference-21"];
+            type: components["schemas"]["GBTNoticeType"];
         };
         "BTNullableQuantityRange-1340": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQuantityRange-181"], "btType"> & {
             btType?: string;
             hasDefaultValue?: boolean;
@@ -14327,96 +14430,96 @@ export interface components {
             btType: "BTNullableQuantityRange-1340";
         });
         BTObjectId: {
-            empty?: boolean;
+            empty: boolean;
         };
         /** @enum {string} */
         BTObjectState: "DELETED" | "TRASH" | "ACTIVE" | "INACTIVE";
         /** @description An workflowable object like Release or Task that supports states and transitions. */
         BTObjectWorkflowInfo: {
             /** @description Whether workflowable object can be discarded. */
-            canBeDiscarded?: boolean;
+            canBeDiscarded: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Whether workflowable object has been discarded. */
-            isDiscarded?: boolean;
+            isDiscarded: boolean;
             /** @description Whether workflowable object has reached terminal state and is frozen. */
-            isFrozen?: boolean;
+            isFrozen: boolean;
             /**
              * Format: date-time
              * @description The timestamp of the last workflow action.
              */
-            lastAttemptTimestamp?: string;
+            lastAttemptTimestamp: string;
             /** @description The error message from the last failed workflow action, if any. */
-            lastEncounteredErrorMessage?: string;
-            metadataState?: components["schemas"]["BTMetadataStateType"];
+            lastEncounteredErrorMessage: string;
+            metadataState: components["schemas"]["BTMetadataStateType"];
             /** @description Name of the resource. */
-            name?: string;
-            objectType?: components["schemas"]["BTAPIWorkflowableType"];
+            name: string;
+            objectType: components["schemas"]["BTAPIWorkflowableType"];
             /** @description The current state of object like SETUP, REJECTED etc. Custom workflows can have any declared state. */
-            stateId?: string;
+            stateId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
             /** @description The workflow definition id that governs this object's states and transitions. */
-            workflowId?: string;
+            workflowId: string;
         };
         "BTOccurrence-74": {
             /** @description Type of JSON object. */
-            btType?: string;
-            fullPathAsString?: string;
-            headInstanceId?: string;
-            internalOccurrence?: boolean;
-            occurrenceWithoutHead?: components["schemas"]["BTOccurrence-74"];
-            occurrenceWithoutTail?: components["schemas"]["BTOccurrence-74"];
-            parent?: components["schemas"]["BTOccurrence-74"];
-            path?: string[];
-            rootOccurrence?: boolean;
-            tailInstanceId?: string;
+            btType: string;
+            fullPathAsString: string;
+            headInstanceId: string;
+            internalOccurrence: boolean;
+            occurrenceWithoutHead: components["schemas"]["BTOccurrence-74"];
+            occurrenceWithoutTail: components["schemas"]["BTOccurrence-74"];
+            parent: components["schemas"]["BTOccurrence-74"];
+            path: string[];
+            rootOccurrence: boolean;
+            tailInstanceId: string;
         };
         "BTOccurrenceData-75": {
             /** @description Type of JSON object. */
-            btType?: string;
-            featureData?: {
+            btType: string;
+            featureData: {
                 [key: string]: components["schemas"]["BTFeatureOccurrenceData-775"];
             };
-            forceHighestQualityTessellation?: boolean;
-            hidden?: boolean;
-            isFixed?: boolean;
-            isHidden?: boolean;
-            lockInfo?: components["schemas"]["BTLockedSubAssembly-4590"];
-            nodeId?: string;
-            occurrence?: components["schemas"]["BTOccurrence-74"];
-            occurrenceAndDeterministicNodeId?: components["schemas"]["BTOccurrenceData-75"];
-            transform?: components["schemas"]["BTBSMatrix-386"];
+            forceHighestQualityTessellation: boolean;
+            hidden: boolean;
+            isFixed: boolean;
+            isHidden: boolean;
+            lockInfo: components["schemas"]["BTLockedSubAssembly-4590"];
+            nodeId: string;
+            occurrence: components["schemas"]["BTOccurrence-74"];
+            occurrenceAndDeterministicNodeId: components["schemas"]["BTOccurrenceData-75"];
+            transform: components["schemas"]["BTBSMatrix-386"];
         };
         "BTOccurrenceDisplayData-95": {
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            forceHighestQualityTessellation?: boolean;
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            isHidden?: boolean;
-            isPatternDescendant?: boolean;
-            occurrenceData?: components["schemas"]["BTOccurrenceData-75"];
-            partIds?: string[];
-            sketchFeatureId?: string;
+            btType: string;
+            elementId: string;
+            forceHighestQualityTessellation: boolean;
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            isHidden: boolean;
+            isPatternDescendant: boolean;
+            occurrenceData: components["schemas"]["BTOccurrenceData-75"];
+            partIds: string[];
+            sketchFeatureId: string;
         };
         "BTOccurrenceEntity-5720": {
             /** @description Type of JSON object. */
-            btType?: string;
-            deterministicId?: string;
-            occurrence?: components["schemas"]["BTOccurrence-74"];
+            btType: string;
+            deterministicId: string;
+            occurrence: components["schemas"]["BTOccurrence-74"];
         };
         "BTOccurrenceFilter-166": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             excludeFlattenedParts?: boolean;
@@ -14444,7 +14547,7 @@ export interface components {
         });
         "BTOccurrenceWithFullPartIds-1464": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTOccurrence-74"], "btType"> & {
             btType?: string;
             fullElementId?: components["schemas"]["BTFullElementIdWithDocument-1729"];
@@ -14461,44 +14564,57 @@ export interface components {
         BTOldPermission: "NOACCESS" | "ANONYMOUS_ACCESS" | "READ" | "READ_COPY_EXPORT" | "COMMENT" | "WRITE" | "RESHARE" | "FULL" | "OWNER";
         "BTOneConfigurationPartProperties-1661": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configuration?: {
+            btType: string;
+            configuration: {
                 [key: string]: components["schemas"]["BTFSValue-1888"];
             };
-            merged?: components["schemas"]["BTOnePartProperties-230"];
-            nodeId?: string;
-            properties?: components["schemas"]["BTOnePartProperties-230"][];
-            propertyIds?: string[];
+            merged: components["schemas"]["BTOnePartProperties-230"];
+            nodeId: string;
+            properties: components["schemas"]["BTOnePartProperties-230"][];
+            propertyIds: string[];
+        };
+        "BTOneConfigurationProperties-1900": {
+            /** @description Type of JSON object. */
+            btType: string;
+            configuration: {
+                [key: string]: components["schemas"]["BTFSValue-1888"];
+            };
+            nodeId: string;
+            propertyIds: string[];
+            propertyValues: {
+                [key: string]: string;
+            };
         };
         "BTOnePartProperties-230": {
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
-            appearanceForNewCell?: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearanceForNewCell: components["schemas"]["BTGraphicsAppearance-1152"];
             /** @description Type of JSON object. */
-            btType?: string;
-            changedPropertiesSet?: string[];
-            customProperties?: components["schemas"]["BTPartCustomProperties-1338"];
-            material?: components["schemas"]["BTPartMaterial-1445"];
-            materialForNewCell?: components["schemas"]["BTPartMaterial-1445"];
-            name?: string;
-            nameForNewCell?: string;
-            nameIfNotNull?: components["schemas"]["BTOnePartProperties-230"];
-            nodeId?: string;
-            parsedQuery?: components["schemas"]["BTPFunctionDeclaration-246"];
-            query?: string;
-            queryListParameter?: components["schemas"]["BTMParameterQueryList-148"];
-            sheetMetalBendOrder?: string[];
-            sheetMetalBendOrderIfNotNull?: components["schemas"]["BTOnePartProperties-230"];
-            visibility?: components["schemas"]["GBTPartVisibility"];
+            btType: string;
+            changedPropertiesSet: string[];
+            customProperties: components["schemas"]["BTPartCustomProperties-1338"];
+            faultVisibility: components["schemas"]["GBTPartFaultVisibility"];
+            material: components["schemas"]["BTPartMaterial-1445"];
+            materialForNewCell: components["schemas"]["BTPartMaterial-1445"];
+            name: string;
+            nameForNewCell: string;
+            nameIfNotNull: components["schemas"]["BTOnePartProperties-230"];
+            nodeId: string;
+            parsedQuery: components["schemas"]["BTPFunctionDeclaration-246"];
+            query: string;
+            queryListParameter: components["schemas"]["BTMParameterQueryList-148"];
+            sheetMetalBendOrder: string[];
+            sheetMetalBendOrderIfNotNull: components["schemas"]["BTOnePartProperties-230"];
+            visibility: components["schemas"]["GBTPartVisibility"];
         };
         /** @description Optional map of configuration parameter id to value */
         BTOptionallyConfiguredValue: {
-            configuredValue?: components["schemas"]["BTConfiguredValue"];
+            configuredValue: components["schemas"]["BTConfiguredValue"];
             /** @description The string value, if not configured */
-            value?: string;
+            value: string;
         };
         "BTOrFilter-167": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             operand1?: components["schemas"]["BTQueryFilter-183"];
@@ -14512,13 +14628,13 @@ export interface components {
         });
         "BTOriginDisplayData-934": {
             /** @description Type of JSON object. */
-            btType?: string;
-            hidden?: boolean;
+            btType: string;
+            hidden: boolean;
         };
         "BTOriginEntity-935": {
             btType: "BTOriginEntity-935";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
         });
@@ -14538,40 +14654,40 @@ export interface components {
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            image?: string;
-            isEnterpriseOwnedResource?: boolean;
+            id: string;
+            image: string;
+            isEnterpriseOwnedResource: boolean;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            type?: number;
+            type: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTPAnnotation-231": {
-            atomic?: boolean;
+            atomic: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            documentationType?: components["schemas"]["GBTPDefinitionType"];
+            btType: string;
+            documentationType: components["schemas"]["GBTPDefinitionType"];
             /** Format: int32 */
-            endSourceLocation?: number;
-            nodeId?: string;
-            shortDescriptor?: string;
-            spaceAfter?: components["schemas"]["BTPSpace-10"];
-            spaceBefore?: components["schemas"]["BTPSpace-10"];
-            spaceDefault?: boolean;
+            endSourceLocation: number;
+            nodeId: string;
+            shortDescriptor: string;
+            spaceAfter: components["schemas"]["BTPSpace-10"];
+            spaceBefore: components["schemas"]["BTPSpace-10"];
+            spaceDefault: boolean;
             /** Format: int32 */
-            startSourceLocation?: number;
-            value?: components["schemas"]["BTPLiteralMap-256"];
+            startSourceLocation: number;
+            value: components["schemas"]["BTPLiteralMap-256"];
         };
         "BTPArgumentDeclaration-232": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             identifier?: components["schemas"]["BTPIdentifier-8"];
@@ -14588,7 +14704,7 @@ export interface components {
         });
         "BTPBuiltinIdentifier-233": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             identifier?: string;
@@ -14601,7 +14717,7 @@ export interface components {
         });
         "BTPConversionFunction-1362": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPProcedureDeclarationBase-266"], "btType"> & {
             btType?: string;
             from?: components["schemas"]["BTPLiteralNumber-258"];
@@ -14617,7 +14733,7 @@ export interface components {
         });
         "BTPExpression-9": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPPropertyAccessor-23"], "btType"> & {
             btType?: string;
         } & {
@@ -14630,7 +14746,7 @@ export interface components {
         "BTPExpressionAccess-237": {
             btType: "BTPExpressionAccess-237";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             accessor?: components["schemas"]["BTPPropertyAccessor-23"];
             base?: components["schemas"]["BTPExpression-9"];
@@ -14641,7 +14757,7 @@ export interface components {
         "BTPExpressionAs-238": {
             btType: "BTPExpressionAs-238";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             operand?: components["schemas"]["BTPExpression-9"];
@@ -14650,7 +14766,7 @@ export interface components {
         "BTPExpressionBuiltinCall-239": {
             btType: "BTPExpressionBuiltinCall-239";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             arguments?: components["schemas"]["BTPExpression-9"][];
             btType?: string;
@@ -14660,7 +14776,7 @@ export interface components {
         "BTPExpressionCall-240": {
             btType: "BTPExpressionCall-240";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             functionExpression?: components["schemas"]["BTPExpression-9"];
@@ -14672,7 +14788,7 @@ export interface components {
         "BTPExpressionFunction-1325": {
             btType: "BTPExpressionFunction-1325";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             arguments?: components["schemas"]["BTPArgumentDeclaration-232"][];
             body?: components["schemas"]["BTPStatementBlock-271"];
@@ -14689,7 +14805,7 @@ export interface components {
         "BTPExpressionGroup-241": {
             btType: "BTPExpressionGroup-241";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             content?: components["schemas"]["BTPExpression-9"];
@@ -14697,7 +14813,7 @@ export interface components {
         "BTPExpressionIs-242": {
             btType: "BTPExpressionIs-242";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             operand?: components["schemas"]["BTPExpression-9"];
@@ -14706,7 +14822,7 @@ export interface components {
         "BTPExpressionNew-243": {
             btType: "BTPExpressionNew-243";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             spaceAfterBox?: components["schemas"]["BTPSpace-10"];
@@ -14716,7 +14832,7 @@ export interface components {
         "BTPExpressionOperator-244": {
             btType: "BTPExpressionOperator-244";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             forExport?: boolean;
@@ -14736,7 +14852,7 @@ export interface components {
         "BTPExpressionSwitch-2632": {
             btType: "BTPExpressionSwitch-2632";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             choices?: components["schemas"]["BTPLiteralMap-256"];
@@ -14746,7 +14862,7 @@ export interface components {
         "BTPExpressionTry-1271": {
             btType: "BTPExpressionTry-1271";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             expression?: components["schemas"]["BTPExpression-9"];
@@ -14757,43 +14873,43 @@ export interface components {
         "BTPExpressionVarReference-245": {
             btType: "BTPExpressionVarReference-245";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
             name?: components["schemas"]["BTPName-261"];
         });
         "BTPFunctionDeclaration-246": {
-            annotation?: components["schemas"]["BTPAnnotation-231"];
-            arguments?: components["schemas"]["BTPArgumentDeclaration-232"][];
-            argumentsToDocument?: components["schemas"]["BTPArgumentDeclaration-232"][];
-            atomic?: boolean;
-            body?: components["schemas"]["BTPStatementBlock-271"];
+            annotation: components["schemas"]["BTPAnnotation-231"];
+            arguments: components["schemas"]["BTPArgumentDeclaration-232"][];
+            argumentsToDocument: components["schemas"]["BTPArgumentDeclaration-232"][];
+            atomic: boolean;
+            body: components["schemas"]["BTPStatementBlock-271"];
             /** @description Type of JSON object. */
-            btType?: string;
-            deprecated?: boolean;
-            deprecatedExplanation?: string;
-            documentationType?: components["schemas"]["GBTPDefinitionType"];
+            btType: string;
+            deprecated: boolean;
+            deprecatedExplanation: string;
+            documentationType: components["schemas"]["GBTPDefinitionType"];
             /** Format: int32 */
-            endSourceLocation?: number;
-            forExport?: boolean;
-            name?: components["schemas"]["BTPIdentifier-8"];
-            nodeId?: string;
-            precondition?: components["schemas"]["BTPStatement-269"];
-            returnType?: components["schemas"]["BTPTypeName-290"];
-            shortDescriptor?: string;
-            spaceAfter?: components["schemas"]["BTPSpace-10"];
-            spaceAfterArglist?: components["schemas"]["BTPSpace-10"];
-            spaceAfterExport?: components["schemas"]["BTPSpace-10"];
-            spaceBefore?: components["schemas"]["BTPSpace-10"];
-            spaceDefault?: boolean;
-            spaceInEmptyList?: components["schemas"]["BTPSpace-10"];
+            endSourceLocation: number;
+            forExport: boolean;
+            name: components["schemas"]["BTPIdentifier-8"];
+            nodeId: string;
+            precondition: components["schemas"]["BTPStatement-269"];
+            returnType: components["schemas"]["BTPTypeName-290"];
+            shortDescriptor: string;
+            spaceAfter: components["schemas"]["BTPSpace-10"];
+            spaceAfterArglist: components["schemas"]["BTPSpace-10"];
+            spaceAfterExport: components["schemas"]["BTPSpace-10"];
+            spaceBefore: components["schemas"]["BTPSpace-10"];
+            spaceDefault: boolean;
+            spaceInEmptyList: components["schemas"]["BTPSpace-10"];
             /** Format: int32 */
-            startSourceLocation?: number;
-            symbolName?: components["schemas"]["BTPIdentifier-8"];
+            startSourceLocation: number;
+            symbolName: components["schemas"]["BTPIdentifier-8"];
         };
         "BTPFunctionOrPredicateDeclaration-247": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPProcedureDeclarationBase-266"], "btType"> & {
             btType?: string;
             name?: components["schemas"]["BTPIdentifier-8"];
@@ -14806,7 +14922,7 @@ export interface components {
         });
         "BTPIdentifier-8": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPPropertyAccessor-23"], "btType"> & {
             btType?: string;
             identifier?: string;
@@ -14820,26 +14936,26 @@ export interface components {
         });
         /** @description Webhook notification payload for all PLM related notifications. */
         BTPLMMessageBody: {
-            appElementSessionId?: string;
-            data?: string;
+            appElementSessionId: string;
+            data: string;
             /** @description Background PLM job's document ID. */
-            documentId?: string;
-            event?: string;
+            documentId: string;
+            event: string;
             /** @description ID of the background PLM job that was created. */
-            jobId?: string;
-            jobType?: components["schemas"]["JobType"];
-            messageId?: string;
+            jobId: string;
+            jobType: components["schemas"]["JobType"];
+            messageId: string;
             /** @description Whether PLM integration was disabled. */
-            settingsDisabled?: boolean;
+            settingsDisabled: boolean;
             /** @description Whether PLM integration settings parameters were modified. */
-            settingsModified?: boolean;
+            settingsModified: boolean;
             /** Format: date-time */
-            timestamp?: string;
-            webhookId?: string;
+            timestamp: string;
+            webhookId: string;
         };
         "BTPLValue-249": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
         } & {
@@ -14852,7 +14968,7 @@ export interface components {
         "BTPLValueAccess-250": {
             btType: "BTPLValueAccess-250";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLValue-249"], "btType"> & {
             accessor?: components["schemas"]["BTPPropertyAccessor-23"];
             base?: components["schemas"]["BTPLValue-249"];
@@ -14861,7 +14977,7 @@ export interface components {
         "BTPLValueBoxDereference-251": {
             btType: "BTPLValueBoxDereference-251";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLValue-249"], "btType"> & {
             box?: components["schemas"]["BTPExpression-9"];
             btType?: string;
@@ -14870,21 +14986,21 @@ export interface components {
         "BTPLValueVarReference-252": {
             btType: "BTPLValueVarReference-252";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLValue-249"], "btType"> & {
             btType?: string;
             name?: components["schemas"]["BTPIdentifier-8"];
         });
         "BTPLiteral-253": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPExpression-9"], "btType"> & {
             btType?: string;
         });
         "BTPLiteralArray-254": {
             btType: "BTPLiteralArray-254";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLiteral-253"], "btType"> & {
             btType?: string;
             spaceInEmptyList?: components["schemas"]["BTPSpace-10"];
@@ -14893,32 +15009,32 @@ export interface components {
         "BTPLiteralBoolean-255": {
             btType: "BTPLiteralBoolean-255";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLiteral-253"], "btType"> & {
             btType?: string;
             value?: boolean;
         });
         "BTPLiteralMap-256": {
-            atomic?: boolean;
+            atomic: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            documentationType?: components["schemas"]["GBTPDefinitionType"];
+            btType: string;
+            documentationType: components["schemas"]["GBTPDefinitionType"];
             /** Format: int32 */
-            endSourceLocation?: number;
-            entries?: components["schemas"]["BTPLiteralMapEntry-257"][];
-            nodeId?: string;
-            shortDescriptor?: string;
-            spaceAfter?: components["schemas"]["BTPSpace-10"];
-            spaceBefore?: components["schemas"]["BTPSpace-10"];
-            spaceDefault?: boolean;
-            spaceInEmptyList?: components["schemas"]["BTPSpace-10"];
+            endSourceLocation: number;
+            entries: components["schemas"]["BTPLiteralMapEntry-257"][];
+            nodeId: string;
+            shortDescriptor: string;
+            spaceAfter: components["schemas"]["BTPSpace-10"];
+            spaceBefore: components["schemas"]["BTPSpace-10"];
+            spaceDefault: boolean;
+            spaceInEmptyList: components["schemas"]["BTPSpace-10"];
             /** Format: int32 */
-            startSourceLocation?: number;
-            trailingComma?: boolean;
+            startSourceLocation: number;
+            trailingComma: boolean;
         };
         "BTPLiteralMapEntry-257": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             key?: components["schemas"]["BTPPropertyAccessor-23"];
@@ -14931,28 +15047,28 @@ export interface components {
             btType: "BTPLiteralMapEntry-257";
         });
         "BTPLiteralNumber-258": {
-            atomic?: boolean;
+            atomic: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            documentationType?: components["schemas"]["GBTPDefinitionType"];
+            btType: string;
+            documentationType: components["schemas"]["GBTPDefinitionType"];
             /** Format: int32 */
-            endSourceLocation?: number;
-            integer?: boolean;
-            nodeId?: string;
-            shortDescriptor?: string;
-            spaceAfter?: components["schemas"]["BTPSpace-10"];
-            spaceBefore?: components["schemas"]["BTPSpace-10"];
-            spaceDefault?: boolean;
+            endSourceLocation: number;
+            integer: boolean;
+            nodeId: string;
+            shortDescriptor: string;
+            spaceAfter: components["schemas"]["BTPSpace-10"];
+            spaceBefore: components["schemas"]["BTPSpace-10"];
+            spaceDefault: boolean;
             /** Format: int32 */
-            startSourceLocation?: number;
-            text?: string;
+            startSourceLocation: number;
+            text: string;
             /** Format: double */
-            value?: number;
+            value: number;
         };
         "BTPLiteralString-259": {
             btType: "BTPLiteralString-259";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLiteral-253"], "btType"> & {
             btType?: string;
             text?: string;
@@ -14961,13 +15077,13 @@ export interface components {
         "BTPLiteralUndefined-260": {
             btType: "BTPLiteralUndefined-260";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPLiteral-253"], "btType"> & {
             btType?: string;
         });
         "BTPModule-234": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             deepImports?: {
@@ -14995,7 +15111,7 @@ export interface components {
         });
         "BTPModuleId-235": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             dbimportString?: string;
@@ -15034,7 +15150,7 @@ export interface components {
         });
         "BTPName-261": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
             forExport?: boolean;
@@ -15051,23 +15167,23 @@ export interface components {
             btType: "BTPName-261";
         });
         "BTPNode-7": {
-            atomic?: boolean;
+            atomic: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            documentationType?: components["schemas"]["GBTPDefinitionType"];
+            btType: string;
+            documentationType: components["schemas"]["GBTPDefinitionType"];
             /** Format: int32 */
-            endSourceLocation?: number;
-            nodeId?: string;
-            shortDescriptor?: string;
-            spaceAfter?: components["schemas"]["BTPSpace-10"];
-            spaceBefore?: components["schemas"]["BTPSpace-10"];
-            spaceDefault?: boolean;
+            endSourceLocation: number;
+            nodeId: string;
+            shortDescriptor: string;
+            spaceAfter: components["schemas"]["BTPSpace-10"];
+            spaceBefore: components["schemas"]["BTPSpace-10"];
+            spaceDefault: boolean;
             /** Format: int32 */
-            startSourceLocation?: number;
+            startSourceLocation: number;
         };
         "BTPOperatorDeclaration-264": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPProcedureDeclarationBase-266"], "btType"> & {
             btType?: string;
             operator?: components["schemas"]["GBTPOperator"];
@@ -15083,13 +15199,13 @@ export interface components {
         "BTPPredicateDeclaration-265": {
             btType: "BTPPredicateDeclaration-265";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPFunctionOrPredicateDeclaration-247"], "btType"> & {
             btType?: string;
         });
         "BTPProcedureDeclarationBase-266": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelNode-286"], "btType"> & {
             arguments?: components["schemas"]["BTPArgumentDeclaration-232"][];
             body?: components["schemas"]["BTPStatementBlock-271"];
@@ -15107,7 +15223,7 @@ export interface components {
         });
         "BTPPropertyAccessor-23": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
         } & {
@@ -15119,19 +15235,19 @@ export interface components {
         });
         "BTPSOIdentity-2741": {
             /** @description Type of JSON object. */
-            btType?: string;
-            theId?: string;
+            btType: string;
+            theId: string;
         };
         "BTPSpace-10": {
             /** @description Type of JSON object. */
-            btType?: string;
-            lines?: string[];
-            nodeId?: string;
-            text?: string;
+            btType: string;
+            lines: string[];
+            nodeId: string;
+            text: string;
         };
         "BTPStatement-269": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             annotation?: components["schemas"]["BTPAnnotation-231"];
             btType?: string;
@@ -15145,7 +15261,7 @@ export interface components {
         "BTPStatementAssignment-270": {
             btType: "BTPStatementAssignment-270";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             lvalue?: components["schemas"]["BTPLValue-249"];
@@ -15155,7 +15271,7 @@ export interface components {
         "BTPStatementBlock-271": {
             btType: "BTPStatementBlock-271";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             spaceAfterOpen?: components["schemas"]["BTPSpace-10"];
@@ -15163,7 +15279,7 @@ export interface components {
         "BTPStatementBreak-272": {
             btType: "BTPStatementBreak-272";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             spaceAfterBreak?: components["schemas"]["BTPSpace-10"];
@@ -15171,7 +15287,7 @@ export interface components {
         "BTPStatementCompressedQuery-1237": {
             btType: "BTPStatementCompressedQuery-1237";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             query?: string;
@@ -15179,7 +15295,7 @@ export interface components {
         "BTPStatementConstantDeclaration-273": {
             btType: "BTPStatementConstantDeclaration-273";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             identifier?: components["schemas"]["BTPIdentifier-8"];
@@ -15192,7 +15308,7 @@ export interface components {
         "BTPStatementContinue-274": {
             btType: "BTPStatementContinue-274";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             spaceAfterContinue?: components["schemas"]["BTPSpace-10"];
@@ -15200,7 +15316,7 @@ export interface components {
         "BTPStatementExpression-275": {
             btType: "BTPStatementExpression-275";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             expression?: components["schemas"]["BTPExpression-9"];
@@ -15208,7 +15324,7 @@ export interface components {
         "BTPStatementIf-276": {
             btType: "BTPStatementIf-276";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             condition?: components["schemas"]["BTPExpression-9"];
@@ -15218,7 +15334,7 @@ export interface components {
         });
         "BTPStatementLoop-277": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             body?: components["schemas"]["BTPStatement-269"];
             btType?: string;
@@ -15227,7 +15343,7 @@ export interface components {
         "BTPStatementLoopFor3-278": {
             btType: "BTPStatementLoopFor3-278";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatementLoop-277"], "btType"> & {
             btType?: string;
             condition?: components["schemas"]["BTPExpression-9"];
@@ -15240,7 +15356,7 @@ export interface components {
         "BTPStatementLoopForIn-279": {
             btType: "BTPStatementLoopForIn-279";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatementLoop-277"], "btType"> & {
             btType?: string;
             container?: components["schemas"]["BTPExpression-9"];
@@ -15255,7 +15371,7 @@ export interface components {
         "BTPStatementLoopWhile-280": {
             btType: "BTPStatementLoopWhile-280";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatementLoop-277"], "btType"> & {
             btType?: string;
             condition?: components["schemas"]["BTPExpression-9"];
@@ -15263,7 +15379,7 @@ export interface components {
         "BTPStatementReturn-281": {
             btType: "BTPStatementReturn-281";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             spaceAfterReturn?: components["schemas"]["BTPSpace-10"];
@@ -15272,7 +15388,7 @@ export interface components {
         "BTPStatementThrow-1080": {
             btType: "BTPStatementThrow-1080";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             value?: components["schemas"]["BTPExpression-9"];
@@ -15280,7 +15396,7 @@ export interface components {
         "BTPStatementTry-1523": {
             btType: "BTPStatementTry-1523";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             body?: components["schemas"]["BTPStatementBlock-271"];
             btType?: string;
@@ -15296,7 +15412,7 @@ export interface components {
         "BTPStatementVarDeclaration-282": {
             btType: "BTPStatementVarDeclaration-282";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPStatement-269"], "btType"> & {
             btType?: string;
             identifier?: components["schemas"]["BTPIdentifier-8"];
@@ -15308,7 +15424,7 @@ export interface components {
         });
         "BTPTopLevelConstantDeclaration-283": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelNode-286"], "btType"> & {
             btType?: string;
             declaration?: components["schemas"]["BTPStatementConstantDeclaration-273"];
@@ -15321,7 +15437,7 @@ export interface components {
         });
         "BTPTopLevelEnumDeclaration-284": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelTypeDeclaration-287"], "btType"> & {
             annotations?: components["schemas"]["BTPAnnotation-231"][];
             btType?: string;
@@ -15337,7 +15453,7 @@ export interface components {
         });
         "BTPTopLevelImport-285": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelNode-286"], "btType"> & {
             btType?: string;
             combinedNamespacePathAndVersion?: string;
@@ -15356,7 +15472,7 @@ export interface components {
         });
         "BTPTopLevelNode-286": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             annotation?: components["schemas"]["BTPAnnotation-231"];
             argumentsToDocument?: components["schemas"]["BTPArgumentDeclaration-232"][];
@@ -15375,7 +15491,7 @@ export interface components {
         });
         "BTPTopLevelTypeDeclaration-287": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelNode-286"], "btType"> & {
             btType?: string;
             name?: components["schemas"]["BTPIdentifier-8"];
@@ -15385,14 +15501,14 @@ export interface components {
         "BTPTopLevelUserTypeDeclaration-288": {
             btType: "BTPTopLevelUserTypeDeclaration-288";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTopLevelTypeDeclaration-287"], "btType"> & {
             btType?: string;
             typecheck?: components["schemas"]["BTPName-261"];
         });
         "BTPTypeName-290": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPNode-7"], "btType"> & {
             btType?: string;
         } & {
@@ -15405,7 +15521,7 @@ export interface components {
         "BTPTypeNameStandard-291": {
             btType: "BTPTypeNameStandard-291";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTypeName-290"], "btType"> & {
             btType?: string;
             type?: components["schemas"]["GBTPType"];
@@ -15413,81 +15529,81 @@ export interface components {
         "BTPTypeNameUser-292": {
             btType: "BTPTypeNameUser-292";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPTypeName-290"], "btType"> & {
             btType?: string;
             type?: components["schemas"]["BTPName-261"];
         });
         "BTParameterExpressionErrorInfo-2037": {
             /** @description Type of JSON object. */
-            btType?: string;
-            errorMessageIdentifier?: components["schemas"]["GBTErrorStringEnum"];
-            messageArguments?: components["schemas"]["BTValueAndUse-4696"][];
+            btType: string;
+            errorMessageIdentifier: components["schemas"]["GBTErrorStringEnum"];
+            messageArguments: components["schemas"]["BTValueAndUse-4696"][];
         };
         "BTParameterGroupSpec-3469": {
             /** Format: int32 */
-            additionalLocalizedStrings?: number;
+            additionalLocalizedStrings: number;
             /** @description Type of JSON object. */
-            btType?: string;
-            collapsedByDefault?: boolean;
-            drivingParameterId?: string;
-            groupId?: string;
-            groupName?: string;
-            groupOrParameterIds?: string[];
-            localizableName?: string;
-            localizedName?: string;
-            stringsToLocalize?: string[];
+            btType: string;
+            collapsedByDefault: boolean;
+            drivingParameterId: string;
+            groupId: string;
+            groupName: string;
+            groupOrParameterIds: string[];
+            localizableName: string;
+            localizedName: string;
+            stringsToLocalize: string[];
         };
         "BTParameterLookupTableEntry-1667": {
             /** Format: int32 */
-            additionalLocalizedStrings?: number;
+            additionalLocalizedStrings: number;
             /** @description Type of JSON object. */
-            btType?: string;
-            label?: string;
-            localizableName?: string;
-            localizedLabel?: string;
-            localizedName?: string;
-            stringsToLocalize?: string[];
+            btType: string;
+            label: string;
+            localizableName: string;
+            localizedLabel: string;
+            localizedName: string;
+            stringsToLocalize: string[];
         };
         "BTParameterLookupTableListEntry-1916": {
             /** Format: int32 */
-            additionalLocalizedStrings?: number;
+            additionalLocalizedStrings: number;
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: int32 */
-            defaultIndex?: number;
-            displayName?: string;
-            entries?: components["schemas"]["BTParameterLookupTableEntry-1667"][];
-            label?: string;
-            localizableName?: string;
-            localizedLabel?: string;
-            localizedName?: string;
-            name?: string;
-            stringsToLocalize?: string[];
+            defaultIndex: number;
+            displayName: string;
+            entries: components["schemas"]["BTParameterLookupTableEntry-1667"][];
+            label: string;
+            localizableName: string;
+            localizedLabel: string;
+            localizedName: string;
+            name: string;
+            stringsToLocalize: string[];
         };
         "BTParameterSpec-6": {
             /** Format: int32 */
-            additionalLocalizedStrings?: number;
+            additionalLocalizedStrings: number;
             /** @description Type of JSON object. */
-            btType?: string;
-            columnName?: string;
-            defaultValue?: components["schemas"]["BTMParameter-1"];
-            enumOptions?: string[];
-            iconUri?: string;
-            localizableName?: string;
-            localizedName?: string;
-            parameterDescription?: string;
-            parameterId?: string;
-            parameterName?: string;
-            quantityType?: components["schemas"]["GBTQuantityType"];
-            stringsToLocalize?: string[];
-            uiHint?: string;
-            uiHints?: components["schemas"]["GBTUIHint"][];
-            visibilityCondition?: components["schemas"]["BTParameterVisibilityCondition-177"];
+            btType: string;
+            columnName: string;
+            defaultValue: components["schemas"]["BTMParameter-1"];
+            enumOptions: string[];
+            iconUri: string;
+            localizableName: string;
+            localizedName: string;
+            parameterDescription: string;
+            parameterId: string;
+            parameterName: string;
+            quantityType: components["schemas"]["GBTQuantityType"];
+            stringsToLocalize: string[];
+            uiHint: string;
+            uiHints: components["schemas"]["GBTUIHint"][];
+            visibilityCondition: components["schemas"]["BTParameterVisibilityCondition-177"];
         };
         "BTParameterSpecAppearance-1740": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15499,7 +15615,7 @@ export interface components {
         });
         "BTParameterSpecArray-2600": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             dialogId?: string;
@@ -15509,6 +15625,7 @@ export interface components {
             itemName?: string;
             /** Format: int32 */
             maxNumberOfPicks?: number;
+            parameters?: components["schemas"]["BTParameterSpec-6"][];
             showLabelsOnly?: boolean;
         } & {
             /**
@@ -15519,7 +15636,7 @@ export interface components {
         });
         "BTParameterSpecBoolean-170": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15531,7 +15648,7 @@ export interface components {
         });
         "BTParameterSpecButton-4111": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15543,7 +15660,7 @@ export interface components {
         });
         "BTParameterSpecCategories-4083": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecMultiEnum-3118"], "btType"> & {
             btType?: string;
             categoryIdToMetadataTypes?: {
@@ -15558,7 +15675,7 @@ export interface components {
         });
         "BTParameterSpecDatabase-1071": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15570,7 +15687,7 @@ export interface components {
         });
         "BTParameterSpecDerived-736": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15582,7 +15699,7 @@ export interface components {
         });
         "BTParameterSpecEnum-171": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             enumName?: string;
@@ -15603,7 +15720,7 @@ export interface components {
         });
         "BTParameterSpecFeatureList-703": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15615,7 +15732,7 @@ export interface components {
         });
         "BTParameterSpecForeignId-172": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15627,7 +15744,7 @@ export interface components {
         });
         "BTParameterSpecIcon-4779": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReadOnlyParameterSpec-1889"], "btType"> & {
             allowLink?: boolean;
             btType?: string;
@@ -15640,7 +15757,7 @@ export interface components {
         });
         "BTParameterSpecLookupTablePath-761": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             lookupTable?: components["schemas"]["BTParameterLookupTableListEntry-1916"];
@@ -15653,7 +15770,7 @@ export interface components {
         });
         "BTParameterSpecMaterial-2700": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -15665,7 +15782,7 @@ export interface components {
         });
         "BTParameterSpecMultiEnum-3118": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             enumName?: string;
@@ -15685,7 +15802,7 @@ export interface components {
         });
         "BTParameterSpecNotice-3132": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReadOnlyParameterSpec-1889"], "btType"> & {
             btType?: string;
         } & {
@@ -15697,7 +15814,7 @@ export interface components {
         });
         "BTParameterSpecNullableQuantity-715": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             ranges?: components["schemas"]["BTNullableQuantityRange-1340"][];
@@ -15710,7 +15827,7 @@ export interface components {
         });
         "BTParameterSpecProgress-3078": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReadOnlyParameterSpec-1889"], "btType"> & {
             btType?: string;
         } & {
@@ -15722,7 +15839,7 @@ export interface components {
         });
         "BTParameterSpecQuantity-173": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             ranges?: components["schemas"]["BTQuantityRange-181"][];
@@ -15735,7 +15852,7 @@ export interface components {
         });
         "BTParameterSpecQuery-174": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             additionalBoxSelectFilter?: components["schemas"]["BTQueryFilter-183"];
             btType?: string;
@@ -15751,7 +15868,7 @@ export interface components {
         });
         "BTParameterSpecReference-2789": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             libraryDefinitionId?: string;
@@ -15765,41 +15882,41 @@ export interface components {
         "BTParameterSpecReferenceAssembly-2821": {
             btType: "BTParameterSpecReferenceAssembly-2821";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReference-2789"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceBlob-1367": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReference-2789"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceCADImport-1792": {
             btType: "BTParameterSpecReferenceCADImport-1792";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReferenceBlob-1367"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceImage-1722": {
             btType: "BTParameterSpecReferenceImage-1722";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReferenceBlob-1367"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceJSON-1816": {
             btType: "BTParameterSpecReferenceJSON-1816";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReferenceBlob-1367"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferencePartStudio-1256": {
             btType: "BTParameterSpecReferencePartStudio-1256";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReference-2789"], "btType"> & {
             allowedInsertableTypes?: components["schemas"]["GBTPartStudioItemType"][];
             btType?: string;
@@ -15810,28 +15927,28 @@ export interface components {
         "BTParameterSpecReferenceTable-1520": {
             btType: "BTParameterSpecReferenceTable-1520";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReferenceBlob-1367"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceText-4945": {
             btType: "BTParameterSpecReferenceText-4945";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReferenceBlob-1367"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceVariableStudio-1060": {
             btType: "BTParameterSpecReferenceVariableStudio-1060";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReference-2789"], "btType"> & {
             btType?: string;
         });
         "BTParameterSpecReferenceWithConfiguration-2950": {
             btType: "BTParameterSpecReferenceWithConfiguration-2950";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpecReference-2789"], "btType"> & {
             allowAssemblies?: boolean;
             allowedInsertableTypes?: components["schemas"]["GBTPartStudioItemType"][];
@@ -15841,7 +15958,7 @@ export interface components {
         });
         "BTParameterSpecString-175": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
             disallowsEmptyStrings?: string;
@@ -15856,7 +15973,7 @@ export interface components {
         });
         "BTParameterSpecStringWithTolerances-2535": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReadOnlyParameterSpec-1889"], "btType"> & {
             btType?: string;
         } & {
@@ -15868,7 +15985,7 @@ export interface components {
         });
         "BTParameterVisibilityAlwaysHidden-176": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityCondition-177"], "btType"> & {
             btType?: string;
         } & {
@@ -15880,7 +15997,7 @@ export interface components {
         });
         "BTParameterVisibilityAlwaysShown-5487": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityCondition-177"], "btType"> & {
             btType?: string;
         } & {
@@ -15892,12 +16009,12 @@ export interface components {
         });
         "BTParameterVisibilityCondition-177": {
             /** @description Type of JSON object. */
-            btType?: string;
-            selfOrChildAlwaysVisible?: boolean;
+            btType: string;
+            selfOrChildAlwaysVisible: boolean;
         };
         "BTParameterVisibilityInRange-2980": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityCondition-177"], "btType"> & {
             btType?: string;
             optionRange?: components["schemas"]["BTEnumOptionRange-3741"];
@@ -15911,7 +16028,7 @@ export interface components {
         });
         "BTParameterVisibilityLogical-178": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityCondition-177"], "btType"> & {
             btType?: string;
             children?: components["schemas"]["BTParameterVisibilityCondition-177"][];
@@ -15925,7 +16042,7 @@ export interface components {
         });
         "BTParameterVisibilityOnEqual-180": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityCondition-177"], "btType"> & {
             btType?: string;
             inArray?: boolean;
@@ -15941,13 +16058,13 @@ export interface components {
         "BTParameterVisibilityOnMateDOFType-2114": {
             btType: "BTParameterVisibilityOnMateDOFType-2114";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterVisibilityOnEqual-180"], "btType"> & {
             btType?: string;
         });
         "BTParametricInstance-2641": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstanceBase-2263"], "btType"> & {
             btType?: string;
             feature?: components["schemas"]["BTMAssemblyFeature-887"];
@@ -15957,14 +16074,14 @@ export interface components {
         });
         "BTParametricOutputInstance-2288": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstanceBase-2263"], "btType"> & {
             btType?: string;
         });
         "BTParametricPartStudioChildInstance-3696": {
             btType: "BTParametricPartStudioChildInstance-3696";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricOutputInstance-2288"], "btType"> & {
             btType?: string;
             partIdentity?: components["schemas"]["BTPSOIdentity-2741"];
@@ -15974,7 +16091,7 @@ export interface components {
         "BTParametricPartStudioInstance-4374": {
             btType: "BTParametricPartStudioInstance-4374";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParametricInstance-2641"], "btType"> & {
             btType?: string;
             configuration?: components["schemas"]["BTMParameter-1"][];
@@ -15992,105 +16109,106 @@ export interface components {
             versionIdIfExternal?: string;
         });
         BTPartAppearanceInfo: {
-            color?: components["schemas"]["BTColorInfo"];
-            isGenerated?: boolean;
+            color: components["schemas"]["BTColorInfo"];
+            isGenerated: boolean;
             /** Format: int32 */
-            opacity?: number;
+            opacity: number;
         };
         "BTPartCustomProperties-1338": {
             /** @description Type of JSON object. */
-            btType?: string;
-            description?: string;
-            partNumber?: string;
-            productLine?: string;
-            project?: string;
-            properties?: {
+            btType: string;
+            description: string;
+            partNumber: string;
+            productLine: string;
+            project: string;
+            properties: {
                 [key: string]: string;
             };
-            revision?: string;
-            tessellationSetting?: string;
-            title1?: string;
-            title2?: string;
-            title3?: string;
-            vendor?: string;
+            revision: string;
+            tessellationSetting: string;
+            title1: string;
+            title2: string;
+            title3: string;
+            vendor: string;
         };
         "BTPartData-16": {
-            bestAvailableTessellationSetting?: components["schemas"]["GBTTessellationSettingEnum"];
+            bestAvailableTessellationSetting: components["schemas"]["GBTTessellationSettingEnum"];
             /** Format: double */
-            boundsDiameter?: number;
+            boundsDiameter: number;
             /** @description Type of JSON object. */
-            btType?: string;
-            closedConstituentPartData?: components["schemas"]["BTClosedConstituentPartData-2911"];
+            btType: string;
+            closedConstituentPartData: components["schemas"]["BTClosedConstituentPartData-2911"];
             /** Format: int32 */
-            coarsePlanarFaceTriangleCount?: number;
+            coarsePlanarFaceTriangleCount: number;
             /** Format: int32 */
-            coarseTriangleCount?: number;
-            constituentBodyDeterministicIds?: string[];
-            copyWithoutEntities?: components["schemas"]["BTPartData-16"];
-            entityDIds?: string[];
-            entityDeterministicIds?: string[];
-            flattenedToUnflattenedEntitiesMapping?: {
+            coarseTriangleCount: number;
+            constituentBodyDeterministicIds: string[];
+            copyWithoutEntities: components["schemas"]["BTPartData-16"];
+            entityDIds: string[];
+            entityDeterministicIds: string[];
+            flattenedToUnflattenedEntitiesMapping: {
                 [key: string]: string[];
             };
-            flattenedToUnflattenedMapping?: {
+            flattenedToUnflattenedMapping: {
                 [key: string]: string;
             };
-            highBoxCorner?: components["schemas"]["BTVector3d-389"];
-            isACopyForTessellationSettings?: boolean;
-            isAssociatedWithFlat?: boolean;
-            isBendCenterLineBody?: boolean;
-            isClosedComposite?: boolean;
-            isComposite?: boolean;
-            isDeletion?: boolean;
-            isEntitylessPartData?: boolean;
-            isFlattenedSheetMetalBody?: boolean;
-            isOpenComposite?: boolean;
-            lowBoxCorner?: components["schemas"]["BTVector3d-389"];
-            ownerFlattenedBodyId?: string;
-            sheetMetalModelId?: string;
-            sheetMetalOrderId?: string;
-            shouldAlwaysUseHighestQualityTessellation?: boolean;
-            tessellationSettings?: number[];
+            highBoxCorner: components["schemas"]["BTVector3d-389"];
+            isACopyForTessellationSettings: boolean;
+            isAssociatedWithFlat: boolean;
+            isBendCenterLineBody: boolean;
+            isClosedComposite: boolean;
+            isComposite: boolean;
+            isDeletion: boolean;
+            isEntitylessPartData: boolean;
+            isFlattenedSheetMetalBody: boolean;
+            isOpenComposite: boolean;
+            lowBoxCorner: components["schemas"]["BTVector3d-389"];
+            ownerFlattenedBodyId: string;
+            sheetMetalModelId: string;
+            sheetMetalOrderId: string;
+            shouldAlwaysUseHighestQualityTessellation: boolean;
+            tessellationSettings: number[];
             /** Format: int32 */
-            totalEntityCount?: number;
-            userTessellationSetting?: components["schemas"]["GBTTessellationSettingEnum"];
+            totalEntityCount: number;
+            userTessellationSetting: components["schemas"]["GBTTessellationSettingEnum"];
         };
         "BTPartDisplayData-17": {
-            appearance?: components["schemas"]["BTGraphicsAppearance-1152"];
-            appearanceForNewCell?: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearance: components["schemas"]["BTGraphicsAppearance-1152"];
+            appearanceForNewCell: components["schemas"]["BTGraphicsAppearance-1152"];
             /** @description Type of JSON object. */
-            btType?: string;
-            customProperties?: components["schemas"]["BTPartCustomProperties-1338"];
-            defaultColorHash?: string;
-            hasFaults?: boolean;
-            hidden?: boolean;
-            highBoxCorner?: components["schemas"]["BTVector3d-389"];
-            id?: string;
-            isActiveSheetMetal?: boolean;
-            isMesh?: boolean;
-            isModifiable?: boolean;
-            isSheet?: boolean;
-            isSolid?: boolean;
-            isWire?: boolean;
-            lowBoxCorner?: components["schemas"]["BTVector3d-389"];
-            material?: components["schemas"]["BTPartMaterial-1445"];
-            materialForNewCell?: components["schemas"]["BTPartMaterial-1445"];
-            meshState?: components["schemas"]["GBTMeshState"];
-            name?: string;
-            nameForNewCell?: string;
+            btType: string;
+            customProperties: components["schemas"]["BTPartCustomProperties-1338"];
+            defaultColorHash: string;
+            faultVisibility: components["schemas"]["GBTPartFaultVisibility"];
+            hasFaults: boolean;
+            hidden: boolean;
+            highBoxCorner: components["schemas"]["BTVector3d-389"];
+            id: string;
+            isActiveSheetMetal: boolean;
+            isMesh: boolean;
+            isModifiable: boolean;
+            isSheet: boolean;
+            isSolid: boolean;
+            isWire: boolean;
+            lowBoxCorner: components["schemas"]["BTVector3d-389"];
+            material: components["schemas"]["BTPartMaterial-1445"];
+            materialForNewCell: components["schemas"]["BTPartMaterial-1445"];
+            meshState: components["schemas"]["GBTMeshState"];
+            name: string;
+            nameForNewCell: string;
             /** Format: int32 */
-            ordinal?: number;
-            partId?: string;
-            propertyIdToSource?: {
+            ordinal: number;
+            partId: string;
+            propertyIdToSource: {
                 [key: string]: components["schemas"]["BTPartMetadataSource-2895"];
             };
-            referencingConfiguredPartNodeIds?: components["schemas"]["BTObjectId"][];
-            visibility?: components["schemas"]["GBTPartVisibility"];
+            referencingConfiguredPartNodeIds: components["schemas"]["BTObjectId"][];
+            visibility: components["schemas"]["GBTPartVisibility"];
         };
         "BTPartInstance-81": {
             btType: "BTPartInstance-81";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTInstance-642"], "btType"> & {
             btType?: string;
             partIdentity?: components["schemas"]["BTPSOIdentity-2741"];
@@ -16100,73 +16218,73 @@ export interface components {
         });
         "BTPartMaterial-1445": {
             /** @description Type of JSON object. */
-            btType?: string;
-            id?: string;
-            libraryName?: string;
-            libraryReference?: components["schemas"]["BTElementReference-725"];
-            name?: string;
-            properties?: {
+            btType: string;
+            id: string;
+            libraryName: string;
+            libraryReference: components["schemas"]["BTElementReference-725"];
+            name: string;
+            properties: {
                 [key: string]: components["schemas"]["BTPartMaterialProperty-1453"];
             };
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         BTPartMaterialInfo: {
-            displayName?: string;
-            id?: string;
-            libraryName?: string;
-            libraryReference?: components["schemas"]["BTExternalElementReferenceInfo"];
-            properties?: components["schemas"]["BTPartMaterialPropertyInfo"][];
+            displayName: string;
+            id: string;
+            libraryName: string;
+            libraryReference: components["schemas"]["BTExternalElementReferenceInfo"];
+            properties: components["schemas"]["BTPartMaterialPropertyInfo"][];
         };
         "BTPartMaterialProperty-1453": {
             /** @description Type of JSON object. */
-            btType?: string;
-            category?: string;
-            description?: string;
-            displayName?: string;
-            name?: string;
-            type?: string;
-            units?: string;
-            value?: string;
+            btType: string;
+            category: string;
+            description: string;
+            displayName: string;
+            name: string;
+            type: string;
+            units: string;
+            value: string;
         };
         BTPartMaterialPropertyInfo: {
-            category?: string;
-            description?: string;
-            displayName?: string;
-            name?: string;
-            type?: string;
-            units?: string;
-            value?: string;
+            category: string;
+            description: string;
+            displayName: string;
+            name: string;
+            type: string;
+            units: string;
+            value: string;
         };
         BTPartMetadataInfo: {
-            appearance?: components["schemas"]["BTPartAppearanceInfo"];
-            bodyType?: string;
-            configurationId?: string;
-            customProperties?: {
+            appearance: components["schemas"]["BTPartAppearanceInfo"];
+            bodyType: string;
+            configurationId: string;
+            customProperties: {
                 [key: string]: string;
             };
-            defaultColorHash?: string;
-            description?: string;
-            elementId?: string;
+            defaultColorHash: string;
+            description: string;
+            elementId: string;
             /** Format: uri */
-            href?: string;
-            id?: string;
-            isFlattenedBody?: boolean;
-            isHidden?: boolean;
-            isMesh?: boolean;
-            material?: components["schemas"]["BTPartMaterialInfo"];
-            meshState?: components["schemas"]["GBTMeshState"];
-            metadataMicroversion?: string;
-            microversionId?: string;
-            name?: string;
+            href: string;
+            id: string;
+            isFlattenedBody: boolean;
+            isHidden: boolean;
+            isMesh: boolean;
+            material: components["schemas"]["BTPartMaterialInfo"];
+            meshState: components["schemas"]["GBTMeshState"];
+            metadataMicroversion: string;
+            microversionId: string;
+            name: string;
             /** Format: int32 */
-            ordinal?: number;
-            partId?: string;
-            partIdentity?: string;
-            partNumber?: string;
-            partQuery?: string;
-            productLine?: string;
-            project?: string;
+            ordinal: number;
+            partId: string;
+            partIdentity: string;
+            partNumber: string;
+            partQuery: string;
+            productLine: string;
+            project: string;
             /**
              * @description `0: AUTOMATIC` Set automatically, like a part name |
              *     `1: MERGED` Merged from another Part Studio | `2: FEATURE` Custom feature | `3: UNCONFIGURED` | `4: CONFIGURED` |
@@ -16174,138 +16292,138 @@ export interface components {
              *     `8: COMPUTED_CONFIGURED` Property is computed in this configuration; may also be configured in other configurations
              *     `9: IMPORT` Imported properties are handled separately
              */
-            propertySourceTypes?: {
+            propertySourceTypes: {
                 [key: string]: number;
             };
-            referencingConfiguredPartNodeIds?: string[];
-            revision?: string;
-            state?: components["schemas"]["BTMetadataStateType"];
-            thumbnailConfigurationId?: string;
-            thumbnailInfo?: components["schemas"]["BTThumbnailInfo"];
-            title1?: string;
-            title2?: string;
-            title3?: string;
-            unflattenedPartId?: string;
-            vendor?: string;
+            referencingConfiguredPartNodeIds: string[];
+            revision: string;
+            state: components["schemas"]["BTMetadataStateType"];
+            thumbnailConfigurationId: string;
+            thumbnailInfo: components["schemas"]["BTThumbnailInfo"];
+            title1: string;
+            title2: string;
+            title3: string;
+            unflattenedPartId: string;
+            vendor: string;
         };
         "BTPartMetadataSource-2895": {
             /** @description Type of JSON object. */
-            btType?: string;
-            sourceId?: string;
-            sourceType?: components["schemas"]["GBTMetadataSourceType"];
+            btType: string;
+            sourceId: string;
+            sourceType: components["schemas"]["GBTMetadataSourceType"];
         };
         "BTPartProperties-293": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configuredParts?: components["schemas"]["BTConfiguredPartProperties-2645"];
-            identityIdToQueryIndex?: {
+            btType: string;
+            configuredParts: components["schemas"]["BTConfiguredPartProperties-2645"];
+            identityIdToQueryIndex: {
                 [key: string]: number;
             };
-            nodeId?: string;
-            parts?: components["schemas"]["BTOnePartProperties-230"][];
+            nodeId: string;
+            parts: components["schemas"]["BTOnePartProperties-230"][];
             /** Format: int64 */
-            roughBytesEstimate?: number;
-            tessellationProperties?: components["schemas"]["BTTessellationProperties-927"];
+            roughBytesEstimate: number;
+            tessellationProperties: components["schemas"]["BTTessellationProperties-927"];
         };
         "BTPartStudioDisplayData-346": {
-            allInsertableDisplayData?: {
+            allInsertableDisplayData: {
                 [key: string]: {
                     [key: string]: components["schemas"]["BTInsertableDisplayData-2405"];
                 };
             };
-            annotationsForElement?: components["schemas"]["BTAnnotationElementDisplayData-894"];
-            appearanceIdToAppearanceOverride?: {
+            annotationsForElement: components["schemas"]["BTAnnotationElementDisplayData-894"];
+            appearanceIdToAppearanceOverride: {
                 [key: string]: components["schemas"]["BTAppearanceOverride-2517"];
             };
-            assemblyReferenceDisplayData?: components["schemas"]["BTAssemblyReferencesDisplayData-1562"];
-            bodyIdToEntityAppearanceSettings?: {
+            assemblyReferenceDisplayData: components["schemas"]["BTAssemblyReferencesDisplayData-1562"];
+            bodyIdToEntityAppearanceSettings: {
                 [key: string]: components["schemas"]["BTBaseEntityAppearanceSettings-1391"];
             };
-            bodyIdToEntityAppearanceSettingsChanged?: boolean;
+            bodyIdToEntityAppearanceSettingsChanged: boolean;
             /** @description Type of JSON object. */
-            btType?: string;
-            cacheablePartStudioDisplayDataVersion?: components["schemas"]["GBTPartStudioDisplayDataVersion"];
-            decalIdToDecal?: {
+            btType: string;
+            cacheablePartStudioDisplayDataVersion: components["schemas"]["GBTPartStudioDisplayDataVersion"];
+            decalIdToDecal: {
                 [key: string]: components["schemas"]["BTDecal-2404"];
             };
-            deterministicIdToAssociatedFeatureIds?: {
+            deterministicIdToAssociatedFeatureIds: {
                 [key: string]: string[];
             };
-            deterministicIdToEntity?: {
+            deterministicIdToEntity: {
                 [key: string]: components["schemas"]["BTBaseEntityData-33"];
             };
-            deterministicIdToPartDisplayData?: {
+            deterministicIdToPartDisplayData: {
                 [key: string]: components["schemas"]["BTPartDisplayData-17"];
             };
-            deterministicPartIdToData?: {
+            deterministicPartIdToData: {
                 [key: string]: components["schemas"]["BTPartData-16"];
             };
-            dimensions?: components["schemas"]["BTDimensionDisplayData-323"][];
-            displayStateId?: string;
-            elementId?: string;
-            featureIdToOperationIndices?: {
+            dimensions: components["schemas"]["BTDimensionDisplayData-323"][];
+            displayStateId: string;
+            elementId: string;
+            featureIdToOperationIndices: {
                 [key: string]: number[];
             };
-            fromCache?: boolean;
-            fromFullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            incremental?: boolean;
+            fromCache: boolean;
+            fromFullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            incremental: boolean;
             /** Format: int32 */
-            instanceCount?: number;
-            isBase?: boolean;
-            isExternal?: boolean;
-            isNoop?: boolean;
-            keepFromMicroversion?: boolean;
-            microversionConfigIntervalAdvancing?: boolean;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfigurationInterval?: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
-            microversionInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
+            instanceCount: number;
+            isBase: boolean;
+            isExternal: boolean;
+            isNoop: boolean;
+            keepFromMicroversion: boolean;
+            microversionConfigIntervalAdvancing: boolean;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfigurationInterval: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
+            microversionInterval: components["schemas"]["BTMicroversionIdInterval-367"];
             /** Format: int32 */
-            numberOfSketchEntities?: number;
-            partColorCycle?: components["schemas"]["BTBasePartColorCycle-2614"];
-            partDisplayData?: components["schemas"]["BTPartDisplayData-17"][];
-            partIdAndTessellationSettingToBuffers?: {
+            numberOfSketchEntities: number;
+            partColorCycle: components["schemas"]["BTBasePartColorCycle-2614"];
+            partDisplayData: components["schemas"]["BTPartDisplayData-17"][];
+            partIdAndTessellationSettingToBuffers: {
                 [key: string]: {
                     [key: string]: components["schemas"]["BTInsertableDisplayData-2405"];
                 };
             };
-            sketchFeatureIdAndTessellationSettingToBuffers?: {
+            sketchFeatureIdAndTessellationSettingToBuffers: {
                 [key: string]: {
                     [key: string]: components["schemas"]["BTInsertableDisplayData-2405"];
                 };
             };
-            sketchImages?: {
+            sketchImages: {
                 [key: string]: {
                     [key: string]: components["schemas"]["BTSketchImageDisplayData-1379"];
                 };
             };
-            updatedParts?: string[];
-            usage?: components["schemas"]["GBTDisplayDataUsage"];
-            usesMultipleTessellationSettings?: boolean;
-            versionForRasterization?: components["schemas"]["BTElementDisplayData-326"];
+            updatedParts: string[];
+            usage: components["schemas"]["GBTDisplayDataUsage"];
+            usesMultipleTessellationSettings: boolean;
+            versionForRasterization: components["schemas"]["BTElementDisplayData-326"];
         };
         "BTPartStudioDisplayDataBase-2751": {
-            annotationsForElement?: components["schemas"]["BTAnnotationElementDisplayData-894"];
+            annotationsForElement: components["schemas"]["BTAnnotationElementDisplayData-894"];
             /** @description Type of JSON object. */
-            btType?: string;
-            elementId?: string;
-            fromFullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            incremental?: boolean;
+            btType: string;
+            elementId: string;
+            fromFullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            incremental: boolean;
             /** Format: int32 */
-            instanceCount?: number;
-            isNoop?: boolean;
-            keepFromMicroversion?: boolean;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfigurationInterval?: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
-            microversionInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
+            instanceCount: number;
+            isNoop: boolean;
+            keepFromMicroversion: boolean;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfigurationInterval: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
+            microversionInterval: components["schemas"]["BTMicroversionIdInterval-367"];
             /** Format: int32 */
-            numberOfSketchEntities?: number;
-            versionForRasterization?: components["schemas"]["BTElementDisplayData-326"];
+            numberOfSketchEntities: number;
+            versionForRasterization: components["schemas"]["BTElementDisplayData-326"];
         };
         "BTPartStudioDisplayDataReference-4360": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTPartStudioDisplayDataBase-2751"], "btType"> & {
             btType?: string;
             cacheDataPath?: components["schemas"]["BTCacheDataPath-191"];
@@ -16321,53 +16439,53 @@ export interface components {
         });
         "BTPartWithConfiguredProperties-2163": {
             /** @description Type of JSON object. */
-            btType?: string;
-            configurationProperties?: components["schemas"]["BTOneConfigurationPartProperties-1661"][];
-            forSubPartProperties?: boolean;
-            nodeId?: string;
-            parsedQuery?: components["schemas"]["BTPFunctionDeclaration-246"];
-            propertyNodeId?: string;
-            query?: string;
+            btType: string;
+            configurationProperties: components["schemas"]["BTOneConfigurationPartProperties-1661"][];
+            forSubPartProperties: boolean;
+            nodeId: string;
+            parsedQuery: components["schemas"]["BTPFunctionDeclaration-246"];
+            propertyNodeId: string;
+            query: string;
         };
         /** @description Skip mesh/curve foreign data creation in individual parts export */
         "BTPartsExportFilter-4308": {
             /** @description Type of JSON object. */
-            btType?: string;
-            skipAllMesh?: boolean;
-            skipCurves?: boolean;
-            skipPartialMesh?: boolean;
+            btType: string;
+            skipAllMesh: boolean;
+            skipCurves: boolean;
+            skipPartialMesh: boolean;
         };
         BTPendingUpgradeInfo: {
             /** Format: date-time */
-            scheduledTime?: string;
+            scheduledTime: string;
             /** Format: int32 */
-            version?: number;
+            version: number;
         };
         BTPlanSubscriberInfo: {
-            email?: string;
-            firstName?: string;
+            email: string;
+            firstName: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            image?: string;
-            lastName?: string;
+            id: string;
+            image: string;
+            lastName: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            state?: number;
+            state: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTPlanarImageMapping-4398": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTImageMapping-3821"], "btType"> & {
             btType?: string;
             planeSystem?: components["schemas"]["BTCoordinateSystem-387"];
@@ -16380,7 +16498,7 @@ export interface components {
         });
         "BTPlaneDescription-692": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             btType?: string;
             isOrientedWithFace?: boolean;
@@ -16394,7 +16512,7 @@ export interface components {
         });
         "BTPlaneOrientationFilter-1700": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             normal?: components["schemas"]["BTVector3d-389"];
@@ -16407,18 +16525,18 @@ export interface components {
         });
         /** @description PLM Context information . */
         BTPlmContextInfo: {
-            description?: string;
+            description: string;
         };
         "BTPointEntity-1439": {
             btType: "BTPointEntity-1439";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
         });
         "BTPolylineDisplayData-3522": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveDisplayData-4722"], "btType"> & {
             btType?: string;
             points?: components["schemas"]["BTVector3d-389"][];
@@ -16431,19 +16549,111 @@ export interface components {
         });
         BTPrivacyConsentInfo: {
             /** Format: date-time */
-            communicationsOptInDate?: string;
+            communicationsOptInDate: string;
             /** Format: date-time */
-            communicationsOptOutDate?: string;
-            communicationsStatus?: boolean;
-            consentVersion?: string;
+            communicationsOptOutDate: string;
+            communicationsStatus: boolean;
+            consentVersion: string;
             /** Format: date-time */
-            dataProcessingOptInDate?: string;
+            dataProcessingOptInDate: string;
             /** Format: date-time */
-            dataProcessingOptOutDate?: string;
-            dataProcessingStatus?: boolean;
+            dataProcessingOptOutDate: string;
+            dataProcessingStatus: boolean;
             /** Format: int64 */
-            eulaVersion?: number;
-            userId?: string;
+            eulaVersion: number;
+            userId: string;
+        };
+        BTProductStructureElementInfo: Omit<components["schemas"]["BTProductStructureItemInfo"], "jsonType"> & {
+            childrenHref?: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            jsonType: "product-element";
+        };
+        /** @description Array of items in the current page. */
+        BTProductStructureItemInfo: {
+            jsonType: string;
+        } & (components["schemas"]["BTBaseInfo"] & {
+            /** @description The configuration parameters of the referring element. */
+            configuration?: components["schemas"]["ConfigInfo"][];
+            /** @description The document ID of the referring element. */
+            documentId?: string;
+            /** @description The name of the document containing the referring element. */
+            documentName?: string;
+            /** Format: int32 */
+            documentState?: number;
+            /** @description The element ID of the referring element. */
+            elementId?: string;
+            /**
+             * Format: int32
+             * @description The element type ordinal of the referring element.
+             */
+            elementType?: number;
+            /** @description Whether the item represents a flattened sheet metal body. */
+            flattenedBody?: boolean;
+            /** @description The folder ID containing the document. */
+            folderId?: string;
+            /** @description Whether the item has an associated drawing. */
+            hasDrawing?: boolean;
+            /**
+             * Format: uri
+             * @description URI to fetch complete information of the resource.
+             */
+            href?: string;
+            /** @description Id of the resource. */
+            id?: string;
+            /** @description Whether this item is the latest revision. */
+            latestRevision?: boolean;
+            /** @description Name of the resource. */
+            name?: string;
+            /** @description Whether this item is not revision-managed. */
+            notRevisionManaged?: boolean;
+            /** @description The part number of the referring element. */
+            partNumber?: string;
+            /** @description The project ID associated with the document. */
+            projectId?: string;
+            /** @description Custom metadata properties of the item. Only populated when includeProperties is true. */
+            properties?: components["schemas"]["BTMetadataValueInfo"][];
+            /** @description The resource type of this item. */
+            resourceType?: string;
+            /** @description The revision of the referring element. */
+            revision?: string;
+            /** @description Whether the revision is obsolete. */
+            revisionObsolete?: boolean;
+            /** @description Standard metadata properties of the item. */
+            standardProperties?: components["schemas"]["Property"][];
+            thumbnail?: components["schemas"]["BTThumbnailInfo"];
+            /**
+             * Format: uri
+             * @description The thumbnail href URI for the referring element.
+             */
+            thumbnailHref?: string;
+            /** @description The version ID of the document containing the referring element. */
+            versionId?: string;
+            /** @description The version name of the document containing the referring element. */
+            versionName?: string;
+            /**
+             * Format: uri
+             * @description URI to visualize the resource in a webclient if applicable.
+             */
+            viewRef?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the version or workspace was created.
+             */
+            wvCreatedAt?: string;
+        });
+        BTProductStructurePartInfo: Omit<components["schemas"]["BTProductStructureItemInfo"], "jsonType"> & {
+            bodyType?: components["schemas"]["GBTBodyType"];
+            partId?: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            jsonType: "product-part";
         };
         BTProjectInfo: Omit<components["schemas"]["BTGlobalTreeNodeInfo"], "jsonType"> & {
             permissionScheme?: components["schemas"]["BTRbacPermissionSchemeInfo"];
@@ -16459,41 +16669,41 @@ export interface components {
             jsonType: "project";
         };
         BTPropertiesTableTemplateInfo: {
-            companyId?: string;
+            companyId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isActive?: boolean;
-            isAllCaps?: boolean;
-            isIndented?: boolean;
+            id: string;
+            isActive: boolean;
+            isAllCaps: boolean;
+            isIndented: boolean;
             /** @description Name of the resource. */
-            name?: string;
-            propertyColumns?: components["schemas"]["BTSimplePropertyInfo"][];
-            tableType?: components["schemas"]["BTPropertiesTableTemplateType"];
-            templateGroupId?: string;
+            name: string;
+            propertyColumns: components["schemas"]["BTSimplePropertyInfo"][];
+            tableType: components["schemas"]["BTPropertiesTableTemplateType"];
+            templateGroupId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTPropertiesTableTemplateParams: {
-            companyId?: string;
-            isAllCaps?: boolean;
-            isIndented?: boolean;
-            name?: string;
-            propertyColumns?: string[];
-            tableType?: components["schemas"]["BTPropertiesTableTemplateType"];
+            companyId: string;
+            isAllCaps: boolean;
+            isIndented: boolean;
+            name: string;
+            propertyColumns: string[];
+            tableType: components["schemas"]["BTPropertiesTableTemplateType"];
         };
         /** @enum {string} */
         BTPropertiesTableTemplateType: "BOM" | "REVISION_TABLE" | "INSPECTION_TABLE";
         "BTPropertyTableColumnInfo-2161": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableColumnInfo-1222"], "btType"> & {
             btType?: string;
             isComputedAssemblyProperty?: boolean;
@@ -16508,20 +16718,20 @@ export interface components {
             btType: "BTPropertyTableColumnInfo-2161";
         });
         BTPropertyUpdateInfo: {
-            errorMessage?: string;
-            itemHref?: string;
-            newValue?: Record<string, never>;
-            oldValue?: Record<string, never>;
-            propertyId?: string;
+            errorMessage: string;
+            itemHref: string;
+            newValue: Record<string, never>;
+            oldValue: Record<string, never>;
+            propertyId: string;
         };
         BTPropertyValueParam: {
             /** @description Id of the property to set. */
-            propertyId?: string;
+            propertyId: string;
             /** @description Value to set for the property. User property values must be a list of `{ "id": "idValue" }` maps. */
-            value?: Record<string, never>;
+            value: Record<string, never>;
         };
         BTPublicationBulkItemParams: {
-            items?: components["schemas"]["BTPublicationItemParams"][];
+            items: components["schemas"]["BTPublicationItemParams"][];
         };
         BTPublicationInfo: {
             jsonType: "BTPublicationInfo";
@@ -16551,182 +16761,190 @@ export interface components {
             versionName?: string;
         };
         BTPublicationItemParams: {
-            dataType?: string;
-            documentId?: string;
-            elementId?: string;
-            encodedConfiguration?: string;
-            isApplication?: boolean;
-            isAssembly?: boolean;
-            isBlob?: boolean;
-            isWholePartStudio?: boolean;
-            mimeType?: string;
-            partId?: string;
-            partName?: string;
-            partNumber?: string;
-            revision?: string;
-            revisionId?: string;
-            versionId?: string;
+            dataType: string;
+            documentId: string;
+            elementId: string;
+            encodedConfiguration: string;
+            isApplication: boolean;
+            isAssembly: boolean;
+            isBlob: boolean;
+            isWholePartStudio: boolean;
+            mimeType: string;
+            partId: string;
+            partName: string;
+            partNumber: string;
+            revision: string;
+            revisionId: string;
+            versionId: string;
         };
         BTPublicationParams: {
-            description?: string;
-            items?: components["schemas"]["BTPublicationItemParams"][];
-            name?: string;
-            notes?: string;
-            oldClientNotes?: string;
-            ownerId?: string;
+            description: string;
+            items: components["schemas"]["BTPublicationItemParams"][];
+            name: string;
+            /**
+             * @deprecated
+             * @description Deprecated. Use the /documents/{did}/notes endpoint instead.
+             */
+            notes: string;
+            /**
+             * @deprecated
+             * @description Deprecated. Use the /documents/{did}/notes endpoint instead.
+             */
+            oldClientNotes: string;
+            ownerId: string;
             /** Format: int32 */
-            ownerType?: number;
-            parentId?: string;
-            projectId?: string;
+            ownerType: number;
+            parentId: string;
+            projectId: string;
         };
         BTPublishedWorkflowId: {
-            companyId?: string;
-            versionId?: string;
-            workflowId?: string;
+            companyId: string;
+            versionId: string;
+            workflowId: string;
         };
         /** @description Captures information about a published workflow */
         BTPublishedWorkflowInfo: {
             /** Format: int32 */
-            activeState?: number;
-            companyId?: string;
-            description?: string;
-            documentId?: string;
-            elementId?: string;
-            id?: string;
-            imageSrc?: string;
-            isPickable?: boolean;
-            json?: string;
-            name?: string;
+            activeState: number;
+            companyId: string;
+            description: string;
+            documentId: string;
+            elementId: string;
+            id: string;
+            imageSrc: string;
+            isPickable: boolean;
+            json: string;
+            name: string;
             /** Format: int32 */
-            objectType?: number;
+            objectType: number;
             /** Format: int32 */
-            ownerType?: number;
+            ownerType: number;
             /**
              * Format: date-time
              * @description The date of publication of workflow
              */
-            publishedDate?: string;
+            publishedDate: string;
             /** @description Whether the workflow connects to an external PLM service like Arena */
-            usesExternalPlm?: boolean;
-            versionId?: string;
+            usesExternalPlm: boolean;
+            versionId: string;
         };
         BTPurchaseIdentityParams: {
             /** Format: int32 */
-            consumedQuantity?: number;
-            identityId?: string;
+            consumedQuantity: number;
+            identityId: string;
             /** Format: int32 */
-            identityType?: number;
-            purchaseId?: string;
+            identityType: number;
+            purchaseId: string;
         };
         BTPurchaseInfo: {
-            accountId?: string;
+            accountId: string;
             /** Format: int64 */
-            actualAmountPaidCents?: number;
+            actualAmountPaidCents: number;
             /** Format: int64 */
-            amountCents?: number;
+            amountCents: number;
             /**
              * Format: int64
              * @description Represents the default annual API call allocation defined by the user's Onshape billing plan.
              */
-            apiAllocationByPlan?: number;
+            apiAllocationByPlan: number;
             /** Format: date-time */
-            apiAllocationEndDate?: string;
+            apiAllocationEndDate: string;
             /**
              * Format: int64
              * @description Manual override set by Onshape admin; when non-zero takes precedence over apiAllocationByPlan.
              */
-            apiAllocationOverride?: number;
+            apiAllocationOverride: number;
             /** Format: date-time */
-            apiAllocationStartDate?: string;
-            application?: components["schemas"]["BTAPIApplicationSummaryInfo"];
+            apiAllocationStartDate: string;
+            application: components["schemas"]["BTAPIApplicationSummaryInfo"];
             /** Format: date-time */
-            canceledAt?: string;
-            card?: components["schemas"]["BTCardInfo"];
-            clientId?: string;
+            canceledAt: string;
+            card: components["schemas"]["BTCardInfo"];
+            clientId: string;
             /** Format: int64 */
-            couponAmountOff?: number;
+            couponAmountOff: number;
             /** Format: int32 */
-            couponPercentOff?: number;
-            createdBy?: string;
-            currency?: string;
+            couponPercentOff: number;
+            createdBy: string;
+            currency: string;
             /** Format: int32 */
-            duration?: number;
+            duration: number;
             /** Format: int32 */
-            durationMonths?: number;
-            group?: string;
+            durationMonths: number;
+            group: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: date-time */
-            lastModified?: string;
-            lastModifiedBy?: string;
+            lastModified: string;
+            lastModifiedBy: string;
             /** Format: int64 */
-            lightSeats?: number;
+            lightSeats: number;
             /** @description Name of the resource. */
-            name?: string;
-            nextCharge?: components["schemas"]["NextCharge"];
-            overageEnabled?: boolean;
+            name: string;
+            nextCharge: components["schemas"]["NextCharge"];
+            overageEnabled: boolean;
             /** Format: int32 */
-            paymentType?: number;
-            pendingCancelation?: boolean;
-            plan?: components["schemas"]["BTBillingPlanInfo"];
-            planId?: string;
-            planName?: string;
+            paymentType: number;
+            pendingCancelation: boolean;
+            plan: components["schemas"]["BTBillingPlanInfo"];
+            planId: string;
+            planName: string;
             /** Format: int32 */
-            planType?: number;
-            preTrialPlanId?: string;
-            proratedCharges?: components["schemas"]["ProratedCharges"][];
+            planType: number;
+            preTrialPlanId: string;
+            proratedCharges: components["schemas"]["ProratedCharges"][];
             /** Format: int64 */
-            proratedTotal?: number;
+            proratedTotal: number;
             /** Format: date-time */
-            purchaseDate?: string;
-            resellerName?: string;
+            purchaseDate: string;
+            resellerName: string;
             /** Format: int64 */
-            seats?: number;
+            seats: number;
             /** Format: int32 */
-            state?: number;
-            subscribers?: components["schemas"]["BTPlanSubscriberInfo"][];
+            state: number;
+            subscribers: components["schemas"]["BTPlanSubscriberInfo"][];
             /** Format: date-time */
-            subscriptionBeginAt?: string;
+            subscriptionBeginAt: string;
             /** Format: date-time */
-            subscriptionEndAt?: string;
-            subscriptionId?: string;
+            subscriptionEndAt: string;
+            subscriptionId: string;
             /** Format: int32 */
-            subscriptionType?: number;
+            subscriptionType: number;
             /** Format: int64 */
-            taxAmountCents?: number;
+            taxAmountCents: number;
             /** Format: date-time */
-            trialEnd?: string;
-            trialInitiatedBy?: string;
+            trialEnd: string;
+            trialInitiatedBy: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTQuantityRange-181": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            defaultValue?: number;
-            location?: components["schemas"]["BTLocationInfo-226"];
+            defaultValue: number;
+            location: components["schemas"]["BTLocationInfo-226"];
             /** Format: double */
-            maxValue?: number;
+            maxValue: number;
             /** Format: double */
-            minValue?: number;
-            units?: string;
+            minValue: number;
+            units: string;
         };
         "BTQueryFilter-183": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTRadialDimensionDisplayData-348": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -16752,7 +16970,7 @@ export interface components {
         });
         "BTRadialDistanceDimensionDisplayData-2644": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -16779,49 +16997,49 @@ export interface components {
             btType: "BTRadialDistanceDimensionDisplayData-2644";
         });
         BTRbacPermissionSchemeInfo: {
-            active?: boolean;
-            description?: string;
-            entries?: components["schemas"]["Entry"][];
+            active: boolean;
+            description: string;
+            entries: components["schemas"]["Entry"][];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            predefinedPermissionScheme?: number;
+            predefinedPermissionScheme: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTRbacRoleInfo: {
-            active?: boolean;
-            description?: string;
+            active: boolean;
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            predefinedRole?: number;
+            predefinedRole: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTReadOnlyParameterSpec-1889": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTParameterSpec-6"], "btType"> & {
             btType?: string;
         } & {
@@ -16833,28 +17051,28 @@ export interface components {
         });
         "BTReferenceCustomData-1551": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         BTReleaseCommentListInfo: {
-            comments?: components["schemas"]["BTCommentInfo"][];
-            rpId?: string;
-            rpName?: string;
+            comments: components["schemas"]["BTCommentInfo"][];
+            rpId: string;
+            rpName: string;
         };
         BTReleaseItemErrorInfo: {
-            changeTaskId?: string;
-            documentId?: string;
-            message?: string;
+            changeTaskId: string;
+            documentId: string;
+            message: string;
             /** Format: int32 */
-            ordinal?: number;
-            pendingTaskId?: string;
-            pendingTaskObjectId?: string;
-            pendingTaskType?: string;
-            rejectAllowed?: boolean;
-            releaseId?: string;
+            ordinal: number;
+            pendingTaskId: string;
+            pendingTaskObjectId: string;
+            pendingTaskType: string;
+            rejectAllowed: boolean;
+            releaseId: string;
             /** Format: int32 */
-            severity?: number;
-            versionId?: string;
-            workspaceId?: string;
+            severity: number;
+            versionId: string;
+            workspaceId: string;
         };
         BTReleaseItemMessageBody: components["schemas"]["BTDocumentMessageBody"] & {
             /** Format: int32 */
@@ -16866,148 +17084,148 @@ export interface components {
             transitionName?: string;
         };
         BTReleasePackageInfo: {
-            addAllDrawingsActive?: boolean;
-            changeOrderId?: string;
-            columnNames?: {
+            addAllDrawingsActive: boolean;
+            changeOrderId: string;
+            columnNames: {
                 [key: string]: string;
             };
-            comments?: components["schemas"]["BTCommentInfo"][];
-            companyId?: string;
+            comments: components["schemas"]["BTCommentInfo"][];
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
-            detailed?: boolean;
-            documentId?: string;
-            hasRevertedToRevisionItems?: boolean;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
+            detailed: boolean;
+            documentId: string;
+            hasRevertedToRevisionItems: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isObsoletion?: boolean;
-            items?: components["schemas"]["BTReleasePackageItemInfo"][];
-            linkedVersionIds?: string[];
+            id: string;
+            isObsoletion: boolean;
+            items: components["schemas"]["BTReleasePackageItemInfo"][];
+            linkedVersionIds: string[];
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
+            modifiedAt: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
             /** @description Name of the resource. */
-            name?: string;
-            originalWorkspaceId?: string;
-            packageThumbnail?: string;
-            parentComments?: components["schemas"]["BTReleaseCommentListInfo"][];
-            parentPackages?: string[];
-            properties?: components["schemas"]["BTWorkflowPropertyInfo"][];
+            name: string;
+            originalWorkspaceId: string;
+            packageThumbnail: string;
+            parentComments: components["schemas"]["BTReleaseCommentListInfo"][];
+            parentPackages: string[];
+            properties: components["schemas"]["BTWorkflowPropertyInfo"][];
             /** @description Indicates whether the release is still in setup state and saved as a draft. */
-            retainedAsDraft?: boolean;
-            revisionRuleId?: string;
-            rootItemsToRebuild?: string[];
-            updatedItemIds?: string[];
-            versionId?: string;
+            retainedAsDraft: boolean;
+            revisionRuleId: string;
+            rootItemsToRebuild: string[];
+            updatedItemIds: string[];
+            versionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workflow?: components["schemas"]["BTWorkflowSnapshotInfo"];
-            workflowError?: string;
-            workflowId?: components["schemas"]["BTPublishedWorkflowId"];
-            workspaceId?: string;
+            viewRef: string;
+            workflow: components["schemas"]["BTWorkflowSnapshotInfo"];
+            workflowError: string;
+            workflowId: components["schemas"]["BTPublishedWorkflowId"];
+            workspaceId: string;
         };
         BTReleasePackageItemInfo: {
-            addedAutomatically?: boolean;
-            canExport?: boolean;
+            addedAutomatically: boolean;
+            canExport: boolean;
             /** Format: int32 */
-            changeDetectionStatus?: number;
-            companyId?: string;
-            configuration?: string;
-            configurationKey?: string;
-            diffThumbnailConfigurationKey?: string;
-            documentId?: string;
-            elementId?: string;
+            changeDetectionStatus: number;
+            companyId: string;
+            configuration: string;
+            configurationKey: string;
+            diffThumbnailConfigurationKey: string;
+            documentId: string;
+            elementId: string;
             /** Format: int32 */
-            elementType?: number;
-            errors?: components["schemas"]["BTReleaseItemErrorInfo"][];
-            flatPartId?: string;
+            elementType: number;
+            errors: components["schemas"]["BTReleaseItemErrorInfo"][];
+            flatPartId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isRevisionManaged?: boolean;
-            isRootItem?: boolean;
-            isTranslatable?: boolean;
-            manuallyRemovedChildrenIds?: string[];
+            id: string;
+            isRevisionManaged: boolean;
+            isRootItem: boolean;
+            isTranslatable: boolean;
+            manuallyRemovedChildrenIds: string[];
             /** Format: int32 */
-            meshState?: number;
-            mimeType?: string;
+            meshState: number;
+            mimeType: string;
             /** @description Name of the resource. */
-            name?: string;
-            obsoletionRevisionId?: string;
-            originalWorkspaceId?: string;
-            parentId?: string;
-            partId?: string;
-            partIdentity?: string;
-            partType?: string;
-            properties?: components["schemas"]["BTMetadataPropertyInfo"][];
-            referenceIds?: string[];
-            referenceIdsFromOriginalWorkspace?: string[];
-            rpid?: string;
-            smallThumbnailHref?: string;
-            subassemblyBomBehavior?: string;
-            syncedWithPLM?: boolean;
-            versionId?: string;
+            name: string;
+            obsoletionRevisionId: string;
+            originalWorkspaceId: string;
+            parentId: string;
+            partId: string;
+            partIdentity: string;
+            partType: string;
+            properties: components["schemas"]["BTMetadataPropertyInfo"][];
+            referenceIds: string[];
+            referenceIdsFromOriginalWorkspace: string[];
+            rpid: string;
+            smallThumbnailHref: string;
+            subassemblyBomBehavior: string;
+            syncedWithPLM: boolean;
+            versionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         /** @description Parameters for an item in a release or obsoletion candidate. */
         BTReleasePackageItemParams: {
             /** @description Encoded configuration string for the item. See [encodeConfigurationMap](#/Element/encodeConfigurationMap). */
-            configuration?: string;
+            configuration: string;
             /** @description Document containing the item. */
-            documentId?: string;
+            documentId: string;
             /** @description Element containing the item. */
-            elementId?: string;
+            elementId: string;
             /**
              * Format: int32
              * @description Type of element, which can be: `0: Part Studio, 1: Assembly, 2: Drawing. 4: Blob`
              */
-            elementType?: number;
+            elementType: number;
             /** @description Flat part ID. */
-            flatPartId?: string;
+            flatPartId: string;
             /** @description Href link to the item. */
-            href?: string;
+            href: string;
             /** @description ID of the item. Use this to reference the item when updating it. See [getReleasePackage](#/ReleasePackage/getReleasePackage). */
-            id?: string;
+            id: string;
             /** @description ID of the parent item, if any. */
-            parentId?: string;
+            parentId: string;
             /** @description ID of the part to add to the release candidate. */
-            partId?: string;
+            partId: string;
             /** @description Part identity string for the part to add to the release candidate. */
-            partIdentity?: string;
+            partIdentity: string;
             /** @description Part number. See [nextNumbers](#/NumberingScheme/nextNumbers). */
-            partNumber?: string;
+            partNumber: string;
             /** @description List of property values associated with the item. */
-            properties?: components["schemas"]["BTPropertyValueParam"][];
+            properties: components["schemas"]["BTPropertyValueParam"][];
             /** @description Revision ID of the item. Use when adding items to an obsoletion candidate. */
-            revisionId?: string;
+            revisionId: string;
             /** @description Version containing the item. */
-            versionId?: string;
+            versionId: string;
             /** @description Workspace containing the item. */
-            workspaceId?: string;
+            workspaceId: string;
         };
         /** @description Parameters for creating a release candidate. */
         BTReleasePackageParams: {
             /** @description List of items to include in the release candidate. */
-            items?: components["schemas"]["BTReleasePackageItemParams"][];
+            items: components["schemas"]["BTReleasePackageItemParams"][];
         };
         BTResourceOwnerInfo: Omit<components["schemas"]["BTGlobalTreeNodeInfo"], "jsonType"> & {
             icon?: string;
@@ -17024,26 +17242,26 @@ export interface components {
         /** @enum {string} */
         BTRestUserRole: "PUBLIC" | "INTERNAL";
         BTRestoreFromHistoryInfo: {
-            newMicroversion?: string;
+            newMicroversion: string;
         };
         BTRestoreInfo: {
-            defaultRestoreStrategy?: components["schemas"]["BTRestoreStrategy"];
-            elementIdToStrategyOverride?: {
+            defaultRestoreStrategy: components["schemas"]["BTRestoreStrategy"];
+            elementIdToStrategyOverride: {
                 [key: string]: components["schemas"]["BTRestoreStrategy"];
             };
         };
         /** @enum {string} */
         BTRestoreStrategy: "KEEP" | "REPLACE";
         BTRevertUnchangedElementParams: {
-            configuration?: string;
-            elementId?: string;
-            referenceIds?: string[];
+            configuration: string;
+            elementId: string;
+            referenceIds: string[];
         };
         BTRevertUnchangedParams: {
-            companyId?: string;
-            connectionId?: string;
-            doUpdate?: boolean;
-            elements?: components["schemas"]["BTRevertUnchangedElementParams"][];
+            companyId: string;
+            connectionId: string;
+            doUpdate: boolean;
+            elements: components["schemas"]["BTRevertUnchangedElementParams"][];
         };
         /** @description The users who approved the release package that created this revision. */
         BTRevisionApproverInfo: {
@@ -17051,15 +17269,15 @@ export interface components {
              * Format: date-time
              * @description Date the revision was created.
              */
-            date?: string;
+            date: string;
             /** @description User ID of the user who approved the revision. */
-            id?: string;
+            id: string;
             /** @description Name of the user who approved the revision. */
-            name?: string;
+            name: string;
         };
         "BTRevisionCustomData-2090": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTReferenceCustomData-1551"], "btType"> & {
             btType?: string;
             partNumber?: string;
@@ -17075,112 +17293,112 @@ export interface components {
         /** @description Revision details. */
         BTRevisionInfo: {
             /** @description The users who approved the release package that created this revision. */
-            approvers?: components["schemas"]["BTRevisionApproverInfo"][];
-            autoObsoletionReleaseId?: string;
-            autoObsoletionReleaseName?: string;
+            approvers: components["schemas"]["BTRevisionApproverInfo"][];
+            autoObsoletionReleaseId: string;
+            autoObsoletionReleaseName: string;
             /**
              * @description Whether the revision can change object type. Used in reuse part number flow.
              * @default false
              */
             canChangeType: boolean;
-            canExport?: boolean;
+            canExport: boolean;
             /** @description The company or enterprise ID that owns the resource. */
-            companyId?: string;
-            configuration?: string;
+            companyId: string;
+            configuration: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** @description The Revision Description metadata property if revision is of a drawing. */
-            description?: string;
+            description: string;
             /** @description The document that contains the revision object. */
-            documentId?: string;
+            documentId: string;
             /** @description The name of the document that contains the revision object. */
-            documentName?: string;
+            documentName: string;
             /**
              * Format: int32
              * @description The state of document containing this revision. Used in reuse part number flow
              */
-            documentState?: number;
+            documentState: number;
             /** @description The element that contains the revision object. */
-            elementId?: string;
+            elementId: string;
             /**
              * Format: int32
              * @description The type of item Element Type. Must be one of: `-1`: Unknown, `0`: Part Studio, `1`: Assembly, `2`: Drawing. `4` : Blob, `8`: Variable Studio
              */
-            elementType?: number;
-            errorMessage?: string;
-            flatPartInsertableId?: string;
+            elementType: number;
+            errorMessage: string;
+            flatPartInsertableId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            insertableId?: string;
+            id: string;
+            insertableId: string;
             /** @description Whether the revision has been obsoleted. */
-            isObsolete?: boolean;
+            isObsolete: boolean;
             /** @description If true, the revision can be created again. */
-            isRereleasable?: boolean;
-            isTranslatable?: boolean;
-            mimeType?: string;
+            isRereleasable: boolean;
+            isTranslatable: boolean;
+            mimeType: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** @description The next revision if applicable. null for the latest revision. */
-            nextRevisionId?: string;
+            nextRevisionId: string;
             /** @description The OBSOLETION release package that obsoleted this revision if applicable. */
-            obsoletionPackageId?: string;
-            partId?: string;
-            partIdentity?: string;
+            obsoletionPackageId: string;
+            partId: string;
+            partIdentity: string;
             /** @description The part number with which the object was revised. */
-            partNumber?: string;
+            partNumber: string;
             /** @description The previous revision if applicable. null for first revision. */
-            previousRevisionId?: string;
+            previousRevisionId: string;
             /** Format: date-time */
-            releaseCreatedDate?: string;
+            releaseCreatedDate: string;
             /** @description The release package that created this revision. */
-            releaseId?: string;
+            releaseId: string;
             /** @description The name of the release package that created this item. */
-            releaseName?: string;
-            releasedBy?: components["schemas"]["BTUserSummaryInfo"];
+            releaseName: string;
+            releasedBy: components["schemas"]["BTUserSummaryInfo"];
             /** @description The id of the revision. */
-            revision?: string;
-            revisionRuleId?: string;
+            revision: string;
+            revisionRuleId: string;
             /** @description The version of the document that contains this revision. */
-            versionId?: string;
+            versionId: string;
             /** @description The name of the version of the document that contains this revision. */
-            versionName?: string;
+            versionName: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTRevisionListResponse: {
             /**
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTRevisionInfo"][];
+            items: components["schemas"]["BTRevisionInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
-            partNumber?: string;
+            next: string;
+            partNumber: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
+            previous: string;
         };
         BTRevisionMessageBody: components["schemas"]["BTReleaseItemMessageBody"] & {
             revisionId?: string;
         };
         "BTRhoDimensionDisplayData-2892": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDimensionDisplayData-323"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17196,107 +17414,107 @@ export interface components {
         });
         "BTRigidOrLockedSubAssemblyOutputInfo-3860": {
             /** @description Type of JSON object. */
-            btType?: string;
-            locked?: boolean;
-            rigid?: boolean;
-            syncedOutputMVID?: components["schemas"]["BTMicroversionId-366"];
+            btType: string;
+            locked: boolean;
+            rigid: boolean;
+            syncedOutputMVID: components["schemas"]["BTMicroversionId-366"];
         };
         /** @enum {string} */
         BTRole: "ANONYMOUS" | "TOTPPENDINGUSER" | "USER" | "DEVELOPER" | "PARTNER" | "ONSHAPECOMPANYUSER" | "ADMIN" | "SERVICE";
         "BTRootAssemblyDisplayData-96": {
-            annotationsForElement?: components["schemas"]["BTAnnotationElementDisplayData-894"];
-            assemblyFeatures?: components["schemas"]["BTAssemblyFeatureDisplayData-1783"][];
+            annotationsForElement: components["schemas"]["BTAnnotationElementDisplayData-894"];
+            assemblyFeatures: components["schemas"]["BTAssemblyFeatureDisplayData-1783"][];
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            buildDurationMillis?: number;
-            deletedAssemblyFeatures?: string[];
-            deletedGeometryMateIds?: string[];
-            deletedLoads?: string[];
-            deletedMateConnectorIds?: string[];
-            deletedMateGroupIds?: string[];
-            deletedMateIds?: string[];
-            deletedOccurrences?: components["schemas"]["BTOccurrence-74"][];
-            elementId?: string;
-            fromFullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            fullElementIdToReferencedSketchIds?: {
+            buildDurationMillis: number;
+            deletedAssemblyFeatures: string[];
+            deletedGeometryMateIds: string[];
+            deletedLoads: string[];
+            deletedMateConnectorIds: string[];
+            deletedMateGroupIds: string[];
+            deletedMateIds: string[];
+            deletedOccurrences: components["schemas"]["BTOccurrence-74"][];
+            elementId: string;
+            fromFullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            fullElementIdToReferencedSketchIds: {
                 [key: string]: string[];
             };
-            geometryMates?: components["schemas"]["BTGeometryMateDisplayData-1050"][];
-            incremental?: boolean;
+            geometryMates: components["schemas"]["BTGeometryMateDisplayData-1050"][];
+            incremental: boolean;
             /** Format: int32 */
-            instanceCount?: number;
-            isCollapsible?: boolean;
-            isForInContext?: boolean;
-            keepFromMicroversion?: boolean;
-            loads?: components["schemas"]["BTLoadDisplayData-837"][];
-            mateConnectors?: components["schemas"]["BTMateConnectorDisplayData-94"][];
-            mateGroups?: components["schemas"]["BTMateGroupDisplayData-1990"][];
-            mates?: components["schemas"]["BTMateDisplayData-1358"][];
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
-            microversionIdAndConfigurationInterval?: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
-            microversionInterval?: components["schemas"]["BTMicroversionIdInterval-367"];
-            occurrences?: components["schemas"]["BTOccurrenceDisplayData-95"][];
-            originDisplayData?: components["schemas"]["BTOriginDisplayData-934"];
-            partStudioDisplayData?: components["schemas"]["BTPartStudioDisplayDataBase-2751"][];
-            quickSummary?: string;
-            sentTimeISO?: string;
-            versionForRasterization?: components["schemas"]["BTElementDisplayData-326"];
+            instanceCount: number;
+            isCollapsible: boolean;
+            isForInContext: boolean;
+            keepFromMicroversion: boolean;
+            loads: components["schemas"]["BTLoadDisplayData-837"][];
+            mateConnectors: components["schemas"]["BTMateConnectorDisplayData-94"][];
+            mateGroups: components["schemas"]["BTMateGroupDisplayData-1990"][];
+            mates: components["schemas"]["BTMateDisplayData-1358"][];
+            microversionId: components["schemas"]["BTMicroversionId-366"];
+            microversionIdAndConfigurationInterval: components["schemas"]["BTMicroversionIdAndConfigurationInterval-2364"];
+            microversionInterval: components["schemas"]["BTMicroversionIdInterval-367"];
+            occurrences: components["schemas"]["BTOccurrenceDisplayData-95"][];
+            originDisplayData: components["schemas"]["BTOriginDisplayData-934"];
+            partStudioDisplayData: components["schemas"]["BTPartStudioDisplayDataBase-2751"][];
+            quickSummary: string;
+            sentTimeISO: string;
+            versionForRasterization: components["schemas"]["BTElementDisplayData-326"];
         };
         BTRootAssemblyInfo: {
-            configuration?: string;
-            documentId?: string;
-            documentMicroversion?: string;
-            documentVersion?: string;
-            elementId?: string;
+            configuration: string;
+            documentId: string;
+            documentMicroversion: string;
+            documentVersion: string;
+            elementId: string;
             /** @description List of Assembly features including those are created by replicates. */
-            features?: components["schemas"]["BTAssemblyFeatureInfo"][];
-            fullConfiguration?: string;
+            features: components["schemas"]["BTAssemblyFeatureInfo"][];
+            fullConfiguration: string;
             /** @description List of instances including those created by patterns and replicates. */
-            instances?: components["schemas"]["BTAssemblyInstanceInfo"][];
-            occurrences?: components["schemas"]["BTAssemblyOccurrenceInfo"][];
+            instances: components["schemas"]["BTAssemblyInstanceInfo"][];
+            occurrences: components["schemas"]["BTAssemblyOccurrenceInfo"][];
             /** @description List of parametric instances. */
-            parametricInstances?: components["schemas"]["BTAssemblyParametricInstanceInfo"][];
-            partNumber?: string;
+            parametricInstances: components["schemas"]["BTAssemblyParametricInstanceInfo"][];
+            partNumber: string;
             /** @description List of patterns. */
-            patterns?: components["schemas"]["BTAssemblyPatternInfo"][];
-            revision?: string;
+            patterns: components["schemas"]["BTAssemblyPatternInfo"][];
+            revision: string;
         };
         BTRootDiffInfo: {
-            changes?: {
+            changes: {
                 [key: string]: components["schemas"]["BTDiffInfo"];
             };
-            collectionChanges?: {
+            collectionChanges: {
                 [key: string]: components["schemas"]["BTDiffInfo"][];
             };
-            entityType?: components["schemas"]["BTDiffInfoCollectionType"];
-            geometryChangeMessages?: string[];
-            sourceConfiguration?: string;
-            sourceId?: string;
-            sourceMicroversionId?: string;
-            sourceValue?: string;
-            sourceVersionId?: string;
-            sourceWorkspaceId?: string;
-            targetConfiguration?: string;
-            targetId?: string;
-            targetMicroversionId?: string;
-            targetValue?: string;
-            targetVersionId?: string;
-            targetWorkspaceId?: string;
-            type?: components["schemas"]["GBTNodeChange"];
+            entityType: components["schemas"]["BTDiffInfoCollectionType"];
+            geometryChangeMessages: string[];
+            sourceConfiguration: string;
+            sourceId: string;
+            sourceMicroversionId: string;
+            sourceValue: string;
+            sourceVersionId: string;
+            sourceWorkspaceId: string;
+            targetConfiguration: string;
+            targetId: string;
+            targetMicroversionId: string;
+            targetValue: string;
+            targetVersionId: string;
+            targetWorkspaceId: string;
+            type: components["schemas"]["GBTNodeChange"];
         };
         "BTSMBendTableRowMetadata-1705": {
             btType: "BTSMBendTableRowMetadata-1705";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBaseSMJointTableRowMetadata-2232"], "btType"> & {
             btType?: string;
             isJointTypeEditable?: boolean;
         });
         "BTSMDefinitionEntityTypeFilter-1651": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             smDefinitionEntityType?: components["schemas"]["GBTEntityType"];
@@ -17310,13 +17528,13 @@ export interface components {
         "BTSMOtherJointTableRowMetadata-2640": {
             btType: "BTSMOtherJointTableRowMetadata-2640";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBaseSMJointTableRowMetadata-2232"], "btType"> & {
             btType?: string;
         });
         "BTSMSpecificMetadata-1315": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTDomainSpecificMetadata-961"], "btType"> & {
             btType?: string;
             definitionEntityType?: components["schemas"]["GBTEntityType"];
@@ -17332,7 +17550,7 @@ export interface components {
         BTSearchEntityType: "unknown" | "capability" | "company" | "document" | "element" | "friend" | "item" | "part" | "team" | "user" | "version" | "workspace" | "project" | "publication" | "comment_task" | "generic_task" | "release_task" | "app_store_entry" | "folder" | "classroom_item" | "classroom" | "assignment" | "submission" | "application";
         "BTSectionGeometryFilter-4161": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isSectionGeometry?: boolean;
@@ -17344,26 +17562,26 @@ export interface components {
             btType: "BTSectionGeometryFilter-4161";
         });
         BTSectionPlaneInfo: {
-            center?: number[];
-            normal?: number[];
-            tangent?: number[];
+            center: number[];
+            normal: number[];
+            tangent: number[];
         };
         BTSelectItemViewStateInfo: {
-            activeSelectorId?: string;
-            documentSelectors?: components["schemas"]["BTDocumentSelectorInfo"][];
-            purpose?: string;
+            activeSelectorId: string;
+            documentSelectors: components["schemas"]["BTDocumentSelectorInfo"][];
+            purpose: string;
         };
         BTSelectedMetadataEnumValue: {
-            enumOptions?: components["schemas"]["BTMetadataEnumValueInfo"][];
-            selectedValue?: string;
+            enumOptions: components["schemas"]["BTMetadataEnumValueInfo"][];
+            selectedValue: string;
         };
         BTSessionCredentialInfo: {
-            provider?: string;
-            type?: string;
+            provider: string;
+            type: string;
         };
         "BTSetFeatureRollbackCall-1899": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureApiBase-1430"], "btType"> & {
             btType?: string;
             /** Format: int32 */
@@ -17377,74 +17595,74 @@ export interface components {
         });
         "BTSetFeatureRollbackResponse-1042": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
-            microversionId?: components["schemas"]["BTMicroversionId-366"];
+            libraryVersion: number;
+            microversionId: components["schemas"]["BTMicroversionId-366"];
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** Format: int32 */
-            rollbackIndex?: number;
+            rollbackIndex: number;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         BTSettingInfo: {
-            key?: string;
-            value?: Record<string, never>;
+            key: string;
+            value: Record<string, never>;
         };
         BTSettingParam: {
-            field?: string;
-            key?: string;
-            operation?: components["schemas"]["BTUserAppSettingOperationType"];
-            value?: Record<string, never>;
+            field: string;
+            key: string;
+            operation: components["schemas"]["BTUserAppSettingOperationType"];
+            value: Record<string, never>;
         };
         /** @description Images are returned as base64-encoded strings. */
         BTShadedViewsInfo: {
-            images?: string[][];
+            images: string[][];
         };
         BTShareEntryParams: {
-            applicationId?: string;
-            companyId?: string;
-            connectionId?: string;
-            email?: string;
+            applicationId: string;
+            companyId: string;
+            connectionId: string;
+            email: string;
             /** Format: int32 */
-            entryType?: number;
-            teamId?: string;
-            userId?: string;
+            entryType: number;
+            teamId: string;
+            userId: string;
         };
         BTShareParams: {
-            connectionId?: string;
-            documentId?: string;
-            elementId?: string;
-            encodedConfiguration?: string;
-            entries?: components["schemas"]["BTShareEntryParams"][];
-            folderId?: string;
-            message?: string;
+            connectionId: string;
+            documentId: string;
+            elementId: string;
+            encodedConfiguration: string;
+            entries: components["schemas"]["BTShareEntryParams"][];
+            folderId: string;
+            message: string;
             /** Format: int64 */
-            permission?: number;
-            permissionSet?: string[];
-            update?: boolean;
-            workspaceId?: string;
+            permission: number;
+            permissionSet: string[];
+            update: boolean;
+            workspaceId: string;
         };
         BTSimplePropertyInfo: {
-            displayName?: string;
-            frozen?: boolean;
-            propertyId?: string;
+            displayName: string;
+            frozen: boolean;
+            propertyId: string;
             /** Format: int32 */
-            publishState?: number;
-            valueType?: components["schemas"]["BTMetadataValueType"];
+            publishState: number;
+            valueType: components["schemas"]["BTMetadataValueType"];
         };
         "BTSimulationFace-2147": {
             btType: "BTSimulationFace-2147";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTEntityFace-31"], "btType"> & {
             bounds?: components["schemas"]["BTBoundingBox-1052"];
             btType?: string;
@@ -17454,7 +17672,7 @@ export interface components {
         });
         "BTSimulationInstance-3093": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             isModal?: boolean;
@@ -17468,7 +17686,7 @@ export interface components {
         });
         "BTSimulationTableColumnInfo-1785": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableColumnInfo-1222"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableAssemblyCrossHighlightData-2675"];
@@ -17481,7 +17699,7 @@ export interface components {
         });
         "BTSingleAssemblyReferenceDisplayData-1557": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSingleReferenceDisplayData-1943"], "btType"> & {
             assemblyDisplayData?: components["schemas"]["BTRootAssemblyDisplayData-96"];
             assemblyNamedPositions?: components["schemas"]["BTAssemblyContextNamedPositionInfo-3801"][];
@@ -17499,21 +17717,21 @@ export interface components {
         });
         "BTSingleReferenceDisplayData-1943": {
             /** @description Type of JSON object. */
-            btType?: string;
-            contextWorkspaceId?: string;
-            documentId?: string;
-            error?: components["schemas"]["GBTErrorStringEnum"];
-            errorMessage?: string;
-            fullElementId?: components["schemas"]["BTFullElementId-756"];
-            isTransient?: boolean;
-            name?: string;
-            referenceName?: string;
-            referenceNodeId?: string;
-            visibility?: components["schemas"]["GBTBSFeatureVisibility"];
+            btType: string;
+            contextWorkspaceId: string;
+            documentId: string;
+            error: components["schemas"]["GBTErrorStringEnum"];
+            errorMessage: string;
+            fullElementId: components["schemas"]["BTFullElementId-756"];
+            isTransient: boolean;
+            name: string;
+            referenceName: string;
+            referenceNodeId: string;
+            visibility: components["schemas"]["GBTBSFeatureVisibility"];
         };
         "BTSketchArcDisplayData-349": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
         } & {
@@ -17525,7 +17743,7 @@ export interface components {
         });
         "BTSketchCircleDisplayData-350": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17539,7 +17757,7 @@ export interface components {
         });
         "BTSketchCompositeEntityDisplayData-1093": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
         } & {
@@ -17551,7 +17769,7 @@ export interface components {
         });
         "BTSketchConicDisplayData-1085": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17568,13 +17786,13 @@ export interface components {
         "BTSketchCurvedTextDisplayData-4245": {
             btType: "BTSketchCurvedTextDisplayData-4245";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchCompositeEntityDisplayData-1093"], "btType"> & {
             btType?: string;
         });
         "BTSketchEllipseDisplayData-712": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17592,7 +17810,7 @@ export interface components {
         });
         "BTSketchEllipticalArcDisplayData-892": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17615,7 +17833,7 @@ export interface components {
         "BTSketchEntity-25": {
             btType: "BTSketchEntity-25";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureEntity-34"], "btType"> & {
             btType?: string;
             isConstruction?: boolean;
@@ -17631,24 +17849,24 @@ export interface components {
         });
         "BTSketchEntityDisplayData-354": {
             /** @description Type of JSON object. */
-            btType?: string;
-            points?: number[];
+            btType: string;
+            points: number[];
         };
         "BTSketchImageDisplayData-1379": {
-            bottomLeftCorner?: components["schemas"]["BTVector3d-389"];
-            bottomRightCorner?: components["schemas"]["BTVector3d-389"];
+            bottomLeftCorner: components["schemas"]["BTVector3d-389"];
+            bottomRightCorner: components["schemas"]["BTVector3d-389"];
             /** @description Type of JSON object. */
-            btType?: string;
-            entities?: components["schemas"]["BTSketchEntityDisplayData-354"][];
-            featureId?: string;
-            isOnFlat?: boolean;
-            points?: number[];
-            sourceId?: string;
-            topLeftCorner?: components["schemas"]["BTVector3d-389"];
+            btType: string;
+            entities: components["schemas"]["BTSketchEntityDisplayData-354"][];
+            featureId: string;
+            isOnFlat: boolean;
+            points: number[];
+            sourceId: string;
+            topLeftCorner: components["schemas"]["BTVector3d-389"];
         };
         "BTSketchLineDisplayData-357": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
         } & {
@@ -17660,7 +17878,7 @@ export interface components {
         });
         "BTSketchObjectFilter-184": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isSketchObject?: boolean;
@@ -17674,7 +17892,7 @@ export interface components {
         });
         "BTSketchPointDisplayData-358": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
         } & {
@@ -17686,7 +17904,7 @@ export interface components {
         });
         "BTSketchSolveStatusFilter-3657": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             solveStatus?: components["schemas"]["GBTMGeomStatus"];
@@ -17699,7 +17917,7 @@ export interface components {
         });
         "BTSketchSplineDisplayData-359": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchEntityDisplayData-354"], "btType"> & {
             btType?: string;
             closed?: boolean;
@@ -17724,7 +17942,7 @@ export interface components {
         "BTSketchTextDisplayData-1707": {
             btType: "BTSketchTextDisplayData-1707";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSketchCompositeEntityDisplayData-1093"], "btType"> & {
             btType?: string;
         });
@@ -17741,18 +17959,18 @@ export interface components {
             jsonType: "smartfolder";
         };
         BTSmartFolderPredicateInfo: {
-            field?: string;
+            field: string;
             /** Format: int32 */
-            operation?: number;
-            value?: Record<string, never>;
+            operation: number;
+            value: Record<string, never>;
         };
         BTSmartFolderSortInfo: {
-            field?: string;
-            sortOrder?: string;
+            field: string;
+            sortOrder: string;
         };
         "BTSphereDescription-1263": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -17766,7 +17984,7 @@ export interface components {
         });
         "BTSplineControlPolygonFilter-1130": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsSplineControlPolygon?: boolean;
             btType?: string;
@@ -17779,7 +17997,7 @@ export interface components {
         });
         "BTSplineDescription-2118": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTCurveDescription-1583"], "btType"> & {
             btType?: string;
             controlPoints?: number[];
@@ -17797,7 +18015,7 @@ export interface components {
         });
         "BTSplineHandleFilter-2971": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsSplineHandle?: boolean;
             btType?: string;
@@ -17810,7 +18028,7 @@ export interface components {
         });
         "BTSplineInternalPointFilter-4101": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             allowsSplineInternalPoint?: boolean;
             btType?: string;
@@ -17823,7 +18041,7 @@ export interface components {
         });
         "BTSpunDescription-657": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             axis?: components["schemas"]["BTVector3d-389"];
             btType?: string;
@@ -17837,43 +18055,43 @@ export interface components {
         /** @description Describes a single instance of standard content. */
         BTStandardContentHierarchyItem: {
             /** @description Category for the corresponding standard content. */
-            category?: string;
+            category: string;
             /** @description Class for the corresponding standard content. */
-            class?: string;
+            class: string;
             /** @description Component for the corresponding standard content. */
-            component?: string;
+            component: string;
             /** @description Document ID for the corresponding standard content. */
-            id?: string;
+            id: string;
             /** @description Standard for the corresponding standard content. */
-            standard?: string;
+            standard: string;
         };
         BTStandardContentParameterDescriptor: {
-            displayName?: string;
-            parameterId?: string;
-            parameterValues?: string[];
+            displayName: string;
+            parameterId: string;
+            parameterValues: string[];
         };
         /** @description Parameters that drive configuration. Used to specify the standard content component to which the custom parameter values are associated. */
         BTStandardContentParameterIdAndValue: {
-            parameterId?: string;
-            value?: string;
+            parameterId: string;
+            value: string;
         };
         /** @description Non-driving custom parameters whose values are to be set. */
         BTStandardContentPropertyIdAndValue: {
-            propertyId?: string;
-            value?: string;
+            propertyId: string;
+            value: string;
         };
         /** @description Specifies a standard content component along with the custom properties whose values are to be set. */
         BTStandardContentSetCustomParameterSpecifier: {
             /** @description Non-driving custom parameters whose values are to be set. */
-            customParameters?: components["schemas"]["BTStandardContentPropertyIdAndValue"][];
+            customParameters: components["schemas"]["BTStandardContentPropertyIdAndValue"][];
             /** @description Parameters that drive configuration. Used to specify the standard content component to which the custom parameter values are associated. */
-            parameters?: components["schemas"]["BTStandardContentParameterIdAndValue"][];
+            parameters: components["schemas"]["BTStandardContentParameterIdAndValue"][];
         };
         BTStandardContentSetCustomParametersBatchRequest: {
-            specifiers?: components["schemas"]["BTStandardContentSetCustomParameterSpecifier"][];
+            specifiers: components["schemas"]["BTStandardContentSetCustomParameterSpecifier"][];
         };
         BTStandardContentSetCustomParametersBatchResponse: {
-            responses?: components["schemas"]["BTStandardContentSetCustomParametersResponse"][];
+            responses: components["schemas"]["BTStandardContentSetCustomParametersResponse"][];
         };
         /**
          * @description Indicates whether or not the individual request had an error.
@@ -17882,13 +18100,13 @@ export interface components {
         BTStandardContentSetCustomParametersError: "NONE" | "INVALID_PARAMETER_VALUE" | "FAILED_TO_SPECIFY_REQUIRED_PARAMETER" | "INVALID_PARAMETER_ID";
         /** @description Reports the status of an individual request to set custom parameter values. */
         BTStandardContentSetCustomParametersResponse: {
-            error?: components["schemas"]["BTStandardContentSetCustomParametersError"];
+            error: components["schemas"]["BTStandardContentSetCustomParametersError"];
             /** @description If there was an error, this provides a more detailed description of the problem. */
-            errorMessage?: string;
+            errorMessage: string;
         };
         "BTStringFormatBlockPattern-1755": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTStringFormatCondition-683"], "btType"> & {
             btType?: string;
             regExpToBlock?: string;
@@ -17901,13 +18119,13 @@ export interface components {
         });
         "BTStringFormatCondition-683": {
             /** @description Type of JSON object. */
-            btType?: string;
-            errorMessage?: string;
-            shouldResetValueWhenConfirmed?: boolean;
+            btType: string;
+            errorMessage: string;
+            shouldResetValueWhenConfirmed: boolean;
         };
         "BTStringFormatMatchPattern-2446": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTStringFormatCondition-683"], "btType"> & {
             btType?: string;
             regExpToMatch?: string;
@@ -17920,7 +18138,7 @@ export interface components {
         });
         "BTStringMaximumLengthPattern-2593": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTStringFormatCondition-683"], "btType"> & {
             btType?: string;
             /** Format: int32 */
@@ -17934,7 +18152,7 @@ export interface components {
         });
         "BTStringMinimumLengthPattern-895": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTStringFormatCondition-683"], "btType"> & {
             btType?: string;
             /** Format: int32 */
@@ -17948,44 +18166,44 @@ export interface components {
         });
         "BTStringNodeWrapper-4224": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
-            string?: string;
+            btType: string;
+            nodeId: string;
+            string: string;
         };
         BTSubAssemblyInfo: {
-            configuration?: string;
-            documentId?: string;
-            documentMicroversion?: string;
-            documentVersion?: string;
-            elementId?: string;
+            configuration: string;
+            documentId: string;
+            documentMicroversion: string;
+            documentVersion: string;
+            elementId: string;
             /** @description List of Assembly features including those are created by replicates. */
-            features?: components["schemas"]["BTAssemblyFeatureInfo"][];
-            fullConfiguration?: string;
+            features: components["schemas"]["BTAssemblyFeatureInfo"][];
+            fullConfiguration: string;
             /** @description List of instances including those created by patterns and replicates. */
-            instances?: components["schemas"]["BTAssemblyInstanceInfo"][];
+            instances: components["schemas"]["BTAssemblyInstanceInfo"][];
             /** @description List of parametric instances. */
-            parametricInstances?: components["schemas"]["BTAssemblyParametricInstanceInfo"][];
-            partNumber?: string;
+            parametricInstances: components["schemas"]["BTAssemblyParametricInstanceInfo"][];
+            partNumber: string;
             /** @description List of patterns. */
-            patterns?: components["schemas"]["BTAssemblyPatternInfo"][];
-            revision?: string;
+            patterns: components["schemas"]["BTAssemblyPatternInfo"][];
+            revision: string;
         };
         BTSubstituteApproverInfo: {
-            companyId?: string;
-            enabled?: boolean;
-            identity?: components["schemas"]["BTIdentityInfo"];
+            companyId: string;
+            enabled: boolean;
+            identity: components["schemas"]["BTIdentityInfo"];
         };
         "BTSurfaceDescription-1564": {
             /** @description Type of JSON object. */
-            btType?: string;
-            direction?: components["schemas"]["BTVector3d-389"];
-            directionOrientedWithFace?: components["schemas"]["BTVector3d-389"];
-            origin?: components["schemas"]["BTVector3d-389"];
-            type?: components["schemas"]["GBTSurfaceTypeEnum"];
+            btType: string;
+            direction: components["schemas"]["BTVector3d-389"];
+            directionOrientedWithFace: components["schemas"]["BTVector3d-389"];
+            origin: components["schemas"]["BTVector3d-389"];
+            type: components["schemas"]["GBTSurfaceTypeEnum"];
         };
         "BTSweepDescription-1473": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             btType?: string;
             profile?: components["schemas"]["BTSplineDescription-2118"];
@@ -17997,12 +18215,12 @@ export interface components {
             btType: "BTSweepDescription-1473";
         });
         BTSyncAppElementParams: {
-            description?: string;
-            elements?: string[];
+            description: string;
+            elements: string[];
         };
         "BTSystemPartColorCycle-1580": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTBasePartColorCycle-2614"], "btType"> & {
             btType?: string;
             version?: components["schemas"]["GBTPartColorCycleVersion"];
@@ -18014,29 +18232,29 @@ export interface components {
             btType: "BTSystemPartColorCycle-1580";
         });
         "BTTable-1825": {
-            allRowValues?: string[][];
+            allRowValues: string[][];
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: int32 */
-            columnCount?: number;
+            columnCount: number;
             /** Format: int32 */
-            frozenColumns?: number;
-            isFailed?: boolean;
-            nodeId?: string;
-            readOnly?: boolean;
+            frozenColumns: number;
+            isFailed: boolean;
+            nodeId: string;
+            readOnly: boolean;
             /** Format: int32 */
-            rowCount?: number;
-            sortOrder?: components["schemas"]["BTTableSortOrder-4371"];
-            statusMessage?: string;
-            statusType?: components["schemas"]["GBTNodeStatusType"];
-            tableColumns?: components["schemas"]["BTTableColumnInfo-1222"][];
-            tableId?: string;
-            tableRows?: components["schemas"]["BTTableRow-1054"][];
-            title?: string;
+            rowCount: number;
+            sortOrder: components["schemas"]["BTTableSortOrder-4371"];
+            statusMessage: string;
+            statusType: components["schemas"]["GBTNodeStatusType"];
+            tableColumns: components["schemas"]["BTTableColumnInfo-1222"][];
+            tableId: string;
+            tableRows: components["schemas"]["BTTableRow-1054"][];
+            title: string;
         };
         "BTTableAssemblyCrossHighlightData-2675": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseCrossHighlightData-2609"], "btType"> & {
             assemblyCrossHighlightItems?: components["schemas"]["BTTableAssemblyCrossHighlightDataItem-2659"][];
         } & {
@@ -18048,32 +18266,32 @@ export interface components {
         });
         "BTTableAssemblyCrossHighlightDataItem-2659": {
             /** @description Type of JSON object. */
-            btType?: string;
-            occurrencePathId?: string;
+            btType: string;
+            occurrencePathId: string;
         };
         "BTTableBaseCrossHighlightData-2609": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTTableBaseRowMetadata-3181": {
             /** @description Type of JSON object. */
-            btType?: string;
-            crossHighlightDataIfAny?: components["schemas"]["BTTableBaseCrossHighlightData-2609"];
+            btType: string;
+            crossHighlightDataIfAny: components["schemas"]["BTTableBaseCrossHighlightData-2609"];
         };
         "BTTableCell-1114": {
             /** @description Type of JSON object. */
-            btType?: string;
-            isEverVisible?: boolean;
-            isReadOnly?: boolean;
-            modifiers?: components["schemas"]["BTTableCellModifier-4883"][];
+            btType: string;
+            isEverVisible: boolean;
+            isReadOnly: boolean;
+            modifiers: components["schemas"]["BTTableCellModifier-4883"][];
         };
         "BTTableCellModifier-4883": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         };
         "BTTableCellModifierForceShowConfigured-5170": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCellModifier-4883"], "btType"> & {
             btType?: string;
         } & {
@@ -18085,7 +18303,7 @@ export interface components {
         });
         "BTTableCellModifierInfo-4585": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCellModifier-4883"], "btType"> & {
             btType?: string;
             tooltip?: string;
@@ -18098,7 +18316,7 @@ export interface components {
         });
         "BTTableCellModifierOpenFeature-1614": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCellModifier-4883"], "btType"> & {
             btType?: string;
             featureId?: string;
@@ -18111,7 +18329,7 @@ export interface components {
         });
         "BTTableCellParameter-2399": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCell-1114"], "btType"> & {
             btType?: string;
             error?: string;
@@ -18128,7 +18346,7 @@ export interface components {
         "BTTableCellParameterWithValue-2122": {
             btType: "BTTableCellParameterWithValue-2122";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCellParameter-2399"], "btType"> & {
             btType?: string;
             value?: components["schemas"]["BTFSValue-1888"];
@@ -18136,7 +18354,7 @@ export interface components {
         "BTTableCellPropertyParameter-2983": {
             btType: "BTTableCellPropertyParameter-2983";
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCellParameter-2399"], "btType"> & {
             aggregationSkippedFilteredOutValues?: boolean;
             btType?: string;
@@ -18146,27 +18364,27 @@ export interface components {
         });
         "BTTableColumnInfo-1222": {
             /** @description Type of JSON object. */
-            btType?: string;
-            id?: string;
-            nodeId?: string;
-            specification?: components["schemas"]["BTTableColumnSpec-1967"];
+            btType: string;
+            id: string;
+            nodeId: string;
+            specification: components["schemas"]["BTTableColumnSpec-1967"];
         };
         "BTTableColumnSpec-1967": {
             /** @description Type of JSON object. */
-            btType?: string;
-            defaultCellSpec?: components["schemas"]["BTParameterSpec-6"];
-            defaultColumnWidthUnits?: components["schemas"]["GBTTableColumnWidthUnits"];
+            btType: string;
+            defaultCellSpec: components["schemas"]["BTParameterSpec-6"];
+            defaultColumnWidthUnits: components["schemas"]["GBTTableColumnWidthUnits"];
             /** Format: int32 */
-            defaultColumnWidthValue?: number;
-            defaultHeaderName?: string;
-            defaultTextAlignment?: components["schemas"]["GBTTableTextAlignment"];
-            isExpandable?: boolean;
-            isRenamable?: boolean;
-            readOnly?: boolean;
+            defaultColumnWidthValue: number;
+            defaultHeaderName: string;
+            defaultTextAlignment: components["schemas"]["GBTTableTextAlignment"];
+            isExpandable: boolean;
+            isRenamable: boolean;
+            readOnly: boolean;
         };
         "BTTableCrossHighlightData-1753": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseCrossHighlightData-2609"], "btType"> & {
             deterministicIdList?: string[];
             featureIdList?: string[];
@@ -18179,31 +18397,31 @@ export interface components {
         });
         "BTTableResponse-1546": {
             /** @description Type of JSON object. */
-            btType?: string;
-            sourceMicroversion?: string;
-            table?: components["schemas"]["BTTable-1825"];
+            btType: string;
+            sourceMicroversion: string;
+            table: components["schemas"]["BTTable-1825"];
         };
         "BTTableRow-1054": {
             /** @description Type of JSON object. */
-            btType?: string;
-            columnIdToCell?: {
+            btType: string;
+            columnIdToCell: {
                 [key: string]: components["schemas"]["BTTableCell-1114"];
             };
-            id?: string;
-            metaData?: components["schemas"]["BTTreeNode-20"];
-            nodeId?: string;
-            rowMetadata?: components["schemas"]["BTTableBaseRowMetadata-3181"];
+            id: string;
+            metaData: components["schemas"]["BTTreeNode-20"];
+            nodeId: string;
+            rowMetadata: components["schemas"]["BTTableBaseRowMetadata-3181"];
         };
         "BTTableSortOrder-4371": {
             /** @description Type of JSON object. */
-            btType?: string;
-            isAscending?: boolean;
-            nodeId?: string;
-            sortingColumnId?: string;
+            btType: string;
+            isAscending: boolean;
+            nodeId: string;
+            sortingColumnId: string;
         };
         "BTTableSpec-915": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureSpec-129"], "btType"> & {
             btType?: string;
             computedPropertyCategoryIds?: string[];
@@ -18218,7 +18436,7 @@ export interface components {
         });
         "BTTableTestCellDouble-2509": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCell-1114"], "btType"> & {
             btType?: string;
             /** Format: double */
@@ -18232,7 +18450,7 @@ export interface components {
         });
         "BTTableTestCellString-2112": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableCell-1114"], "btType"> & {
             btType?: string;
             cellValue?: string;
@@ -18244,250 +18462,252 @@ export interface components {
             btType: "BTTableTestCellString-2112";
         });
         BTTaskInfo: {
-            action?: string;
-            approverRole?: string;
-            comments?: components["schemas"]["BTCommentInfo"][];
-            companyId?: string;
+            action: string;
+            approverRole: string;
+            comments: components["schemas"]["BTCommentInfo"][];
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            creator?: components["schemas"]["BTUserSummaryInfo"];
-            deletable?: boolean;
-            description?: string;
-            documentId?: string;
-            documentName?: string;
+            createdAt: string;
+            creator: components["schemas"]["BTUserSummaryInfo"];
+            deletable: boolean;
+            description: string;
+            documentId: string;
+            documentName: string;
             /** Format: int32 */
-            documentType?: number;
-            editable?: boolean;
-            elementId?: string;
+            documentType: number;
+            editable: boolean;
+            elementId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            objectId?: string;
-            properties?: components["schemas"]["BTMetadataPropertyInfo"][];
-            publishedWorkflow?: components["schemas"]["BTPublishedWorkflowInfo"];
+            name: string;
+            objectId: string;
+            properties: components["schemas"]["BTMetadataPropertyInfo"][];
+            publishedWorkflow: components["schemas"]["BTPublishedWorkflowInfo"];
             /** Format: date-time */
-            resolvedAt?: string;
-            resolvedBy?: components["schemas"]["BTUserSummaryInfo"];
-            roles?: components["schemas"]["BTTaskRbacRoleInfo"][];
-            simpleName?: string;
-            sourceWorkspaceOrVersionName?: string;
-            state?: string;
+            resolvedAt: string;
+            resolvedBy: components["schemas"]["BTUserSummaryInfo"];
+            roles: components["schemas"]["BTTaskRbacRoleInfo"][];
+            simpleName: string;
+            sourceWorkspaceOrVersionName: string;
+            state: string;
             /** Format: int32 */
-            status?: number;
-            taskItems?: components["schemas"]["BTTaskItemInfo"][];
-            taskType?: string;
-            teams?: components["schemas"]["BTTaskTeamSummaryInfo"][];
-            thumbnail?: components["schemas"]["BTThumbnailInfo"];
-            transition?: string;
-            users?: components["schemas"]["BTTaskUserSummaryInfo"][];
-            versionId?: string;
+            status: number;
+            taskItems: components["schemas"]["BTTaskItemInfo"][];
+            taskType: string;
+            teams: components["schemas"]["BTTaskTeamSummaryInfo"][];
+            thumbnail: components["schemas"]["BTThumbnailInfo"];
+            transition: string;
+            users: components["schemas"]["BTTaskUserSummaryInfo"][];
+            versionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workflowInfo?: components["schemas"]["BTWorkflowableObjectInfo"];
+            viewRef: string;
+            workflowInfo: components["schemas"]["BTWorkflowableObjectInfo"];
             /** Format: int32 */
-            workflowableObjectType?: number;
-            workspaceId?: string;
+            workflowableObjectType: number;
+            workspaceId: string;
         };
         BTTaskItemInfo: {
-            assemblyFeatures?: string[];
-            bodyType?: string;
-            configuration?: string;
-            dataType?: string;
-            documentId?: string;
-            elementFeature?: string;
-            elementId?: string;
-            elementOccurrences?: string[];
-            elementQuery?: string;
+            assemblyFeatures: string[];
+            bodyType: string;
+            configuration: string;
+            dataType: string;
+            documentId: string;
+            elementFeature: string;
+            elementId: string;
+            elementOccurrences: string[];
+            elementQuery: string;
             /** Format: int32 */
-            elementType?: number;
-            fileName?: string;
+            elementType: number;
+            fileName: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            mimeType?: string;
+            id: string;
+            mimeType: string;
             /** @description Name of the resource. */
-            name?: string;
-            partId?: string;
+            name: string;
+            partId: string;
             /** Format: int32 */
-            releaseState?: number;
-            revisionId?: string;
-            versionId?: string;
-            viewData?: components["schemas"]["BTViewDataInfo"];
+            releaseState: number;
+            revisionId: string;
+            versionId: string;
+            viewData: components["schemas"]["BTViewDataInfo"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         /** @description References to add to the task. */
         BTTaskItemParams: {
             /** @description Body type to reference from a task. */
-            bodyType?: string;
+            bodyType: string;
             /** @description Configuration of reference. Used to restrict a reference to a specific configuration of an element. */
-            configuration?: string;
+            configuration: string;
             /** @description Description of the reference. */
-            description?: string;
+            description: string;
             /** @description Id of a document. Required to reference a document or anything contained within it. */
-            documentId?: string;
+            documentId: string;
             /** @description Id of an element reference. Used when referencing an element. */
-            elementId?: string;
+            elementId: string;
             /**
              * Format: int32
              * @description Type of element reference. Options are 0 (Part Studio), 1 (Assembly), 2 (Drawing), 3 (Feature Studio), 4 (Blob), 5 (Application), 6 (Table), 7 (Bill of Materials),  8 (Variable Studio), or 9 (Publication Item).
              */
-            elementType?: number;
+            elementType: number;
             /** @description Mimetype of reference. Used when referencing blob elements. */
-            mimeType?: string;
+            mimeType: string;
             /** @description Name of the reference. */
-            name?: string;
+            name: string;
             /** @description Deterministic Id of a part. Used when referencing parts. */
-            partId?: string;
+            partId: string;
             /** @description Id of a revision to reference from a task. */
-            revisionId?: string;
+            revisionId: string;
             /** @description Id of a document version. Used when referencing the version itself or an element or part in it. */
-            versionId?: string;
+            versionId: string;
             /** @description Id of a document workspace. Used when referencing the workspace itself or an element or part in it. */
-            workspaceId?: string;
+            workspaceId: string;
         };
         BTTaskListResponse: {
             /**
              * Format: uri
              * @description URI for current page of resources.
              */
-            href?: string;
+            href: string;
             /** @description Array of items in the current page. */
-            items?: components["schemas"]["BTTaskInfo"][];
+            items: components["schemas"]["BTTaskInfo"][];
             /**
              * Format: uri
              * @description URI for next page of the resources if more are available.
              */
-            next?: string;
+            next: string;
             /**
              * Format: uri
              * @description URI for previous page of the resources.
              */
-            previous?: string;
-            taskTypes?: components["schemas"]["BTTaskTypeInfo"][];
+            previous: string;
+            taskTypes: components["schemas"]["BTTaskTypeInfo"][];
         };
         BTTaskRbacRoleInfo: {
-            acted?: boolean;
-            active?: boolean;
-            description?: string;
+            acted: boolean;
+            active: boolean;
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int32 */
-            predefinedRole?: number;
+            predefinedRole: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTTaskTeamSummaryInfo: {
-            acted?: boolean;
-            active?: boolean;
-            canMove?: boolean;
-            connectionName?: string;
-            connectionNames?: string[];
+            acted: boolean;
+            active: boolean;
+            canMove: boolean;
+            connectionName: string;
+            connectionNames: string[];
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isContainer?: boolean;
-            isEnterpriseOwned?: boolean;
-            isExternalConnectionResource?: boolean;
-            isMutable?: boolean;
+            id: string;
+            isContainer: boolean;
+            isEnterpriseOwned: boolean;
+            isExternalConnectionResource: boolean;
+            isMutable: boolean;
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
+            modifiedAt: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
             /** @description Name of the resource. */
-            name?: string;
-            owner?: components["schemas"]["BTOwnerInfo"];
-            parentId?: string;
+            name: string;
+            owner: components["schemas"]["BTOwnerInfo"];
+            parentId: string;
             /** Format: int32 */
-            predefinedTeam?: number;
-            predefinedTeamMutable?: boolean;
-            projectId?: string;
-            resourceType?: string;
-            treeHref?: string;
-            unparentHref?: string;
+            predefinedTeam: number;
+            predefinedTeamMutable: boolean;
+            projectId: string;
+            resourceType: string;
+            treeHref: string;
+            unparentHref: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTTaskTypeInfo: {
-            displayName?: string;
-            id?: string;
-            name?: string;
+            displayName: string;
+            id: string;
+            name: string;
         };
         BTTaskUserSummaryInfo: {
-            acted?: boolean;
-            company?: components["schemas"]["BTCompanySummaryInfo"];
-            confirmationRequested?: boolean;
-            documentationName?: string;
-            documentationNameOverride?: string;
-            email?: string;
-            firstName?: string;
-            globalPermissions?: components["schemas"]["GlobalPermissionInfo"];
+            acted: boolean;
+            company: components["schemas"]["BTCompanySummaryInfo"];
+            /** Format: int32 */
+            companyUserState: number;
+            confirmationRequested: boolean;
+            documentationName: string;
+            documentationNameOverride: string;
+            email: string;
+            firstName: string;
+            globalPermissions: components["schemas"]["GlobalPermissionInfo"];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            image?: string;
+            id: string;
+            image: string;
             /** Format: int32 */
-            invitationState?: number;
-            isExternal?: boolean;
-            isGuest?: boolean;
-            isLight?: boolean;
-            isOnshapeSupport?: boolean;
+            invitationState: number;
+            isExternal: boolean;
+            isGuest: boolean;
+            isLight: boolean;
+            isOnshapeSupport: boolean;
             /** Format: date-time */
-            lastLoginTime?: string;
-            lastName?: string;
+            lastLoginTime: string;
+            lastName: string;
             /** @description Name of the resource. */
-            name?: string;
-            personalMessageAllowed?: boolean;
+            name: string;
+            personalMessageAllowed: boolean;
             /** Format: int32 */
-            source?: number;
+            source: number;
             /** Format: int32 */
-            state?: number;
+            state: number;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTTeamInfo: Omit<components["schemas"]["BTTeamSummaryInfo"], "jsonType"> & {
             admin?: boolean;
@@ -18502,67 +18722,67 @@ export interface components {
             jsonType: "team";
         };
         BTTeamMemberInfo: {
-            admin?: boolean;
+            admin: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            member?: components["schemas"]["BTUserSummaryInfo"];
+            id: string;
+            member: components["schemas"]["BTUserSummaryInfo"];
             /** @description Name of the resource. */
-            name?: string;
-            team?: components["schemas"]["BTTeamSummaryInfo"];
+            name: string;
+            team: components["schemas"]["BTTeamSummaryInfo"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTTeamSummaryInfo: {
-            active?: boolean;
-            canMove?: boolean;
-            connectionName?: string;
-            connectionNames?: string[];
+            active: boolean;
+            canMove: boolean;
+            connectionName: string;
+            connectionNames: string[];
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isContainer?: boolean;
-            isEnterpriseOwned?: boolean;
-            isExternalConnectionResource?: boolean;
-            isMutable?: boolean;
+            id: string;
+            isContainer: boolean;
+            isEnterpriseOwned: boolean;
+            isExternalConnectionResource: boolean;
+            isMutable: boolean;
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
+            modifiedAt: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
             /** @description Name of the resource. */
-            name?: string;
-            owner?: components["schemas"]["BTOwnerInfo"];
-            parentId?: string;
+            name: string;
+            owner: components["schemas"]["BTOwnerInfo"];
+            parentId: string;
             /** Format: int32 */
-            predefinedTeam?: number;
-            predefinedTeamMutable?: boolean;
-            projectId?: string;
-            resourceType?: string;
-            treeHref?: string;
-            unparentHref?: string;
+            predefinedTeam: number;
+            predefinedTeamMutable: boolean;
+            projectId: string;
+            resourceType: string;
+            treeHref: string;
+            unparentHref: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         "BTTessellatedGeometry-2576": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTEntityGeometry-35"], "btType"> & {
             btType?: string;
         } & {
@@ -18574,18 +18794,18 @@ export interface components {
         });
         "BTTessellationProperties-927": {
             /** Format: double */
-            angularTolerance?: number;
+            angularTolerance: number;
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            chordalTolerance?: number;
-            nodeId?: string;
+            chordalTolerance: number;
+            nodeId: string;
             /** Format: int32 */
-            tessellationBudget?: number;
+            tessellationBudget: number;
         };
         "BTTextObjectFilter-1515": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isText?: boolean;
@@ -18598,7 +18818,7 @@ export interface components {
         });
         "BTTextStrokeFilter-461": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTQueryFilter-183"], "btType"> & {
             btType?: string;
             isStroke?: boolean;
@@ -18611,24 +18831,24 @@ export interface components {
         });
         BTThumbnailInfo: {
             /** Format: uri */
-            href?: string;
-            id?: string;
-            secondarySizes?: components["schemas"]["BTThumbnailSizeInfo"][][];
-            sizes?: components["schemas"]["BTThumbnailSizeInfo"][];
+            href: string;
+            id: string;
+            secondarySizes: components["schemas"]["BTThumbnailSizeInfo"][][];
+            sizes: components["schemas"]["BTThumbnailSizeInfo"][];
         };
         BTThumbnailSizeInfo: {
             /** Format: uri */
-            href?: string;
-            mediaType?: string;
-            renderMode?: string;
-            sheetName?: string;
-            size?: string;
-            uniqueId?: string;
-            viewOrientation?: string;
+            href: string;
+            mediaType: string;
+            renderMode: string;
+            sheetName: string;
+            size: string;
+            uniqueId: string;
+            viewOrientation: string;
         };
         "BTToleranceSpec-3441": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureSpec-129"], "btType"> & {
             btType?: string;
         } & {
@@ -18640,7 +18860,7 @@ export interface components {
         });
         "BTToleranceString-3274": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTMNode-19"], "btType"> & {
             btType?: string;
             classification?: string;
@@ -18656,22 +18876,22 @@ export interface components {
         });
         "BTTolerantValueDisplayData-3483": {
             /** @description Type of JSON object. */
-            btType?: string;
-            fitClass?: string;
-            isAngle?: boolean;
-            isDefined?: boolean;
+            btType: string;
+            fitClass: string;
+            isAngle: boolean;
+            isDefined: boolean;
             /** Format: double */
-            lowerTolerance?: number;
+            lowerTolerance: number;
             /** Format: double */
-            nominalValue?: number;
-            precision?: components["schemas"]["GBTTolerancePrecision"];
-            toleranceType?: components["schemas"]["GBTToleranceType"];
+            nominalValue: number;
+            precision: components["schemas"]["GBTTolerancePrecision"];
+            toleranceType: components["schemas"]["GBTToleranceType"];
             /** Format: double */
-            upperTolerance?: number;
+            upperTolerance: number;
         };
         "BTTorusDescription-1834": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTSurfaceDescription-1564"], "btType"> & {
             axis?: components["schemas"]["BTVector3d-389"];
             btType?: string;
@@ -18853,6 +19073,7 @@ export interface components {
             urdfMeshFormat?: components["schemas"]["GBTUrdfMeshFormat"];
             urdfStlEncoding?: components["schemas"]["GBTStlEncodingType"];
             useFileNameToSetSinglePartName?: boolean;
+            useGlbCompression?: boolean;
             useGltfCompression?: boolean;
             useIGESImportPostProcessing?: boolean;
             useIgesCompatibilityMode?: boolean;
@@ -18868,204 +19089,204 @@ export interface components {
             versionString: string;
         };
         BTTranslationRequestImportInfo: {
-            documentId?: string;
-            failureReason?: string;
+            documentId: string;
+            failureReason: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            requestElementId?: string;
-            requestState?: components["schemas"]["BTTranslationRequestState"];
-            resultDocumentId?: string;
-            resultElementIds?: string[];
-            resultExternalDataIds?: string[];
-            resultWorkspaceId?: string;
-            versionId?: string;
+            name: string;
+            requestElementId: string;
+            requestState: components["schemas"]["BTTranslationRequestState"];
+            resultDocumentId: string;
+            resultElementIds: string[];
+            resultExternalDataIds: string[];
+            resultWorkspaceId: string;
+            versionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         BTTranslationRequestInfo: {
-            documentId?: string;
+            documentId: string;
             /** @description The file name after evaluating a rule for the given `formatName`. `NULL` if `evaluateExportRule=false` or if the export rule is not found. */
-            exportRuleFileName?: string;
-            failureReason?: string;
+            exportRuleFileName: string;
+            failureReason: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
-            requestElementId?: string;
-            requestState?: components["schemas"]["BTTranslationRequestState"];
-            resultDocumentId?: string;
-            resultElementIds?: string[];
-            resultExternalDataIds?: string[];
-            resultWorkspaceId?: string;
-            versionId?: string;
+            name: string;
+            requestElementId: string;
+            requestState: components["schemas"]["BTTranslationRequestState"];
+            resultDocumentId: string;
+            resultElementIds: string[];
+            resultExternalDataIds: string[];
+            resultWorkspaceId: string;
+            versionId: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workspaceId?: string;
+            viewRef: string;
+            workspaceId: string;
         };
         /** @enum {string} */
         BTTranslationRequestState: "ACTIVE" | "DONE" | "FAILED";
         "BTTreeEdit-13": {
             /** @description Type of JSON object. */
-            btType?: string;
-            editType?: components["schemas"]["EditType"];
-            newNodes?: components["schemas"]["BTTreeNode-20"][];
-            nothing?: boolean;
+            btType: string;
+            editType: components["schemas"]["EditType"];
+            newNodes: components["schemas"]["BTTreeNode-20"][];
+            nothing: boolean;
         };
         "BTTreeNode-20": {
             /** @description Type of JSON object. */
-            btType?: string;
-            nodeId?: string;
+            btType: string;
+            nodeId: string;
         };
         BTTrialInfo: {
-            paidCustomerInPast?: boolean;
-            planId?: string;
-            planInterval?: string;
+            paidCustomerInPast: boolean;
+            planId: string;
+            planInterval: string;
             /** Format: int64 */
-            seats?: number;
+            seats: number;
             /** Format: int64 */
-            trialDaysRemaining?: number;
+            trialDaysRemaining: number;
             /** Format: date-time */
-            trialEndDate?: string;
+            trialEndDate: string;
             /** Format: date-time */
-            trialStartDate?: string;
+            trialStartDate: string;
         };
         "BTUiFeatureStudioChecksum-2438": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: int32 */
-            crc32?: number;
-            microversion?: components["schemas"]["BTMicroversionId-366"];
+            crc32: number;
+            microversion: components["schemas"]["BTMicroversionId-366"];
         };
         "BTUiSelection-1185": {
             /** @description Type of JSON object. */
-            btType?: string;
-            deterministicIdList?: string[];
-            id?: string;
-            occurrence?: components["schemas"]["BTOccurrence-74"];
-            tableRowId?: string;
-            type?: components["schemas"]["GBTUiSelectionType"];
+            btType: string;
+            deterministicIdList: string[];
+            id: string;
+            occurrence: components["schemas"]["BTOccurrence-74"];
+            tableRowId: string;
+            type: components["schemas"]["GBTUiSelectionType"];
         };
         BTUnchangedElementInfo: {
-            connectionId?: string;
-            elementId?: string;
-            unchangedReferences?: components["schemas"]["BTUnchangedReferenceInfo"][];
+            connectionId: string;
+            elementId: string;
+            unchangedReferences: components["schemas"]["BTUnchangedReferenceInfo"][];
         };
         BTUnchangedReferenceInfo: {
-            metadataUnchanged?: boolean;
-            nodeIds?: string[];
-            toRevision?: components["schemas"]["BTRevisionInfo"];
+            metadataUnchanged: boolean;
+            nodeIds: string[];
+            toRevision: components["schemas"]["BTRevisionInfo"];
         };
         BTUniqueDocumentItemParams: {
-            apiConfiguration?: string;
-            documentId?: string;
-            elementId?: string;
-            elementType?: string;
-            partId?: string;
-            partNumber?: string;
-            revision?: string;
-            versionId?: string;
-            workspaceId?: string;
+            apiConfiguration: string;
+            documentId: string;
+            elementId: string;
+            elementType: string;
+            partId: string;
+            partNumber: string;
+            revision: string;
+            versionId: string;
+            workspaceId: string;
         };
         BTUnitInfo: {
-            defaultUnits?: components["schemas"]["BTDefaultUnitsInfo"];
+            defaultUnits: components["schemas"]["BTDefaultUnitsInfo"];
             /** @description Specifies the display precision for every supported unit. */
-            unitsDisplayPrecision?: {
+            unitsDisplayPrecision: {
                 [key: string]: number;
             };
         };
         BTUnitsMaximumDisplayPrecisionInfo: {
-            unitsDisplayPrecision?: {
+            unitsDisplayPrecision: {
                 [key: string]: number;
             };
         };
         "BTUpdateFeaturesCall-1748": {
             /** @description Type of JSON object. */
-            btType?: string;
-            features?: components["schemas"]["BTMFeature-134"][];
+            btType: string;
+            features: components["schemas"]["BTMFeature-134"][];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
-            updateSuppressionAttributes?: boolean;
+            sourceMicroversion: string;
+            updateSuppressionAttributes: boolean;
         };
         "BTUpdateFeaturesResponse-1333": {
             /** @description Type of JSON object. */
-            btType?: string;
-            featureStates?: {
+            btType: string;
+            featureStates: {
                 [key: string]: components["schemas"]["BTFeatureState-1688"];
             };
-            features?: components["schemas"]["BTMFeature-134"][];
+            features: components["schemas"]["BTMFeature-134"][];
             /**
              * Format: int32
              * @description FeatureScript version used in the Part Studio. Do not modify.
              */
-            libraryVersion?: number;
+            libraryVersion: number;
             /** @description On output, `true` indicates a microversion mismatch was encountered. */
-            microversionSkew?: boolean;
+            microversionSkew: boolean;
             /** @description If `true`, the call will refuse to make the addition if the current microversion for the document does not match the source microversion. If `false`, a best-effort attempt is made to re-interpret the feature addition in the context of a newer document microversion. */
-            rejectMicroversionSkew?: boolean;
+            rejectMicroversionSkew: boolean;
             /** @description Version of the structure serialization rules used to encode the output. This enables incompatibility detection during software updates. */
-            serializationVersion?: string;
+            serializationVersion: string;
             /** @description The state from which the result was extracted. Geometry ID interpretation is dependent on this document microversion. */
-            sourceMicroversion?: string;
+            sourceMicroversion: string;
         };
         BTUpdateMeshUnitsParams: {
-            units?: string;
+            units: string;
         };
         BTUpdateReferenceParams: {
-            connectionId?: string;
-            editDescription?: string;
-            referenceUpdates?: components["schemas"]["UpdateParams"][];
+            connectionId: string;
+            editDescription: string;
+            referenceUpdates: components["schemas"]["UpdateParams"][];
         };
         /** @description Parameters for updating a release or obsoletion candidate. */
         BTUpdateReleasePackageParams: {
             /** @description Items to remove from the release candidate when `action=REMOVE_ITEMS`. */
-            itemIds?: string[];
+            itemIds: string[];
             /** @description Items in the release candidate. */
-            items?: components["schemas"]["BTReleasePackageItemParams"][];
+            items: components["schemas"]["BTReleasePackageItemParams"][];
             /** @description Release candidate properties. */
-            properties?: components["schemas"]["BTPropertyValueParam"][];
+            properties: components["schemas"]["BTPropertyValueParam"][];
         };
         BTUpdateTaskParams: {
             /** @description Use to transfer task ownership to the company. */
-            companyId?: string;
+            companyId: string;
             /** @description References to remove from the task. */
-            deleteItemIds?: string[];
-            descriptionParamValue?: string;
+            deleteItemIds: string[];
+            descriptionParamValue: string;
             /** @description References to add to the task. */
-            itemParams?: components["schemas"]["BTTaskItemParams"][];
-            nameParamValue?: string;
+            itemParams: components["schemas"]["BTTaskItemParams"][];
+            nameParamValue: string;
             /** @description Task metadata properties. */
-            propertyValues?: components["schemas"]["BTPropertyValueParam"][];
-            workflowId?: string;
+            propertyValues: components["schemas"]["BTPropertyValueParam"][];
+            workflowId: string;
         };
         BTUserAdminInfo: Omit<components["schemas"]["BTUserInfo"], "jsonType"> & {
             discount?: components["schemas"]["BTDiscount"];
@@ -19099,24 +19320,24 @@ export interface components {
             jsonType: "BTUserAdminSummaryInfo";
         };
         BTUserAppMessageBody: {
-            appElementSessionId?: string;
-            clientId?: string;
-            data?: string;
-            event?: string;
-            identityId?: string;
-            messageId?: string;
-            settingType?: components["schemas"]["BTApplicationSettingsType"];
+            appElementSessionId: string;
+            clientId: string;
+            data: string;
+            event: string;
+            identityId: string;
+            messageId: string;
+            settingType: components["schemas"]["BTApplicationSettingsType"];
             /** Format: date-time */
-            timestamp?: string;
-            webhookId?: string;
+            timestamp: string;
+            webhookId: string;
         };
         /** @enum {string} */
         BTUserAppSettingOperationType: "ADD" | "REMOVE" | "UPDATE";
         BTUserAppSettingsInfo: {
-            settings?: components["schemas"]["BTSettingInfo"][];
+            settings: components["schemas"]["BTSettingInfo"][];
         };
         BTUserAppSettingsParams: {
-            settings?: components["schemas"]["BTSettingParam"][];
+            settings: components["schemas"]["BTSettingParam"][];
         };
         BTUserBasicSummaryInfo: {
             jsonType: string;
@@ -19204,31 +19425,31 @@ export interface components {
         };
         BTUserMetricsInfo: {
             /** Format: int64 */
-            createdDocuments?: number;
-            hasRecentlyOpenedDocuments?: boolean;
-            hasSharedDocuments?: boolean;
-            hasTrashedDocuments?: boolean;
+            createdDocuments: number;
+            hasRecentlyOpenedDocuments: boolean;
+            hasSharedDocuments: boolean;
+            hasTrashedDocuments: boolean;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: int64 */
-            privateDocuments?: number;
+            privateDocuments: number;
             /** Format: int64 */
-            publicDocuments?: number;
+            publicDocuments: number;
             /** Format: int64 */
-            sharedDocuments?: number;
-            userAccountLimitsCrossed?: boolean;
+            sharedDocuments: number;
+            userAccountLimitsCrossed: boolean;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTUserOAuth2SummaryInfo: Omit<components["schemas"]["BTUserSummaryInfo"], "jsonType"> & {
             clientId?: string;
@@ -19247,59 +19468,64 @@ export interface components {
             jsonType: "BTUserOAuth2SummaryInfo";
         };
         BTUserSettingsInfo: {
-            axisRotationLock?: boolean;
-            commonUnits?: components["schemas"]["BTCommonUnitsInfo"];
-            customColors?: string[];
-            defaultUnits?: components["schemas"]["BTDefaultUnitsInfo"];
-            displayAssemblyProperties?: boolean;
-            /** Format: int32 */
-            drawingBackgroundId?: number;
-            enforceApplicationAcl?: boolean;
-            exportDrawingOptions?: string;
-            exportSolidOptions?: string;
-            graphicsRenderMode?: string;
-            graphicsSmoothEdge?: string;
-            highlightLaminarEdges?: string;
-            id?: string;
-            importOptions?: string;
-            isolateEnableSelectionDesire?: boolean;
-            isolateHideTransparent?: string;
+            axisRotationLock: boolean;
+            commonUnits: components["schemas"]["BTCommonUnitsInfo"];
             /** Format: float */
-            isolateOpacitySliderValue?: number;
-            locale?: string;
-            makeTransparentEnableSelectionDesire?: boolean;
+            contextTranslucencySliderValue: number;
+            contextTranslucent: boolean;
+            customColors: string[];
+            defaultUnits: components["schemas"]["BTDefaultUnitsInfo"];
+            displayAssemblyProperties: boolean;
+            /** Format: int32 */
+            drawingBackgroundId: number;
+            enforceApplicationAcl: boolean;
+            exportDrawingOptions: string;
+            exportSolidOptions: string;
+            graphicsRenderMode: string;
+            graphicsSmoothEdge: string;
+            highlightLaminarEdges: string;
+            id: string;
+            importOptions: string;
+            isolateEnableSelectionDesire: boolean;
+            isolateHideTransparent: string;
             /** Format: float */
-            makeTransparentOpacitySliderValue?: number;
-            materialLibrarySettings?: components["schemas"]["BTMaterialLibrarySettingsInfo"];
-            miniToolbarSettings?: string;
-            mouseActions?: string;
-            perspectiveModeOn?: string;
-            previousSketchFont?: string;
-            reverseScrollWheelZoomDirection?: boolean;
-            selectItemViewStateInfos?: components["schemas"]["BTSelectItemViewStateInfo"][];
-            sketchShowConstraints?: boolean;
-            sketchShowErrors?: boolean;
-            sketchShowExpressions?: boolean;
+            isolateOpacitySliderValue: number;
+            locale: string;
+            makeTransparentEnableSelectionDesire: boolean;
+            /** Format: float */
+            makeTransparentOpacitySliderValue: number;
+            materialLibrarySettings: components["schemas"]["BTMaterialLibrarySettingsInfo"];
+            miniToolbarSettings: string;
+            mouseActions: string;
+            perspectiveModeOn: string;
+            previousSketchFont: string;
+            reverseScrollWheelZoomDirection: boolean;
+            selectItemViewStateInfos: components["schemas"]["BTSelectItemViewStateInfo"][];
+            sketchShowConstraints: boolean;
+            sketchShowErrors: boolean;
+            sketchShowExpressions: boolean;
             /** Format: int32 */
-            startupPage?: number;
-            substituteApprovers?: components["schemas"]["BTSubstituteApproverInfo"][];
+            startupPage: number;
+            substituteApprovers: components["schemas"]["BTSubstituteApproverInfo"][];
             /** Format: int32 */
-            theme?: number;
-            unitsDisplayPrecision?: {
+            theme: number;
+            unitsDisplayPrecision: {
                 [key: string]: number;
             };
-            unitsMaximumDisplayPrecision?: components["schemas"]["BTUnitsMaximumDisplayPrecisionInfo"];
-            use24HourTime?: boolean;
-            useDecimalComma?: boolean;
-            usePenAsMouse?: boolean;
-            viewManipulationMouseKeyMapping?: components["schemas"]["BTViewManipulationMouseKeyMappingInfo"];
+            unitsMaximumDisplayPrecision: components["schemas"]["BTUnitsMaximumDisplayPrecisionInfo"];
+            use24HourTime: boolean;
+            useDecimalComma: boolean;
+            usePenAsMouse: boolean;
+            viewManipulationMouseKeyMapping: components["schemas"]["BTViewManipulationMouseKeyMappingInfo"];
             /** Format: int32 */
-            viewMappingId?: number;
+            viewMappingId: number;
         };
         /** @enum {string} */
         BTUserState: "DELETED" | "ACTIVE" | "INACTIVE" | "REQUESTED" | "APPROVED" | "REQUEST_EXPIRED" | "ALL" | "MARKED_FOR_DELETION";
         BTUserSummaryInfo: Omit<components["schemas"]["BTUserDetailSummaryInfo"], "jsonType"> & {
             company?: components["schemas"]["BTCompanySummaryInfo"];
+            /** Format: int32 */
+            companyUserState?: number;
             confirmationRequested?: boolean;
             documentationNameOverride?: string;
             globalPermissions?: components["schemas"]["GlobalPermissionInfo"];
@@ -19316,9 +19542,9 @@ export interface components {
         };
         "BTValueAndUse-4696": {
             /** @description Type of JSON object. */
-            btType?: string;
-            use?: components["schemas"]["GBTValueUse"];
-            value?: components["schemas"]["BTFSValue-1888"];
+            btType: string;
+            use: components["schemas"]["GBTValueUse"];
+            value: components["schemas"]["BTFSValue-1888"];
         };
         /** @description Variables in the VariableTable */
         BTVariableInfo: {
@@ -19363,11 +19589,11 @@ export interface components {
         };
         BTVariableStudioReferenceListInfo: {
             /** @description List of variable studio references */
-            references?: components["schemas"]["BTVariableStudioReferenceInfo"][];
+            references: components["schemas"]["BTVariableStudioReferenceInfo"][];
         };
         "BTVariableStudioReferenceSpec-5278": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTFeatureSpec-129"], "btType"> & {
             btType?: string;
         } & {
@@ -19388,7 +19614,7 @@ export interface components {
         };
         "BTVariableTableRowMetadata-3912": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTTableBaseRowMetadata-3181"], "btType"> & {
             btType?: string;
             crossHighlightData?: components["schemas"]["BTTableBaseCrossHighlightData-2609"];
@@ -19404,239 +19630,289 @@ export interface components {
         });
         "BTVector2d-1812": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            x?: number;
+            x: number;
             /** Format: double */
-            y?: number;
+            y: number;
         };
         "BTVector3d-389": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
             /** Format: double */
-            x?: number;
+            x: number;
             /** Format: double */
-            y?: number;
+            y: number;
             /** Format: double */
-            z?: number;
+            z: number;
         };
-        /** @enum {string} */
-        BTVersionGraphMode: "ALL_BRANCHES" | "ACTIVE_BRANCH" | "ALL_BRANCHES_WITH_WORKSPACES" | "ACTIVE_BRANCH_WITH_PARENTS";
         BTVersionInfo: {
             /** Format: date-time */
-            createdAt?: string;
-            creator?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
-            documentId?: string;
+            createdAt: string;
+            creator: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
+            documentId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            lastModifier?: components["schemas"]["BTUserBasicSummaryInfo"];
-            metadataWorkspaceId?: string;
-            microversion?: string;
+            id: string;
+            lastModifier: components["schemas"]["BTUserBasicSummaryInfo"];
+            metadataWorkspaceId: string;
+            microversion: string;
             /** Format: date-time */
-            modifiedAt?: string;
+            modifiedAt: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: date-time */
-            overrideDate?: string;
-            parent?: string;
+            overrideDate: string;
+            parent: string;
             /** Format: int32 */
-            purpose?: number;
-            thumbnail?: components["schemas"]["BTThumbnailInfo"];
-            type?: string;
+            purpose: number;
+            thumbnail: components["schemas"]["BTThumbnailInfo"];
+            type: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTVersionOrWorkspaceMergeInfo: {
-            defaultMergeStrategy?: components["schemas"]["BTMergeStrategy"];
-            id?: string;
-            mergeStrategyElementOverrides?: {
+            defaultMergeStrategy: components["schemas"]["BTMergeStrategy"];
+            id: string;
+            mergeStrategyElementOverrides: {
                 [key: string]: components["schemas"]["BTMergeStrategy"];
             };
-            type?: string;
+            type: string;
         };
         BTVersionOrWorkspaceParams: {
-            clientInteractionMode?: string;
-            description?: string;
-            documentId?: string;
-            fromHistory?: boolean;
-            isRelease?: boolean;
-            microversionId?: string;
-            missingBomTableTemplateId?: string;
-            name?: string;
+            clientInteractionMode: string;
+            description: string;
+            documentId: string;
+            fromHistory: boolean;
+            isRelease: boolean;
+            microversionId: string;
+            missingBomTableTemplateId: string;
+            name: string;
             /**
              * @description Publish FeatureScript at this version.
              * @default false
              */
             publishVersion: boolean;
             /** Format: int32 */
-            purpose?: number;
-            readOnly?: boolean;
-            versionId?: string;
-            workspaceId?: string;
+            purpose: number;
+            readOnly: boolean;
+            versionId: string;
+            workspaceId: string;
         };
         BTViewDataInfo: {
             /** Format: double */
-            angle?: number;
-            cameraViewport?: number[];
-            isPerspective?: boolean;
-            viewMatrix?: number[];
+            angle: number;
+            cameraViewport: number[];
+            isPerspective: boolean;
+            viewMatrix: number[];
         };
         BTViewDataParams: {
             /** Format: double */
-            angle?: number;
-            cameraViewport?: number[];
-            isPerspective?: boolean;
-            viewMatrix?: number[];
+            angle: number;
+            cameraViewport: number[];
+            isPerspective: boolean;
+            viewMatrix: number[];
         };
         /** @description Describes a view feature. */
         BTViewFeatureBaseInfo: {
             /** @description The ID of the view feature. */
-            id?: string;
+            id: string;
             /** @description The name of the view feature. */
-            name?: string;
+            name: string;
         };
         BTViewManipulationMouseKeyMappingInfo: {
-            axisRotate3DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
-            pan2DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
-            pan3DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
-            rotate3DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
-            zoom2DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
-            zoom3DMapping?: components["schemas"]["BTKeyMouseValuesInfo"][];
+            axisRotate3DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
+            pan2DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
+            pan3DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
+            rotate3DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
+            zoom2DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
+            zoom3DMapping: components["schemas"]["BTKeyMouseValuesInfo"][];
         };
         BTWebClientCapabilitiesParams: {
-            angleInstancedArrays?: boolean;
+            angleInstancedArrays: boolean;
             /** Format: double */
-            clientBrowserStorageQuota?: number;
+            clientBrowserStorageQuota: number;
             /** Format: double */
-            clientBrowserStorageUsed?: number;
-            compressedTextureS3tc?: boolean;
-            depthTexture?: boolean;
+            clientBrowserStorageUsed: number;
+            compressedTextureS3tc: boolean;
+            depthTexture: boolean;
             /** Format: double */
-            devicePixelRatio?: number;
-            drawBuffers?: boolean;
-            extTextureFilterAnisotropic?: boolean;
-            has3dMouse?: boolean;
-            oesElementIndexUint?: boolean;
-            oesStandardDerivatives?: boolean;
-            oesTextureFloat?: boolean;
-            oesTextureFloatLinear?: boolean;
-            oesTextureHalfFloat?: boolean;
-            oesTextureHalfFloatLinear?: boolean;
-            oesVertexArrayObject?: boolean;
-            renderer?: string;
+            devicePixelRatio: number;
+            drawBuffers: boolean;
+            extTextureFilterAnisotropic: boolean;
+            has3dMouse: boolean;
+            oesElementIndexUint: boolean;
+            oesStandardDerivatives: boolean;
+            oesTextureFloat: boolean;
+            oesTextureFloatLinear: boolean;
+            oesTextureHalfFloat: boolean;
+            oesTextureHalfFloatLinear: boolean;
+            oesVertexArrayObject: boolean;
+            renderer: string;
             /** Format: int32 */
-            screenHeight?: number;
+            screenHeight: number;
             /** Format: int32 */
-            screenWidth?: number;
-            supportsWebGL2?: boolean;
-            supportsWebGPU?: boolean;
-            vendor?: string;
+            screenWidth: number;
+            supportsWebGL2: boolean;
+            supportsWebGPU: boolean;
+            vendor: string;
         };
         BTWebRendererPerformanceMeasurementParams: {
             /** Format: float */
-            linesPerSecond?: number;
-            renderer?: string;
+            linesPerSecond: number;
+            renderer: string;
             /** Format: float */
-            trianglesPerSecond?: number;
-            vendor?: string;
+            trianglesPerSecond: number;
+            vendor: string;
         };
         BTWebhookInfo: {
             /** @description Company admins can register webhooks to listen to all company events. */
-            companyId?: string;
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserSummaryInfo"];
-            data?: string;
-            description?: string;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserSummaryInfo"];
+            data: string;
+            description: string;
             /** Format: int32 */
-            droppedEventCount?: number;
+            droppedEventCount: number;
             /** @description List of events for which webhook callback is invoked. */
-            events?: string[];
+            events: string[];
             /** @description Applications can pass this parameter as X-Session-ID with every REST call to distinguish webhooks triggered by self. */
-            externalSessionId?: string;
-            filter?: string;
-            folderId?: string;
+            externalSessionId: string;
+            filter: string;
+            folderId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /**
              * @description Transient webhooks are automatically cleaned up after a period of inactivity.
              * @default true
              */
             isTransient: boolean;
             /** Format: date-time */
-            modifiedAt?: string;
+            modifiedAt: string;
             /** @description Name of the resource. */
-            name?: string;
-            options?: components["schemas"]["BTWebhookOptions"];
-            projectId?: string;
-            url?: string;
+            name: string;
+            options: components["schemas"]["BTWebhookOptions"];
+            projectId: string;
+            url: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTWebhookLifecycleMessageBody: {
-            appElementSessionId?: string;
-            data?: string;
-            event?: string;
-            messageId?: string;
+            appElementSessionId: string;
+            data: string;
+            event: string;
+            messageId: string;
             /** Format: date-time */
-            timestamp?: string;
-            webhookId?: string;
+            timestamp: string;
+            webhookId: string;
         };
         BTWebhookOptions: {
-            collapseEvents?: boolean;
+            collapseEvents: boolean;
         };
         BTWebhookParams: {
-            clientId?: string;
+            clientId: string;
             /** @description Company admins can register webhooks to listen to all company events. */
-            companyId?: string;
-            data?: string;
+            companyId: string;
+            data: string;
             /** @description Webhook description. */
-            description?: string;
-            documentId?: string;
-            elementId?: string;
+            description: string;
+            documentId: string;
+            elementId: string;
             /** @description List of events for which webhook callback is invoked. */
-            events?: string[];
+            events: string[];
             /** @description Applications can pass this parameter as X-Session-ID with every REST call to distinguish webhooks triggered by self. */
-            externalSessionId?: string;
-            filter?: string;
-            folderId?: string;
-            id?: string;
+            externalSessionId: string;
+            filter: string;
+            folderId: string;
+            id: string;
             /**
              * @description Transient webhooks are automatically cleaned up after a period of inactivity.
              * @default true
              */
             isTransient: boolean;
-            linkDocumentId?: string;
+            linkDocumentId: string;
             /** @description Webhook name. */
-            name?: string;
-            options?: components["schemas"]["BTWebhookOptions"];
-            partId?: string;
-            projectId?: string;
-            url?: string;
-            userId?: string;
-            versionId?: string;
-            workspaceId?: string;
+            name: string;
+            options: components["schemas"]["BTWebhookOptions"];
+            partId: string;
+            projectId: string;
+            url: string;
+            userId: string;
+            versionId: string;
+            workspaceId: string;
+        };
+        BTWhereUsedItemInfoList: {
+            /** @description The resolved default configuration parameters for the queried element. Only populated when the configuration query parameter is set to 'default'. */
+            defaultConfig: components["schemas"]["ConfigInfo"][];
+            /**
+             * Format: uri
+             * @description URI for current page of resources.
+             */
+            href: string;
+            /** @description Array of items in the current page. */
+            items: components["schemas"]["BTProductStructureItemInfo"][];
+            /**
+             * Format: uri
+             * @description URI for next page of the resources if more are available.
+             */
+            next: string;
+            /**
+             * Format: uri
+             * @description URI for previous page of the resources.
+             */
+            previous: string;
+            /** @description List of document versions in which the queried item is referenced. Each entry contains the version info, referring document and element details, configuration, revision, and part identifiers. Only populated when includeVersionInfo is true. */
+            versions: components["schemas"]["BTWhereUsedVersionReferencedInfo"][];
+        };
+        /** @description List of document versions in which the queried item is referenced. Each entry contains the version info, referring document and element details, configuration, revision, and part identifiers. Only populated when includeVersionInfo is true. */
+        BTWhereUsedVersionReferencedInfo: {
+            /** @description The configuration parameters of the referenced item in this version. */
+            configuration: components["schemas"]["ConfigInfo"][];
+            /**
+             * Format: date-time
+             * @description The timestamp when this version was created.
+             */
+            createdAt: string;
+            document: components["schemas"]["BTDocumentBaseSummaryInfo"];
+            /** @description The element ID of the referring element in this version. */
+            elementId: string;
+            /**
+             * Format: int32
+             * @description The element type ordinal of the referring element.
+             */
+            elementType: number;
+            /** @description The part ID of the referenced item. */
+            partId: string;
+            /** @description The part name of the referenced item. */
+            partName: string;
+            /** @description The part number of the referenced item. */
+            partNumber: string;
+            /** @description The revision id of the referenced item. */
+            revision: string;
+            /** @description Whether the revision of this item is obsolete. */
+            revisionObsolete: boolean;
+            version: components["schemas"]["BTBaseInfo"];
         };
         "BTWidthMateDisplayData-2888": {
             /** @description Type of JSON object. */
-            btType?: string;
+            btType: string;
         } & (Omit<components["schemas"]["BTAssemblyFeatureDisplayData-1783"], "btType"> & {
             btType?: string;
             location?: components["schemas"]["BTCoordinateSystem-387"];
@@ -19649,247 +19925,247 @@ export interface components {
             btType: "BTWidthMateDisplayData-2888";
         });
         BTWorkflowActionInfo: {
-            action?: string;
-            allowIfApprovers?: boolean;
-            allowIfNoApprovers?: boolean;
-            alwaysAllow?: boolean;
-            isAdminOverride?: boolean;
-            isApproverAction?: boolean;
-            isCreatorOverride?: boolean;
-            label?: string;
-            requiredProperties?: string[];
-            tooltip?: string;
-            type?: components["schemas"]["BTTransitionType"];
-            uiHint?: string;
+            action: string;
+            allowIfApprovers: boolean;
+            allowIfNoApprovers: boolean;
+            alwaysAllow: boolean;
+            isAdminOverride: boolean;
+            isApproverAction: boolean;
+            isCreatorOverride: boolean;
+            label: string;
+            requiredProperties: string[];
+            tooltip: string;
+            type: components["schemas"]["BTTransitionType"];
+            uiHint: string;
         };
         BTWorkflowAuditLogEntryInfo: {
-            approvalOverride?: boolean;
-            approverIds?: string[];
-            commentId?: string;
+            approvalOverride: boolean;
+            approverIds: string[];
+            commentId: string;
             /** Format: date-time */
-            date?: string;
+            date: string;
             /** Format: int32 */
-            entryType?: number;
-            errorMessage?: string;
-            featureScriptConsole?: string;
-            featureScriptNotices?: string[];
-            featureScriptResponse?: Record<string, never>;
-            id?: string;
-            objectId?: string;
-            propertyUpdates?: components["schemas"]["BTPropertyUpdateInfo"][];
-            supportCode?: string;
-            transitionsSkipped?: string[];
-            userId?: string;
-            workflowAction?: string;
-            workflowState?: string;
-            workflowTransition?: string;
+            entryType: number;
+            errorMessage: string;
+            featureScriptConsole: string;
+            featureScriptNotices: string[];
+            featureScriptResponse: Record<string, never>;
+            id: string;
+            objectId: string;
+            propertyUpdates: components["schemas"]["BTPropertyUpdateInfo"][];
+            supportCode: string;
+            transitionsSkipped: string[];
+            userId: string;
+            workflowAction: string;
+            workflowState: string;
+            workflowTransition: string;
         };
         BTWorkflowAuditLogInfo: {
-            companyId?: string;
-            debugMicroversionId?: string;
-            entries?: components["schemas"]["BTWorkflowAuditLogEntryInfo"][];
-            objectId?: string;
+            companyId: string;
+            debugMicroversionId: string;
+            entries: components["schemas"]["BTWorkflowAuditLogEntryInfo"][];
+            objectId: string;
             /** Format: int32 */
-            objectType?: number;
-            publishedWorkflowId?: components["schemas"]["BTPublishedWorkflowId"];
+            objectType: number;
+            publishedWorkflowId: components["schemas"]["BTPublishedWorkflowId"];
         };
         BTWorkflowMessageBody: {
-            appElementSessionId?: string;
-            data?: string;
-            event?: string;
-            messageId?: string;
-            objectId?: string;
-            objectType?: string;
+            appElementSessionId: string;
+            data: string;
+            event: string;
+            messageId: string;
+            objectId: string;
+            objectType: string;
             /** Format: date-time */
-            timestamp?: string;
-            transitionName?: string;
-            webhookId?: string;
-            workflowId?: string;
+            timestamp: string;
+            transitionName: string;
+            webhookId: string;
+            workflowId: string;
         };
         /** @enum {string} */
         BTWorkflowObserverEntryType: "USER" | "TEAM" | "ROLE" | "ALIAS";
         /** @description Array of items in the current page. */
         BTWorkflowObserverOptionInfo: {
-            alias?: components["schemas"]["BTAliasInfo"];
-            company?: components["schemas"]["BTCompanySummaryInfo"];
+            alias: components["schemas"]["BTAliasInfo"];
+            company: components["schemas"]["BTCompanySummaryInfo"];
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: int32 */
-            identityType?: number;
-            role?: components["schemas"]["BTRbacRoleInfo"];
-            team?: components["schemas"]["BTTeamSummaryInfo"];
-            user?: components["schemas"]["BTUserSummaryInfo"];
+            identityType: number;
+            role: components["schemas"]["BTRbacRoleInfo"];
+            team: components["schemas"]["BTTeamSummaryInfo"];
+            user: components["schemas"]["BTUserSummaryInfo"];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         /** @enum {string} */
         BTWorkflowObserverState: "NONE" | "APPROVED" | "REJECTED" | "OVERRIDDEN";
         BTWorkflowPropertyInfo: {
-            aggregationSkippedFilteredOutValues?: boolean;
-            computedAssemblyProperty?: boolean;
-            computedProperty?: boolean;
-            computedPropertyError?: string;
-            computedPropertyEvalInfo?: string;
-            dateFormat?: string;
-            defaultValue?: Record<string, never>;
-            dirty?: boolean;
-            editable?: boolean;
-            editableInUi?: boolean;
-            enumValues?: components["schemas"]["BTMetadataEnumValueInfo"][];
-            hideInUi?: boolean;
-            initialValue?: Record<string, never>;
-            isApproverProperty?: boolean;
-            isNotifierProperty?: boolean;
-            multivalued?: boolean;
-            name?: string;
-            observers?: components["schemas"]["BTWorkflowableObjectObserver"][];
-            propertyId?: string;
+            aggregationSkippedFilteredOutValues: boolean;
+            computedAssemblyProperty: boolean;
+            computedProperty: boolean;
+            computedPropertyError: string;
+            computedPropertyEvalInfo: string;
+            dateFormat: string;
+            defaultValue: Record<string, never>;
+            dirty: boolean;
+            editable: boolean;
+            editableInUi: boolean;
+            enumValues: components["schemas"]["BTMetadataEnumValueInfo"][];
+            hideInUi: boolean;
+            initialValue: Record<string, never>;
+            isApproverProperty: boolean;
+            isNotifierProperty: boolean;
+            multivalued: boolean;
+            name: string;
+            observers: components["schemas"]["BTWorkflowableObjectObserver"][];
+            propertyId: string;
             /**
              * Format: int32
              * @description 0: Unknown | 1: Not computed | 2: Computed without override | 3: Computed with override | 4: Computed with subassembly overrides | 5: Overridden
              */
-            propertyOverrideStatus?: number;
+            propertyOverrideStatus: number;
             /** Format: int32 */
-            propertySource?: number;
-            publicPartOverridable?: boolean;
-            required?: boolean;
-            schemaId?: string;
-            teamsOnly?: boolean;
-            uiHints?: components["schemas"]["BTMetadataPropertyUiHintsInfo"];
-            usersOnly?: boolean;
-            validator?: components["schemas"]["BTMetadataPropertyValidatorInfo"];
-            value?: Record<string, never>;
-            valueType?: string;
+            propertySource: number;
+            publicPartOverridable: boolean;
+            required: boolean;
+            schemaId: string;
+            teamsOnly: boolean;
+            uiHints: components["schemas"]["BTMetadataPropertyUiHintsInfo"];
+            usersOnly: boolean;
+            validator: components["schemas"]["BTMetadataPropertyValidatorInfo"];
+            value: Record<string, never>;
+            valueType: string;
         };
         BTWorkflowSnapshotInfo: {
-            actions?: components["schemas"]["BTWorkflowActionInfo"][];
-            approverIds?: string[];
-            canBeDiscarded?: boolean;
-            currentStateDisplayName?: string;
-            debugMicroversionId?: string;
-            errorMessage?: string;
-            isCreator?: boolean;
-            isDiscarded?: boolean;
-            isFrozen?: boolean;
-            isSetup?: boolean;
-            metadataState?: string;
-            notifierIds?: string[];
-            state?: components["schemas"]["BTWorkflowStateInfo"];
-            usesExternalPlm?: boolean;
+            actions: components["schemas"]["BTWorkflowActionInfo"][];
+            approverIds: string[];
+            canBeDiscarded: boolean;
+            currentStateDisplayName: string;
+            debugMicroversionId: string;
+            errorMessage: string;
+            isCreator: boolean;
+            isDiscarded: boolean;
+            isFrozen: boolean;
+            isSetup: boolean;
+            metadataState: string;
+            notifierIds: string[];
+            state: components["schemas"]["BTWorkflowStateInfo"];
+            usesExternalPlm: boolean;
         };
         BTWorkflowStateInfo: {
-            approverSourceProperty?: string;
-            displayName?: string;
-            editPermissions?: string[];
-            editableProperties?: string[];
-            name?: string;
-            nonEditableProperties?: string[];
-            notifierSourceProperty?: string;
-            requiredItemProperties?: string[];
-            requiredProperties?: string[];
+            approverSourceProperty: string;
+            displayName: string;
+            editPermissions: string[];
+            editableProperties: string[];
+            name: string;
+            nonEditableProperties: string[];
+            notifierSourceProperty: string;
+            requiredItemProperties: string[];
+            requiredProperties: string[];
         };
         BTWorkflowableObjectInfo: {
-            companyId?: string;
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
-            documentId?: string;
+            createdAt: string;
+            createdBy: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
+            documentId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
+            id: string;
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: components["schemas"]["BTUserBasicSummaryInfo"];
+            modifiedAt: string;
+            modifiedBy: components["schemas"]["BTUserBasicSummaryInfo"];
             /** @description Name of the resource. */
-            name?: string;
-            properties?: components["schemas"]["BTWorkflowPropertyInfo"][];
+            name: string;
+            properties: components["schemas"]["BTWorkflowPropertyInfo"][];
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
-            workflow?: components["schemas"]["BTWorkflowSnapshotInfo"];
-            workflowError?: string;
-            workflowId?: components["schemas"]["BTPublishedWorkflowId"];
+            viewRef: string;
+            workflow: components["schemas"]["BTWorkflowSnapshotInfo"];
+            workflowError: string;
+            workflowId: components["schemas"]["BTPublishedWorkflowId"];
         };
         BTWorkflowableObjectObserver: {
-            adminOverride?: boolean;
+            adminOverride: boolean;
             /** Format: date-time */
-            approvalDate?: string;
-            approvalState?: components["schemas"]["BTWorkflowObserverState"];
-            approverId?: string;
-            approverName?: string;
-            associatedStates?: string;
-            companyId?: string;
+            approvalDate: string;
+            approvalState: components["schemas"]["BTWorkflowObserverState"];
+            approverId: string;
+            approverName: string;
+            associatedStates: string;
+            companyId: string;
             /** Format: date-time */
-            createdAt?: string;
-            createdBy?: string;
-            creatorOverride?: boolean;
-            description?: string;
-            entryId?: string;
-            entryType?: components["schemas"]["BTWorkflowObserverEntryType"];
-            id?: string;
-            isExternal?: boolean;
+            createdAt: string;
+            createdBy: string;
+            creatorOverride: boolean;
+            description: string;
+            entryId: string;
+            entryType: components["schemas"]["BTWorkflowObserverEntryType"];
+            id: string;
+            isExternal: boolean;
             /** Format: date-time */
-            modifiedAt?: string;
-            modifiedBy?: string;
-            name?: string;
-            new?: boolean;
-            objectId?: string;
+            modifiedAt: string;
+            modifiedBy: string;
+            name: string;
+            new: boolean;
+            objectId: string;
             /** Format: int32 */
-            observationType?: number;
-            propertyId?: string;
+            observationType: number;
+            propertyId: string;
             /** Format: date-time */
-            rejectionDate?: string;
-            removable?: boolean;
+            rejectionDate: string;
+            removable: boolean;
         };
         BTWorkspaceInfo: {
-            canDelete?: boolean;
+            canDelete: boolean;
             /** Format: date-time */
-            createdAt?: string;
-            creator?: components["schemas"]["BTUserBasicSummaryInfo"];
-            description?: string;
-            documentId?: string;
+            createdAt: string;
+            creator: components["schemas"]["BTUserBasicSummaryInfo"];
+            description: string;
+            documentId: string;
             /**
              * Format: uri
              * @description URI to fetch complete information of the resource.
              */
-            href?: string;
+            href: string;
             /** @description Id of the resource. */
-            id?: string;
-            isReadOnly?: boolean;
-            lastModifier?: components["schemas"]["BTUserBasicSummaryInfo"];
-            microversion?: string;
+            id: string;
+            isReadOnly: boolean;
+            lastModifier: components["schemas"]["BTUserBasicSummaryInfo"];
+            microversion: string;
             /** Format: date-time */
-            modifiedAt?: string;
+            modifiedAt: string;
             /** @description Name of the resource. */
-            name?: string;
+            name: string;
             /** Format: date-time */
-            overrideDate?: string;
-            parent?: string;
-            parents?: components["schemas"]["BTVersionInfo"][];
-            protectionRule?: components["schemas"]["BTWorkspaceProtectionRuleOptions"];
-            state?: components["schemas"]["BTObjectState"];
-            thumbnail?: components["schemas"]["BTThumbnailInfo"];
-            type?: string;
+            overrideDate: string;
+            parent: string;
+            parents: components["schemas"]["BTVersionInfo"][];
+            protectionRule: components["schemas"]["BTWorkspaceProtectionRuleOptions"];
+            state: components["schemas"]["BTObjectState"];
+            thumbnail: components["schemas"]["BTThumbnailInfo"];
+            type: string;
             /**
              * Format: uri
              * @description URI to visualize the resource in a webclient if applicable.
              */
-            viewRef?: string;
+            viewRef: string;
         };
         BTWorkspaceMessageBody: components["schemas"]["BTDocumentMessageBody"] & {
             /** @description The resultant document microverion if applicable created due to workspace modification. */
@@ -19898,7 +20174,7 @@ export interface components {
         /** @enum {string} */
         BTWorkspaceProtectionRuleOptions: "OPEN" | "MERGE" | "FAST_FORWARD_MERGE";
         BTZipFileInfo: {
-            files?: string[];
+            files: string[];
         };
         BlobItem: Omit<components["schemas"]["BTPublicationInfoItem"], "jsonType"> & {
             dataTypeForResponse?: string;
@@ -19918,264 +20194,284 @@ export interface components {
         };
         Buffer: {
             /** Format: int32 */
-            byteLength?: number;
-            extensions?: {
+            byteLength: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            uri?: string;
+            extras: Record<string, never>;
+            name: string;
+            uri: string;
         };
         BufferModel: {
-            bufferData?: {
+            bufferData: {
                 /** Format: int32 */
-                short?: number;
-                char?: string;
+                short: number;
+                char: string;
                 /** Format: int32 */
-                int?: number;
+                int: number;
                 /** Format: int64 */
-                long?: number;
+                long: number;
                 /** Format: float */
-                float?: number;
+                float: number;
                 /** Format: double */
-                double?: number;
-                direct?: boolean;
-                readOnly?: boolean;
+                double: number;
+                direct: boolean;
+                readOnly: boolean;
             };
             /** Format: int32 */
-            byteLength?: number;
-            name?: string;
-            uri?: string;
+            byteLength: number;
+            name: string;
+            uri: string;
         };
         BufferView: {
             /** Format: int32 */
-            buffer?: number;
+            buffer: number;
             /** Format: int32 */
-            byteLength?: number;
+            byteLength: number;
             /** Format: int32 */
-            byteOffset?: number;
+            byteOffset: number;
             /** Format: int32 */
-            byteStride?: number;
-            extensions?: {
+            byteStride: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
+            extras: Record<string, never>;
+            name: string;
             /** Format: int32 */
-            target?: number;
+            target: number;
         };
         BufferViewModel: {
-            bufferModel?: components["schemas"]["BufferModel"];
-            bufferViewData?: {
+            bufferModel: components["schemas"]["BufferModel"];
+            bufferViewData: {
                 /** Format: int32 */
-                short?: number;
-                char?: string;
+                short: number;
+                char: string;
                 /** Format: int32 */
-                int?: number;
+                int: number;
                 /** Format: int64 */
-                long?: number;
+                long: number;
                 /** Format: float */
-                float?: number;
+                float: number;
                 /** Format: double */
-                double?: number;
-                direct?: boolean;
-                readOnly?: boolean;
+                double: number;
+                direct: boolean;
+                readOnly: boolean;
             };
             /** Format: int32 */
-            byteLength?: number;
+            byteLength: number;
             /** Format: int32 */
-            byteOffset?: number;
+            byteOffset: number;
             /** Format: int32 */
-            byteStride?: number;
-            name?: string;
+            byteStride: number;
+            name: string;
             /** Format: int32 */
-            target?: number;
+            target: number;
         };
         Callback: {
-            empty?: boolean;
-            extensions?: {
+            empty: boolean;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
+            get$ref: string;
         } & {
             [key: string]: components["schemas"]["PathItem"];
         };
         Camera: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            orthographic?: components["schemas"]["CameraOrthographic"];
-            perspective?: components["schemas"]["CameraPerspective"];
-            type?: string;
+            extras: Record<string, never>;
+            name: string;
+            orthographic: components["schemas"]["CameraOrthographic"];
+            perspective: components["schemas"]["CameraPerspective"];
+            type: string;
         };
         CameraOrthographic: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: float */
-            xmag?: number;
+            xmag: number;
             /** Format: float */
-            ymag?: number;
+            ymag: number;
             /** Format: float */
-            zfar?: number;
+            zfar: number;
             /** Format: float */
-            znear?: number;
+            znear: number;
         };
         CameraPerspective: {
             /** Format: float */
-            aspectRatio?: number;
-            extensions?: {
+            aspectRatio: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: float */
-            yfov?: number;
+            yfov: number;
             /** Format: float */
-            zfar?: number;
+            zfar: number;
             /** Format: float */
-            znear?: number;
+            znear: number;
         };
         Category: {
-            id?: string;
-            name?: string;
-            plmId?: string;
+            id: string;
+            name: string;
+            plmId: string;
         };
         CombinedSketchEntityType: {
-            constraintType?: components["schemas"]["GBTConstraintType"];
-            entityType?: components["schemas"]["GBTSketchEntityType"];
+            constraintType: components["schemas"]["GBTConstraintType"];
+            entityType: components["schemas"]["GBTSketchEntityType"];
         };
         CompanyRole: {
-            admin?: boolean;
-            companyId?: string;
-            companyName?: string;
-            guest?: boolean;
-            light?: boolean;
+            admin: boolean;
+            companyId: string;
+            companyName: string;
+            guest: boolean;
+            light: boolean;
         };
         Components: {
-            callbacks?: {
+            callbacks: {
                 [key: string]: components["schemas"]["Callback"];
             };
-            examples?: {
+            examples: {
                 [key: string]: components["schemas"]["Example"];
             };
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            headers?: {
+            headers: {
                 [key: string]: components["schemas"]["Header"];
             };
-            links?: {
+            links: {
                 [key: string]: components["schemas"]["Link"];
             };
-            parameters?: {
+            parameters: {
                 [key: string]: components["schemas"]["Parameter"];
             };
-            pathItems?: {
+            pathItems: {
                 [key: string]: components["schemas"]["PathItem"];
             };
-            requestBodies?: {
+            requestBodies: {
                 [key: string]: components["schemas"]["RequestBody"];
             };
-            responses?: {
+            responses: {
                 [key: string]: components["schemas"]["ApiResponse"];
             };
-            schemas?: {
+            schemas: {
                 [key: string]: components["schemas"]["Schema"];
             };
-            securitySchemes?: {
+            securitySchemes: {
                 [key: string]: components["schemas"]["SecurityScheme"];
             };
         };
+        /** @description The configuration parameters of the referring element. */
+        ConfigInfo: {
+            /** @description The formatted display value of the configuration parameter. */
+            displayValue: string;
+            /** @description The abbreviated display value with unit for the configuration parameter. */
+            displayValueAbbrUnit: string;
+            /** @description The configuration parameter ID. */
+            id: string;
+            /** @description The configuration parameter name. */
+            name: string;
+            /**
+             * Format: int32
+             * @description The configuration parameter type. `0: ENUM | 1: BOOLEAN | 2: STRING | 3: QUANTITY`
+             */
+            type: number;
+            /** @description The raw value of the configuration parameter. */
+            value: string;
+        };
         ConfigurationEntry: {
-            parameterId?: string;
-            parameterValue?: string;
+            parameterId: string;
+            parameterValue: string;
         };
         ConfigurationInfoEntry: {
-            explicit?: boolean;
-            isCosmetic?: boolean;
-            isVisible?: boolean;
-            parameterAbbreviatedDisplayValue?: string;
-            parameterDisplayValue?: string;
-            parameterId?: string;
-            parameterName?: string;
+            explicit: boolean;
+            isCosmetic: boolean;
+            isVisible: boolean;
+            parameterAbbreviatedDisplayValue: string;
+            parameterDisplayValue: string;
+            parameterId: string;
+            parameterName: string;
             /** Format: int32 */
-            parameterType?: number;
-            parameterValue?: string;
+            parameterType: number;
+            parameterValue: string;
         };
         Contact: {
-            email?: string;
-            extensions?: {
+            email: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            name?: string;
-            url?: string;
+            name: string;
+            url: string;
         };
         CoordinatesInfo: {
             /** Format: float */
-            x?: number;
+            x: number;
             /** Format: float */
-            y?: number;
+            y: number;
             /** Format: float */
-            z?: number;
+            z: number;
         };
         CoordinatesParams: {
             /** Format: float */
-            x?: number;
+            x: number;
             /** Format: float */
-            y?: number;
+            y: number;
             /** Format: float */
-            z?: number;
+            z: number;
         };
         Discriminator: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            mapping?: {
+            mapping: {
                 [key: string]: string;
             };
-            propertyName?: string;
+            propertyName: string;
         };
         /** @enum {string} */
         EditType: "NOTHING" | "NEW_ROOT" | "MOVE" | "CHANGE" | "CHANGE_FIELD" | "INSERTION" | "DELETION" | "LIST";
         /** @enum {string} */
         ElementType: "SCALAR" | "VEC2" | "VEC3" | "VEC4" | "MAT2" | "MAT3" | "MAT4";
         Encoding: {
-            allowReserved?: boolean;
-            contentType?: string;
-            explode?: boolean;
-            extensions?: {
+            allowReserved: boolean;
+            contentType: string;
+            explode: boolean;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            headers?: {
+            headers: {
                 [key: string]: components["schemas"]["Header"];
             };
-            style?: components["schemas"]["StyleEnum"];
+            style: components["schemas"]["StyleEnum"];
         };
         Entry: {
-            permissionSet?: string[];
-            role?: components["schemas"]["BTRbacRoleInfo"];
+            permissionSet: string[];
+            role: components["schemas"]["BTRbacRoleInfo"];
         };
         Example: {
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalValue?: string;
-            get$ref?: string;
-            summary?: string;
-            value?: Record<string, never>;
-            valueSetFlag?: boolean;
+            externalValue: string;
+            get$ref: string;
+            summary: string;
+            value: Record<string, never>;
+            valueSetFlag: boolean;
         };
         ExternalDocumentation: {
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            url?: string;
+            url: string;
         };
+        /** @enum {string} */
+        GBTAnnotationAttachmentLocation: "TOP_MIDDLE" | "BOTTOM_MIDDLE" | "OPPOSITE_LEADER_EDGE" | "UNKNOWN";
         /** @enum {string} */
         GBTAnnotationType: "DATUM" | "GTOL" | "DIMENSION_POSITION" | "DIMENSION" | "WELD" | "HOLE_CALLOUT" | "HOLE_CALLOUT_POSITION" | "CHAMFER_CALLOUT" | "CHAMFER_CALLOUT_POSITION" | "UNKNOWN";
         /** @enum {string} */
@@ -20231,7 +20527,7 @@ export interface components {
         /** @enum {string} */
         GBTEntityType: "VERTEX" | "EDGE" | "FACE" | "BODY" | "DEGENERATE_EDGE" | "UNKNOWN";
         /** @enum {string} */
-        GBTErrorStringEnum: "NO_ERROR" | "UNKNOWN_OPERATION" | "TOO_MANY_ENTITIES_SELECTED" | "POINTS_COINCIDENT" | "NO_TRANSLATION_DIRECTION" | "NO_ROTATION_AXIS" | "NO_TANGENT_PLANE" | "NO_TANGENT_LINE" | "INVALID_INPUT" | "CANNOT_RESOLVE_ENTITIES" | "CANNOT_EVALUATE_VERTEX" | "CANNOT_RESOLVE_PLANE" | "CANNOT_COMPUTE_BBOX" | "CANNOT_BE_EMPTY" | "CACHE_WRITE_FAILED" | "CACHE_READ_FAILED" | "HLR_FAILED" | "BAD_GEOMETRY" | "INVALID_RESULT" | "MISSING_EXT_REF" | "READ_FAILED" | "WRITE_FAILED" | "WRONG_TYPE" | "TANGENT_PROPAGATION_FAILED" | "REGEN_ERROR" | "COULD_NOT_COMPUTE_TRANSFORM" | "MATE_INVALID_MATE" | "MATECONNECTOR_INVALID_MATE" | "MATE_TWO_MATECONNECTORS_NEEDED" | "MATECONNECTORS_ON_SAME_OCCURRENCE" | "MATE_OVERDEFINED" | "MATE_INCONSISTENT" | "BOOLEAN_NEED_ONE_SOLID" | "BOOLEAN_INVALID" | "BOOLEAN_INTERSECT_FAIL" | "BOOLEAN_SAME_INPUT" | "BOOLEAN_BAD_INPUT" | "BOOLEAN_UNION_NO_OP" | "BOOLEAN_INTERSECT_NO_OP" | "BOOLEAN_SUBTRACT_NO_OP" | "CPLANE_INPUT_MIDPLANE" | "CPLANE_INPUT_OFFSET_PLANE" | "CPLANE_INPUT_POINT_PLANE" | "CPLANE_INPUT_LINE_ANGLE" | "CPLANE_INPUT_POINT_LINE" | "CPLANE_INPUT_THREE_POINT" | "CPLANE_FAILED" | "DRAFT_NO_NEUTRAL_PLANE" | "DRAFT_NO_DRAFT_FACE" | "DRAFT_FAILED" | "EXTRUDE_INVALID_REF_FACE" | "EXTRUDE_INVALID_REF_SURFACE" | "EXTRUDE_FAILED" | "EXTRUDE_NO_DIRECTION" | "EXTRUDE_INVALID_ENTITIES" | "PATTERN_INPUT_TOO_MANY_INSTANCES" | "PATTERN_INPUT_TOO_FEW_INSTANCES" | "PATTERN_FACE_FAILED" | "PATTERN_NOT_ON_BODY" | "PATTERN_BODY_FAILED" | "TRANSFORM_TRANSLATE_INPUT" | "TRANSFORM_TRANSLATE_BY_DISTANCE_INPUT" | "TRANSFORM_FAILED" | "SHELL_FAILED" | "EDGEBLEND_SMOOTH" | "EDGEBLEND_FAILED" | "DIRECT_EDIT_WRONG_CONCENTRIC" | "DIRECT_EDIT_WRONG_EQ_RADIUS" | "DIRECT_EDIT_NO_FILLET_FACES" | "DIRECT_EDIT_NO_OFFSET" | "DIRECT_EDIT_CONSTRAIN_FACE_FAILED" | "DIRECT_EDIT_REPLACE_FACE_FAILED" | "DIRECT_EDIT_DELETE_FACE_FAILED" | "DIRECT_EDIT_MODIFY_FILLET_FAILED" | "DIRECT_EDIT_MODIFY_FACE_FAILED" | "DIRECT_EDIT_MOVE_FACE_FAILED" | "DIRECT_EDIT_OFFSET_FACE_FAILED" | "IMPORT_PART_FAILED" | "IMPORT_ASSEMBLY_FAILED" | "IMPRINT_FAILED" | "REVOLVE_FAILED" | "REVOLVE_2ND_DIR_FAILED" | "REVOLVE_NOT_PLANAR" | "REVOLVE_PERPENDICULAR" | "REVOLVE_INVALID_ENTITIES" | "SPLIT_FAILED" | "SPLIT_INVALID_INPUT" | "SWEEP_INVALID_PATH" | "SWEEP_FAILED" | "SWEEP_PATH_FAILED" | "SWEEP_PROFILE_FAILED" | "WIRE_CREATION_FAILED" | "SKETCH_NO_PLANE" | "SKETCH_INPUT_INVALID" | "SKETCH_NOT_ACTIVE" | "SKETCH_SOLVER_NOT_INITIALIZED" | "SKETCH_EVALUATION_FAILED" | "SKETCH_MODIFICATION_FAILED" | "SKETCH_UPDATE_FAILED" | "SKETCH_SOLVE_FAILED" | "SKETCH_ADD_CONSTRAINT_FAILED" | "SKETCH_ADD_DIMENSION_FAILED" | "SKETCH_POSITION_DIMENSION_FAILED" | "SKETCH_CONSTRAINT_NEEDS_SKETCH_ENTITY" | "SKETCH_CONSTRAINT_UNKNOWN" | "SKETCH_MISSING_ENTITY" | "SKETCH_FILLET_INVALID_POINT" | "SKETCH_FILLET_PARALLEL" | "SKETCH_FILLET_FAIL" | "SKETCH_USE_FAILED" | "SKETCH_USE_PARTIAL" | "SKETCH_SPLINE_FAILED" | "SKETCH_BAD_SPLINE" | "SKETCH_DRAG_ERROR" | "SKETCH_PROJ_FAILED" | "SKETCH_PROJ_PARTIAL" | "SKETCH_TANGENT_ARC_FAILED" | "SKETCH_TANGENT_NOT_FOUND" | "SKETCH_OFFSET_FAILED" | "SKETCH_OFFSET_DISTANCE" | "SKETCH_TRIM_FAILED" | "SKETCH_INFERENCE_FAILED" | "SKETCH_MODIFY_DIM_FAILED" | "SKETCH_DRAG_NO_SKETCH" | "SKETCH_INFER_DIM_FAILED" | "SKETCH_DELETE_PTS_FAILED" | "SKETCH_DELETE_FAILED" | "SKETCH_ARC_FAILED" | "SKETCH_LINE_FAILED" | "SKETCH_CIRCLE_FAILED" | "SKETCH_RECTANGLE_FAILED" | "SKETCH_TANGENT_ARC_INVALID_START" | "SKETCH_CONSTRUCTION_POINT_FAILED" | "SYS_INTERNAL_DESERIALIZATION" | "SYS_SERVER_EXCEPTION" | "SYS_ERROR_REGEN" | "SYS_ERROR_MESSAGING" | "CANNOT_RESOLVE_ELEMENT" | "NOTHING_SELECTED" | "SKETCH_ANGLE_TWO_LINES" | "SKETCH_DIMENSION_DIFF_ENTITIES" | "SKETCH_CONSTRAINT_DIFF_ENTITIES" | "SKETCH_CONSTRAINT_TWO_ENTITIES" | "SKETCH_DIMENSION_TWO_ENTITIES" | "SKETCH_COINCIDENT_FAILED" | "SKETCH_COINCIDENT_INPUT_ERROR" | "SKETCH_COINCIDENT_DIFF_POINTS" | "SKETCH_CONCENTRIC_INPUT_ERROR" | "SKETCH_CONCENTRIC_FAILED" | "SKETCH_EQUAL_INPUT_ERROR" | "SKETCH_EQUAL_NO_ENDS" | "SKETCH_EQUAL_FAILED" | "SKETCH_FIX_ONE_ENT" | "SKETCH_FIX_FAILED" | "SKETCH_DIR_INTERNAL" | "SKETCH_DIR_INPUT" | "SKETCH_HORIZONTAL_FAILED" | "SKETCH_VERTICAL_FAILED" | "SKETCH_OFFSET_CONSTRAINT_FAILED" | "SKETCH_PARALLEL_CONSTRAINT_FAILED" | "SKETCH_PARALLEL_INPUT_ERROR" | "SKETCH_DIMENSION_INPUT_ERROR" | "SKETCH_DIMENSION_DIST_ERROR" | "SKETCH_DIMENSION_FAILED" | "SKETCH_NORMAL_NEED_LINE" | "SKETCH_NORMAL_INPUT_ERROR" | "SKETCH_NORMAL_INPUT_NEEDED" | "SKETCH_CANNOT_SPLIT_INTO_GROUPS" | "SKETCH_OFFSET_BAD_PAIR" | "SKETCH_OFFSET_INPUT_ERROR" | "SKETCH_MIDPOINT_INPUT_ERROR" | "SKETCH_MIDPOINT_NEED_POINT" | "SKETCH_MIDPOINT_NEED_DIFF_POINT" | "SKETCH_MIDPOINT_MISSING_ENDS" | "SKETCH_MIDPOINT_MISSING_PTS" | "SKETCH_MIDPOINT_NO_INTERNAL_LINE" | "SKETCH_MIDPOINT_NO_COINCIDENT" | "SKETCH_MIDPOINT_FAILED" | "SKETCH_PERPENDICULAR_INPUT_ERROR" | "SKETCH_PERPENDICULAR_FAILED" | "SKETCH_POINT_LINE_ONLY" | "SKETCH_PROJECTION_UNKNOWN" | "SKETCH_PROJECTION_FAILED" | "SKETCH_SIL_PROJECTION_INPUT_ERROR" | "SKETCH_SIL_PROJECTION_MISSING_POINT" | "SKETCH_LENGTH_DIM_INPUT_ERROR" | "SKETCH_LENGTH_DIM_MISSING_ENDS" | "SKETCH_LENGTH_DIM_NOT_FOUND" | "SKETCH_LENGTH_DIM_FAILED" | "SKETCH_RADIUS_INPUT_ERROR" | "SKETCH_RADIUS_DIM_FAILED" | "SKETCH_TANGENT_INPUT_ERROR" | "SKETCH_TANGENT_FAILED" | "PART_QUERY_FAILED" | "PART_QUERY_MULTI" | "MATECONNECTOR_QUERY_FAILED" | "MATECONNECTOR_QUERY_ORIGIN_FAILED" | "MATECONNECTOR_QUERY_AXIS_FAILED" | "MATECONNECTOR_QUERY_CSYS_FAILED" | "ASSEMBLY_INSERT_WILL_CAUSE_CYCLES" | "SKETCH_MIRROR_NEED_VALID_MIRROR_LINE" | "SKETCH_MIRROR_NEED_ENTITIES_TO_MIRROR" | "SKETCH_MIRROR_CONSTRAINT_FAILED" | "SKETCH_MIRROR_FAILED" | "SELF_INTERSECTING_CURVE_SELECTED" | "SWEEP_START_NOT_ON_PROFILE" | "PATTERN_DIRECTIONS_PARALLEL" | "MATE_OCCURRENCE_NOT_VALID" | "MATE_WITHIN_SAME_GROUP" | "EXPORT_ASSEMBLY_UNKNOWN_NODE_TYPE" | "EXPORT_ASSEMBLY_CREATE_INSTANCE_FAILED" | "EXPORT_PARTS_AS_XTS_NOT_A_BODY" | "EXPORT_PARTS_AS_XTS_FAILED_TO_WRITE_XT" | "MATECONNECTOR_OWNER_PART_NOT_RESOLVED" | "WIRE_CREATION_PARTIAL_FAILURE" | "SERVER_IS_IN_INVALID_STATE" | "SKETCH_EXTEND_FAILED" | "FOLLOW_CYCLE_ERROR" | "SKETCH_FILLET_INVALID_RADIUS" | "SKETCH_CONSTRAINT_COINCIDENT_TWO_ENTITIES" | "SKETCH_CONSTRAINT_CONCENTRIC_TWO_ENTITIES" | "SKETCH_CONSTRAINT_EQUAL_TWO_ENTITIES" | "SKETCH_CONSTRAINT_MIDPOINT_TWO_ENTITIES" | "EXTRUDE_NO_SELECTED_REGION" | "EXTRUDE_NO_REGION_IN_SKETCH" | "DELETE_SELECT_PARTS" | "COPY_SELECT_PARTS" | "SPLIT_NO_CHANGE" | "MIRROR_NO_PLANE" | "MIRROR_SELECT_PARTS" | "PATTERN_CIRCULAR_NO_AXIS" | "PATTERN_SELECT_FACES" | "PATTERN_SELECT_PARTS" | "PATTERN_LINEAR_NO_DIR" | "SHELL_SELECT_FACES" | "DRAFT_SELECT_NEUTRAL" | "DRAFT_SELECT_FACES" | "CHAMFER_SELECT_EDGES" | "FILLET_SELECT_EDGES" | "EXTRUDE_SURF_NO_CURVE" | "EXTRUDE_SELECT_TERMINATING_BODY" | "EXTRUDE_SELECT_TERMINATING_SURFACE" | "DIRECT_EDIT_SELECT_ANCHOR" | "REVOLVE_SURF_NO_CURVE" | "REVOLVE_SELECT_FACES" | "REVOLVE_SELECT_AXIS" | "SWEEP_SELECT_PROFILE" | "SWEEP_SELECT_PATH" | "DIRECT_EDIT_DELETE_SELECT_FACES" | "DIRECT_EDIT_MODIFY_FILLET_SELECT" | "DIRECT_EDIT_MODIFY_FACE_SELECT" | "DIRECT_EDIT_REPLACE_FACE_SELECT" | "DIRECT_EDIT_OFFSET_FACE_SELECT" | "DIRECT_EDIT_MOVE_FACE_SELECT" | "SELECT_MATECONNECTOR" | "OVERDEFINED_ASSEMBLY" | "PART_STUDIO_UPGRADE_SUCCESSFUL" | "PART_STUDIO_UPGRADE_FAILED" | "PART_STUDIO_UPGRADE_NONE" | "MATE_GROUP_OCCURRENCES_UNRESOLVED" | "SWEEP_SURF_NO_CURVE_PROFILE" | "MATE_RESET_HAD_NO_EFFECT" | "MATECONNECTOR_MULTIPLE_OCCURRENCES" | "MATECONNECTOR_OCCURRENCE_NOT_RESOLVED" | "ELEMENT_REFERENCE_CYCLE_DETECTED" | "MATE_OVERDEFINES_ASSEMBLY" | "MATE_CANNOT_RESOLVE_CONNECTORS" | "SKETCH_EXCEEDS_BOUNDS" | "SWEEP_SELF_INT" | "SKETCH_UNSOLVABLE_CONSTRAINT" | "RESTRUCTURE_INVALID_SOURCE_OR_TARGET" | "CPLANE_INPUT_CURVE_POINT" | "TRANSFORM_OCCURRENCES_HAD_NO_EFFECT" | "HELIX_FAILED" | "HELIX_INPUT_CONE" | "RENDERER_NOT_AVAILABLE" | "RENDERER_FAILED_TO_RENDER" | "EXPRESSION_FAILED_VALIDATION" | "VERSION_MISMATCH_ERROR" | "EXTRUDE_UPTO_NEXT_NO_DIVISION" | "MATE_BETWEEN_FIXED_OCCURRENCES" | "THICKEN_SELECT_ENTITIES" | "THICKEN_FAILED" | "WORKSPACE_UPGRADE_SUCCESSFUL" | "WORKSPACE_UPGRADE_FAILED" | "WORKSPACE_UPGRADE_NONE" | "SKETCH_CIRCULAR_PATTERN_FAILED" | "DIRECT_EDIT_ALL_FILLET_FACES_SELECTED" | "DIRECT_EDIT_FAILED_TO_IDENTIFY_FILLETS" | "PARASOLID_IMPORT_FAILED" | "FOLLOW_LEADER_HAS_NO_FUNCTIONALITY_ERROR" | "MIRROR_SELECT_FACES" | "RELATION_INVALID_RELATION" | "RELATION_INVALID_MATE" | "GEAR_RELATION_INVALID_MATE_TYPES" | "SCREW_RELATION_INVALID_MATE_TYPES" | "RACK_RELATION_INVALID_MATE_TYPES" | "ROLLING_RELATION_INVALID_MATE_TYPES" | "LINEAR_RELATION_INVALID_MATE_TYPES" | "RELATION_OVERDEFINED" | "RELATION_INCONSISTENT" | "RELATION_SAME_OCCURRENCES" | "SKETCH_SPLIT_FAILED" | "SKETCH_CONSTRAINT_PIERCE_TWO_ENTITIES" | "SKETCH_PIERCE_FAILED" | "MIRROR_FACE_FAILED" | "MIRROR_BODY_FAILED" | "SKETCH_CANNOT_PIERCE_WITH_PLANE" | "WITH_SUPPORT_CODE" | "FILLET_FAIL_SMOOTH" | "FILLET_FAILED" | "CHAMFER_FAIL_SMOOTH" | "CHAMFER_FAILED" | "BOOLEAN_OFFSET_NO_FACES" | "MATE_OCCURRENCE_SUPPRESSED" | "MATECONNECTOR_OCCURRENCE_SUPPRESSED" | "SKETCH_SPLINE_NEW_POINTS_TOO_CLOSE" | "SKETCH_SPLINE_CANNOT_DELETE_ENDPOINTS" | "SKETCH_SPLINE_POINT_TO_DELETE_NOT_FOUND" | "ASSEMBLY_INSERT_FAILED" | "SKETCH_PATTERN_UNKNOWN_FAILURE" | "SKETCH_PATTERN_TOO_LARGE" | "SKETCH_LINEAR_PATTERN_ZERO_LENGTH" | "SKETCH_LINEAR_PATTERN_PARALLEL_DIRECTIONS" | "SKETCH_CIRCULAR_PATTERN_ZERO_ANGLE" | "SKETCH_ELLIPSE_FAILED" | "SKETCH_ELLIPSE_FAILED_TOO_SMALL" | "DELETE_PARTS_FAILED" | "DELETE_PARTS_PARTIAL" | "SKETCH_ELLIPSE_RADIUS_INPUT_ERROR" | "QUADRANT_CONSTRAINT_INPUT" | "SKETCH_QUADRANT_FAILED" | "SKETCH_SPLINE_TOO_FEW_POINTS" | "SKETCH_SPLINE_NOT_INTERPOLATED_SPLINE" | "SKETCH_SPLINE_POINTS_NOT_DELETED" | "SKETCH_TEXT_RECTANGLE_FAILED" | "IMPORT_DERIVED_NO_PARTS" | "LOFT_SELECT_PROFILES" | "LOFT_PROFILE_SINGLE_FACE" | "LOFT_PROFILE_SOLID" | "LOFT_PROFILE_POINT" | "LOFT_PROFILE_FAILED" | "LOFT_SELECT_GUIDES" | "LOFT_GUIDE_FAILED" | "LOFT_PERIODIC_ERROR" | "LOFT_GUIDE_POINT_INTERSECTION" | "LOFT_GUIDE_PROFILE_INTERSECTION" | "LOFT_VERTEX_MATCHING" | "LOFT_DIRECTION_ERROR" | "LOFT_PROFILE_ALIGNMENT" | "LOFT_GUIDE_ALIGNMENT" | "LOFT_VERTEX_ADDITIONS" | "LOFT_FAILED" | "LOFT_INVALID" | "LOFT_ALIGNMENT_INFO" | "LOFT_VERTEX_NOT_ON_PROFILE" | "LOFT_PROFILE_NO_INNER_LOOPS" | "LOFT_TWO_PROFILES" | "CANNOT_OFFSET_ELLIPSE" | "SKETCH_MIRROR_NEEDS_LINE_AND_TWO_OTHERS" | "SKETCH_POLYGON_BAD_SIDE_COUNT" | "SKETCH_DIRECTIONAL_GROUP_INPUT" | "NAMED_VIEWS_DUPLICATE_NAME" | "SILHOUETTE_USE_FAILED" | "PASTE_SKETCH_METRICS_FAILURE" | "PASTE_SKETCH_LIBRARY_MISMATCH" | "PASTE_SKETCH_CLIPBOARD_EMPTY" | "SKETCH_MIRROR_OFFSET_SPLINE" | "SKETCH_MIRROR_CURVE_POINT" | "LOFT_PERIODIC_GUIDE_ERROR" | "SHELL_SELECT_PARTS" | "RELATION_MATE_DOES_NOT_EXIST" | "RELATION_MATE_IS_SUPPRESSED" | "VARIABLE_NAME_INVALID" | "LOFT_GUIDE_INFO" | "HOLE_NO_POINTS" | "HOLE_FAIL_BBOX" | "HOLE_EMPTY_SCOPE" | "HOLE_NO_HITS" | "WITH_EXTRA_DATA" | "HOLE_DISJOINT" | "SKETCH_INSERT_DWG_CONVERSION_FAILURE" | "HOLE_CBORE_TOO_SMALL" | "HOLE_CBORE_TOO_DEEP" | "HOLE_CSINK_TOO_SMALL" | "HOLE_CSINK_TOO_DEEP" | "SWEEP_PATH_NO_CONSTRUCTION" | "SKETCH_IMAGE_RECTANGLE_FAILED" | "ASSEMBLY_REPLICATE_NO_VALID_TARGET" | "ASSEMBLY_REPLICATE_NO_MATCHING_TARGET" | "LOFT_SHAPE_CONTROL_FAILED" | "LOFT_START_CONDITIONS_FAILED" | "LOFT_END_CONDITIONS_FAILED" | "LOFT_NO_FACE_FOR_START_CLAMP" | "LOFT_NO_FACE_FOR_END_CLAMP" | "LOFT_NO_PLANE_FOR_START_CLAMP" | "LOFT_NO_PLANE_FOR_END_CLAMP" | "LOFT_NO_CLAMPS_ON_POINT_PROFILE" | "EXPORT_NOT_IMPLEMENTED" | "SKETCH_POLYGON_ZERO_RADIUS_FAIL" | "DRAWING_FAILED_TO_RESOLVE_VIEW_REFERENCE" | "DRAWING_PARTSTUDIO_EMPTY_AFTER_SECTION_CUT" | "DRAWING_ASSEMBLY_DOES_NOT_CONTAIN_VISIBLE_INSTANCES" | "DRAWING_ASSEMBLY_EMPTY_AFTER_SECTION_CUT" | "DRAWING_VIEW_GENERATION_FAILED" | "SKETCH_SLOT_FAILURE" | "SKETCH_SLOT_PARTIAL_FAILURE" | "NO_UNIT" | "RESTRUCTURE_INVALID_SOURCE" | "RESTRUCTURE_INVALID_TARGET" | "MATE_MIN_MAX_LIMIT_VIOLATION" | "REST_ASSEMBLY_GET_DOCUMENT_FAILED" | "REST_ASSEMBLY_UNKNOWN_INSERTABLE_TYPE" | "REST_ASSEMBLY_SETUP_EXCEPTION" | "REST_ASSEMBLY_BEGIN_OPERATION_FAILED" | "REST_ASSEMBLY_INSERT_INSTANCE_FAILED" | "REST_ASSEMBLY_COMMIT_OPERATION_FAILED" | "REST_ASSEMBLY_CLOSE_CLIENT_FAILED" | "REST_ASSEMBLY_NULL_OCCURRENCES" | "REST_ASSEMBLY_EMPTY_OCCURRENCE" | "REST_ASSEMBLY_TRANSFORM_WRONG_SIZE" | "ASSEMBLY_EMPTY_OCCURRENCE_LIST" | "ASSEMBLY_NULL_TRANSFORM" | "ASSEMBLY_TRANSFORM_NOT_RIGID" | "ASSEMBLY_CANNOT_TRANSFORM_FIXED_OCCURRENCE" | "ASSEMBLY_TRANSFORM_FAILED" | "ASSEMBLY_OCCURRENCE_NOT_FOUND" | "ASSEMBLY_REPLICATE_MULTIPLE_VALID_TARGET" | "ASSEMBLY_REPLICATE_NO_TARGET_SELECTED" | "CPLANE_INPUT_LINE_ANGLE2" | "CPLANE_DEGENERATE_SELECTION" | "CPLANE_SELECT_LINE_ANGLE_REFERENCE" | "ASSEMBLY_REPLICATE_INVALID_SEED_INSTANCE" | "CANNOT_USE_VARIABLES_IN_SKETCH_PATTERNS" | "SKETCH_MIRROR_OFFSET_ELLIPSE" | "EXTERNAL_REFERENCE_FAILED_TO_CREATE" | "SPLIT_FACE_NO_CHANGE" | "SKETCH_INTERSECTION_FAILED" | "SKETCH_INTERSECTION_MULTIPLE_FAILED" | "SKETCH_INTERSECTION_PARTIAL_FAILED" | "FEATURE_ID_IN_PATH_DOES_NOT_MATCH_BODY" | "FEATURE_NOT_FOUND" | "FEATURE_DOES_NOT_MATCH" | "FEATURE_HAS_INVALID_TYPE" | "FEATURE_DOES_NOT_MATCH_ITS_FEATURE_SPEC" | "FEATURE_BAD_SERIALIZATION_VERSION" | "FEATURE_WRONG_SERIALIZATION_VERSION" | "FEATURE_INVALID_ROLLBACK_INDEX" | "FEATURE_ERROR_IN_INPUT" | "FEATURE_CONCURRENCY_ERROR" | "FEATURE_CHANGE_BREAKS_MODEL" | "FEATURE_NODE_IDS_INVALID" | "ROLLBACK_INDEX_INVALID" | "FEATURE_NO_SOLIDS" | "SKETCH_EXTERNAL_GEOMETRY_MISMATCH" | "HOLE_EXCEEDS_MAX_LOCATIONS" | "SKETCH_TEXT_IS_EMPTY" | "SKETCH_INSERT_DWG_MAX_ENTITIES_EXCEEDED" | "HOLE_TAP_DIA_TOO_LARGE" | "ASSEMBLY_EMPTY_BODY" | "SIMPLIFY_BODY_FAILED" | "INVALID_VIEW_NAME" | "PATTERN_SELECT_FEATURES" | "MIRROR_SELECT_FEATURES" | "PATTERN_FEATURE_FAILED" | "SKETCH_TRANSFORM_FAILED" | "TANGENT_MATE_TWO_ENTITIES_NEEDED" | "HOLE_CANNOT_DETERMINE_LAST_BODY" | "RESTRUCTURE_CANNOT_MODIFY_SAVED_VERSION" | "REST_ASSEMBLY_EXTERNAL_REFERENCE_REQUIRES_VERSION" | "REST_ASSEMBLY_EXTERNAL_REFERENCE_DISALLOWS_MICROVERSION" | "REST_ASSEMBLY_VERSION_SUPPORTED_ONLY_FOR_EXTERNAL_REFERENCES" | "SWEEP_BAD_LOCK_FACES" | "SKETCH_TEXT_CANNOT_BE_CONSTRUCTION" | "CUSTOM_ERROR" | "BEND_BAD_CONFIGURATION" | "BEND_WRONG_NUMBER_OF_ENTITIES" | "BEND_BAD_CURVES" | "BEND_GENERAL_ERROR" | "BEND_EDGE_NO_EDGES" | "BEND_EDGE_NO_SEED_ENTITY" | "EXTEND_SHEET_BODY_NO_BODY" | "EXTRACT_SURFACE_NO_FACES" | "FLATTEN_NO_EDGES" | "FLATTEN_NO_FACES" | "FOLD_NO_BODIES" | "BEND_PREP_NO_FACES" | "BEND_PREP_NO_BODIES" | "BEND_PREP_ERROR_FINDING_EDGE_LOCATIONS" | "BEND_PREP_ERROR_IMPRINTING_EDGES" | "ASSEMBLY_ANIMATE_MATE_START_AFTER_END" | "ASSEMBLY_ANIMATE_NO_MATE" | "ASSEMBLY_ANIMATE_MATE_SUPPRESSED" | "TANGENT_MATE_GEOMETRY_NOT_SUPPORTED" | "SKETCH_DIMENSION_INFINITY" | "BOLEAN_INPUTS_NOT_SOLID" | "FACE_IS_NOT_RECTANGLE" | "HOLE_DESTROY_SOLID" | "HELIX_INPUT_CIRCLE" | "IMPORT_SCALING_NON_MESH_DATA" | "EVALUATE_FACE_TANGENT_FOR_MESHES" | "CANNOT_COMPUTE_CENTROID" | "CANNOT_EVALUATE_DIMENSION" | "CANNOT_IMPORT_MESH" | "SKETCH_ELLIPSE_ZERO_AXIS" | "TRANSFORM_SCALE_UNIFORMLY" | "TRANSFORM_MATE_CONNECTORS" | "ASSEMBLY_WRONG_ELEMENT_TYPE" | "ASSEMBLY_ELEMENT_NOT_FOUND" | "SHEET_METAL_TABLE_UNKNOWN_ERROR" | "SHEET_METAL_TABLE_REGEN_ERROR" | "SHEET_METAL_TABLE_READ_ONLY" | "ASSEMBLY_PATTERN_INVALID_TYPE" | "ASSEMBLY_PATTERN_DIRECTION_ERROR" | "ASSEMBLY_PATTERN_NONPOSITIVE_LINEAR_DISTANCE" | "ASSEMBLY_PATTERN_NONPOSITIVE_ANGLE" | "ASSEMBLY_PATTERN_INVALID_SEED" | "ASSEMBLY_PATTERN_INVALID_REFERENCE_MATE_CONNECTOR" | "RESTORE_FEATURE_FAILED" | "FACES_NOT_OWNED_BY_PARTS" | "EDGES_NOT_OWNED_BY_PARTS" | "SHEET_METAL_REBUILD_ERROR" | "SHEET_METAL_INPUT_BODY_SHOULD_NOT_BE_SHEET_METAL" | "SHEET_METAL_CANNOT_RECOGNIZE_PARTS" | "SHEET_METAL_CANNOT_THICKEN" | "SHEET_METAL_CONVERT_PLANE" | "ASSEMBLY_PATTERN_AXIS_ERROR" | "RIB_NO_PROFILES" | "RIB_NO_PARTS" | "RIB_PROFILE_FAILED" | "RIB_BODY_FAILED" | "RIB_NO_INTERSECTIONS" | "RIB_MERGE_FAILED" | "ASSEMBLY_NAMED_POSITIONS_SAVE_FAILED" | "ASSEMBLY_NAMED_POSITIONS_LOAD_FAILED" | "ASSEMBLY_NAMED_POSITIONS_NO_MATES_TO_SAVE" | "ASSEMBLY_NAMED_POSITIONS_POSITION_NOT_FOUND" | "SPHERE_FAILED" | "ASSEMBLY_PATTERN_NOT_SUPPORTED" | "ASSEMBLY_NAMED_POSITIONS_PARTIAL_LOAD_FAILURE" | "ASSEMBLY_NAMED_POSITIONS_LOAD_SUCCEEDED_WITH_EXTRA_MATES" | "ASSEMBLY_NAMED_POSITIONS_SAVED_MATE_NOT_FOUND_ON_LOAD" | "SHEET_METAL_SINGLE_MODEL_NEEDED" | "SHEET_METAL_ACTIVE_JOIN_NEEDED" | "INSTANCE_QUERY_FAILED" | "SHEET_METAL_ACTIVE_EDGE_NEEDED" | "SHEET_METAL_FLANGE_NO_EDGES" | "MESH_NOT_SUPPORTED" | "SHEET_METAL_PARTS_PROHIBITED" | "VARIABLE_CANNOT_EVALUATE" | "DRAWING_ASSEMBLY_INVALID_SECTION_CUT" | "DRAWING_PARTSTUDIO_INVALID_SECTION_CUT" | "SHEET_METAL_COULD_NOT_UNFOLD" | "PARAMETER_OUT_OF_RANGE" | "SHEET_METAL_NO_0_ANGLE_BEND" | "SHEET_METAL_FLAT_RIP_NO_EDIT" | "SHEET_METAL_CANT_CHANGE_TO_FLAT" | "PARAMETER_PRECONDITION_FAILED" | "PARAMETER_SYNTAX_ERROR" | "SHEET_METAL_CAN_ONLY_REMOVE" | "SHEET_METAL_CAN_ONLY_SUBTRACT" | "REST_ASSEMBLY_INVALID_FEATURE" | "REST_ASSEMBLY_INVALID_BODY_TYPE" | "PARTING_OUT_TARGET_READONLY" | "SHEET_METAL_MULTI_SM_DEFAULT_RADIUS" | "SHEET_METAL_FLANGE_FAIL_ALIGNMENT" | "SHEET_METAL_FLANGE_FAIL_UP_TO" | "SHEET_METAL_FLANGE_FAIL_UP_TO_ENTITY" | "SHEET_METAL_FLANGE_FAIL" | "SHEET_METAL_FLANGE_FAIL_LIMIT_OPP_FLANGE" | "CANT_SPLIT_SHEET_METAL_BEND_FACE" | "IN_CONTEXT_INSTANCE_INVALID_TARGET" | "SHEET_METAL_SELF_INTERSECTING_MODEL" | "SHEET_METAL_SELF_INTERSECTING_FLAT" | "SHEET_METAL_NON_90_BUTT" | "SHEET_METAL_RIP_STYLE_ERROR" | "CANNOT_USE_MATECONNECTORS_IN_PATTERN" | "CANNOT_COPY_MATECONNECTORS" | "SHEET_METAL_CAN_ONLY_OFFSET" | "MODIFIABLE_ENTITY_ONLY" | "IN_CONTEXT_UPDATE_DELETED_ASSEMBLY" | "IN_CONTEXT_UPDATE_EMPTY_INSTANCE" | "IN_CONTEXT_UPDATE_INVALID_SOURCE" | "IN_CONTEXT_UPDATE_INVALID_TARGET" | "SHEET_METAL_NO_FEATURE_PATTERN" | "CUSTOM_FEATURE_DEFINITION_NOT_FOUND" | "SHEET_METAL_START_SELECT_BENDS" | "SHEET_METAL_END_DONE" | "PATH_EDGES_NOT_CONTINUOUS" | "SHEET_METAL_RIP_FAIL_INTERNAL_EDGE" | "SHEET_METAL_RIP_FAIL" | "SHEET_METAL_RIP_MULTI_BODY" | "SHEET_METAL_RIP_FAIL_NON_PLANAR" | "PATTERN_CURVE_NO_EDGES" | "SHEET_METAL_RIP_NO_CORNER" | "SHEET_METAL_RIP_EVEN" | "SHEET_METAL_RIP_WALL_NOT_FOUND" | "SHEET_METAL_RIP_SAME_VERTEX" | "SHEET_METAL_RIP_NEED_MORE_VERTICES" | "SHEET_METAL_MAKE_JOINT_FAIL" | "CURVE_PATTERN_START_OFF_PATH" | "PART_LOAD_FAILED" | "SHEET_METAL_MOVE_NOT_PLANAR" | "SHEET_METAL_JOINT_FAIL_ADJACENT_FACES" | "WRONG_PARASOLID_VERSION" | "SHEET_METAL_SINGLE_MODEL_NEEDED_EDGES" | "REST_ASSEMBLY_MISSING_INSTANCE_DOCUMENT_ID" | "REST_ASSEMBLY_MISSING_INSTANCE_ELEMENT_ID" | "FACE_CLASH" | "CURVE_PATTERN_START_OFF_CLOSED_PATH" | "SHEET_METAL_CUT_JOINT" | "EXPORT_STL_NO_PARTS" | "INPUT_NAME_TOO_LONG" | "IMPORT_BODY_FAILED_CHECK" | "DERIVED_BODIES_HAVE_FAULTS" | "SHEET_METAL_BLOCKED_PATTERN" | "SHEET_METAL_FLANGE_INTERNAL" | "SHEET_METAL_TOO_THICK" | "SHEET_METAL_BEND_END_NOT_A_CORNER" | "SHEET_METAL_NOT_A_CLOSED_CORNER" | "SHEET_METAL_CORNER_NOT_A_BEND_END" | "RIB_ONLY_OPEN_PROFILES" | "TAB_NO_LONGER_EXISTS" | "CLINE_FAILED" | "ILLEGAL_MODIFICATION" | "ASSEMBLY_MATE_VALUE_SET_FAILED" | "EXTRUDE_OFFSET_TOO_DEEP" | "SHEET_METAL_CANNOT_MOVE_BEND_EDGE" | "UP_TO_FACE_NOT_PARALLEL" | "TRANSLATION_FACE_NOT_PLANAR" | "MOVE_FACE_NO_INTERSECTION" | "SWEEP_PATH_PROFILE_NO_INTERSECTION" | "DIRECT_EDIT_MOVE_FACE_CREATE_SELECT" | "SHEET_METAL_THICKEN_IN_CONTEXT_INFO" | "CANNOT_DELETE_RHO_DIMENSION" | "INVALID_RHO" | "SKETCH_RHO_DIM_NOT_FOUND" | "SKETCH_CONIC_FAILED" | "TAB_NAME_TOO_LONG" | "DIRECT_EDIT_DELETE_FACE_ALL_FACES" | "SHEET_METAL_CORNER_BREAK_FAILED" | "BOOLEAN_NO_TARGET_SURFACE" | "BAD_BSPLINECURVE_DEFINITION" | "REQUIRE_3D_BSPLINECURVE_DATA" | "PERIODIC_BSPLINECURVE_NOT_CLOSED" | "PERIODIC_BSPLINECURVE_NOT_SMOOTH" | "RATIONAL_BSPLINECURVE_WEIGHT_NEGATIVE" | "BSPLINECURVE_NOT_G1" | "BRIDGING_CURVE_VERTEX_BOTH_SIDES" | "BRIDGING_CURVE_ONE_EDGE_EACH_SIDE" | "BRIDGING_CURVE_VERTEX_AT_END_OF_EDGE" | "PROJECT_CURVES_PARALLEL_PLANES" | "PROJECT_CURVES_DIFFERENT_SKETCHES" | "SHEET_METAL_SELECT_PART" | "VARIABLE_NOT_FOUND" | "CANNOT_EDIT_FIXED_CONIC" | "EXTRACT_WIRES_OVERLAPPING_EDGES" | "EXTRACT_WIRES_NON_MANIFOLD" | "EXTRACT_WIRES_NEEDS_EDGES" | "SPLINE_TWO_POINTS" | "CLOSED_SPLINE_THREE_POINTS" | "TANGENCY_ONE_EDGE" | "FIT_SPLINE_CANNOT_EVALUATE_END_CONDITION" | "FIT_SPLINE_REPEATED_POINT" | "FEATURE_ID_REQUIRED" | "PARAMETER_NOT_FOUND" | "PARAMETER_DOES_NOT_MATCH_ITS_FEATURE_SPEC" | "SHEET_METAL_CORNER_BREAK_DISABLED" | "SHEET_METAL_FILLET_NO_CONIC" | "SHEET_METAL_CHAMFER_NO_TWO_OFFSETS" | "SHEET_METAL_CHAMFER_NO_OFFSET_ANGLE" | "SHEET_METAL_CHAMFER_MUST_BE_EQUAL_OFFSETS" | "SHEET_METAL_ACTIVE_ENTITY_NEEDED" | "SHEET_METAL_CORNER_BREAK_NOT_A_CORNER" | "SHEET_METAL_CORNER_BREAK_NO_WALL" | "SHEET_METAL_CORNER_BREAK_VERTEX_NOT_FREE" | "SHEET_METAL_CORNER_BREAK_ATTRIBUTE_EXISTS" | "FIT_SPLINE_ZERO_START_MAGNITUDE" | "FIT_SPLINE_ZERO_END_MAGNITUDE" | "SHEET_METAL_CORNER_BREAK_SELECT_ENTITIES" | "EXTRUDE_SELECT_TERMINATING_VERTEX" | "FILL_SURFACE_NO_EDGES" | "FILL_SURFACE_DOUBLE_SELECTION" | "FILL_SURFACE_MULTI_LOOP" | "FILL_SURFACE_OPEN_LOOP" | "FILL_SURFACE_FAIL" | "FILL_SURFACE_ATTACH_FAIL" | "FILL_SURFACE_G2_FAIL" | "FILL_SURFACE_VERTEX_INTERPOLATION_FAIL" | "LOFT_SPINE_DISJOINT_PATH" | "LOFT_SPINE_SELF_INTERSECTING_PATH" | "LOFT_SPINE_PATH_PROFILE_NO_INTERSECTION" | "LOFT_SPINE_FAILED_XSECTIONS" | "LOFT_SPINE_GUIDE_WITH_POINT_PROFILE" | "LOFT_SPINE_PROFILES_NOT_IN_ORDER" | "LOFT_SELECT_SPINE" | "DOCUMENT_NOT_FOUND" | "ELEMENT_NOT_FOUND" | "ENCLOSE_NO_REGION" | "ENCLOSE_CANNOT_MERGE_REGIONS" | "ENCLOSE_CANNOT_CREATE_SOLID" | "ENCLOSE_NOTHING_SELECTED" | "ENCLOSE_UNKNOWN_ERROR" | "ACCESS_NOT_ALLOWED" | "LOFT_SPINE_TOO_MANY_GUIDES" | "FEATURE_INVALID_NAMESPACE" | "FEATURE_NULL_NOT_ALLOWED" | "SKETCH_DIMENSION_LIMIT_ERROR" | "FILL_SURFACE_WIRE_CONTINUITY_MISMATCH" | "FILL_SURFACE_INTERNAL_CONTINUITY_MISMATCH" | "LOFT_START_OR_END_CONDITIONS_FAILED" | "LOFT_START_OR_END_CONDITIONS_MAGNITUDE_NO_EFFECT" | "FOLLOW_LEADER_IS_IN_UNFOLLOWABLE_TAB" | "LOFT_START_OR_END_CONDITIONS_WITH_GUIDES_FAILED" | "REST_ASSEMBLY_MISSING_TRANSFORM_GROUPS" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP_INSTANCES" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP_INSTANCE" | "LOFT_NO_FACE_FOR_GUIDE_CLAMP" | "LOFT_NO_CONTINUITY_CONDITION_AT_INTERNAL_GUIDE" | "SKETCH_CONSTRAINT_NOT_FOUND" | "SKETCH_CONSTRAINT_PARAMETER_NOT_FOUND" | "SKETCH_ENTITY_NOT_FOUND" | "SKETCH_ENTITY_PARAMETER_NOT_FOUND" | "FEATURE_PARAMETER_TYPE_MISMATCH" | "FEATURE_CONFIGURED_PARAMETER_NO_VALUES" | "FEATURE_CONFIGURED_PARAMETER_INCONSISTENT_TYPES" | "SHEET_METAL_FLANGE_FAIL_AUTO_MITER" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_EDGE" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_PLANE" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_DIRECTION" | "SHEET_METAL_FLANGE_FAIL_NO_BEND" | "SHEET_METAL_FLANGE_NO_PARALLEL_ENTITY" | "SHEET_METAL_FLANGE_NO_DIRECTION_ENTITY" | "SHEET_METAL_TAB_NO_BEND" | "BOOLEAN_NO_SURFACE_IN_MERGE_SCOPE" | "BOOLEAN_NO_SHARED_EDGE_WITH_SURFACE_IN_MERGE_SCOPE" | "SHEET_METAL_BEND_RELIEF_NO_CORNER" | "SHEET_METAL_CORNER_SELECT_ENTITIES" | "SHEET_METAL_BEND_RELIEF_SELECT_ENTITIES" | "VRFILLET_RADIUS_REQUIRED_AT_VERTEX" | "VRFILLET_RHO_REQUIRED_AT_VERTEX" | "VRFILLET_MAG_REQUIRED_AT_VERTEX" | "VRFILLET_SELECT_VERTICES" | "VRFILLET_VERTEX_NOT_ON_CHAIN" | "VRFILLET_INVALID_CHAIN" | "SHEET_METAL_TAB_NO_MERGE" | "SHEET_METAL_TAB_NONPLANAR" | "SHEET_METAL_TAB_NO_WALL" | "SHEET_METAL_TAB_NO_TAB" | "VRFILLET_NO_EFFECT" | "VRFILLET_MULTI_SELECTION" | "SHEET_METAL_TAB_NO_PARALLEL_WALL" | "SHEET_METAL_CORNER_UNDER_SIZED" | "FILLET_PARTIAL_FAIL" | "VRFILLET_INTERNAL_ZERO" | "SHEET_METAL_TAB_NO_EFFECT" | "SHEET_METAL_TAB_LOW_CLEARANCE" | "SHEET_METAL_TAB_FAILS_MERGE" | "SHEET_METAL_TAB_COLLISION" | "REPLACE_FACE_FACE_COUNT_CHANGED" | "FACE_OVERLAP" | "FACE_REMOVED" | "INTERSECTING_EDGES" | "CANNOT_SPLIT_FACE" | "FILL_SURFACE_BAD_SUPPORT" | "FILL_SURFACE_SUPPORT_NOT_ON_BOUNDARY" | "FILL_SURFACE_SUPPORT_NOT_SMOOTH" | "FILL_CURVE_OR_POINT_CONSTRAINTS" | "SHEET_METAL_ADD_WRONG_MODEL" | "SHEET_METAL_PATTERN_DISABLED_BOOLEANS" | "DRAWING_ALL_INSTANCES_HIDDEN" | "FILL_SUPPORT_NOT_SMOOTH_INTERNAL" | "SKETCH_CONSTRAINT_WRONG_SHEET_METAL_BODY" | "SKETCH_CONSTRAINT_FLAT_IN_3D" | "SKETCH_CONSTRAINT_3D_IN_FLAT" | "FIT_SPLINE_CURVATURE_FACE" | "FIT_SPLINE_CANNOT_EVALUATE_CURVATURE_END_CONDITION" | "FIT_SPLINE_NEED_DIRECTION_FOR_CURVATURE" | "CONFIGURATION_HAS_BAD_PARAMETERS" | "CONFIGURATION_HAS_BAD_CURRENT_CONFIGURATION" | "FEATURE_CONFIGURED_PARAMETER_VALUES_HAVE_IDS" | "WORKSPACE_NO_LONGER_EXISTS" | "CONTENT_STACKING_INVALID_MODE" | "CONTENT_STACKING_INVALID_COMPONENTS" | "CONTENT_STACKING_INVALID_TOP_STACK" | "SHEET_METAL_FACE_PATTERN_NO_JOINT" | "SHEET_METAL_FACE_PATTERN_FLOATING_CUT" | "SHEET_METAL_FACE_PATTERN_FLOATING_WALL" | "SM_FLAT_OP_NO_INTERSECT" | "SM_FLAT_OP_PARTIAL_INTERSECT" | "SM_FLAT_OP_ADD_CROSSES_EDGE" | "SM_FLAT_OP_NON_PLANAR_TOOL" | "SM_FLAT_OP_NON_PLANAR_TARGET" | "SM_FLAT_OPERATION_FAILED" | "SM_FLAT_OP_LEGACY_MODEL" | "SHEET_METAL_FLANGE_NON_LINEAR_EDGES" | "SHEET_METAL_CYLINDER_BEND" | "SHEET_METAL_INVALID_FACE" | "SHEET_METAL_ROLLED_CORNER_RELIF" | "SHEET_METAL_RELIEF_FAILURES" | "EDGE_CHANGE_FAILED" | "BOOLEAN_INPUTS_NOT_SOLID" | "TRANSFORM_SCALE_SELECTION" | "SHEET_METAL_SUBTRACT_DESTROYS_SHEET" | "SPLIT_KEEP_TOOLS_WITH_FACE" | "SPLIT_TRIM_WITH_SINGLE_FACE" | "SHEET_METAL_SKETCH_DETACHED_FACE" | "HOLE_CUT_FAIL" | "SHEET_METAL_FLAT_OP_ROLL_FAIL" | "PATTERN_EDGE_FAILED" | "SHEET_METAL_FACE_PATTERN_NO_VERTEX" | "SHEET_METAL_FACE_PATTERN_PARTIAL_FLOATING_WALL" | "EXTRUDE_3D_AND_FLAT" | "PATTERN_SWITCH_TO_PER_INSTANCE" | "PATTERN_NO_GEOM_FROM_FEATURES" | "RM_NO_LINK_PERMISSION_TO_REVISION" | "DRAFT_SELECT_PARTING_EDGES" | "DRAFT_CONFLICTING_OPPOSITION" | "SPLIT_SELECT_TARGETS" | "SPLIT_SELECT_TOOL" | "SPLIT_SELECT_FACE_TARGETS" | "SPLIT_SELECT_FACE_TOOLS" | "ASSEMBLY_PATTERN_EXCEED_MAX_INSTANCE_COUNT" | "ASSEMBLY_PATTERN_RECURSIVE_SEED" | "NO_LINK_PERMISSION_TO_THIS_DOCUMENT" | "SM_FLAT_OP_FACES_NOT_COPLANAR" | "FLATTENED_SHEET_METAL_SKETCH_PROHIBITED" | "DRAFT_SELECT_PULL_DIRECTION_ENTITY" | "DRAFT_PARALLEL_PARTING_EDGE" | "FLATTENED_SHEET_METAL_SKETCH_ONE_FACE" | "SKETCH_OFFSET_CHAIN_FAIL" | "SKETCH_OFFSET_BASE_CURVE_CONSUMED" | "SKETCH_OFFSET_SPLINE_SPLIT" | "SKETCH_OFFSET_ELLIPSE_SPLIT" | "CANNOT_FIND_FLATTENED_BODY" | "SHEET_METAL_ACTIVE_MODEL_REQUIRED" | "SKETCH_REFERENCE_WRONG_FLAT_PART" | "SKETCH_CANNOT_REFERENCE_3D" | "SM_FLAT_OP_CANNOT_JOIN_DIFFERENT_TRANSFORMS" | "DEFINED_IN_3D_CANT_REFERENCE_SM_FLAT" | "DEFINED_IN_SM_FLAT_CANT_REFERENCE_3D" | "CANNOT_CHANGE_REFERENCE_TO_DELETED_DOCUMENT" | "CANNOT_CHANGE_REFERENCE_ELEMENT_NOT_FOUND" | "COPIED_SKETCH_NOT_FOUND" | "VARIABLE_NAME_TOO_LONG" | "NO_INSTANCE_TO_REPLACE" | "ASSEMBLY_REPLACE_NO_REPLACER" | "CANNOT_REPLACE_IN_SUBASSEMBLIES" | "FILL_SURFACE_G1_FAIL" | "ALL_CONFIGURATION_PARAMETERS_NOT_SPECIFIED" | "ASSEMBLY_REPLACE_INVALID_SEED_INSTANCE" | "ASSEMBLY_REPLACE_INVALID_SEED_TYPE" | "ASSEMBLY_REPLACE_SUPPRESSED_FORBIDDEN" | "DISPLAY_STATES_INVALID_NAME" | "DISPLAY_STATES_DUPLICATE_NAME" | "WORKSPACE_UPGRADE_NONE_ENABLE_CAPABILITY" | "DISPLAY_STATES_UPDATE_HAD_NO_EFFECT" | "DISPLAY_STATES_APPLY_HAD_NO_EFFECT" | "DISPLAY_STATES_DOES_NOT_EXIST" | "LOFT_SPINE_NONTANGENT_PATH" | "LOFT_SPINE_APPROXIMATED" | "REST_ASSEMBLY_REVISION_PART_NUMBER_BLANK" | "REST_ASSEMBLY_REVISION_NOT_FOUND" | "ROLL_FAILED" | "ROLL_CANNOT_ADJUST" | "ROLL_MISMATCHED_SOURCE" | "INVALID_ROLL_SURFACE" | "ROLL_NOT_TO_OR_FROM_PLANE" | "FAILED_TO_FIND_ELEMENT_FOR_TO_STATE" | "FAILED_TO_FIND_VERSION_FOR_TO_STATE" | "MISSING_REVISION_ID_FOR_TO_STATE" | "MISSING_VERSION_ID_FOR_TO_STATE" | "INVALID_DOCUMENT_ID_FOR_TO_STATE" | "ASSEMBLY_CONTAINS_MISSING_PART_DATA" | "SHEET_METAL_HEM_NO_EDGES" | "SHEET_METAL_HEM_NON_LINEAR_EDGES" | "SHEET_METAL_HEM_FAIL_ALIGNMENT" | "SHEET_METAL_HEM_TOO_SHORT" | "SHEET_METAL_HEM_TEAR_DROP_GAP_TOO_LARGE" | "SHEET_METAL_HEM_INTERNAL" | "SHEET_METAL_HEM_FAILED" | "INVALID_CONFIGURATION_SPECIFIED" | "EDGEBLEND_PARTIAL" | "CHAMFER_PARTIAL_FAIL" | "LOFT_INCONSISTENT_EXTENT" | "LOFT_CANT_TRIM_PROFILES_INFO" | "LOFT_CANT_TRIM_GUIDES_INFO" | "NON_GEOMETRIC_ITEM_INSERTION_FAILED" | "SHEET_METAL_FLANGE_NEXT_TO_CYLINDER_BEND" | "SHEET_METAL_HEM_NEXT_TO_CYLINDER_BEND" | "SHEET_METAL_MOVE_FACE_NEXT_TO_CYLINDER_BEND" | "ASSEMBLY_UNKNOWN_SOLVE_ERROR" | "ASSEMBLY_FEATURE_FAILED_TO_RESOLVE_ALL_INSTANCES" | "SHEET_METAL_ORPHANED_BEND" | "ASSEMBLY_CONTEXT_INVALID_REFERENCE" | "ASSEMBLY_FEATURE_QUERY_DATA_MISSING" | "NON_GEOMETRIC_ITEMS_DOCUMENT_NOT_OWNED_BY_COMPANY" | "NON_GEOMETRIC_ITEM_NO_ITEM_FOUND_FOR_DOCUMENT_OWNER" | "EXTEND_SHEET_BODY_NO_TARGET" | "EXTEND_TARGET_MISSED" | "EXTEND_SELF_INTERSECTION" | "EXTEND_FAILED" | "EXTEND_TO_FACE_FAILED" | "TRIM_TO_MULTI_FAILED" | "EXTEND_NON_LAMINAR" | "EXTEND_TO_VERTEX_FAILED" | "TRIM_FAILED" | "SKETCH_EQUAL_CURVATURE_FAILED" | "SKETCH_EQUAL_CURVATURE_INPUT_ERROR" | "ASSEMBLY_EXPLODE_STEP_DIRECTION_QUERY_FAILED" | "WRAP_DESTINATION_NO_FACE" | "WRAP_TRIM_FAILED" | "WRAP_TRIM_NO_INTERSECTION" | "WRAP_IMPRINT_FAILED" | "WRAP_NEEDS_ANCHOR" | "WRAP_SELECT_TOOLS" | "WRAP_SELECT_TARGET" | "CREATE_COMPOSITE_PART_FAILED" | "NESTED_COMPOSITE_PARTS" | "ASSEMBLY_EXPLOSION_DOES_NOT_EXIST" | "FILL_SURFACE_NO_GUIDES" | "HOLE_INCONSISTENT_TAP_INFO" | "WRAP_SOURCE_DIFFERING_PLANES" | "WRAP_IMPRINT_SHEET_METAL" | "WRAP_SELECT_ANCHORS" | "OPERATION_CANCELLED" | "COMPOSITE_CLOSED_OVERLAP" | "COMPOSITE_OPEN_OVERLAP" | "COMPOSITE_SKETCH" | "COMPOSITE_MATE_CONNECTOR" | "COMPOSITE_PLANE" | "COMPOSITE_NON_MODIFIABLE" | "ASSEMBLY_REPLACE_WILL_CAUSE_CYCLES" | "CREATE_OUTLINE_TWO_OFFSET_FACES_PER_BODY" | "SHEET_METAL_TOOL_DOES_NOT_CUT_THROUGH" | "PERIODIC_BSPLINESURFACE_NOT_CLOSED" | "PERIODIC_BSPLINESURFACE_NOT_SMOOTH" | "CANNOT_MAKE_BSPLINESURFACE" | "BSPLINESURFACE_NOT_G1" | "BAD_2D_BOUNDARY_BSPLINECURVE_DEFINITION" | "PERIODIC_2D_BOUNDARY_BSPLINECURVE_NOT_CLOSED" | "PERIODIC_2D_BOUNDARY_BSPLINECURVE_NOT_SMOOTH" | "BSPLINESURFACE_BOUNDARY_NOT_SINGLE_CLOSED_LOOP" | "BSPLINESURFACE_FAILED_TO_MAKE_SOLID" | "BOOLEAN_NO_SHARED_EDGE_WITH_OTHER_SURFACE" | "BOOLEAN_NO_SURFACE_TO_MERGE_WITH" | "BOOLEAN_INVALID_PARAMETER_COMBINATION" | "MODIFY_COMPOSITE_PART_FAILED" | "INSTANCE_CONSUMED_BY_CLOSED_COMPOSITE" | "EXPLODE_STEP_INSTANCE_IS_SUPPRESSED" | "NO_COMPOSITE_FOR_SINGLE_SOLID" | "COMPOSITE_PART_ADD_AND_REMOVE_BODY" | "BOOLEAN_TOOL_INPUTS_NOT_SOLID" | "BOOLEAN_CANNOT_MIX_SOLIDS_AND_SURFACES" | "BSPLINESURFACE_CONTROL_POINTS_GRID_TOO_LONG" | "BSPLINE_TOO_MANY_CONTROL_POINTS" | "BSPLINE_DEGREE_TOO_HIGH" | "COMPOSITE_PART_SELECT_ENTITIES" | "DELETE_COMPOSITE_PART_FAILED" | "SURFACES_NOT_SUPPORTED_BY_PATTERN_REMOVE_AND_INTERSECT" | "SHEET_METAL_TAB_MERGE_AND_SUBTRACT_SAME_FLANGE" | "EXPLODED_VIEW_INVALID_STARTING_POSITION" | "CANNOT_EXPLODE_SKETCH" | "FAILED_TO_CREATE_EXPLODED_VIEW" | "ASSEMBLY_NAMED_POSITIONS_NEW_INSTANCES" | "SYS_FEATURE_EXCEPTION" | "CURVE_PARTIAL_FAILED" | "CURVE_FAILED" | "SPLIT_KEEP_PLANES_AND_MATE_CONNECTORS" | "EXPLODE_LINES_MUST_SPECIFY_STARTING_POINT" | "EXPLODE_LINES_FAILED_TO_RESOLVE_ENTITY" | "SPLINE_THROUGH_EDGES_SELECTED_EDGES_DONT_FORM_CHAIN" | "SPLINE_THROUGH_EDGES_TANGENT_DISCONTINUITY_AT_EDGE_ENDS" | "SPLINE_THROUGH_EDGES_CANNOT_FIT_SPLINE" | "SPLINE_THROUGH_EDGES_SELECT_EDGES" | "SPLINE_THROUGH_EDGES_RESULTED_IN_MORE_THAN_ONE_EDGE" | "SKETCH_CANNOT_DELETE_SPLINE_HANDLES" | "SKETCH_TRIM_NO_SPLINE_HANDLES" | "SKETCH_SPLIT_NO_SPLINE_HANDLES" | "SKETCH_EXTEND_NO_SPLINE_HANDLES" | "SKETCH_PATTERN_NO_SPLINE_HANDLES" | "SKETCH_FILLET_NO_SPLINE_HANDLES" | "SKETCH_MIRROR_NO_SPLINE_HANDLES" | "SKETCH_TRANSFORM_NO_SPLINE_HANDLES" | "MATE_OFFSET_INVALID_ROTATION_TYPE" | "SKETCH_TANGENT_CONSTRAINT_SPLINE_AND_HANDLE" | "SKETCH_CURVATURE_CONSTRAINT_SPLINE_AND_HANDLE" | "EXPLODE_LINE_NOT_ON_EXPLODED_INSTANCE" | "SWEEP_DISJOINT_PROFILE" | "SWEEP_MIXED_PROFILE" | "MULTI_PROFILE_SWEEP_NO_INNER_LOOPS" | "SWEEP_PROFILE_DIM_MISMATCH" | "LOFT_CONNECTION_MATCHING" | "SIMULATION_LOAD_DIRECTION_QUERY_FAILED" | "SIMULATION_LOAD_REGION_QUERY_FAILED" | "SIMULATION_LOAD_REGION_QUERY_EMPTY" | "SIMULATION_LOAD_REGION_NOT_ON_LOAD_INSTANCE" | "SIMULATION_LOAD_INSTANCE_NOT_SPECIFIED" | "SIMULATION_LOAD_DIRECTION_NOT_SPECIFIED" | "SIMULATION_FUNCTIONAL_CONNECTION_QUERY_FAILED" | "SIMULATION_FUNCTIONAL_CONNECTION_QUERY_EMPTY" | "HOLE_MATCH_FAILED" | "RULED_SURFACE_SELECT_EDGES" | "RULED_SURFACE_MITER_FAILED" | "RULED_SURFACE_NO_TANGENT_DIR" | "RULED_SURFACE_SELECT_DIRECTION" | "RULED_SURFACE_ZERO_LENGTH" | "RULED_SURFACE_SELECT_UP_TO_ENTITY" | "RULED_SURFACE_OVERLAPPING_SKETCH_EDGES" | "RULED_SURFACE_EDGES_NOT_MANIFOLD" | "RULED_SURFACE_FAILED" | "RULED_SURFACE_NO_LOCK_FACE" | "RULED_SURFACE_VERTEX_SELECT_VERTEX" | "RULED_SURFACE_MULTIPLE_LOCK_FACES" | "RULED_SURFACE_TOP_LEVEL_BOUNDARY_ENTITY" | "RULED_SURFACE_SPLIT_VERTEX" | "FULL_ROUND_SELECT_FACES" | "FULL_ROUND_MINIMUM_VERSION" | "FULL_ROUND_ADJACENT_CENTER_FACES" | "FULL_ROUND_COMMON_BODY" | "FAILED_TO_CREATE_ASSEMBLY_SIMULATION" | "IN_CONTEXT_UPDATE_DELETED_WORKSPACE" | "HOLE_TOOL_CONSTRUCTION_FAILED" | "HOLE_PARTIAL_FAILURE" | "HOLE_EXCEEDS_MAX_LOCATIONS_500" | "CONSTRUCT_PATH_EDGES_OVERLAP" | "CONSTRUCT_PATH_NOT_MANIFOLD" | "CONSTRUCT_PATH_FAILED" | "CONSTRUCT_PATH_FACES_OPPOSITE_SIDES" | "RULED_SURFACE_REFERENCE_FACES_BOTH_SIDES" | "HOLE_TARGETS_DO_NOT_DIFFER" | "RULED_SURFACE_OVERRIDES_CLASH" | "FGS_STREAM_ERROR" | "NO_MATERIAL_FOR_MASS_PROPERTY" | "SPECIFIED_SIMULATION_DOES_NOT_EXIST" | "MULTIPLE_MODAL_SIMULATIONS_PROHIBITED" | "LOFT_POINT_PROFILE_NORMAL_TO_PROFILE_GUIDE" | "RULED_SURFACE_GLOBAL_NORMAL_OVERRIDE" | "RULED_SURFACE_EDGE_PARALLEL_REFERENCE" | "FIXED_PART_REQUIRED_FOR_SIMULATION" | "MATERIAL_ASSIGNMENT_REQUIRED_FOR_SIMULATION" | "LOAD_REQUIRED_FOR_LINEAR_STATIC_SIMULATION" | "MATERIAL_LACKS_REQUIRED_PROPERTY_FOR_SIMULATION" | "FILLET_EDGES_NOT_MANIFOLD" | "SHEET_METAL_FILLET_NO_WIDTH" | "FRAME_TAG_PROFILE_SELECT_SKETCH" | "FRAME_TAG_PROFILE_SPECIFY_COLUMNS" | "FRAME_TAG_PROFILE_HEADER_EMPTY" | "FRAME_TAG_PROFILE_VALUE_EMPTY" | "FRAME_MISSING_CAP_FACES" | "FRAME_MISSING_SWEPT_EDGES" | "FRAME_MISSING_SWEPT_FACES" | "FRAME_CUTLIST_NO_END_FACE_EDGE_GEOMETRY_PAIR" | "PUBLICATION_ITEM_INSERT_FAILED" | "PUBLICATION_ITEM_INSERT_FAILED_NO_LINK_PERMISSION" | "PUBLICATION_ITEM_INSERT_FAILED_NO_DUPLICATES_ALLOWED" | "PUBLICATION_ITEM_UPDATE_FAILED_NO_DUPLICATES_ALLOWED" | "PUBLICATION_ITEM_UPDATE_FAILED" | "VRFILLET_RADIUS_REQUIRED_AT_POINT" | "VRFILLET_PARAMETER_REQUIRED_AT_POINT" | "VRFILLET_RHO_REQUIRED_AT_POINT" | "VRFILLET_MAG_REQUIRED_AT_POINT" | "VRFILLET_SELECT_EDGES" | "VRFILLET_EDGE_NOT_ON_CHAIN" | "BRIDGING_CURVE_POSITIONS_IDENTICAL" | "SPLIT_FACE_MUTUAL_IMPRINT" | "BRIDGING_CURVE_ZERO_SPEED_SCALE" | "VARIABLE_DESCRIPTION_TOO_LONG" | "FRAME_BAD_PATH" | "FRAME_SWEEP_FAILED" | "FRAME_TRIM_FAILED" | "FRAME_MALFORMED_BEAM" | "FRAME_BAD_CORNER_TYPE" | "FRAME_SELECT_PROFILE" | "FRAME_PROFILE_REGION" | "FRAME_NO_INTERNAL_TRIM" | "FRAME_MULTIPLE_TRIM_PLANES" | "FRAME_MULTIPLE_EQUAL_BEAMS_AFTER_SPLIT" | "FRAME_TRIM_GROUPS" | "FRAME_DISJOINT_GROUPS" | "FRAME_CANDIDATE_FACES" | "FRAME_LENGTHWISE_TRIM" | "FRAME_TRIM_SELECT_TARGETS" | "FRAME_TRIM_SELECT_TOOL" | "FRAME_SELECT_PATH" | "FRAME_TAG_PROFILE_HEADER_RESERVED" | "FRAME_CUTLIST_COLUMN_EMPTY" | "FRAME_TAG_PROFILE_NO_FEATURE_PATTERN" | "FRAME_CUTLIST_NO_FEATURE_PATTERN" | "SPLIT_EDGE_SELECT_EDGES" | "SPLIT_EDGE_SIZES_MISMATCH" | "SPLIT_EDGE_PARAMETER_BOUND" | "SPLIT_EDGE_FAILED" | "SPLIT_CLOSED_EDGE_ONE_POINT" | "SPLIT_EDGE_PROVIDE_PARAMETERS" | "NO_MATERIAL_FOR_COMPOSITE_PART_COMPUTED_MASS" | "FRAME_MULTIPLE_EQUAL_SEGMENTS_AFTER_SPLIT" | "FRAME_MALFORMED_SEGMENT" | "SIMULATION_UNSUPPORTED_INSTANCE" | "MIXED_MODEL_LAYOUT" | "ADJACENT_MESH_FACES_FOR_CAP_OR_HEAL" | "NOT_ALL_MESH_FACES_PATTERN" | "VOLUME_ACCURACY_MUST_BE_HIGH_FOR_REGEN" | "ASSEMBLY_REPLICATE_INVALID_SEED_MATE" | "ASSEMBLY_REPLICATE_MISSING_SEED_MATE" | "DXF_UNKNOWN_ENTITY" | "DXF_NONUNIFORM_SCALING" | "DXF_COULD_NOT_READ_FILE" | "DXF_COULD_NOT_CONVERT_HATCH" | "DXF_COULD_NOT_CONVERT_BODY" | "DXF_COULD_NOT_CONVERT_REGION" | "DXF_BAD_SPLINE_DATA" | "SIMULATION_LOAD_INSTANCE_SUPPRESSED" | "DIAMETERS_MUST_BE_EQUAL" | "NOT_CONVEX" | "SELECT_CYLINDER_EDGES" | "NOT_CYLINDER_OR_CONE" | "UNABLE_TO_FIND_THREAD_BOUNDARY" | "UNDERCUT_OFF_FACE" | "UNDERCUT_TOO_DEEP" | "HOLE_CBORE_CSINK_VALUES_NON_STD" | "SHEET_METAL_FLANGE_PARAMETER_BOUND" | "SHEET_METAL_FLANGE_ZERO_WIDTH" | "SHEET_METAL_FLANGE_NO_BOUNDING_ENTITY" | "SHEET_METAL_FLANGE_BOUNDING_ENTITY_PARALLEL" | "SHEET_METAL_FLANGE_BOUNDING_ENTITY_NOT_SUPPORTED" | "FRAME_BAD_COMPOSITE_SEGMENT" | "SKETCH_SPLINE_POINT_HAS_HANDLE" | "SKETCH_TRIM_NO_SPLINE_CONTROL_POLYGON" | "SELECTED_NON_MATCHING_SIZE" | "NEAREST_MATCHING_THREAD_SIZE" | "SKETCH_PATTERN_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_TRANSFORM_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_FILLET_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_MIRROR_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_SPLIT_NO_SPLINE_CONTROL_POLYGON" | "VARIABLE_SELECT_FIRST_ENTITY" | "VARIABLE_SELECT_SECOND_ENTITY" | "VARIABLE_SELECT_CUSTOM_DIRECTION" | "VARIABLE_SELECT_ENTITIES_TO_MEASURE" | "VARIABLE_SELECT_ENTITY_TO_MEASURE" | "VARIABLE_NO_GEOMETRY_WITH_DIAMETER" | "VARIABLE_ONLY_TWO_ENTITIES_ALLOWED" | "VARIABLE_FLATTENED_ENTITIES_MUST_BE_SAME_BODY" | "CURVE_PROJECTION_FAILED" | "FACE_INTERSECTION_FAILED" | "FACE_INTERSECTION_NO_RESULT" | "FACE_INTERSECTION_UNIQUE_SELECTION" | "FACE_INTERSECTION_OVERLAPPING_SELECTION" | "CHAMFER_SIZE_EXCEED_GUSSET_SIZE" | "EMPTY_GUSSET_SELECTION" | "CANNOT_FIT_A_GUSSET" | "NON_FRAME_EDGE_SELECTED" | "SWEPT_EDGE_SELECTED" | "NO_CAP_FACE_SELECTED_ERROR" | "INVALID_CAP_FACE_SELECTED_ERROR" | "CAP_MULTI_FACE_SELECTED_ERROR" | "CAP_MULTI_LUMENS_SELECTED_ERROR" | "CAP_CURVED_FRAME_ERROR" | "CAP_FRAME_AXIS_ERROR" | "VARIABLE_CANNOT_USE_MAXIMUM_WITH_INFINITE_ENTITIES" | "VARIABLE_NO_AXIS_ENTITIES" | "CURVE_PROJECTION_NO_RESULT" | "BSURF_FAILED" | "BSURF_PROFILE_FAILED" | "BSURF_INCONSISTENT_BOUNDARY_CONDITIONS" | "FGS_SIMULATION_ERROR_SIMULATION_NON_CONVERGENT" | "FGS_SIMULATION_ERROR_LATERAL_BEARING_FORCE" | "FGS_SIMULATION_ERROR_LOADS_NONE" | "FGS_SIMULATION_ERROR_CONSTRAINTS_NONE" | "FGS_SIMULATION_ERROR_CONSTRAINTS_ONLY_KINEMATIC" | "FGS_SIMULATION_ERROR_INTERNAL_ERROR" | "DXF_COULD_NOT_CONVERT_TEXT" | "FGS_SIMULATION_ASSEMBLY_TOO_COMPLEX" | "SPLIT_SELECT_FACE_DIRECTION" | "SELECTION_IS_INVALID" | "CANNOT_ADD_MORE_THAN_ONE_THREAD_TO_UNSPLIT_CYLINDER" | "UNDERCUT_TOO_SHALLOW" | "CAP_INCLINED_CUT_FRAME_ERROR" | "SPLIT_OFF_FACE" | "UNDERCUT_DIAMETER_TOO_LARGE" | "PUBLICATION_ACTION_FAILED_NO_PLAN_ACCESS" | "DISPLAY_STATES_NO_REFERENCE" | "INVALID_ARC_LENGTH" | "FILLET_ADJOINING_EDGE_NOT_FILLETED" | "FILLET_BOUNDARY_INTERSECTS_EDGE" | "FILLET_BOUNDARY_OVERLAP" | "FILLET_EDGE_OVERLAPPED_BY_FILLET" | "FILLET_FACE_RANGE_TOO_LARGE" | "FILLET_ILLEGAL_END_BOUNDARY" | "FILLET_OVERLAP" | "FILLET_OVERLAPS_EDGE_LOOP" | "FILLET_PRODUCED_SELF_INT_SURFACE" | "FILLET_RANGE_INCONSISTENT_EDGE" | "FILLET_REQUIRES_SURFACE_EXTENSION" | "FILLET_RHO_TOO_LARGE" | "FILLET_VERTEX_EDGES_COMPLICATED" | "CHAMFER_ADJOINING_EDGE_NOT_CHAMFERED" | "CHAMFER_BOUNDARY_INTERSECTS_EDGE" | "CHAMFER_BOUNDARY_OVERLAP" | "CHAMFER_EDGE_OVERLAPPED_BY_CHAMFER" | "CHAMFER_FACE_RANGE_TOO_LARGE" | "CHAMFER_ILLEGAL_END_BOUNDARY" | "CHAMFER_OVERLAP" | "CHAMFER_OVERLAPS_EDGE_LOOP" | "CHAMFER_PRODUCED_SELF_INT_SURFACE" | "CHAMFER_RANGE_INCONSISTENT_EDGE" | "CHAMFER_REQUIRES_SURFACE_EXTENSION" | "CHAMFER_RHO_TOO_LARGE" | "CHAMFER_VERTEX_EDGES_COMPLICATED" | "EDGEBLEND_ADJOINING_EDGE_NOT_BLENDED" | "EDGEBLEND_BOUNDARY_INTERSECTS_EDGE" | "EDGEBLEND_BOUNDARY_OVERLAP" | "EDGEBLEND_EDGE_OVERLAPPED_BY_BLEND" | "EDGEBLEND_FACE_RANGE_TOO_LARGE" | "EDGEBLEND_ILLEGAL_END_BOUNDARY" | "EDGEBLEND_OVERLAP" | "EDGEBLEND_OVERLAPS_EDGE_LOOP" | "EDGEBLEND_PRODUCED_SELF_INT_SURFACE" | "EDGEBLEND_RANGE_INCONSISTENT_EDGE" | "EDGEBLEND_REQUIRES_SURFACE_EXTENSION" | "EDGEBLEND_RHO_TOO_LARGE" | "EDGEBLEND_VERTEX_EDGES_COMPLICATED" | "SIMULATION_LOAD_ON_FIXED_INSTANCE" | "FRAME_CUSTOM_ALIGNMENT_POINTS_NOT_IN_SKETCH" | "NON_MATCHING_SIZE_ERROR" | "FILL_CANNOT_MATCH_EDGE_ADJACENT_FACES" | "FILL_ADJACENT_FACE_BAD_INPUT" | "FRAME_BAD_OFFSET_INDEX" | "EXTERNAL_THREADS_UNSUPPORTED_ON_SHEET_METAL" | "THREAD_DEPTH_BEYOND_CYLINDER" | "VRFILLET_ASYMMETRIC_RADIUS_REQUIRED_AT_VERTEX" | "VRFILLET_ASYMMETRIC_RADIUS_REQUIRED_AT_POINT" | "VRFILLET_BAD_COEDGE" | "FILLET_LEGACY_ASYMMETRIC_UNSUPPORTED" | "PARTIAL_FILLET_BAD_INPUT_ERROR" | "GUSSET_EMPTY_ALIGNMENT_SELECTION" | "GUSSET_ALIGNMENT_NO_INTERSECTION" | "BRIDGING_CURVE_VERTEX_OR_EDGE_ON_SIDE" | "CANNOT_USE_PARTIAL_FILLET_IN_SHEET_METAL" | "PARTIAL_FILLET_CLOSED_PATH_ERROR" | "WRONG_CYLINDER_EDGE_SELECTED" | "GUSSET_OFFSET_NOT_PARALLEL" | "GUSSET_ALIGNED_OFFSET_NOT_PARALLEL" | "BRIDGING_CURVE_VERTEX_BELONG_TO_FACE" | "BRIDGING_CURVE_EDGE_BELONG_TO_FACE" | "BRIDGING_CURVE_NO_START_SELECTION" | "BRIDGING_CURVE_NO_END_SELECTION" | "NAMED_VIEW_INVALID" | "MUTUAL_TRIM_SAME_SURFACE_USED" | "MUTUAL_TRIM_SURFACE_NOT_SELECTED" | "MUTUAL_TRIM_GENERIC_ERROR" | "SHEET_METAL_CANNOT_CUT" | "BSURF_2_PROFILES" | "BSURF_OPEN_CHAIN" | "BSURF_PROFILE_QUALITY" | "BSURF_PROFILE_MISMATCH" | "BSURF_INVALID_BOUNDARY_CONDITIONS" | "BSURF_SOLVE_FAILS" | "HOLE_CSINK_ANGLE_TOO_WIDE" | "HOLE_CSINK_ANGLE_TOO_NARROW" | "EXTRUDE_START_OFFSET_BOUND_NOT_PLANAR" | "EXTRUDE_START_OFFSET_BOUND_NOT_PARALLEL_TO_EXTRUDED_ENTITIES" | "EXTRUDE_DIRECTION_COPLANAR" | "EXTRUDE_DIRECTION_INVALID_ENTITY" | "BSURF_CONVERGENCE_CURVES" | "BSURF_CONVERGENCE_TANGENCY" | "EXTRUDE_SELECT_DIRECTION" | "EXTRUDE_SELECT_START_OFFSET_ENTITY" | "BSURF_INCONSISTENT_CONDITIONS_ERROR" | "PARTIAL_FILLET_INVALID_BOUNDS_ERROR" | "DOCUMENT_ELEMENT_NOT_FOUND" | "BSURF_PROFILE_NON_G1" | "SM_FLAT_OP_FACES_DONT_MATCH" | "HOLE_REVERSED_BOUNDS" | "HELIX_INPUT_AXIS" | "HELIX_BOTH_RADII_ZERO" | "HELIX_START_POINT_MISALIGNED" | "HELIX_END_POINT_MISALIGNED" | "FACE_BLEND_SELECT_FACES" | "FACE_BLEND_FAILED" | "FACE_BLEND_DIMENSION_TOO_SMALL" | "FACE_BLEND_DIMENSION_TOO_LARGE" | "FACE_BLEND_CANNOT_ATTACH" | "FACE_BLEND_WRONG_LEFT_WALL_SENSE" | "FACE_BLEND_WRONG_RIGHT_WALL_SENSE" | "FACE_BLEND_WRONG_SENSES" | "FACE_BLEND_LEFT_WALL_MULTIPLE_BODIES" | "FACE_BLEND_RIGHT_WALL_MULTIPLE_BODIES" | "FACE_BLEND_INCONSISTENT_DATA" | "FACE_BLEND_INVALID_TANGENT_HOLD_LINE" | "FACE_BLEND_INVALID_CONIC_HOLD_LINE" | "FACE_BLEND_BAD_SPINE" | "FACE_BLEND_RHO_TOO_LARGE" | "FACE_BLEND_RHO_INVALID" | "FACE_BLEND_SELF_INTERSECTION" | "FACE_BLEND_INVALID_CAP" | "FACE_BLEND_INVALID_LIMIT" | "FACE_BLEND_INVALID_LIMIT_DIRECTION" | "FACE_BLEND_SPINE_ZERO_ANGLE_PROPAGATION" | "FACE_BLEND_SPINE_TANGENT_PROPAGATION" | "FACE_BLEND_SELECT_SPINE" | "FACE_BLEND_HOLD_LINE_IN_WALLS" | "FACE_BLEND_TANGENT_HL_ASYMMETRIC" | "FACE_BLEND_WIDTH_HOLD_LINES" | "FACE_BLEND_EDGE_LIMIT_NEEDS_SIDE" | "FACE_BLEND_INVALID_PLANE_LIMIT" | "FACE_BLEND_INVALID_PROPAGATION_ANGLE" | "OFFSET_WIRE_GENERIC_ERROR" | "OFFSET_WIRE_SELECT_WALL_PATH" | "OFFSET_WIRE_DIR1_FAILED" | "OFFSET_WIRE_DIR2_FAILED" | "FACE_BLEND_SOLID_LONG_ATTACH" | "OFFSET_WIRE_SHAPES_NON_CONSISTENT" | "OFFSET_WIRE_MULTIPLE_SHAPES" | "BOOLEAN_NON_MANIFOLD_RESULT" | "DRAWING_ASSEMBLY_NONMANIFOLD_SECTION_CUT" | "DRAWING_PARTSTUDIO_NONMANIFOLD_SECTION_CUT" | "MOVE_CURVE_BOUNDARY_FAILED" | "MOVE_CURVE_BOUNDARY_EXTENSION_NO_INTERSECTION" | "MOVE_CURVE_BOUNDARY_TRIM_NO_INTERSECTION" | "MOVE_CURVE_BOUNDARY_SELECT_CURVE" | "MOVE_CURVE_BOUNDARY_SELECT_TRIM_BOUNDARY" | "MOVE_CURVE_BOUNDARY_SELECT_EXTEND_BOUNDARY" | "MOVE_CURVE_BOUNDARY_NO_SKETCH_ENTITIES" | "MOVE_CURVE_BOUNDARY_ONLY_WIRES" | "MOVE_CURVE_BOUNDARY_SELECT_HELP_POINT" | "MOVE_CURVE_BOUNDARY_EXTEND_REQUIRES_OPEN_CURVE" | "MOVE_CURVE_BOUNDARY_SPLIT_CLOSED_AT_TWO_POINTS" | "HOLE_NO_END_BOUNDS" | "HOLE_TAP_TOO_DEEP" | "MOVE_CURVE_BOUNDARY_TOOL_IS_TARGET" | "DRAWING_IGNORE_FAULTY_PARTS" | "ISOCLINE_NO_RESULT" | "ISOCLINE_SELECT_FACES" | "ISOCLINE_SELECT_DIRECTION" | "ISOCLINE_FAILED" | "FGS_GENERATIVE_OPT_MAX_ITERATIONS" | "FGS_GENERATIVE_TARGET_VOLUME_LOW" | "FGS_GENERATIVE_TARGET_VOLUME_LARGE" | "FGS_GENERATIVE_THIN_GENERIC" | "FGS_GENERATIVE_SYMMETRY_DEF_PROBLEM" | "FGS_GENERATIVE_MINRADIUS_SMALL" | "FGS_GENERATIVE_MINRADIUS_LARGE" | "FGS_GENERATIVE_OPT_INVALID_SETUP" | "CURVE_PATTERN_DISTANCE_TOO_LARGE" | "BEND_REPLACEMENT_HEAL_FAILED" | "CANNOT_COPY_CONSTRAINTS" | "PARAMETER_EXPRESSION_VALIDATION_UNITS_MISMATCH_3ARGS" | "PARAMETER_EXPRESSION_VALIDATION_SYNTAX_ERROR_0ARGS" | "PARAMETER_EXPRESSION_VALIDATION_RESERVED_ID_1ARG" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_1ARG" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_2ARGS" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_3ARGS" | "PARAMETER_EXPRESSION_VALIDATION_INCORRECT_TYPE" | "PARAMETER_EXPRESSION_UNKNOWN_FUNCTION" | "PARAMETER_EXPRESSION_UNKNOWN_VARIABLE" | "REVOLVE_NOT_COPLANAR_WITH_AXIS" | "FRAME_ANGLE_REFERENCE_INVALID_ENTITY" | "AMBIGUOUS_GEOMETRY_FOR_GUSSET_DEFINITION" | "HOLE_START_BOUND_INVALID" | "HOLE_NO_START_BOUND" | "BODY_DRAFT_FAILED" | "BODY_DRAFT_NO_REFERENCES" | "BODY_DRAFT_NO_ANGLES" | "BODY_DRAFT_INVALID_ABOVE_ANGLE" | "BODY_DRAFT_INVALID_BELOW_ANGLE" | "BODY_DRAFT_INVALID_PARTING_ENTITY" | "BODY_DRAFT_INVALID_PULL_DIRECTION" | "BODY_DRAFT_MITER_NEED_BOTH_SIDES" | "BODY_DRAFT_EDGE_SEPARATION_FAILED" | "BODY_DRAFT_EDGE_SPLIT_FAILED" | "BODY_DRAFT_ISOCLINE_SPLIT_FAILED" | "BODY_DRAFT_PARTING_PLANE_SHEET_ERROR" | "BODY_DRAFT_INVALID_REFERENCE" | "BODY_DRAFT_REFERENCE_LOOP" | "BODY_DRAFT_TOO_STEEP" | "BODY_DRAFT_BAD_PULL_DIRECTION" | "BODY_DRAFT_MITER_FAILED" | "DECAL_HORIZONTAL_REFERENCE_INVALID_ENTITY" | "OFFSET_WIRE_SHEET_CREATION_FAILED" | "REPLACE_FACE_SHEET_SMALL" | "REPLACE_FACES_NOT_ADJACENT" | "SHEET_METAL_HOLE_REBUILD_FAILED" | "CPLANE_TANGENT_INPUT" | "CPLANE_TANGENT_SELECT_REFERENCE" | "CPLANE_TANGENT_PLANE_INVALID" | "CPLANE_TANGENT_POINT_INVALID" | "REPLACE_FACES_NOT_SAME_BODY" | "MUST_USE_DEFAULT_RADIUS_WITH_FACE_BEND" | "CANNOT_RIP_A_FACE_BEND" | "CANNOT_MAKE_A_FACE_BEND_TANGENT" | "SKETCH_HAS_PATTERN_TOO_LARGE" | "SKETCH_LINEAR_PATTERN_FAILED" | "DECAL_PROJECTED_OFF_FACE" | "FIT_TOLERANCE_LIMITS_NOT_FOUND" | "FIT_TOLERANCE_SIZE_TOO_LARGE_ISO" | "FIT_TOLERANCE_SIZE_TOO_LARGE_ANSI" | "DECAL_NO_FACE_SELECTION" | "DECAL_NO_IMAGE_SELECTION" | "DECAL_IMAGE_TOO_LARGE" | "FGS_SIMULATION_ASSEMBLY_HAS_NO_INSTANCES" | "FGS_SIMULATION_ASSEMBLY_HAS_TOO_FEW_INSTANCES" | "FGS_MODAL_SIMULATION_HAS_ALL_FIXED_PARTS" | "BODY_DRAFT_STRAY_NONMITER_EDGES" | "MASS_PROPERTY_FACES_NOT_COPLANAR" | "PARAMETER_VALUE_INVALID" | "SHEET_METAL_CHAMFER_NO_TANGENT_BASED" | "CHAMFER_DIRECTION_OVERRIDE_NO_EFFECT" | "FILLET_CHAMFER_UNSUPPORTED" | "LINEAR_PATTERN_SKETCH_REAPPLY_INFO" | "CIRCULAR_PATTERN_SKETCH_REAPPLY_INFO" | "CURVE_PATTERN_SKETCH_REAPPLY_INFO" | "MIRROR_SKETCH_REAPPLY_INFO" | "CHAMFER_HELD_BACK" | "SWEEP_BAD_LOCK_DIRECTION" | "SHEET_METAL_COUNTER_HOLE_UNSUPPORTED" | "SPECIFIED_FEATURE_DOES_NOT_EXIST" | "SHEET_METAL_BEND_NO_BEND_LINE" | "SHEET_METAL_BEND_BAD_BEND_LINE" | "SHEET_METAL_BEND_NO_FACE" | "SHEET_METAL_BEND_NO_PARALLEL" | "SHEET_METAL_BEND_NO_DIRECTION" | "SHEET_METAL_BEND_BAD_FACE" | "SHEET_METAL_BEND_IMPRINT_FAILED" | "SHEET_METAL_BEND_BAD_DECOMPOSITION" | "SHEET_METAL_BEND_LINE_PERPENDICULAR_TO_FACE" | "SWEEP_SELECT_DIRECTION" | "SHEET_METAL_BEND_ROLL_FAILED" | "SHEET_METAL_BOTH_SIDES_CONNECTED" | "SHEET_METAL_CANNOT_BEND_BUTTS" | "SHEET_METAL_BEND_COLLISION" | "MISSING_PARAMETER_REFERENCE" | "MISSING_IMAGE_PARAMETER_REFERENCE" | "BODY_DRAFT_SELECT_EDGES" | "BODY_DRAFT_SELECT_FACES" | "BODY_DRAFT_SELECT_PARTS" | "SPLIT_EDGE_INVALID_SURFACE" | "BODY_DRAFT_NO_EFFECT" | "OFFSET_CURVE_ON_FACE_SELECT_EDGES" | "OFFSET_CURVE_ON_FACE_WIRE_EDGES" | "OFFSET_CURVE_ON_FACE_INVALID_TARGETS" | "OFFSET_CURVE_ON_FACE_INVALID_DISTANCE" | "OFFSET_CURVE_ON_FACE_IMPRINT_NO_EXTEND" | "OFFSET_CURVE_ON_FACE_FAILED_TO_CREATE_CHAIN" | "OFFSET_CURVE_ON_FACE_BRANCHING_CHAIN" | "OFFSET_CURVE_ON_FACE_FAILED" | "OFFSET_CURVE_ON_FACE_BAD_DIRECTION" | "OFFSET_CURVE_ON_FACE_GEODESIC_OUTSIDE" | "OFFSET_CURVE_ON_FACE_EXTENSION_FAILED" | "OFFSET_CURVE_ON_FACE_CHAIN_YIELDED_NO_RESULT" | "OFFSET_CURVE_ON_FACE_NO_RESULT" | "OFFSET_CURVE_ON_FACE_INPUT_WITH_NO_TARGETS" | "OFFSET_CURVE_ON_FACE_EUCLIDEAN_SIDE_PICK_FAIL" | "OFFSET_CURVE_ON_FACE_SCAR_EDGE" | "OFFSET_CURVE_ON_FACE_CLOSED_CURVE_NO_TRIM" | "OFFSET_CURVE_ON_FACE_SIDE_DIFF_FAIL" | "ANGLE_CONTROL_PARALLEL_TO_BEND" | "BODY_DRAFT_PARTING_SURFACE_SMALL" | "MASS_PROPERTY_MATE_CONNECTOR_Z_AXIS_NOT_NORMAL" | "DERIVED_MATE_CONNECTOR_INDEX_OUT_OF_BOUNDS" | "DERIVED_MATE_CONNECTOR_NO_LONGER_VALID" | "DERIVED_MATE_CONNECTOR_RESET" | "DERIVED_NO_MATE_CONNECTORS" | "TESSELLATED_LOFT_ERROR" | "BODY_DRAFT_INVALID_FACE_REFERENCE" | "BODY_DRAFT_INVALID_EDGE_REFERENCE" | "BODY_DRAFT_INVALID_PART_REFERENCE" | "HOLE_CANNOT_DETERMINE_TAPPED_BODY" | "HOLE_PARAMS_OVERRIDDEN_INFO" | "HOLE_TAP_DIA_TOO_LARGE_OR_EQUAL" | "SPLIT_AS_MODIFICATION_MULTIPLE_RESULTS" | "FORMED_TAG_FORM_NO_FEATURE_PATTERN" | "FORMED_TAG_FORM_SELECT_DIFFERENT_PARTS" | "FORMED_TAG_FORM_SELECT_SKETCH" | "FORMED_TAG_FORM_SELECT_SOMETHING" | "ISOPARAMETRIC_CURVE_SELECT_FACE" | "ISOPARAMETRIC_CURVE_SELECT_POINT" | "ISOPARAMETRIC_CURVE_SELECT_POSITION" | "ISOPARAMETRIC_CURVE_POINT_NOT_ON_FACE" | "THIN_SWEEP_3D_PROFILE_TRIM_WARNING" | "THIN_SWEEP_FAILED_TO_FIND_TRIM_PLANES_WARNING" | "THIN_SWEEP_TRIM_FAILED" | "ISOPARAMETRIC_CURVE_SELECT_SINGLE_FACE" | "HOLE_FASTENER_FIT_IS_NOT_APPLICABLE" | "PATTERN_SKIPPED_INSTANCES_SEED_INDEX" | "PATTERN_SKIPPED_INSTANCES_OUT_OF_RANGE_INDEX" | "FORMED_SELECT_LOCATION" | "FORMED_NO_PART_STUDIO_SELECTED" | "FORMED_SELECT_LOCATION_ON_ACTIVE_FACE" | "FORMED_LOCATION_ON_MULTIPLE_FACES" | "FORMED_NOT_ON_HOLE_FORMED_FACE" | "THIN_SWEEP_THICKEN_FAILED" | "DERIVED_NO_PARTS" | "DERIVED_NO_INSTANCING" | "DERIVED_NO_SAME_SOURCE" | "DERIVED_FULL_FEATURE_PATTERN" | "THIN_LOFT_3D_PROFILE_TRIM_WARNING" | "THIN_LOFT_FAILED_TO_FIND_TRIM_PLANES_WARNING" | "THIN_LOFT_THICKEN_FAILED" | "FGS_MODAL_SIMULATION_MAXIMUM_RIGID_MODES_REACHED" | "ASSEMBLY_MIRROR_PLANE_ERROR" | "POLYLINE_CONSECUTIVE_EQUAL_POINTS" | "POLYLINE_ZERO_ANGLE" | "POLYLINE_BEND_RADII_INVALID_SIZE" | "POLYLINE_INVALID_BEND" | "SKETCH_MISSING_LOCAL_REFERENCE" | "SKETCH_DIMENSION_MISSING_PARAMETER" | "MATECONNECTOR_QUERY_SECONDARY_AXIS_CONFLICT" | "MATECONNECTOR_NORMAL_RESOLUTION_FAILED" | "LOFT_PLANAR_GUIDE_NOT_FOUND" | "PART_STUDIO_DOES_NOT_EXIST_IN_MOMENT" | "SOME_BODIES_WERE_REMOVED_FROM_EXPORT" | "ALL_BODIES_WERE_REMOVED_FROM_EXPORT" | "CONFIG_NO_PARAMETERS_FOUND" | "CONFIG_INCORRECT_PARAMETER_TYPE" | "CONFIG_TOO_MANY_PARAMETERS" | "REFERENCE_REPAIR_MISSING_CONFIGURATION" | "SKETCH_CANNOT_MAKE_2_POINTS_BEZIER" | "PART_INSTANCE_SELECTED_IN_MULTIPLE_GENERATIVE_DESIGNS" | "CURVE_PATTERN_LOCK_FACES_INTERSECTION_FAILED" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_DENSITY" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_POISSONS_RATIO" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_YOUNGS_MODULUS" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_TENSILE_YIELD_STRENGTH" | "SIMULATION_ASSEMBLY_HAS_UNSUPPORTED_MATES" | "ASSEMBLY_NAMED_POSITIONS_OUTSIDE_MATE_LIMIT" | "ASSEMBLY_NAMED_POSITIONS_SUBASSEMBLY_OUTSIDE_MATE_LIMIT" | "GENERATIVE_RUN_WAS_CANCELED" | "SKETCH_CHAMFER_INVALID_POINT" | "SKETCH_CHAMFER_PARALLEL" | "SKETCH_CHAMFER_FAIL" | "SKETCH_CHAMFER_INVALID_INPUTS" | "ASSEMBLY_FEATURE_MISSING_SELECTION" | "ASSEMBLY_NAMED_POSITIONS_LOCKED_SUBASSEMBLY_FOUND" | "CURVE_PATTERN_MISSING_FACE_SELECTION" | "TL_CONNECTION_ON_ALL_PROFILES" | "TL_FAILED" | "TL_CONNECTIONS_CROSS" | "TL_SELECT_PROFILES" | "TL_TWO_PROFILES" | "TL_CONSECUTIVE_ACORNS" | "TL_MIXED_PROFILES" | "TL_MIXED_PROFILE_TOPOLOGY" | "TL_FAILED_TO_CREATE_PROFILES" | "TL_CONNECTION_NOT_ON_PROFILE" | "SHEET_METAL_FILLET_NO_VARIABLE" | "PARTIALLY_INVALID_INPUT" | "SKETCH_BEZIER_DEGREE_DIM_NOT_FOUND" | "INVALID_BEZIER_DEGREE" | "CANNOT_DELETE_BEZIER_DEGREE_DIMENSION" | "DERIVED_NO_INSTANCING_SM" | "DERIVED_SM_AUTO_INSERT" | "ASSEMBLY_PATTERN_WRONG_REFERENCE_WAS_SELECTED" | "ASSEMBLY_PATTERN_REFERENCE_COULD_NOT_BE_FOUND" | "DERIVED_NO_ACTIVE_SM_COMPOSITE" | "PARTIAL_FILLET_INVALID_BOUND_ENTITY" | "FGS_THICKNESS_UNCLOSED_INPUT" | "FGS_THICKNESS_INTERNAL_ERROR" | "SKETCH_SPLIT_NO_BEZIER" | "SKETCH_TRIM_NO_BEZIER" | "EXPORT_NO_PARTS" | "SHEET_METAL_FILLET_OPTIONS_USE_CORNER_BREAK" | "SHEET_METAL_CHAMFER_OPTIONS_USE_CORNER_BREAK" | "SHEET_METAL_ATTRIBUTE_CORNER_BREAK_UNSUPPORTED_SELECTION" | "SHEET_METAL_USE_CORNER_BREAK_INFO" | "DRAWING_VIEW_CORRESPONDENCE_FAILED" | "EDIT_CURVE_SELECT_PLANE" | "EDIT_CURVE_SELECT_WIRE" | "EDIT_CURVE_MULTIPLE_EDGES" | "EDIT_CURVE_DEGREE_TOO_HIGH" | "EDIT_CURVE_INDEX_TOO_LARGE" | "EDIT_CURVE_PERIODICITY_CHANGE" | "EDIT_CURVE_FAILED" | "EDIT_CURVE_NOT_WIRE" | "EDIT_CURVE_CANNOT_EDIT_SKETCH_WIRE" | "EDIT_CURVE_LOCK_ENDS_PERIODIC" | "EDIT_CURVE_NO_BEST_FIT" | "PARTIAL_FILLET_OFFSET_BOUNDARY_TOO_LARGE" | "ASSEMBLY_MIRROR_INVALID_SEED" | "FLATTEN_COULD_NOT_FLATTEN" | "FLATTEN_SELECT_CONTIGUOUS_REGION" | "RULED_SURFACE_BAD_VERTEX" | "EDIT_CURVE_TOO_MANY_CONTROL_POINTS" | "EDIT_CURVE_NO_END_OVERLAP" | "EDIT_CURVE_APPROXIMATION_DEGREE_TOO_SMALL" | "EDIT_CURVE_CLOSED_APPROXIMATION_NO_DERIVATIVE" | "CONFIGURATION_PARAMETER_HAS_BAD_VISIBILITY_CONDITION" | "SHEET_METAL_FORMED_REBUILD_FAILED" | "SKETCH_PROFILE_ANALYSIS_FAILED" | "FORMED_SPLIT_PART" | "LOFT_NO_DIRECTION_FOR_START" | "LOFT_NO_DIRECTION_FOR_END" | "TOO_MANY_SAMPLES" | "FORMED_TOOL_NOT_NORMAL_TO_FACE" | "SHEET_METAL_ACTIVE_MODEL_NEEDED" | "SHEET_METAL_SELECT_PARTS" | "SHEET_METAL_INACTIVE_MODEL_SELECTED" | "FORMED_NOT_SAME_LOCATION" | "SIMULATION_MASS_OVERRIDE_WILL_BE_IGNORED" | "SIMULATION_MASS_OVERRIDE_ARE_IGNORED" | "FORMED_TAG_FORM_SELECT_SKETCH_WITH_WIRE_POINT" | "FORMED_TAG_FORM_BODIES_ALREADY_TAGGED" | "FORMED_TAG_FORM_POSITIVE_PART_NOT_SOLID" | "FORMED_TAG_FORM_NEGATIVE_PART_NOT_SOLID" | "FORMED_TAG_FORM_POSITIVE_PART_CONSUMED" | "FORMED_TAG_FORM_NEGATIVE_PART_CONSUMED" | "FORMED_BOOLEAN_UNION_NO_OP" | "FORMED_BOOLEAN_SUBTRACT_NO_OP" | "FORMED_FAILED_TO_DERIVE" | "TWO_WIDTH_MATECONNECTORS_NEEDED" | "ONE_TAB_MATECONNECTOR_NEEDED" | "TWO_TAB_MATECONNECTORS_NEEDED" | "FORMED_TAG_FORM_ORIGIN_OUTSIDE_TOOLS_BBOX" | "FORMED_TOOLS_INTERSECT_CANNOT_CUT" | "ROUTING_CURVE_AT_LEAST_TWO_DISTINCT_POINTS" | "ROUTING_CURVE_ORTHO_PATH_ALREADY_AXIS_ALIGNED" | "ROUTING_CURVE_INVALID_PATH" | "ROUTING_CURVE_CSV_INVALID_DATA" | "ROUTING_CURVE_CSV_NOT_ENOUGH_COLUMNS" | "EXTEND_TO_PART_FAILED" | "EXTEND_OFFSET_FAILED" | "SKETCH_PATTERN_NEEDS_SEED" | "WRAP_NEEDS_DIFFERENT_ANCHOR" | "CANNOT_RESOLVE_PART_STUDIO" | "CANNOT_RESOLVE_ASSEMBLY" | "NO_MESH_FOUND" | "CONSTRAINED_SURFACE_TOO_FEW_POINTS" | "CONSTRAINED_SURFACE_BAD_TOLERANCE" | "CONSTRAINED_SURFACE_BAD_POSITION" | "CONSTRAINED_SURFACE_FAILED_TOLERANCE" | "CONSTRAINED_SURFACE_FAILED" | "CONSTRAINED_SURFACE_SELECT_MESH" | "ROUTING_CURVE_SELECT_CURVE" | "ROUTING_CURVE_AT_LEAST_THREE_DISTINCT_POINTS" | "ASSEMBLY_MIRROR_HAS_REFERENCE_ERRORS" | "ASSEMBLY_MIRROR_HAS_NO_REFERENCE_ERRORS" | "FEATURE_NOT_PROVIDED" | "TOLERANT_OFFSET_END_CONSUMED" | "TOLERANT_OFFSET_NOT_TO_FACE" | "TOLERANT_DEPTH_NO_SECOND" | "TOLERANT_DEPTH_END_CONSUMED" | "MIXED_THICKNESS_TOLERANCE" | "DOUBLE_THICKNESS_TOLERANCE" | "TOLERANT_ANGLE_NO_SECOND" | "TOLERANT_ANGLE_END_CONSUMED" | "TOLERANT_THICKNESS_NEEDS_PLANE" | "TOLERANT_SOLID_ONLY" | "TOLERANT_INVALID_OFFSET_TARGET" | "SHEET_METAL_HEM_ADJACENT_CONE" | "SHEET_METAL_FLANGE_ADJACENT_CONE" | "SHEET_METAL_BEND_RELIEF_CONE" | "SHEET_METAL_ACTIVE_MODEL_CANNOT_OFFSET" | "TRIM_TO_MULTI_FAILED_FOR_UPTO_BODY" | "LOFT_CONNECTION_EDGE_PARAMETER_MISMATCH" | "SHEET_METAL_NO_CONE_APEX" | "SIMULATION_MATERIAL_PROPERTY_OUTSIDE_REQUIRED_BOUNDS" | "FGS_CONNECTIONS_ASSEMBLY_TOO_COMPLEX" | "THIN_EXTRUDE_NOT_PARALLEL_PLANES" | "WIDTH_AND_TAB_MATECONNECTORS_ON_SAME_OCCURRENCE" | "MIRROR_INVALID_SEED_ASSEMBLY" | "CANNOT_COMPUTE_MAX_DEVIATION" | "CANNOT_COMPUTE_MIN_DEVIATION" | "ASSEMBLY_MIRROR_INVOLVES_FIXED_OCCURRENCES" | "QUERY_VARIABLE_EMPTY_NAME" | "FEATURES_WITH_CYCLIC_DEPENDENCY_DETECTED" | "ASSEMBLY_MIRROR_RECURSIVE_SEED" | "QUERY_VARIABLE_NAME_ALREADY_USED_IN_NON_QUERY_VARIABLE" | "QUERY_VARIABLE_EMPTY_SELECTION" | "QUERY_VARIABLE_NAME_CANNOT_START_WITH_POUND" | "VARIABLE_NAME_ALREADY_USED_IN_QUERY_VARIABLE" | "ASSEMBLY_MIRROR_TARGET_PART_MISSING" | "ASSEMBLY_MIRROR_TARGET_FEATURE_MISSING" | "ASSEMBLY_MIRROR_TARGET_ELEMENT_MISSING" | "ASSEMBLY_MIRROR_DERIVED_ELEMENT_CONFIGURATIONS_INVALID" | "ASSEMBLY_DERIVED_MIRROR_REFERENCE_MISSING" | "INVALID_SUPPRESSION_EXPRESSION" | "ASSEMBLY_MIRROR_CHILD_HAS_REFERENCE_ERROR" | "THICKNESS_NO_CLOSED_COMPOSITES" | "VALUE_WITH_UNITS_ERROR" | "ROW_INDEX_RANGE_ERROR" | "ROW_INDEX_MIN_ERROR" | "ROW_INDEX_MAX_ERROR" | "ROW_INDEX_ERROR" | "ROW_LABEL_INDEX_ERROR" | "COL_INDEX_RANGE_ERROR" | "COL_INDEX_MIN_ERROR" | "COL_INDEX_MAX_ERROR" | "COL_INDEX_ERROR" | "COL_LABEL_INDEX_ERROR" | "QUERY_VARIABLE_NAME_CANNOT_CONTAIN_QUOTE" | "DRAWING_EMPTY_SECTION_TARGET_BODY" | "SKETCH_CANNOT_EVALUATE_PATTERN_PARAMETER" | "TL_SELF_INTERSECTING_BODY" | "SKETCH_PATTERN_MISSING_PARAMETER" | "SKETCH_PATTERN_INVALID_VALUE" | "TL_PROFILES_TRANSFORMED" | "TOLERANT_RADIUS_NO_VARIABLE_RADIUS" | "TOLERANT_RADIUS_NO_ASYMMETRY" | "TL_CONE_NEEDS_TANGENT_POLYLINES" | "ASSEMBLY_MIRROR_TARGET_FEATURE_SUPPRESSED" | "REVOLVE_UP_TO_FAILED" | "REVOLVE_UP_TO_NEXT_FAILED" | "REVOLVE_UP_TO_THIN_FAILED" | "REVOLVE_UP_TO_NEXT_NO_TARGET" | "DEVIATION_ANALYSIS_FAILED" | "REVOLVE_SELECT_TERMINATING_BODY" | "REVOLVE_SELECT_TERMINATING_SURFACE" | "REVOLVE_SELECT_TERMINATING_VERTEX" | "FGS_GENERATIVE_SEW_SEGMENTS_FAILED" | "FGS_GENERATIVE_BUILD_MIXED_BODY_FAILED" | "FGS_GENERATIVE_BUILD_BODY_FAILED" | "FGS_GENERATIVE_REPLACE_WITH_FACE_FAILED" | "TL_NO_INTERSECTING_PROFILES" | "SHEET_METAL_LOFT_PROFILES_TOUCH" | "SHEET_METAL_LOFT_ORTHOGONAL_PROFILE" | "SHEET_METAL_LOFT_DISJOINT_RESULT" | "ASSEMBLY_MIRROR_NO_ACTIVE_SM_COMPOSITE" | "CANNOT_FIND_ROW" | "CANNOT_FIND_COLUMN" | "SELECT_CSV_DATA" | "INVALID_ROW_REGEX" | "INVALID_COLUMN_REGEX" | "SHEET_METAL_LOFT_MERGE_SCOPE_SHIFT" | "LOFT_GUIDE_NOT_SMOOTH" | "DERIVED_NO_CLOSED_COMPOSITE_WITH_SM_WARNING" | "DERIVED_NO_CLOSED_COMPOSITE_WITH_SM_ERROR" | "SWEEP_TWIST_REQUIRE_TANGENT_PATH" | "SWEEP_SCALE_REQUIRE_TANGENT_PATH" | "SWEEP_TWIST_SCALE_REQUIRE_TANGENT_PATH" | "SWEEP_MULTIPROFILE_SCALE_NOT_ALLOWED" | "SWEEP_TWIST_ANGLE_EXCEEDS_LIMITS" | "SWEEP_TWIST_PITCH_EXCEEDS_LIMITS" | "SIMULATION_BOUNDARY_CONDITION_INSTANCE_NOT_SPECIFIED" | "SIMULATION_BOUNDARY_CONDITION_REGION_QUERY_FAILED" | "SIMULATION_BOUNDARY_CONDITION_REGION_QUERY_EMPTY" | "SIMULATION_BOUNDARY_CONDITION_INSTANCE_SUPPRESSED" | "SIMULATION_BOUNDARY_CONDITION_DIRECTION_QUERY_FAILED" | "SIMULATION_BOUNDARY_CONDITION_DIRECTION_NOT_SPECIFIED" | "SM_BEND_ANGLE_TOO_SMALL" | "PCB_HOLE_NO_BASE_PLANE" | "PCB_HOLE_NO_INTERIOR_FACE" | "PCB_HOLE_DUPLICATE_HOLE_ID" | "PCB_HOLE_INTERIOR_FACES_MUST_BELONG_TO_SAME_BODY" | "PCB_HOLE_LESS_THAN_2_PARALLEL_FACES" | "PCB_HOLE_MORE_THAN_2_PARALLEL_FACES" | "PCB_HOLE_FACE_ON_OUTLINE_OF_REGION" | "PCB_HOLE_INTERIOR_FACES_MUST_BELONG_TO_SAME_HOLE" | "PCB_HOLE_ALREADY_TAGGED" | "MATE_CONNECTOR_STACKED_AND_MULTIPLE_ENTITIES" | "CYCLE_OF_ONLY_MATE_CONNECTORS" | "SKETCH_CURVE_WITH_NON_PERIODIC_UNBOUNDED_GEOMETRY" | "DRAWING_EMPTY_VIEW_CORRESPONDENCE_FAILED" | "RENDERER_FAILED_TO_LOAD_DISPLAY_DATA" | "SHEET_METAL_DERIP_FAILED" | "REST_ASSEMBLY_MISSING_MATE_FEATURE_ID" | "REST_ASSEMBLY_MISSING_MATE_OWNER_OCCURRENCE_PATH" | "FGS_TS_SOLVER_ISSUE_INTERNAL_ERROR_NO_CLEAR_USER_FIX" | "UNKNOWN";
+        GBTErrorStringEnum: "NO_ERROR" | "UNKNOWN_OPERATION" | "TOO_MANY_ENTITIES_SELECTED" | "POINTS_COINCIDENT" | "NO_TRANSLATION_DIRECTION" | "NO_ROTATION_AXIS" | "NO_TANGENT_PLANE" | "NO_TANGENT_LINE" | "INVALID_INPUT" | "CANNOT_RESOLVE_ENTITIES" | "CANNOT_EVALUATE_VERTEX" | "CANNOT_RESOLVE_PLANE" | "CANNOT_COMPUTE_BBOX" | "CANNOT_BE_EMPTY" | "CACHE_WRITE_FAILED" | "CACHE_READ_FAILED" | "HLR_FAILED" | "BAD_GEOMETRY" | "INVALID_RESULT" | "MISSING_EXT_REF" | "READ_FAILED" | "WRITE_FAILED" | "WRONG_TYPE" | "TANGENT_PROPAGATION_FAILED" | "REGEN_ERROR" | "COULD_NOT_COMPUTE_TRANSFORM" | "MATE_INVALID_MATE" | "MATECONNECTOR_INVALID_MATE" | "MATE_TWO_MATECONNECTORS_NEEDED" | "MATECONNECTORS_ON_SAME_OCCURRENCE" | "MATE_OVERDEFINED" | "MATE_INCONSISTENT" | "BOOLEAN_NEED_ONE_SOLID" | "BOOLEAN_INVALID" | "BOOLEAN_INTERSECT_FAIL" | "BOOLEAN_SAME_INPUT" | "BOOLEAN_BAD_INPUT" | "BOOLEAN_UNION_NO_OP" | "BOOLEAN_INTERSECT_NO_OP" | "BOOLEAN_SUBTRACT_NO_OP" | "CPLANE_INPUT_MIDPLANE" | "CPLANE_INPUT_OFFSET_PLANE" | "CPLANE_INPUT_POINT_PLANE" | "CPLANE_INPUT_LINE_ANGLE" | "CPLANE_INPUT_POINT_LINE" | "CPLANE_INPUT_THREE_POINT" | "CPLANE_FAILED" | "DRAFT_NO_NEUTRAL_PLANE" | "DRAFT_NO_DRAFT_FACE" | "DRAFT_FAILED" | "EXTRUDE_INVALID_REF_FACE" | "EXTRUDE_INVALID_REF_SURFACE" | "EXTRUDE_FAILED" | "EXTRUDE_NO_DIRECTION" | "EXTRUDE_INVALID_ENTITIES" | "PATTERN_INPUT_TOO_MANY_INSTANCES" | "PATTERN_INPUT_TOO_FEW_INSTANCES" | "PATTERN_FACE_FAILED" | "PATTERN_NOT_ON_BODY" | "PATTERN_BODY_FAILED" | "TRANSFORM_TRANSLATE_INPUT" | "TRANSFORM_TRANSLATE_BY_DISTANCE_INPUT" | "TRANSFORM_FAILED" | "SHELL_FAILED" | "EDGEBLEND_SMOOTH" | "EDGEBLEND_FAILED" | "DIRECT_EDIT_WRONG_CONCENTRIC" | "DIRECT_EDIT_WRONG_EQ_RADIUS" | "DIRECT_EDIT_NO_FILLET_FACES" | "DIRECT_EDIT_NO_OFFSET" | "DIRECT_EDIT_CONSTRAIN_FACE_FAILED" | "DIRECT_EDIT_REPLACE_FACE_FAILED" | "DIRECT_EDIT_DELETE_FACE_FAILED" | "DIRECT_EDIT_MODIFY_FILLET_FAILED" | "DIRECT_EDIT_MODIFY_FACE_FAILED" | "DIRECT_EDIT_MOVE_FACE_FAILED" | "DIRECT_EDIT_OFFSET_FACE_FAILED" | "IMPORT_PART_FAILED" | "IMPORT_ASSEMBLY_FAILED" | "IMPRINT_FAILED" | "REVOLVE_FAILED" | "REVOLVE_2ND_DIR_FAILED" | "REVOLVE_NOT_PLANAR" | "REVOLVE_PERPENDICULAR" | "REVOLVE_INVALID_ENTITIES" | "SPLIT_FAILED" | "SPLIT_INVALID_INPUT" | "SWEEP_INVALID_PATH" | "SWEEP_FAILED" | "SWEEP_PATH_FAILED" | "SWEEP_PROFILE_FAILED" | "WIRE_CREATION_FAILED" | "SKETCH_NO_PLANE" | "SKETCH_INPUT_INVALID" | "SKETCH_NOT_ACTIVE" | "SKETCH_SOLVER_NOT_INITIALIZED" | "SKETCH_EVALUATION_FAILED" | "SKETCH_MODIFICATION_FAILED" | "SKETCH_UPDATE_FAILED" | "SKETCH_SOLVE_FAILED" | "SKETCH_ADD_CONSTRAINT_FAILED" | "SKETCH_ADD_DIMENSION_FAILED" | "SKETCH_POSITION_DIMENSION_FAILED" | "SKETCH_CONSTRAINT_NEEDS_SKETCH_ENTITY" | "SKETCH_CONSTRAINT_UNKNOWN" | "SKETCH_MISSING_ENTITY" | "SKETCH_FILLET_INVALID_POINT" | "SKETCH_FILLET_PARALLEL" | "SKETCH_FILLET_FAIL" | "SKETCH_USE_FAILED" | "SKETCH_USE_PARTIAL" | "SKETCH_SPLINE_FAILED" | "SKETCH_BAD_SPLINE" | "SKETCH_DRAG_ERROR" | "SKETCH_PROJ_FAILED" | "SKETCH_PROJ_PARTIAL" | "SKETCH_TANGENT_ARC_FAILED" | "SKETCH_TANGENT_NOT_FOUND" | "SKETCH_OFFSET_FAILED" | "SKETCH_OFFSET_DISTANCE" | "SKETCH_TRIM_FAILED" | "SKETCH_INFERENCE_FAILED" | "SKETCH_MODIFY_DIM_FAILED" | "SKETCH_DRAG_NO_SKETCH" | "SKETCH_INFER_DIM_FAILED" | "SKETCH_DELETE_PTS_FAILED" | "SKETCH_DELETE_FAILED" | "SKETCH_ARC_FAILED" | "SKETCH_LINE_FAILED" | "SKETCH_CIRCLE_FAILED" | "SKETCH_RECTANGLE_FAILED" | "SKETCH_TANGENT_ARC_INVALID_START" | "SKETCH_CONSTRUCTION_POINT_FAILED" | "SYS_INTERNAL_DESERIALIZATION" | "SYS_SERVER_EXCEPTION" | "SYS_ERROR_REGEN" | "SYS_ERROR_MESSAGING" | "CANNOT_RESOLVE_ELEMENT" | "NOTHING_SELECTED" | "SKETCH_ANGLE_TWO_LINES" | "SKETCH_DIMENSION_DIFF_ENTITIES" | "SKETCH_CONSTRAINT_DIFF_ENTITIES" | "SKETCH_CONSTRAINT_TWO_ENTITIES" | "SKETCH_DIMENSION_TWO_ENTITIES" | "SKETCH_COINCIDENT_FAILED" | "SKETCH_COINCIDENT_INPUT_ERROR" | "SKETCH_COINCIDENT_DIFF_POINTS" | "SKETCH_CONCENTRIC_INPUT_ERROR" | "SKETCH_CONCENTRIC_FAILED" | "SKETCH_EQUAL_INPUT_ERROR" | "SKETCH_EQUAL_NO_ENDS" | "SKETCH_EQUAL_FAILED" | "SKETCH_FIX_ONE_ENT" | "SKETCH_FIX_FAILED" | "SKETCH_DIR_INTERNAL" | "SKETCH_DIR_INPUT" | "SKETCH_HORIZONTAL_FAILED" | "SKETCH_VERTICAL_FAILED" | "SKETCH_OFFSET_CONSTRAINT_FAILED" | "SKETCH_PARALLEL_CONSTRAINT_FAILED" | "SKETCH_PARALLEL_INPUT_ERROR" | "SKETCH_DIMENSION_INPUT_ERROR" | "SKETCH_DIMENSION_DIST_ERROR" | "SKETCH_DIMENSION_FAILED" | "SKETCH_NORMAL_NEED_LINE" | "SKETCH_NORMAL_INPUT_ERROR" | "SKETCH_NORMAL_INPUT_NEEDED" | "SKETCH_CANNOT_SPLIT_INTO_GROUPS" | "SKETCH_OFFSET_BAD_PAIR" | "SKETCH_OFFSET_INPUT_ERROR" | "SKETCH_MIDPOINT_INPUT_ERROR" | "SKETCH_MIDPOINT_NEED_POINT" | "SKETCH_MIDPOINT_NEED_DIFF_POINT" | "SKETCH_MIDPOINT_MISSING_ENDS" | "SKETCH_MIDPOINT_MISSING_PTS" | "SKETCH_MIDPOINT_NO_INTERNAL_LINE" | "SKETCH_MIDPOINT_NO_COINCIDENT" | "SKETCH_MIDPOINT_FAILED" | "SKETCH_PERPENDICULAR_INPUT_ERROR" | "SKETCH_PERPENDICULAR_FAILED" | "SKETCH_POINT_LINE_ONLY" | "SKETCH_PROJECTION_UNKNOWN" | "SKETCH_PROJECTION_FAILED" | "SKETCH_SIL_PROJECTION_INPUT_ERROR" | "SKETCH_SIL_PROJECTION_MISSING_POINT" | "SKETCH_LENGTH_DIM_INPUT_ERROR" | "SKETCH_LENGTH_DIM_MISSING_ENDS" | "SKETCH_LENGTH_DIM_NOT_FOUND" | "SKETCH_LENGTH_DIM_FAILED" | "SKETCH_RADIUS_INPUT_ERROR" | "SKETCH_RADIUS_DIM_FAILED" | "SKETCH_TANGENT_INPUT_ERROR" | "SKETCH_TANGENT_FAILED" | "PART_QUERY_FAILED" | "PART_QUERY_MULTI" | "MATECONNECTOR_QUERY_FAILED" | "MATECONNECTOR_QUERY_ORIGIN_FAILED" | "MATECONNECTOR_QUERY_AXIS_FAILED" | "MATECONNECTOR_QUERY_CSYS_FAILED" | "ASSEMBLY_INSERT_WILL_CAUSE_CYCLES" | "SKETCH_MIRROR_NEED_VALID_MIRROR_LINE" | "SKETCH_MIRROR_NEED_ENTITIES_TO_MIRROR" | "SKETCH_MIRROR_CONSTRAINT_FAILED" | "SKETCH_MIRROR_FAILED" | "SELF_INTERSECTING_CURVE_SELECTED" | "SWEEP_START_NOT_ON_PROFILE" | "PATTERN_DIRECTIONS_PARALLEL" | "MATE_OCCURRENCE_NOT_VALID" | "MATE_WITHIN_SAME_GROUP" | "EXPORT_ASSEMBLY_UNKNOWN_NODE_TYPE" | "EXPORT_ASSEMBLY_CREATE_INSTANCE_FAILED" | "EXPORT_PARTS_AS_XTS_NOT_A_BODY" | "EXPORT_PARTS_AS_XTS_FAILED_TO_WRITE_XT" | "MATECONNECTOR_OWNER_PART_NOT_RESOLVED" | "WIRE_CREATION_PARTIAL_FAILURE" | "SERVER_IS_IN_INVALID_STATE" | "SKETCH_EXTEND_FAILED" | "FOLLOW_CYCLE_ERROR" | "SKETCH_FILLET_INVALID_RADIUS" | "SKETCH_CONSTRAINT_COINCIDENT_TWO_ENTITIES" | "SKETCH_CONSTRAINT_CONCENTRIC_TWO_ENTITIES" | "SKETCH_CONSTRAINT_EQUAL_TWO_ENTITIES" | "SKETCH_CONSTRAINT_MIDPOINT_TWO_ENTITIES" | "EXTRUDE_NO_SELECTED_REGION" | "EXTRUDE_NO_REGION_IN_SKETCH" | "DELETE_SELECT_PARTS" | "COPY_SELECT_PARTS" | "SPLIT_NO_CHANGE" | "MIRROR_NO_PLANE" | "MIRROR_SELECT_PARTS" | "PATTERN_CIRCULAR_NO_AXIS" | "PATTERN_SELECT_FACES" | "PATTERN_SELECT_PARTS" | "PATTERN_LINEAR_NO_DIR" | "SHELL_SELECT_FACES" | "DRAFT_SELECT_NEUTRAL" | "DRAFT_SELECT_FACES" | "CHAMFER_SELECT_EDGES" | "FILLET_SELECT_EDGES" | "EXTRUDE_SURF_NO_CURVE" | "EXTRUDE_SELECT_TERMINATING_BODY" | "EXTRUDE_SELECT_TERMINATING_SURFACE" | "DIRECT_EDIT_SELECT_ANCHOR" | "REVOLVE_SURF_NO_CURVE" | "REVOLVE_SELECT_FACES" | "REVOLVE_SELECT_AXIS" | "SWEEP_SELECT_PROFILE" | "SWEEP_SELECT_PATH" | "DIRECT_EDIT_DELETE_SELECT_FACES" | "DIRECT_EDIT_MODIFY_FILLET_SELECT" | "DIRECT_EDIT_MODIFY_FACE_SELECT" | "DIRECT_EDIT_REPLACE_FACE_SELECT" | "DIRECT_EDIT_OFFSET_FACE_SELECT" | "DIRECT_EDIT_MOVE_FACE_SELECT" | "SELECT_MATECONNECTOR" | "OVERDEFINED_ASSEMBLY" | "PART_STUDIO_UPGRADE_SUCCESSFUL" | "PART_STUDIO_UPGRADE_FAILED" | "PART_STUDIO_UPGRADE_NONE" | "MATE_GROUP_OCCURRENCES_UNRESOLVED" | "SWEEP_SURF_NO_CURVE_PROFILE" | "MATE_RESET_HAD_NO_EFFECT" | "MATECONNECTOR_MULTIPLE_OCCURRENCES" | "MATECONNECTOR_OCCURRENCE_NOT_RESOLVED" | "ELEMENT_REFERENCE_CYCLE_DETECTED" | "MATE_OVERDEFINES_ASSEMBLY" | "MATE_CANNOT_RESOLVE_CONNECTORS" | "SKETCH_EXCEEDS_BOUNDS" | "SWEEP_SELF_INT" | "SKETCH_UNSOLVABLE_CONSTRAINT" | "RESTRUCTURE_INVALID_SOURCE_OR_TARGET" | "CPLANE_INPUT_CURVE_POINT" | "TRANSFORM_OCCURRENCES_HAD_NO_EFFECT" | "HELIX_FAILED" | "HELIX_INPUT_CONE" | "RENDERER_NOT_AVAILABLE" | "RENDERER_FAILED_TO_RENDER" | "EXPRESSION_FAILED_VALIDATION" | "VERSION_MISMATCH_ERROR" | "EXTRUDE_UPTO_NEXT_NO_DIVISION" | "MATE_BETWEEN_FIXED_OCCURRENCES" | "THICKEN_SELECT_ENTITIES" | "THICKEN_FAILED" | "WORKSPACE_UPGRADE_SUCCESSFUL" | "WORKSPACE_UPGRADE_FAILED" | "WORKSPACE_UPGRADE_NONE" | "SKETCH_CIRCULAR_PATTERN_FAILED" | "DIRECT_EDIT_ALL_FILLET_FACES_SELECTED" | "DIRECT_EDIT_FAILED_TO_IDENTIFY_FILLETS" | "PARASOLID_IMPORT_FAILED" | "FOLLOW_LEADER_HAS_NO_FUNCTIONALITY_ERROR" | "MIRROR_SELECT_FACES" | "RELATION_INVALID_RELATION" | "RELATION_INVALID_MATE" | "GEAR_RELATION_INVALID_MATE_TYPES" | "SCREW_RELATION_INVALID_MATE_TYPES" | "RACK_RELATION_INVALID_MATE_TYPES" | "ROLLING_RELATION_INVALID_MATE_TYPES" | "LINEAR_RELATION_INVALID_MATE_TYPES" | "RELATION_OVERDEFINED" | "RELATION_INCONSISTENT" | "RELATION_SAME_OCCURRENCES" | "SKETCH_SPLIT_FAILED" | "SKETCH_CONSTRAINT_PIERCE_TWO_ENTITIES" | "SKETCH_PIERCE_FAILED" | "MIRROR_FACE_FAILED" | "MIRROR_BODY_FAILED" | "SKETCH_CANNOT_PIERCE_WITH_PLANE" | "WITH_SUPPORT_CODE" | "FILLET_FAIL_SMOOTH" | "FILLET_FAILED" | "CHAMFER_FAIL_SMOOTH" | "CHAMFER_FAILED" | "BOOLEAN_OFFSET_NO_FACES" | "MATE_OCCURRENCE_SUPPRESSED" | "MATECONNECTOR_OCCURRENCE_SUPPRESSED" | "SKETCH_SPLINE_NEW_POINTS_TOO_CLOSE" | "SKETCH_SPLINE_CANNOT_DELETE_ENDPOINTS" | "SKETCH_SPLINE_POINT_TO_DELETE_NOT_FOUND" | "ASSEMBLY_INSERT_FAILED" | "SKETCH_PATTERN_UNKNOWN_FAILURE" | "SKETCH_PATTERN_TOO_LARGE" | "SKETCH_LINEAR_PATTERN_ZERO_LENGTH" | "SKETCH_LINEAR_PATTERN_PARALLEL_DIRECTIONS" | "SKETCH_CIRCULAR_PATTERN_ZERO_ANGLE" | "SKETCH_ELLIPSE_FAILED" | "SKETCH_ELLIPSE_FAILED_TOO_SMALL" | "DELETE_PARTS_FAILED" | "DELETE_PARTS_PARTIAL" | "SKETCH_ELLIPSE_RADIUS_INPUT_ERROR" | "QUADRANT_CONSTRAINT_INPUT" | "SKETCH_QUADRANT_FAILED" | "SKETCH_SPLINE_TOO_FEW_POINTS" | "SKETCH_SPLINE_NOT_INTERPOLATED_SPLINE" | "SKETCH_SPLINE_POINTS_NOT_DELETED" | "SKETCH_TEXT_RECTANGLE_FAILED" | "IMPORT_DERIVED_NO_PARTS" | "LOFT_SELECT_PROFILES" | "LOFT_PROFILE_SINGLE_FACE" | "LOFT_PROFILE_SOLID" | "LOFT_PROFILE_POINT" | "LOFT_PROFILE_FAILED" | "LOFT_SELECT_GUIDES" | "LOFT_GUIDE_FAILED" | "LOFT_PERIODIC_ERROR" | "LOFT_GUIDE_POINT_INTERSECTION" | "LOFT_GUIDE_PROFILE_INTERSECTION" | "LOFT_VERTEX_MATCHING" | "LOFT_DIRECTION_ERROR" | "LOFT_PROFILE_ALIGNMENT" | "LOFT_GUIDE_ALIGNMENT" | "LOFT_VERTEX_ADDITIONS" | "LOFT_FAILED" | "LOFT_INVALID" | "LOFT_ALIGNMENT_INFO" | "LOFT_VERTEX_NOT_ON_PROFILE" | "LOFT_PROFILE_NO_INNER_LOOPS" | "LOFT_TWO_PROFILES" | "CANNOT_OFFSET_ELLIPSE" | "SKETCH_MIRROR_NEEDS_LINE_AND_TWO_OTHERS" | "SKETCH_POLYGON_BAD_SIDE_COUNT" | "SKETCH_DIRECTIONAL_GROUP_INPUT" | "NAMED_VIEWS_DUPLICATE_NAME" | "SILHOUETTE_USE_FAILED" | "PASTE_SKETCH_METRICS_FAILURE" | "PASTE_SKETCH_LIBRARY_MISMATCH" | "PASTE_SKETCH_CLIPBOARD_EMPTY" | "SKETCH_MIRROR_OFFSET_SPLINE" | "SKETCH_MIRROR_CURVE_POINT" | "LOFT_PERIODIC_GUIDE_ERROR" | "SHELL_SELECT_PARTS" | "RELATION_MATE_DOES_NOT_EXIST" | "RELATION_MATE_IS_SUPPRESSED" | "VARIABLE_NAME_INVALID" | "LOFT_GUIDE_INFO" | "HOLE_NO_POINTS" | "HOLE_FAIL_BBOX" | "HOLE_EMPTY_SCOPE" | "HOLE_NO_HITS" | "WITH_EXTRA_DATA" | "HOLE_DISJOINT" | "SKETCH_INSERT_DWG_CONVERSION_FAILURE" | "HOLE_CBORE_TOO_SMALL" | "HOLE_CBORE_TOO_DEEP" | "HOLE_CSINK_TOO_SMALL" | "HOLE_CSINK_TOO_DEEP" | "SWEEP_PATH_NO_CONSTRUCTION" | "SKETCH_IMAGE_RECTANGLE_FAILED" | "ASSEMBLY_REPLICATE_NO_VALID_TARGET" | "ASSEMBLY_REPLICATE_NO_MATCHING_TARGET" | "LOFT_SHAPE_CONTROL_FAILED" | "LOFT_START_CONDITIONS_FAILED" | "LOFT_END_CONDITIONS_FAILED" | "LOFT_NO_FACE_FOR_START_CLAMP" | "LOFT_NO_FACE_FOR_END_CLAMP" | "LOFT_NO_PLANE_FOR_START_CLAMP" | "LOFT_NO_PLANE_FOR_END_CLAMP" | "LOFT_NO_CLAMPS_ON_POINT_PROFILE" | "EXPORT_NOT_IMPLEMENTED" | "SKETCH_POLYGON_ZERO_RADIUS_FAIL" | "DRAWING_FAILED_TO_RESOLVE_VIEW_REFERENCE" | "DRAWING_PARTSTUDIO_EMPTY_AFTER_SECTION_CUT" | "DRAWING_ASSEMBLY_DOES_NOT_CONTAIN_VISIBLE_INSTANCES" | "DRAWING_ASSEMBLY_EMPTY_AFTER_SECTION_CUT" | "DRAWING_VIEW_GENERATION_FAILED" | "SKETCH_SLOT_FAILURE" | "SKETCH_SLOT_PARTIAL_FAILURE" | "NO_UNIT" | "RESTRUCTURE_INVALID_SOURCE" | "RESTRUCTURE_INVALID_TARGET" | "MATE_MIN_MAX_LIMIT_VIOLATION" | "REST_ASSEMBLY_GET_DOCUMENT_FAILED" | "REST_ASSEMBLY_UNKNOWN_INSERTABLE_TYPE" | "REST_ASSEMBLY_SETUP_EXCEPTION" | "REST_ASSEMBLY_BEGIN_OPERATION_FAILED" | "REST_ASSEMBLY_INSERT_INSTANCE_FAILED" | "REST_ASSEMBLY_COMMIT_OPERATION_FAILED" | "REST_ASSEMBLY_CLOSE_CLIENT_FAILED" | "REST_ASSEMBLY_NULL_OCCURRENCES" | "REST_ASSEMBLY_EMPTY_OCCURRENCE" | "REST_ASSEMBLY_TRANSFORM_WRONG_SIZE" | "ASSEMBLY_EMPTY_OCCURRENCE_LIST" | "ASSEMBLY_NULL_TRANSFORM" | "ASSEMBLY_TRANSFORM_NOT_RIGID" | "ASSEMBLY_CANNOT_TRANSFORM_FIXED_OCCURRENCE" | "ASSEMBLY_TRANSFORM_FAILED" | "ASSEMBLY_OCCURRENCE_NOT_FOUND" | "ASSEMBLY_REPLICATE_MULTIPLE_VALID_TARGET" | "ASSEMBLY_REPLICATE_NO_TARGET_SELECTED" | "CPLANE_INPUT_LINE_ANGLE2" | "CPLANE_DEGENERATE_SELECTION" | "CPLANE_SELECT_LINE_ANGLE_REFERENCE" | "ASSEMBLY_REPLICATE_INVALID_SEED_INSTANCE" | "CANNOT_USE_VARIABLES_IN_SKETCH_PATTERNS" | "SKETCH_MIRROR_OFFSET_ELLIPSE" | "EXTERNAL_REFERENCE_FAILED_TO_CREATE" | "SPLIT_FACE_NO_CHANGE" | "SKETCH_INTERSECTION_FAILED" | "SKETCH_INTERSECTION_MULTIPLE_FAILED" | "SKETCH_INTERSECTION_PARTIAL_FAILED" | "FEATURE_ID_IN_PATH_DOES_NOT_MATCH_BODY" | "FEATURE_NOT_FOUND" | "FEATURE_DOES_NOT_MATCH" | "FEATURE_HAS_INVALID_TYPE" | "FEATURE_DOES_NOT_MATCH_ITS_FEATURE_SPEC" | "FEATURE_BAD_SERIALIZATION_VERSION" | "FEATURE_WRONG_SERIALIZATION_VERSION" | "FEATURE_INVALID_ROLLBACK_INDEX" | "FEATURE_ERROR_IN_INPUT" | "FEATURE_CONCURRENCY_ERROR" | "FEATURE_CHANGE_BREAKS_MODEL" | "FEATURE_NODE_IDS_INVALID" | "ROLLBACK_INDEX_INVALID" | "FEATURE_NO_SOLIDS" | "SKETCH_EXTERNAL_GEOMETRY_MISMATCH" | "HOLE_EXCEEDS_MAX_LOCATIONS" | "SKETCH_TEXT_IS_EMPTY" | "SKETCH_INSERT_DWG_MAX_ENTITIES_EXCEEDED" | "HOLE_TAP_DIA_TOO_LARGE" | "ASSEMBLY_EMPTY_BODY" | "SIMPLIFY_BODY_FAILED" | "INVALID_VIEW_NAME" | "PATTERN_SELECT_FEATURES" | "MIRROR_SELECT_FEATURES" | "PATTERN_FEATURE_FAILED" | "SKETCH_TRANSFORM_FAILED" | "TANGENT_MATE_TWO_ENTITIES_NEEDED" | "HOLE_CANNOT_DETERMINE_LAST_BODY" | "RESTRUCTURE_CANNOT_MODIFY_SAVED_VERSION" | "REST_ASSEMBLY_EXTERNAL_REFERENCE_REQUIRES_VERSION" | "REST_ASSEMBLY_EXTERNAL_REFERENCE_DISALLOWS_MICROVERSION" | "REST_ASSEMBLY_VERSION_SUPPORTED_ONLY_FOR_EXTERNAL_REFERENCES" | "SWEEP_BAD_LOCK_FACES" | "SKETCH_TEXT_CANNOT_BE_CONSTRUCTION" | "CUSTOM_ERROR" | "BEND_BAD_CONFIGURATION" | "BEND_WRONG_NUMBER_OF_ENTITIES" | "BEND_BAD_CURVES" | "BEND_GENERAL_ERROR" | "BEND_EDGE_NO_EDGES" | "BEND_EDGE_NO_SEED_ENTITY" | "EXTEND_SHEET_BODY_NO_BODY" | "EXTRACT_SURFACE_NO_FACES" | "FLATTEN_NO_EDGES" | "FLATTEN_NO_FACES" | "FOLD_NO_BODIES" | "BEND_PREP_NO_FACES" | "BEND_PREP_NO_BODIES" | "BEND_PREP_ERROR_FINDING_EDGE_LOCATIONS" | "BEND_PREP_ERROR_IMPRINTING_EDGES" | "ASSEMBLY_ANIMATE_MATE_START_AFTER_END" | "ASSEMBLY_ANIMATE_NO_MATE" | "ASSEMBLY_ANIMATE_MATE_SUPPRESSED" | "TANGENT_MATE_GEOMETRY_NOT_SUPPORTED" | "SKETCH_DIMENSION_INFINITY" | "BOLEAN_INPUTS_NOT_SOLID" | "FACE_IS_NOT_RECTANGLE" | "HOLE_DESTROY_SOLID" | "HELIX_INPUT_CIRCLE" | "IMPORT_SCALING_NON_MESH_DATA" | "EVALUATE_FACE_TANGENT_FOR_MESHES" | "CANNOT_COMPUTE_CENTROID" | "CANNOT_EVALUATE_DIMENSION" | "CANNOT_IMPORT_MESH" | "SKETCH_ELLIPSE_ZERO_AXIS" | "TRANSFORM_SCALE_UNIFORMLY" | "TRANSFORM_MATE_CONNECTORS" | "ASSEMBLY_WRONG_ELEMENT_TYPE" | "ASSEMBLY_ELEMENT_NOT_FOUND" | "SHEET_METAL_TABLE_UNKNOWN_ERROR" | "SHEET_METAL_TABLE_REGEN_ERROR" | "SHEET_METAL_TABLE_READ_ONLY" | "ASSEMBLY_PATTERN_INVALID_TYPE" | "ASSEMBLY_PATTERN_DIRECTION_ERROR" | "ASSEMBLY_PATTERN_NONPOSITIVE_LINEAR_DISTANCE" | "ASSEMBLY_PATTERN_NONPOSITIVE_ANGLE" | "ASSEMBLY_PATTERN_INVALID_SEED" | "ASSEMBLY_PATTERN_INVALID_REFERENCE_MATE_CONNECTOR" | "RESTORE_FEATURE_FAILED" | "FACES_NOT_OWNED_BY_PARTS" | "EDGES_NOT_OWNED_BY_PARTS" | "SHEET_METAL_REBUILD_ERROR" | "SHEET_METAL_INPUT_BODY_SHOULD_NOT_BE_SHEET_METAL" | "SHEET_METAL_CANNOT_RECOGNIZE_PARTS" | "SHEET_METAL_CANNOT_THICKEN" | "SHEET_METAL_CONVERT_PLANE" | "ASSEMBLY_PATTERN_AXIS_ERROR" | "RIB_NO_PROFILES" | "RIB_NO_PARTS" | "RIB_PROFILE_FAILED" | "RIB_BODY_FAILED" | "RIB_NO_INTERSECTIONS" | "RIB_MERGE_FAILED" | "ASSEMBLY_NAMED_POSITIONS_SAVE_FAILED" | "ASSEMBLY_NAMED_POSITIONS_LOAD_FAILED" | "ASSEMBLY_NAMED_POSITIONS_NO_MATES_TO_SAVE" | "ASSEMBLY_NAMED_POSITIONS_POSITION_NOT_FOUND" | "SPHERE_FAILED" | "ASSEMBLY_PATTERN_NOT_SUPPORTED" | "ASSEMBLY_NAMED_POSITIONS_PARTIAL_LOAD_FAILURE" | "ASSEMBLY_NAMED_POSITIONS_LOAD_SUCCEEDED_WITH_EXTRA_MATES" | "ASSEMBLY_NAMED_POSITIONS_SAVED_MATE_NOT_FOUND_ON_LOAD" | "SHEET_METAL_SINGLE_MODEL_NEEDED" | "SHEET_METAL_ACTIVE_JOIN_NEEDED" | "INSTANCE_QUERY_FAILED" | "SHEET_METAL_ACTIVE_EDGE_NEEDED" | "SHEET_METAL_FLANGE_NO_EDGES" | "MESH_NOT_SUPPORTED" | "SHEET_METAL_PARTS_PROHIBITED" | "VARIABLE_CANNOT_EVALUATE" | "DRAWING_ASSEMBLY_INVALID_SECTION_CUT" | "DRAWING_PARTSTUDIO_INVALID_SECTION_CUT" | "SHEET_METAL_COULD_NOT_UNFOLD" | "PARAMETER_OUT_OF_RANGE" | "SHEET_METAL_NO_0_ANGLE_BEND" | "SHEET_METAL_FLAT_RIP_NO_EDIT" | "SHEET_METAL_CANT_CHANGE_TO_FLAT" | "PARAMETER_PRECONDITION_FAILED" | "PARAMETER_SYNTAX_ERROR" | "SHEET_METAL_CAN_ONLY_REMOVE" | "SHEET_METAL_CAN_ONLY_SUBTRACT" | "REST_ASSEMBLY_INVALID_FEATURE" | "REST_ASSEMBLY_INVALID_BODY_TYPE" | "PARTING_OUT_TARGET_READONLY" | "SHEET_METAL_MULTI_SM_DEFAULT_RADIUS" | "SHEET_METAL_FLANGE_FAIL_ALIGNMENT" | "SHEET_METAL_FLANGE_FAIL_UP_TO" | "SHEET_METAL_FLANGE_FAIL_UP_TO_ENTITY" | "SHEET_METAL_FLANGE_FAIL" | "SHEET_METAL_FLANGE_FAIL_LIMIT_OPP_FLANGE" | "CANT_SPLIT_SHEET_METAL_BEND_FACE" | "IN_CONTEXT_INSTANCE_INVALID_TARGET" | "SHEET_METAL_SELF_INTERSECTING_MODEL" | "SHEET_METAL_SELF_INTERSECTING_FLAT" | "SHEET_METAL_NON_90_BUTT" | "SHEET_METAL_RIP_STYLE_ERROR" | "CANNOT_USE_MATECONNECTORS_IN_PATTERN" | "CANNOT_COPY_MATECONNECTORS" | "SHEET_METAL_CAN_ONLY_OFFSET" | "MODIFIABLE_ENTITY_ONLY" | "IN_CONTEXT_UPDATE_DELETED_ASSEMBLY" | "IN_CONTEXT_UPDATE_EMPTY_INSTANCE" | "IN_CONTEXT_UPDATE_INVALID_SOURCE" | "IN_CONTEXT_UPDATE_INVALID_TARGET" | "SHEET_METAL_NO_FEATURE_PATTERN" | "CUSTOM_FEATURE_DEFINITION_NOT_FOUND" | "SHEET_METAL_START_SELECT_BENDS" | "SHEET_METAL_END_DONE" | "PATH_EDGES_NOT_CONTINUOUS" | "SHEET_METAL_RIP_FAIL_INTERNAL_EDGE" | "SHEET_METAL_RIP_FAIL" | "SHEET_METAL_RIP_MULTI_BODY" | "SHEET_METAL_RIP_FAIL_NON_PLANAR" | "PATTERN_CURVE_NO_EDGES" | "SHEET_METAL_RIP_NO_CORNER" | "SHEET_METAL_RIP_EVEN" | "SHEET_METAL_RIP_WALL_NOT_FOUND" | "SHEET_METAL_RIP_SAME_VERTEX" | "SHEET_METAL_RIP_NEED_MORE_VERTICES" | "SHEET_METAL_MAKE_JOINT_FAIL" | "CURVE_PATTERN_START_OFF_PATH" | "PART_LOAD_FAILED" | "SHEET_METAL_MOVE_NOT_PLANAR" | "SHEET_METAL_JOINT_FAIL_ADJACENT_FACES" | "WRONG_PARASOLID_VERSION" | "SHEET_METAL_SINGLE_MODEL_NEEDED_EDGES" | "REST_ASSEMBLY_MISSING_INSTANCE_DOCUMENT_ID" | "REST_ASSEMBLY_MISSING_INSTANCE_ELEMENT_ID" | "FACE_CLASH" | "CURVE_PATTERN_START_OFF_CLOSED_PATH" | "SHEET_METAL_CUT_JOINT" | "EXPORT_STL_NO_PARTS" | "INPUT_NAME_TOO_LONG" | "IMPORT_BODY_FAILED_CHECK" | "DERIVED_BODIES_HAVE_FAULTS" | "SHEET_METAL_BLOCKED_PATTERN" | "SHEET_METAL_FLANGE_INTERNAL" | "SHEET_METAL_TOO_THICK" | "SHEET_METAL_BEND_END_NOT_A_CORNER" | "SHEET_METAL_NOT_A_CLOSED_CORNER" | "SHEET_METAL_CORNER_NOT_A_BEND_END" | "RIB_ONLY_OPEN_PROFILES" | "TAB_NO_LONGER_EXISTS" | "CLINE_FAILED" | "ILLEGAL_MODIFICATION" | "ASSEMBLY_MATE_VALUE_SET_FAILED" | "EXTRUDE_OFFSET_TOO_DEEP" | "SHEET_METAL_CANNOT_MOVE_BEND_EDGE" | "UP_TO_FACE_NOT_PARALLEL" | "TRANSLATION_FACE_NOT_PLANAR" | "MOVE_FACE_NO_INTERSECTION" | "SWEEP_PATH_PROFILE_NO_INTERSECTION" | "DIRECT_EDIT_MOVE_FACE_CREATE_SELECT" | "SHEET_METAL_THICKEN_IN_CONTEXT_INFO" | "CANNOT_DELETE_RHO_DIMENSION" | "INVALID_RHO" | "SKETCH_RHO_DIM_NOT_FOUND" | "SKETCH_CONIC_FAILED" | "TAB_NAME_TOO_LONG" | "DIRECT_EDIT_DELETE_FACE_ALL_FACES" | "SHEET_METAL_CORNER_BREAK_FAILED" | "BOOLEAN_NO_TARGET_SURFACE" | "BAD_BSPLINECURVE_DEFINITION" | "REQUIRE_3D_BSPLINECURVE_DATA" | "PERIODIC_BSPLINECURVE_NOT_CLOSED" | "PERIODIC_BSPLINECURVE_NOT_SMOOTH" | "RATIONAL_BSPLINECURVE_WEIGHT_NEGATIVE" | "BSPLINECURVE_NOT_G1" | "BRIDGING_CURVE_VERTEX_BOTH_SIDES" | "BRIDGING_CURVE_ONE_EDGE_EACH_SIDE" | "BRIDGING_CURVE_VERTEX_AT_END_OF_EDGE" | "PROJECT_CURVES_PARALLEL_PLANES" | "PROJECT_CURVES_DIFFERENT_SKETCHES" | "SHEET_METAL_SELECT_PART" | "VARIABLE_NOT_FOUND" | "CANNOT_EDIT_FIXED_CONIC" | "EXTRACT_WIRES_OVERLAPPING_EDGES" | "EXTRACT_WIRES_NON_MANIFOLD" | "EXTRACT_WIRES_NEEDS_EDGES" | "SPLINE_TWO_POINTS" | "CLOSED_SPLINE_THREE_POINTS" | "TANGENCY_ONE_EDGE" | "FIT_SPLINE_CANNOT_EVALUATE_END_CONDITION" | "FIT_SPLINE_REPEATED_POINT" | "FEATURE_ID_REQUIRED" | "PARAMETER_NOT_FOUND" | "PARAMETER_DOES_NOT_MATCH_ITS_FEATURE_SPEC" | "SHEET_METAL_CORNER_BREAK_DISABLED" | "SHEET_METAL_FILLET_NO_CONIC" | "SHEET_METAL_CHAMFER_NO_TWO_OFFSETS" | "SHEET_METAL_CHAMFER_NO_OFFSET_ANGLE" | "SHEET_METAL_CHAMFER_MUST_BE_EQUAL_OFFSETS" | "SHEET_METAL_ACTIVE_ENTITY_NEEDED" | "SHEET_METAL_CORNER_BREAK_NOT_A_CORNER" | "SHEET_METAL_CORNER_BREAK_NO_WALL" | "SHEET_METAL_CORNER_BREAK_VERTEX_NOT_FREE" | "SHEET_METAL_CORNER_BREAK_ATTRIBUTE_EXISTS" | "FIT_SPLINE_ZERO_START_MAGNITUDE" | "FIT_SPLINE_ZERO_END_MAGNITUDE" | "SHEET_METAL_CORNER_BREAK_SELECT_ENTITIES" | "EXTRUDE_SELECT_TERMINATING_VERTEX" | "FILL_SURFACE_NO_EDGES" | "FILL_SURFACE_DOUBLE_SELECTION" | "FILL_SURFACE_MULTI_LOOP" | "FILL_SURFACE_OPEN_LOOP" | "FILL_SURFACE_FAIL" | "FILL_SURFACE_ATTACH_FAIL" | "FILL_SURFACE_G2_FAIL" | "FILL_SURFACE_VERTEX_INTERPOLATION_FAIL" | "LOFT_SPINE_DISJOINT_PATH" | "LOFT_SPINE_SELF_INTERSECTING_PATH" | "LOFT_SPINE_PATH_PROFILE_NO_INTERSECTION" | "LOFT_SPINE_FAILED_XSECTIONS" | "LOFT_SPINE_GUIDE_WITH_POINT_PROFILE" | "LOFT_SPINE_PROFILES_NOT_IN_ORDER" | "LOFT_SELECT_SPINE" | "DOCUMENT_NOT_FOUND" | "ELEMENT_NOT_FOUND" | "ENCLOSE_NO_REGION" | "ENCLOSE_CANNOT_MERGE_REGIONS" | "ENCLOSE_CANNOT_CREATE_SOLID" | "ENCLOSE_NOTHING_SELECTED" | "ENCLOSE_UNKNOWN_ERROR" | "ACCESS_NOT_ALLOWED" | "LOFT_SPINE_TOO_MANY_GUIDES" | "FEATURE_INVALID_NAMESPACE" | "FEATURE_NULL_NOT_ALLOWED" | "SKETCH_DIMENSION_LIMIT_ERROR" | "FILL_SURFACE_WIRE_CONTINUITY_MISMATCH" | "FILL_SURFACE_INTERNAL_CONTINUITY_MISMATCH" | "LOFT_START_OR_END_CONDITIONS_FAILED" | "LOFT_START_OR_END_CONDITIONS_MAGNITUDE_NO_EFFECT" | "FOLLOW_LEADER_IS_IN_UNFOLLOWABLE_TAB" | "LOFT_START_OR_END_CONDITIONS_WITH_GUIDES_FAILED" | "REST_ASSEMBLY_MISSING_TRANSFORM_GROUPS" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP_INSTANCES" | "REST_ASSEMBLY_NULL_TRANSFORM_GROUP_INSTANCE" | "LOFT_NO_FACE_FOR_GUIDE_CLAMP" | "LOFT_NO_CONTINUITY_CONDITION_AT_INTERNAL_GUIDE" | "SKETCH_CONSTRAINT_NOT_FOUND" | "SKETCH_CONSTRAINT_PARAMETER_NOT_FOUND" | "SKETCH_ENTITY_NOT_FOUND" | "SKETCH_ENTITY_PARAMETER_NOT_FOUND" | "FEATURE_PARAMETER_TYPE_MISMATCH" | "FEATURE_CONFIGURED_PARAMETER_NO_VALUES" | "FEATURE_CONFIGURED_PARAMETER_INCONSISTENT_TYPES" | "SHEET_METAL_FLANGE_FAIL_AUTO_MITER" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_EDGE" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_PLANE" | "SHEET_METAL_FLANGE_FAIL_PARALLEL_DIRECTION" | "SHEET_METAL_FLANGE_FAIL_NO_BEND" | "SHEET_METAL_FLANGE_NO_PARALLEL_ENTITY" | "SHEET_METAL_FLANGE_NO_DIRECTION_ENTITY" | "SHEET_METAL_TAB_NO_BEND" | "BOOLEAN_NO_SURFACE_IN_MERGE_SCOPE" | "BOOLEAN_NO_SHARED_EDGE_WITH_SURFACE_IN_MERGE_SCOPE" | "SHEET_METAL_BEND_RELIEF_NO_CORNER" | "SHEET_METAL_CORNER_SELECT_ENTITIES" | "SHEET_METAL_BEND_RELIEF_SELECT_ENTITIES" | "VRFILLET_RADIUS_REQUIRED_AT_VERTEX" | "VRFILLET_RHO_REQUIRED_AT_VERTEX" | "VRFILLET_MAG_REQUIRED_AT_VERTEX" | "VRFILLET_SELECT_VERTICES" | "VRFILLET_VERTEX_NOT_ON_CHAIN" | "VRFILLET_INVALID_CHAIN" | "SHEET_METAL_TAB_NO_MERGE" | "SHEET_METAL_TAB_NONPLANAR" | "SHEET_METAL_TAB_NO_WALL" | "SHEET_METAL_TAB_NO_TAB" | "VRFILLET_NO_EFFECT" | "VRFILLET_MULTI_SELECTION" | "SHEET_METAL_TAB_NO_PARALLEL_WALL" | "SHEET_METAL_CORNER_UNDER_SIZED" | "FILLET_PARTIAL_FAIL" | "VRFILLET_INTERNAL_ZERO" | "SHEET_METAL_TAB_NO_EFFECT" | "SHEET_METAL_TAB_LOW_CLEARANCE" | "SHEET_METAL_TAB_FAILS_MERGE" | "SHEET_METAL_TAB_COLLISION" | "REPLACE_FACE_FACE_COUNT_CHANGED" | "FACE_OVERLAP" | "FACE_REMOVED" | "INTERSECTING_EDGES" | "CANNOT_SPLIT_FACE" | "FILL_SURFACE_BAD_SUPPORT" | "FILL_SURFACE_SUPPORT_NOT_ON_BOUNDARY" | "FILL_SURFACE_SUPPORT_NOT_SMOOTH" | "FILL_CURVE_OR_POINT_CONSTRAINTS" | "SHEET_METAL_ADD_WRONG_MODEL" | "SHEET_METAL_PATTERN_DISABLED_BOOLEANS" | "DRAWING_ALL_INSTANCES_HIDDEN" | "FILL_SUPPORT_NOT_SMOOTH_INTERNAL" | "SKETCH_CONSTRAINT_WRONG_SHEET_METAL_BODY" | "SKETCH_CONSTRAINT_FLAT_IN_3D" | "SKETCH_CONSTRAINT_3D_IN_FLAT" | "FIT_SPLINE_CURVATURE_FACE" | "FIT_SPLINE_CANNOT_EVALUATE_CURVATURE_END_CONDITION" | "FIT_SPLINE_NEED_DIRECTION_FOR_CURVATURE" | "CONFIGURATION_HAS_BAD_PARAMETERS" | "CONFIGURATION_HAS_BAD_CURRENT_CONFIGURATION" | "FEATURE_CONFIGURED_PARAMETER_VALUES_HAVE_IDS" | "WORKSPACE_NO_LONGER_EXISTS" | "CONTENT_STACKING_INVALID_MODE" | "CONTENT_STACKING_INVALID_COMPONENTS" | "CONTENT_STACKING_INVALID_TOP_STACK" | "SHEET_METAL_FACE_PATTERN_NO_JOINT" | "SHEET_METAL_FACE_PATTERN_FLOATING_CUT" | "SHEET_METAL_FACE_PATTERN_FLOATING_WALL" | "SM_FLAT_OP_NO_INTERSECT" | "SM_FLAT_OP_PARTIAL_INTERSECT" | "SM_FLAT_OP_ADD_CROSSES_EDGE" | "SM_FLAT_OP_NON_PLANAR_TOOL" | "SM_FLAT_OP_NON_PLANAR_TARGET" | "SM_FLAT_OPERATION_FAILED" | "SM_FLAT_OP_LEGACY_MODEL" | "SHEET_METAL_FLANGE_NON_LINEAR_EDGES" | "SHEET_METAL_CYLINDER_BEND" | "SHEET_METAL_INVALID_FACE" | "SHEET_METAL_ROLLED_CORNER_RELIF" | "SHEET_METAL_RELIEF_FAILURES" | "EDGE_CHANGE_FAILED" | "BOOLEAN_INPUTS_NOT_SOLID" | "TRANSFORM_SCALE_SELECTION" | "SHEET_METAL_SUBTRACT_DESTROYS_SHEET" | "SPLIT_KEEP_TOOLS_WITH_FACE" | "SPLIT_TRIM_WITH_SINGLE_FACE" | "SHEET_METAL_SKETCH_DETACHED_FACE" | "HOLE_CUT_FAIL" | "SHEET_METAL_FLAT_OP_ROLL_FAIL" | "PATTERN_EDGE_FAILED" | "SHEET_METAL_FACE_PATTERN_NO_VERTEX" | "SHEET_METAL_FACE_PATTERN_PARTIAL_FLOATING_WALL" | "EXTRUDE_3D_AND_FLAT" | "PATTERN_SWITCH_TO_PER_INSTANCE" | "PATTERN_NO_GEOM_FROM_FEATURES" | "RM_NO_LINK_PERMISSION_TO_REVISION" | "DRAFT_SELECT_PARTING_EDGES" | "DRAFT_CONFLICTING_OPPOSITION" | "SPLIT_SELECT_TARGETS" | "SPLIT_SELECT_TOOL" | "SPLIT_SELECT_FACE_TARGETS" | "SPLIT_SELECT_FACE_TOOLS" | "ASSEMBLY_PATTERN_EXCEED_MAX_INSTANCE_COUNT" | "ASSEMBLY_PATTERN_RECURSIVE_SEED" | "NO_LINK_PERMISSION_TO_THIS_DOCUMENT" | "SM_FLAT_OP_FACES_NOT_COPLANAR" | "FLATTENED_SHEET_METAL_SKETCH_PROHIBITED" | "DRAFT_SELECT_PULL_DIRECTION_ENTITY" | "DRAFT_PARALLEL_PARTING_EDGE" | "FLATTENED_SHEET_METAL_SKETCH_ONE_FACE" | "SKETCH_OFFSET_CHAIN_FAIL" | "SKETCH_OFFSET_BASE_CURVE_CONSUMED" | "SKETCH_OFFSET_SPLINE_SPLIT" | "SKETCH_OFFSET_ELLIPSE_SPLIT" | "CANNOT_FIND_FLATTENED_BODY" | "SHEET_METAL_ACTIVE_MODEL_REQUIRED" | "SKETCH_REFERENCE_WRONG_FLAT_PART" | "SKETCH_CANNOT_REFERENCE_3D" | "SM_FLAT_OP_CANNOT_JOIN_DIFFERENT_TRANSFORMS" | "DEFINED_IN_3D_CANT_REFERENCE_SM_FLAT" | "DEFINED_IN_SM_FLAT_CANT_REFERENCE_3D" | "CANNOT_CHANGE_REFERENCE_TO_DELETED_DOCUMENT" | "CANNOT_CHANGE_REFERENCE_ELEMENT_NOT_FOUND" | "COPIED_SKETCH_NOT_FOUND" | "VARIABLE_NAME_TOO_LONG" | "NO_INSTANCE_TO_REPLACE" | "ASSEMBLY_REPLACE_NO_REPLACER" | "CANNOT_REPLACE_IN_SUBASSEMBLIES" | "FILL_SURFACE_G1_FAIL" | "ALL_CONFIGURATION_PARAMETERS_NOT_SPECIFIED" | "ASSEMBLY_REPLACE_INVALID_SEED_INSTANCE" | "ASSEMBLY_REPLACE_INVALID_SEED_TYPE" | "ASSEMBLY_REPLACE_SUPPRESSED_FORBIDDEN" | "DISPLAY_STATES_INVALID_NAME" | "DISPLAY_STATES_DUPLICATE_NAME" | "WORKSPACE_UPGRADE_NONE_ENABLE_CAPABILITY" | "DISPLAY_STATES_UPDATE_HAD_NO_EFFECT" | "DISPLAY_STATES_APPLY_HAD_NO_EFFECT" | "DISPLAY_STATES_DOES_NOT_EXIST" | "LOFT_SPINE_NONTANGENT_PATH" | "LOFT_SPINE_APPROXIMATED" | "REST_ASSEMBLY_REVISION_PART_NUMBER_BLANK" | "REST_ASSEMBLY_REVISION_NOT_FOUND" | "ROLL_FAILED" | "ROLL_CANNOT_ADJUST" | "ROLL_MISMATCHED_SOURCE" | "INVALID_ROLL_SURFACE" | "ROLL_NOT_TO_OR_FROM_PLANE" | "FAILED_TO_FIND_ELEMENT_FOR_TO_STATE" | "FAILED_TO_FIND_VERSION_FOR_TO_STATE" | "MISSING_REVISION_ID_FOR_TO_STATE" | "MISSING_VERSION_ID_FOR_TO_STATE" | "INVALID_DOCUMENT_ID_FOR_TO_STATE" | "ASSEMBLY_CONTAINS_MISSING_PART_DATA" | "SHEET_METAL_HEM_NO_EDGES" | "SHEET_METAL_HEM_NON_LINEAR_EDGES" | "SHEET_METAL_HEM_FAIL_ALIGNMENT" | "SHEET_METAL_HEM_TOO_SHORT" | "SHEET_METAL_HEM_TEAR_DROP_GAP_TOO_LARGE" | "SHEET_METAL_HEM_INTERNAL" | "SHEET_METAL_HEM_FAILED" | "INVALID_CONFIGURATION_SPECIFIED" | "EDGEBLEND_PARTIAL" | "CHAMFER_PARTIAL_FAIL" | "LOFT_INCONSISTENT_EXTENT" | "LOFT_CANT_TRIM_PROFILES_INFO" | "LOFT_CANT_TRIM_GUIDES_INFO" | "NON_GEOMETRIC_ITEM_INSERTION_FAILED" | "SHEET_METAL_FLANGE_NEXT_TO_CYLINDER_BEND" | "SHEET_METAL_HEM_NEXT_TO_CYLINDER_BEND" | "SHEET_METAL_MOVE_FACE_NEXT_TO_CYLINDER_BEND" | "ASSEMBLY_UNKNOWN_SOLVE_ERROR" | "ASSEMBLY_FEATURE_FAILED_TO_RESOLVE_ALL_INSTANCES" | "SHEET_METAL_ORPHANED_BEND" | "ASSEMBLY_CONTEXT_INVALID_REFERENCE" | "ASSEMBLY_FEATURE_QUERY_DATA_MISSING" | "NON_GEOMETRIC_ITEMS_DOCUMENT_NOT_OWNED_BY_COMPANY" | "NON_GEOMETRIC_ITEM_NO_ITEM_FOUND_FOR_DOCUMENT_OWNER" | "EXTEND_SHEET_BODY_NO_TARGET" | "EXTEND_TARGET_MISSED" | "EXTEND_SELF_INTERSECTION" | "EXTEND_FAILED" | "EXTEND_TO_FACE_FAILED" | "TRIM_TO_MULTI_FAILED" | "EXTEND_NON_LAMINAR" | "EXTEND_TO_VERTEX_FAILED" | "TRIM_FAILED" | "SKETCH_EQUAL_CURVATURE_FAILED" | "SKETCH_EQUAL_CURVATURE_INPUT_ERROR" | "ASSEMBLY_EXPLODE_STEP_DIRECTION_QUERY_FAILED" | "WRAP_DESTINATION_NO_FACE" | "WRAP_TRIM_FAILED" | "WRAP_TRIM_NO_INTERSECTION" | "WRAP_IMPRINT_FAILED" | "WRAP_NEEDS_ANCHOR" | "WRAP_SELECT_TOOLS" | "WRAP_SELECT_TARGET" | "CREATE_COMPOSITE_PART_FAILED" | "NESTED_COMPOSITE_PARTS" | "ASSEMBLY_EXPLOSION_DOES_NOT_EXIST" | "FILL_SURFACE_NO_GUIDES" | "HOLE_INCONSISTENT_TAP_INFO" | "WRAP_SOURCE_DIFFERING_PLANES" | "WRAP_IMPRINT_SHEET_METAL" | "WRAP_SELECT_ANCHORS" | "OPERATION_CANCELLED" | "COMPOSITE_CLOSED_OVERLAP" | "COMPOSITE_OPEN_OVERLAP" | "COMPOSITE_SKETCH" | "COMPOSITE_MATE_CONNECTOR" | "COMPOSITE_PLANE" | "COMPOSITE_NON_MODIFIABLE" | "ASSEMBLY_REPLACE_WILL_CAUSE_CYCLES" | "CREATE_OUTLINE_TWO_OFFSET_FACES_PER_BODY" | "SHEET_METAL_TOOL_DOES_NOT_CUT_THROUGH" | "PERIODIC_BSPLINESURFACE_NOT_CLOSED" | "PERIODIC_BSPLINESURFACE_NOT_SMOOTH" | "CANNOT_MAKE_BSPLINESURFACE" | "BSPLINESURFACE_NOT_G1" | "BAD_2D_BOUNDARY_BSPLINECURVE_DEFINITION" | "PERIODIC_2D_BOUNDARY_BSPLINECURVE_NOT_CLOSED" | "PERIODIC_2D_BOUNDARY_BSPLINECURVE_NOT_SMOOTH" | "BSPLINESURFACE_BOUNDARY_NOT_SINGLE_CLOSED_LOOP" | "BSPLINESURFACE_FAILED_TO_MAKE_SOLID" | "BOOLEAN_NO_SHARED_EDGE_WITH_OTHER_SURFACE" | "BOOLEAN_NO_SURFACE_TO_MERGE_WITH" | "BOOLEAN_INVALID_PARAMETER_COMBINATION" | "MODIFY_COMPOSITE_PART_FAILED" | "INSTANCE_CONSUMED_BY_CLOSED_COMPOSITE" | "EXPLODE_STEP_INSTANCE_IS_SUPPRESSED" | "NO_COMPOSITE_FOR_SINGLE_SOLID" | "COMPOSITE_PART_ADD_AND_REMOVE_BODY" | "BOOLEAN_TOOL_INPUTS_NOT_SOLID" | "BOOLEAN_CANNOT_MIX_SOLIDS_AND_SURFACES" | "BSPLINESURFACE_CONTROL_POINTS_GRID_TOO_LONG" | "BSPLINE_TOO_MANY_CONTROL_POINTS" | "BSPLINE_DEGREE_TOO_HIGH" | "COMPOSITE_PART_SELECT_ENTITIES" | "DELETE_COMPOSITE_PART_FAILED" | "SURFACES_NOT_SUPPORTED_BY_PATTERN_REMOVE_AND_INTERSECT" | "SHEET_METAL_TAB_MERGE_AND_SUBTRACT_SAME_FLANGE" | "EXPLODED_VIEW_INVALID_STARTING_POSITION" | "CANNOT_EXPLODE_SKETCH" | "FAILED_TO_CREATE_EXPLODED_VIEW" | "ASSEMBLY_NAMED_POSITIONS_NEW_INSTANCES" | "SYS_FEATURE_EXCEPTION" | "CURVE_PARTIAL_FAILED" | "CURVE_FAILED" | "SPLIT_KEEP_PLANES_AND_MATE_CONNECTORS" | "EXPLODE_LINES_MUST_SPECIFY_STARTING_POINT" | "EXPLODE_LINES_FAILED_TO_RESOLVE_ENTITY" | "SPLINE_THROUGH_EDGES_SELECTED_EDGES_DONT_FORM_CHAIN" | "SPLINE_THROUGH_EDGES_TANGENT_DISCONTINUITY_AT_EDGE_ENDS" | "SPLINE_THROUGH_EDGES_CANNOT_FIT_SPLINE" | "SPLINE_THROUGH_EDGES_SELECT_EDGES" | "SPLINE_THROUGH_EDGES_RESULTED_IN_MORE_THAN_ONE_EDGE" | "SKETCH_CANNOT_DELETE_SPLINE_HANDLES" | "SKETCH_TRIM_NO_SPLINE_HANDLES" | "SKETCH_SPLIT_NO_SPLINE_HANDLES" | "SKETCH_EXTEND_NO_SPLINE_HANDLES" | "SKETCH_PATTERN_NO_SPLINE_HANDLES" | "SKETCH_FILLET_NO_SPLINE_HANDLES" | "SKETCH_MIRROR_NO_SPLINE_HANDLES" | "SKETCH_TRANSFORM_NO_SPLINE_HANDLES" | "MATE_OFFSET_INVALID_ROTATION_TYPE" | "SKETCH_TANGENT_CONSTRAINT_SPLINE_AND_HANDLE" | "SKETCH_CURVATURE_CONSTRAINT_SPLINE_AND_HANDLE" | "EXPLODE_LINE_NOT_ON_EXPLODED_INSTANCE" | "SWEEP_DISJOINT_PROFILE" | "SWEEP_MIXED_PROFILE" | "MULTI_PROFILE_SWEEP_NO_INNER_LOOPS" | "SWEEP_PROFILE_DIM_MISMATCH" | "LOFT_CONNECTION_MATCHING" | "SIMULATION_LOAD_DIRECTION_QUERY_FAILED" | "SIMULATION_LOAD_REGION_QUERY_FAILED" | "SIMULATION_LOAD_REGION_QUERY_EMPTY" | "SIMULATION_LOAD_REGION_NOT_ON_LOAD_INSTANCE" | "SIMULATION_LOAD_INSTANCE_NOT_SPECIFIED" | "SIMULATION_LOAD_DIRECTION_NOT_SPECIFIED" | "SIMULATION_FUNCTIONAL_CONNECTION_QUERY_FAILED" | "SIMULATION_FUNCTIONAL_CONNECTION_QUERY_EMPTY" | "HOLE_MATCH_FAILED" | "RULED_SURFACE_SELECT_EDGES" | "RULED_SURFACE_MITER_FAILED" | "RULED_SURFACE_NO_TANGENT_DIR" | "RULED_SURFACE_SELECT_DIRECTION" | "RULED_SURFACE_ZERO_LENGTH" | "RULED_SURFACE_SELECT_UP_TO_ENTITY" | "RULED_SURFACE_OVERLAPPING_SKETCH_EDGES" | "RULED_SURFACE_EDGES_NOT_MANIFOLD" | "RULED_SURFACE_FAILED" | "RULED_SURFACE_NO_LOCK_FACE" | "RULED_SURFACE_VERTEX_SELECT_VERTEX" | "RULED_SURFACE_MULTIPLE_LOCK_FACES" | "RULED_SURFACE_TOP_LEVEL_BOUNDARY_ENTITY" | "RULED_SURFACE_SPLIT_VERTEX" | "FULL_ROUND_SELECT_FACES" | "FULL_ROUND_MINIMUM_VERSION" | "FULL_ROUND_ADJACENT_CENTER_FACES" | "FULL_ROUND_COMMON_BODY" | "FAILED_TO_CREATE_ASSEMBLY_SIMULATION" | "IN_CONTEXT_UPDATE_DELETED_WORKSPACE" | "HOLE_TOOL_CONSTRUCTION_FAILED" | "HOLE_PARTIAL_FAILURE" | "HOLE_EXCEEDS_MAX_LOCATIONS_500" | "CONSTRUCT_PATH_EDGES_OVERLAP" | "CONSTRUCT_PATH_NOT_MANIFOLD" | "CONSTRUCT_PATH_FAILED" | "CONSTRUCT_PATH_FACES_OPPOSITE_SIDES" | "RULED_SURFACE_REFERENCE_FACES_BOTH_SIDES" | "HOLE_TARGETS_DO_NOT_DIFFER" | "RULED_SURFACE_OVERRIDES_CLASH" | "FGS_STREAM_ERROR" | "NO_MATERIAL_FOR_MASS_PROPERTY" | "SPECIFIED_SIMULATION_DOES_NOT_EXIST" | "MULTIPLE_MODAL_SIMULATIONS_PROHIBITED" | "LOFT_POINT_PROFILE_NORMAL_TO_PROFILE_GUIDE" | "RULED_SURFACE_GLOBAL_NORMAL_OVERRIDE" | "RULED_SURFACE_EDGE_PARALLEL_REFERENCE" | "FIXED_PART_REQUIRED_FOR_SIMULATION" | "MATERIAL_ASSIGNMENT_REQUIRED_FOR_SIMULATION" | "LOAD_REQUIRED_FOR_LINEAR_STATIC_SIMULATION" | "MATERIAL_LACKS_REQUIRED_PROPERTY_FOR_SIMULATION" | "FILLET_EDGES_NOT_MANIFOLD" | "SHEET_METAL_FILLET_NO_WIDTH" | "FRAME_TAG_PROFILE_SELECT_SKETCH" | "FRAME_TAG_PROFILE_SPECIFY_COLUMNS" | "FRAME_TAG_PROFILE_HEADER_EMPTY" | "FRAME_TAG_PROFILE_VALUE_EMPTY" | "FRAME_MISSING_CAP_FACES" | "FRAME_MISSING_SWEPT_EDGES" | "FRAME_MISSING_SWEPT_FACES" | "FRAME_CUTLIST_NO_END_FACE_EDGE_GEOMETRY_PAIR" | "PUBLICATION_ITEM_INSERT_FAILED" | "PUBLICATION_ITEM_INSERT_FAILED_NO_LINK_PERMISSION" | "PUBLICATION_ITEM_INSERT_FAILED_NO_DUPLICATES_ALLOWED" | "PUBLICATION_ITEM_UPDATE_FAILED_NO_DUPLICATES_ALLOWED" | "PUBLICATION_ITEM_UPDATE_FAILED" | "VRFILLET_RADIUS_REQUIRED_AT_POINT" | "VRFILLET_PARAMETER_REQUIRED_AT_POINT" | "VRFILLET_RHO_REQUIRED_AT_POINT" | "VRFILLET_MAG_REQUIRED_AT_POINT" | "VRFILLET_SELECT_EDGES" | "VRFILLET_EDGE_NOT_ON_CHAIN" | "BRIDGING_CURVE_POSITIONS_IDENTICAL" | "SPLIT_FACE_MUTUAL_IMPRINT" | "BRIDGING_CURVE_ZERO_SPEED_SCALE" | "VARIABLE_DESCRIPTION_TOO_LONG" | "FRAME_BAD_PATH" | "FRAME_SWEEP_FAILED" | "FRAME_TRIM_FAILED" | "FRAME_MALFORMED_BEAM" | "FRAME_BAD_CORNER_TYPE" | "FRAME_SELECT_PROFILE" | "FRAME_PROFILE_REGION" | "FRAME_NO_INTERNAL_TRIM" | "FRAME_MULTIPLE_TRIM_PLANES" | "FRAME_MULTIPLE_EQUAL_BEAMS_AFTER_SPLIT" | "FRAME_TRIM_GROUPS" | "FRAME_DISJOINT_GROUPS" | "FRAME_CANDIDATE_FACES" | "FRAME_LENGTHWISE_TRIM" | "FRAME_TRIM_SELECT_TARGETS" | "FRAME_TRIM_SELECT_TOOL" | "FRAME_SELECT_PATH" | "FRAME_TAG_PROFILE_HEADER_RESERVED" | "FRAME_CUTLIST_COLUMN_EMPTY" | "FRAME_TAG_PROFILE_NO_FEATURE_PATTERN" | "FRAME_CUTLIST_NO_FEATURE_PATTERN" | "SPLIT_EDGE_SELECT_EDGES" | "SPLIT_EDGE_SIZES_MISMATCH" | "SPLIT_EDGE_PARAMETER_BOUND" | "SPLIT_EDGE_FAILED" | "SPLIT_CLOSED_EDGE_ONE_POINT" | "SPLIT_EDGE_PROVIDE_PARAMETERS" | "NO_MATERIAL_FOR_COMPOSITE_PART_COMPUTED_MASS" | "FRAME_MULTIPLE_EQUAL_SEGMENTS_AFTER_SPLIT" | "FRAME_MALFORMED_SEGMENT" | "SIMULATION_UNSUPPORTED_INSTANCE" | "MIXED_MODEL_LAYOUT" | "ADJACENT_MESH_FACES_FOR_CAP_OR_HEAL" | "NOT_ALL_MESH_FACES_PATTERN" | "VOLUME_ACCURACY_MUST_BE_HIGH_FOR_REGEN" | "ASSEMBLY_REPLICATE_INVALID_SEED_MATE" | "ASSEMBLY_REPLICATE_MISSING_SEED_MATE" | "DXF_UNKNOWN_ENTITY" | "DXF_NONUNIFORM_SCALING" | "DXF_COULD_NOT_READ_FILE" | "DXF_COULD_NOT_CONVERT_HATCH" | "DXF_COULD_NOT_CONVERT_BODY" | "DXF_COULD_NOT_CONVERT_REGION" | "DXF_BAD_SPLINE_DATA" | "SIMULATION_LOAD_INSTANCE_SUPPRESSED" | "DIAMETERS_MUST_BE_EQUAL" | "NOT_CONVEX" | "SELECT_CYLINDER_EDGES" | "NOT_CYLINDER_OR_CONE" | "UNABLE_TO_FIND_THREAD_BOUNDARY" | "UNDERCUT_OFF_FACE" | "UNDERCUT_TOO_DEEP" | "HOLE_CBORE_CSINK_VALUES_NON_STD" | "SHEET_METAL_FLANGE_PARAMETER_BOUND" | "SHEET_METAL_FLANGE_ZERO_WIDTH" | "SHEET_METAL_FLANGE_NO_BOUNDING_ENTITY" | "SHEET_METAL_FLANGE_BOUNDING_ENTITY_PARALLEL" | "SHEET_METAL_FLANGE_BOUNDING_ENTITY_NOT_SUPPORTED" | "FRAME_BAD_COMPOSITE_SEGMENT" | "SKETCH_SPLINE_POINT_HAS_HANDLE" | "SKETCH_TRIM_NO_SPLINE_CONTROL_POLYGON" | "SELECTED_NON_MATCHING_SIZE" | "NEAREST_MATCHING_THREAD_SIZE" | "SKETCH_PATTERN_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_TRANSFORM_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_FILLET_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_MIRROR_NO_SPLINE_CONTROL_POLYGON" | "SKETCH_SPLIT_NO_SPLINE_CONTROL_POLYGON" | "VARIABLE_SELECT_FIRST_ENTITY" | "VARIABLE_SELECT_SECOND_ENTITY" | "VARIABLE_SELECT_CUSTOM_DIRECTION" | "VARIABLE_SELECT_ENTITIES_TO_MEASURE" | "VARIABLE_SELECT_ENTITY_TO_MEASURE" | "VARIABLE_NO_GEOMETRY_WITH_DIAMETER" | "VARIABLE_ONLY_TWO_ENTITIES_ALLOWED" | "VARIABLE_FLATTENED_ENTITIES_MUST_BE_SAME_BODY" | "CURVE_PROJECTION_FAILED" | "FACE_INTERSECTION_FAILED" | "FACE_INTERSECTION_NO_RESULT" | "FACE_INTERSECTION_UNIQUE_SELECTION" | "FACE_INTERSECTION_OVERLAPPING_SELECTION" | "CHAMFER_SIZE_EXCEED_GUSSET_SIZE" | "EMPTY_GUSSET_SELECTION" | "CANNOT_FIT_A_GUSSET" | "NON_FRAME_EDGE_SELECTED" | "SWEPT_EDGE_SELECTED" | "NO_CAP_FACE_SELECTED_ERROR" | "INVALID_CAP_FACE_SELECTED_ERROR" | "CAP_MULTI_FACE_SELECTED_ERROR" | "CAP_MULTI_LUMENS_SELECTED_ERROR" | "CAP_CURVED_FRAME_ERROR" | "CAP_FRAME_AXIS_ERROR" | "VARIABLE_CANNOT_USE_MAXIMUM_WITH_INFINITE_ENTITIES" | "VARIABLE_NO_AXIS_ENTITIES" | "CURVE_PROJECTION_NO_RESULT" | "BSURF_FAILED" | "BSURF_PROFILE_FAILED" | "BSURF_INCONSISTENT_BOUNDARY_CONDITIONS" | "FGS_SIMULATION_ERROR_SIMULATION_NON_CONVERGENT" | "FGS_SIMULATION_ERROR_LATERAL_BEARING_FORCE" | "FGS_SIMULATION_ERROR_LOADS_NONE" | "FGS_SIMULATION_ERROR_CONSTRAINTS_NONE" | "FGS_SIMULATION_ERROR_CONSTRAINTS_ONLY_KINEMATIC" | "FGS_SIMULATION_ERROR_INTERNAL_ERROR" | "DXF_COULD_NOT_CONVERT_TEXT" | "FGS_SIMULATION_ASSEMBLY_TOO_COMPLEX" | "SPLIT_SELECT_FACE_DIRECTION" | "SELECTION_IS_INVALID" | "CANNOT_ADD_MORE_THAN_ONE_THREAD_TO_UNSPLIT_CYLINDER" | "UNDERCUT_TOO_SHALLOW" | "CAP_INCLINED_CUT_FRAME_ERROR" | "SPLIT_OFF_FACE" | "UNDERCUT_DIAMETER_TOO_LARGE" | "PUBLICATION_ACTION_FAILED_NO_PLAN_ACCESS" | "DISPLAY_STATES_NO_REFERENCE" | "INVALID_ARC_LENGTH" | "FILLET_ADJOINING_EDGE_NOT_FILLETED" | "FILLET_BOUNDARY_INTERSECTS_EDGE" | "FILLET_BOUNDARY_OVERLAP" | "FILLET_EDGE_OVERLAPPED_BY_FILLET" | "FILLET_FACE_RANGE_TOO_LARGE" | "FILLET_ILLEGAL_END_BOUNDARY" | "FILLET_OVERLAP" | "FILLET_OVERLAPS_EDGE_LOOP" | "FILLET_PRODUCED_SELF_INT_SURFACE" | "FILLET_RANGE_INCONSISTENT_EDGE" | "FILLET_REQUIRES_SURFACE_EXTENSION" | "FILLET_RHO_TOO_LARGE" | "FILLET_VERTEX_EDGES_COMPLICATED" | "CHAMFER_ADJOINING_EDGE_NOT_CHAMFERED" | "CHAMFER_BOUNDARY_INTERSECTS_EDGE" | "CHAMFER_BOUNDARY_OVERLAP" | "CHAMFER_EDGE_OVERLAPPED_BY_CHAMFER" | "CHAMFER_FACE_RANGE_TOO_LARGE" | "CHAMFER_ILLEGAL_END_BOUNDARY" | "CHAMFER_OVERLAP" | "CHAMFER_OVERLAPS_EDGE_LOOP" | "CHAMFER_PRODUCED_SELF_INT_SURFACE" | "CHAMFER_RANGE_INCONSISTENT_EDGE" | "CHAMFER_REQUIRES_SURFACE_EXTENSION" | "CHAMFER_RHO_TOO_LARGE" | "CHAMFER_VERTEX_EDGES_COMPLICATED" | "EDGEBLEND_ADJOINING_EDGE_NOT_BLENDED" | "EDGEBLEND_BOUNDARY_INTERSECTS_EDGE" | "EDGEBLEND_BOUNDARY_OVERLAP" | "EDGEBLEND_EDGE_OVERLAPPED_BY_BLEND" | "EDGEBLEND_FACE_RANGE_TOO_LARGE" | "EDGEBLEND_ILLEGAL_END_BOUNDARY" | "EDGEBLEND_OVERLAP" | "EDGEBLEND_OVERLAPS_EDGE_LOOP" | "EDGEBLEND_PRODUCED_SELF_INT_SURFACE" | "EDGEBLEND_RANGE_INCONSISTENT_EDGE" | "EDGEBLEND_REQUIRES_SURFACE_EXTENSION" | "EDGEBLEND_RHO_TOO_LARGE" | "EDGEBLEND_VERTEX_EDGES_COMPLICATED" | "SIMULATION_LOAD_ON_FIXED_INSTANCE" | "FRAME_CUSTOM_ALIGNMENT_POINTS_NOT_IN_SKETCH" | "NON_MATCHING_SIZE_ERROR" | "FILL_CANNOT_MATCH_EDGE_ADJACENT_FACES" | "FILL_ADJACENT_FACE_BAD_INPUT" | "FRAME_BAD_OFFSET_INDEX" | "EXTERNAL_THREADS_UNSUPPORTED_ON_SHEET_METAL" | "THREAD_DEPTH_BEYOND_CYLINDER" | "VRFILLET_ASYMMETRIC_RADIUS_REQUIRED_AT_VERTEX" | "VRFILLET_ASYMMETRIC_RADIUS_REQUIRED_AT_POINT" | "VRFILLET_BAD_COEDGE" | "FILLET_LEGACY_ASYMMETRIC_UNSUPPORTED" | "PARTIAL_FILLET_BAD_INPUT_ERROR" | "GUSSET_EMPTY_ALIGNMENT_SELECTION" | "GUSSET_ALIGNMENT_NO_INTERSECTION" | "BRIDGING_CURVE_VERTEX_OR_EDGE_ON_SIDE" | "CANNOT_USE_PARTIAL_FILLET_IN_SHEET_METAL" | "PARTIAL_FILLET_CLOSED_PATH_ERROR" | "WRONG_CYLINDER_EDGE_SELECTED" | "GUSSET_OFFSET_NOT_PARALLEL" | "GUSSET_ALIGNED_OFFSET_NOT_PARALLEL" | "BRIDGING_CURVE_VERTEX_BELONG_TO_FACE" | "BRIDGING_CURVE_EDGE_BELONG_TO_FACE" | "BRIDGING_CURVE_NO_START_SELECTION" | "BRIDGING_CURVE_NO_END_SELECTION" | "NAMED_VIEW_INVALID" | "MUTUAL_TRIM_SAME_SURFACE_USED" | "MUTUAL_TRIM_SURFACE_NOT_SELECTED" | "MUTUAL_TRIM_GENERIC_ERROR" | "SHEET_METAL_CANNOT_CUT" | "BSURF_2_PROFILES" | "BSURF_OPEN_CHAIN" | "BSURF_PROFILE_QUALITY" | "BSURF_PROFILE_MISMATCH" | "BSURF_INVALID_BOUNDARY_CONDITIONS" | "BSURF_SOLVE_FAILS" | "HOLE_CSINK_ANGLE_TOO_WIDE" | "HOLE_CSINK_ANGLE_TOO_NARROW" | "EXTRUDE_START_OFFSET_BOUND_NOT_PLANAR" | "EXTRUDE_START_OFFSET_BOUND_NOT_PARALLEL_TO_EXTRUDED_ENTITIES" | "EXTRUDE_DIRECTION_COPLANAR" | "EXTRUDE_DIRECTION_INVALID_ENTITY" | "BSURF_CONVERGENCE_CURVES" | "BSURF_CONVERGENCE_TANGENCY" | "EXTRUDE_SELECT_DIRECTION" | "EXTRUDE_SELECT_START_OFFSET_ENTITY" | "BSURF_INCONSISTENT_CONDITIONS_ERROR" | "PARTIAL_FILLET_INVALID_BOUNDS_ERROR" | "DOCUMENT_ELEMENT_NOT_FOUND" | "BSURF_PROFILE_NON_G1" | "SM_FLAT_OP_FACES_DONT_MATCH" | "HOLE_REVERSED_BOUNDS" | "HELIX_INPUT_AXIS" | "HELIX_BOTH_RADII_ZERO" | "HELIX_START_POINT_MISALIGNED" | "HELIX_END_POINT_MISALIGNED" | "FACE_BLEND_SELECT_FACES" | "FACE_BLEND_FAILED" | "FACE_BLEND_DIMENSION_TOO_SMALL" | "FACE_BLEND_DIMENSION_TOO_LARGE" | "FACE_BLEND_CANNOT_ATTACH" | "FACE_BLEND_WRONG_LEFT_WALL_SENSE" | "FACE_BLEND_WRONG_RIGHT_WALL_SENSE" | "FACE_BLEND_WRONG_SENSES" | "FACE_BLEND_LEFT_WALL_MULTIPLE_BODIES" | "FACE_BLEND_RIGHT_WALL_MULTIPLE_BODIES" | "FACE_BLEND_INCONSISTENT_DATA" | "FACE_BLEND_INVALID_TANGENT_HOLD_LINE" | "FACE_BLEND_INVALID_CONIC_HOLD_LINE" | "FACE_BLEND_BAD_SPINE" | "FACE_BLEND_RHO_TOO_LARGE" | "FACE_BLEND_RHO_INVALID" | "FACE_BLEND_SELF_INTERSECTION" | "FACE_BLEND_INVALID_CAP" | "FACE_BLEND_INVALID_LIMIT" | "FACE_BLEND_INVALID_LIMIT_DIRECTION" | "FACE_BLEND_SPINE_ZERO_ANGLE_PROPAGATION" | "FACE_BLEND_SPINE_TANGENT_PROPAGATION" | "FACE_BLEND_SELECT_SPINE" | "FACE_BLEND_HOLD_LINE_IN_WALLS" | "FACE_BLEND_TANGENT_HL_ASYMMETRIC" | "FACE_BLEND_WIDTH_HOLD_LINES" | "FACE_BLEND_EDGE_LIMIT_NEEDS_SIDE" | "FACE_BLEND_INVALID_PLANE_LIMIT" | "FACE_BLEND_INVALID_PROPAGATION_ANGLE" | "OFFSET_WIRE_GENERIC_ERROR" | "OFFSET_WIRE_SELECT_WALL_PATH" | "OFFSET_WIRE_DIR1_FAILED" | "OFFSET_WIRE_DIR2_FAILED" | "FACE_BLEND_SOLID_LONG_ATTACH" | "OFFSET_WIRE_SHAPES_NON_CONSISTENT" | "OFFSET_WIRE_MULTIPLE_SHAPES" | "BOOLEAN_NON_MANIFOLD_RESULT" | "DRAWING_ASSEMBLY_NONMANIFOLD_SECTION_CUT" | "DRAWING_PARTSTUDIO_NONMANIFOLD_SECTION_CUT" | "MOVE_CURVE_BOUNDARY_FAILED" | "MOVE_CURVE_BOUNDARY_EXTENSION_NO_INTERSECTION" | "MOVE_CURVE_BOUNDARY_TRIM_NO_INTERSECTION" | "MOVE_CURVE_BOUNDARY_SELECT_CURVE" | "MOVE_CURVE_BOUNDARY_SELECT_TRIM_BOUNDARY" | "MOVE_CURVE_BOUNDARY_SELECT_EXTEND_BOUNDARY" | "MOVE_CURVE_BOUNDARY_NO_SKETCH_ENTITIES" | "MOVE_CURVE_BOUNDARY_ONLY_WIRES" | "MOVE_CURVE_BOUNDARY_SELECT_HELP_POINT" | "MOVE_CURVE_BOUNDARY_EXTEND_REQUIRES_OPEN_CURVE" | "MOVE_CURVE_BOUNDARY_SPLIT_CLOSED_AT_TWO_POINTS" | "HOLE_NO_END_BOUNDS" | "HOLE_TAP_TOO_DEEP" | "MOVE_CURVE_BOUNDARY_TOOL_IS_TARGET" | "DRAWING_IGNORE_FAULTY_PARTS" | "ISOCLINE_NO_RESULT" | "ISOCLINE_SELECT_FACES" | "ISOCLINE_SELECT_DIRECTION" | "ISOCLINE_FAILED" | "FGS_GENERATIVE_OPT_MAX_ITERATIONS" | "FGS_GENERATIVE_TARGET_VOLUME_LOW" | "FGS_GENERATIVE_TARGET_VOLUME_LARGE" | "FGS_GENERATIVE_THIN_GENERIC" | "FGS_GENERATIVE_SYMMETRY_DEF_PROBLEM" | "FGS_GENERATIVE_MINRADIUS_SMALL" | "FGS_GENERATIVE_MINRADIUS_LARGE" | "FGS_GENERATIVE_OPT_INVALID_SETUP" | "CURVE_PATTERN_DISTANCE_TOO_LARGE" | "BEND_REPLACEMENT_HEAL_FAILED" | "CANNOT_COPY_CONSTRAINTS" | "PARAMETER_EXPRESSION_VALIDATION_UNITS_MISMATCH_3ARGS" | "PARAMETER_EXPRESSION_VALIDATION_SYNTAX_ERROR_0ARGS" | "PARAMETER_EXPRESSION_VALIDATION_RESERVED_ID_1ARG" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_1ARG" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_2ARGS" | "PARAMETER_EXPRESSION_VALIDATION_CANNOT_APPLY_OP_TO_3ARGS" | "PARAMETER_EXPRESSION_VALIDATION_INCORRECT_TYPE" | "PARAMETER_EXPRESSION_UNKNOWN_FUNCTION" | "PARAMETER_EXPRESSION_UNKNOWN_VARIABLE" | "REVOLVE_NOT_COPLANAR_WITH_AXIS" | "FRAME_ANGLE_REFERENCE_INVALID_ENTITY" | "AMBIGUOUS_GEOMETRY_FOR_GUSSET_DEFINITION" | "HOLE_START_BOUND_INVALID" | "HOLE_NO_START_BOUND" | "BODY_DRAFT_FAILED" | "BODY_DRAFT_NO_REFERENCES" | "BODY_DRAFT_NO_ANGLES" | "BODY_DRAFT_INVALID_ABOVE_ANGLE" | "BODY_DRAFT_INVALID_BELOW_ANGLE" | "BODY_DRAFT_INVALID_PARTING_ENTITY" | "BODY_DRAFT_INVALID_PULL_DIRECTION" | "BODY_DRAFT_MITER_NEED_BOTH_SIDES" | "BODY_DRAFT_EDGE_SEPARATION_FAILED" | "BODY_DRAFT_EDGE_SPLIT_FAILED" | "BODY_DRAFT_ISOCLINE_SPLIT_FAILED" | "BODY_DRAFT_PARTING_PLANE_SHEET_ERROR" | "BODY_DRAFT_INVALID_REFERENCE" | "BODY_DRAFT_REFERENCE_LOOP" | "BODY_DRAFT_TOO_STEEP" | "BODY_DRAFT_BAD_PULL_DIRECTION" | "BODY_DRAFT_MITER_FAILED" | "DECAL_HORIZONTAL_REFERENCE_INVALID_ENTITY" | "OFFSET_WIRE_SHEET_CREATION_FAILED" | "REPLACE_FACE_SHEET_SMALL" | "REPLACE_FACES_NOT_ADJACENT" | "SHEET_METAL_HOLE_REBUILD_FAILED" | "CPLANE_TANGENT_INPUT" | "CPLANE_TANGENT_SELECT_REFERENCE" | "CPLANE_TANGENT_PLANE_INVALID" | "CPLANE_TANGENT_POINT_INVALID" | "REPLACE_FACES_NOT_SAME_BODY" | "MUST_USE_DEFAULT_RADIUS_WITH_FACE_BEND" | "CANNOT_RIP_A_FACE_BEND" | "CANNOT_MAKE_A_FACE_BEND_TANGENT" | "SKETCH_HAS_PATTERN_TOO_LARGE" | "SKETCH_LINEAR_PATTERN_FAILED" | "DECAL_PROJECTED_OFF_FACE" | "FIT_TOLERANCE_LIMITS_NOT_FOUND" | "FIT_TOLERANCE_SIZE_TOO_LARGE_ISO" | "FIT_TOLERANCE_SIZE_TOO_LARGE_ANSI" | "DECAL_NO_FACE_SELECTION" | "DECAL_NO_IMAGE_SELECTION" | "DECAL_IMAGE_TOO_LARGE" | "FGS_SIMULATION_ASSEMBLY_HAS_NO_INSTANCES" | "FGS_SIMULATION_ASSEMBLY_HAS_TOO_FEW_INSTANCES" | "FGS_MODAL_SIMULATION_HAS_ALL_FIXED_PARTS" | "BODY_DRAFT_STRAY_NONMITER_EDGES" | "MASS_PROPERTY_FACES_NOT_COPLANAR" | "PARAMETER_VALUE_INVALID" | "SHEET_METAL_CHAMFER_NO_TANGENT_BASED" | "CHAMFER_DIRECTION_OVERRIDE_NO_EFFECT" | "FILLET_CHAMFER_UNSUPPORTED" | "LINEAR_PATTERN_SKETCH_REAPPLY_INFO" | "CIRCULAR_PATTERN_SKETCH_REAPPLY_INFO" | "CURVE_PATTERN_SKETCH_REAPPLY_INFO" | "MIRROR_SKETCH_REAPPLY_INFO" | "CHAMFER_HELD_BACK" | "SWEEP_BAD_LOCK_DIRECTION" | "SHEET_METAL_COUNTER_HOLE_UNSUPPORTED" | "SPECIFIED_FEATURE_DOES_NOT_EXIST" | "SHEET_METAL_BEND_NO_BEND_LINE" | "SHEET_METAL_BEND_BAD_BEND_LINE" | "SHEET_METAL_BEND_NO_FACE" | "SHEET_METAL_BEND_NO_PARALLEL" | "SHEET_METAL_BEND_NO_DIRECTION" | "SHEET_METAL_BEND_BAD_FACE" | "SHEET_METAL_BEND_IMPRINT_FAILED" | "SHEET_METAL_BEND_BAD_DECOMPOSITION" | "SHEET_METAL_BEND_LINE_PERPENDICULAR_TO_FACE" | "SWEEP_SELECT_DIRECTION" | "SHEET_METAL_BEND_ROLL_FAILED" | "SHEET_METAL_BOTH_SIDES_CONNECTED" | "SHEET_METAL_CANNOT_BEND_BUTTS" | "SHEET_METAL_BEND_COLLISION" | "MISSING_PARAMETER_REFERENCE" | "MISSING_IMAGE_PARAMETER_REFERENCE" | "BODY_DRAFT_SELECT_EDGES" | "BODY_DRAFT_SELECT_FACES" | "BODY_DRAFT_SELECT_PARTS" | "SPLIT_EDGE_INVALID_SURFACE" | "BODY_DRAFT_NO_EFFECT" | "OFFSET_CURVE_ON_FACE_SELECT_EDGES" | "OFFSET_CURVE_ON_FACE_WIRE_EDGES" | "OFFSET_CURVE_ON_FACE_INVALID_TARGETS" | "OFFSET_CURVE_ON_FACE_INVALID_DISTANCE" | "OFFSET_CURVE_ON_FACE_IMPRINT_NO_EXTEND" | "OFFSET_CURVE_ON_FACE_FAILED_TO_CREATE_CHAIN" | "OFFSET_CURVE_ON_FACE_BRANCHING_CHAIN" | "OFFSET_CURVE_ON_FACE_FAILED" | "OFFSET_CURVE_ON_FACE_BAD_DIRECTION" | "OFFSET_CURVE_ON_FACE_GEODESIC_OUTSIDE" | "OFFSET_CURVE_ON_FACE_EXTENSION_FAILED" | "OFFSET_CURVE_ON_FACE_CHAIN_YIELDED_NO_RESULT" | "OFFSET_CURVE_ON_FACE_NO_RESULT" | "OFFSET_CURVE_ON_FACE_INPUT_WITH_NO_TARGETS" | "OFFSET_CURVE_ON_FACE_EUCLIDEAN_SIDE_PICK_FAIL" | "OFFSET_CURVE_ON_FACE_SCAR_EDGE" | "OFFSET_CURVE_ON_FACE_CLOSED_CURVE_NO_TRIM" | "OFFSET_CURVE_ON_FACE_SIDE_DIFF_FAIL" | "ANGLE_CONTROL_PARALLEL_TO_BEND" | "BODY_DRAFT_PARTING_SURFACE_SMALL" | "MASS_PROPERTY_MATE_CONNECTOR_Z_AXIS_NOT_NORMAL" | "DERIVED_MATE_CONNECTOR_INDEX_OUT_OF_BOUNDS" | "DERIVED_MATE_CONNECTOR_NO_LONGER_VALID" | "DERIVED_MATE_CONNECTOR_RESET" | "DERIVED_NO_MATE_CONNECTORS" | "TESSELLATED_LOFT_ERROR" | "BODY_DRAFT_INVALID_FACE_REFERENCE" | "BODY_DRAFT_INVALID_EDGE_REFERENCE" | "BODY_DRAFT_INVALID_PART_REFERENCE" | "HOLE_CANNOT_DETERMINE_TAPPED_BODY" | "HOLE_PARAMS_OVERRIDDEN_INFO" | "HOLE_TAP_DIA_TOO_LARGE_OR_EQUAL" | "SPLIT_AS_MODIFICATION_MULTIPLE_RESULTS" | "FORMED_TAG_FORM_NO_FEATURE_PATTERN" | "FORMED_TAG_FORM_SELECT_DIFFERENT_PARTS" | "FORMED_TAG_FORM_SELECT_SKETCH" | "FORMED_TAG_FORM_SELECT_SOMETHING" | "ISOPARAMETRIC_CURVE_SELECT_FACE" | "ISOPARAMETRIC_CURVE_SELECT_POINT" | "ISOPARAMETRIC_CURVE_SELECT_POSITION" | "ISOPARAMETRIC_CURVE_POINT_NOT_ON_FACE" | "THIN_SWEEP_3D_PROFILE_TRIM_WARNING" | "THIN_SWEEP_FAILED_TO_FIND_TRIM_PLANES_WARNING" | "THIN_SWEEP_TRIM_FAILED" | "ISOPARAMETRIC_CURVE_SELECT_SINGLE_FACE" | "HOLE_FASTENER_FIT_IS_NOT_APPLICABLE" | "PATTERN_SKIPPED_INSTANCES_SEED_INDEX" | "PATTERN_SKIPPED_INSTANCES_OUT_OF_RANGE_INDEX" | "FORMED_SELECT_LOCATION" | "FORMED_NO_PART_STUDIO_SELECTED" | "FORMED_SELECT_LOCATION_ON_ACTIVE_FACE" | "FORMED_LOCATION_ON_MULTIPLE_FACES" | "FORMED_NOT_ON_HOLE_FORMED_FACE" | "THIN_SWEEP_THICKEN_FAILED" | "DERIVED_NO_PARTS" | "DERIVED_NO_INSTANCING" | "DERIVED_NO_SAME_SOURCE" | "DERIVED_FULL_FEATURE_PATTERN" | "THIN_LOFT_3D_PROFILE_TRIM_WARNING" | "THIN_LOFT_FAILED_TO_FIND_TRIM_PLANES_WARNING" | "THIN_LOFT_THICKEN_FAILED" | "FGS_MODAL_SIMULATION_MAXIMUM_RIGID_MODES_REACHED" | "ASSEMBLY_MIRROR_PLANE_ERROR" | "POLYLINE_CONSECUTIVE_EQUAL_POINTS" | "POLYLINE_ZERO_ANGLE" | "POLYLINE_BEND_RADII_INVALID_SIZE" | "POLYLINE_INVALID_BEND" | "SKETCH_MISSING_LOCAL_REFERENCE" | "SKETCH_DIMENSION_MISSING_PARAMETER" | "MATECONNECTOR_QUERY_SECONDARY_AXIS_CONFLICT" | "MATECONNECTOR_NORMAL_RESOLUTION_FAILED" | "LOFT_PLANAR_GUIDE_NOT_FOUND" | "PART_STUDIO_DOES_NOT_EXIST_IN_MOMENT" | "SOME_BODIES_WERE_REMOVED_FROM_EXPORT" | "ALL_BODIES_WERE_REMOVED_FROM_EXPORT" | "CONFIG_NO_PARAMETERS_FOUND" | "CONFIG_INCORRECT_PARAMETER_TYPE" | "CONFIG_TOO_MANY_PARAMETERS" | "REFERENCE_REPAIR_MISSING_CONFIGURATION" | "SKETCH_CANNOT_MAKE_2_POINTS_BEZIER" | "PART_INSTANCE_SELECTED_IN_MULTIPLE_GENERATIVE_DESIGNS" | "CURVE_PATTERN_LOCK_FACES_INTERSECTION_FAILED" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_DENSITY" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_POISSONS_RATIO" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_YOUNGS_MODULUS" | "SIMULATION_MATERIAL_LACKS_REQUIRED_PROPERTY_TENSILE_YIELD_STRENGTH" | "SIMULATION_ASSEMBLY_HAS_UNSUPPORTED_MATES" | "ASSEMBLY_NAMED_POSITIONS_OUTSIDE_MATE_LIMIT" | "ASSEMBLY_NAMED_POSITIONS_SUBASSEMBLY_OUTSIDE_MATE_LIMIT" | "GENERATIVE_RUN_WAS_CANCELED" | "SKETCH_CHAMFER_INVALID_POINT" | "SKETCH_CHAMFER_PARALLEL" | "SKETCH_CHAMFER_FAIL" | "SKETCH_CHAMFER_INVALID_INPUTS" | "ASSEMBLY_FEATURE_MISSING_SELECTION" | "ASSEMBLY_NAMED_POSITIONS_LOCKED_SUBASSEMBLY_FOUND" | "CURVE_PATTERN_MISSING_FACE_SELECTION" | "TL_CONNECTION_ON_ALL_PROFILES" | "TL_FAILED" | "TL_CONNECTIONS_CROSS" | "TL_SELECT_PROFILES" | "TL_TWO_PROFILES" | "TL_CONSECUTIVE_ACORNS" | "TL_MIXED_PROFILES" | "TL_MIXED_PROFILE_TOPOLOGY" | "TL_FAILED_TO_CREATE_PROFILES" | "TL_CONNECTION_NOT_ON_PROFILE" | "SHEET_METAL_FILLET_NO_VARIABLE" | "PARTIALLY_INVALID_INPUT" | "SKETCH_BEZIER_DEGREE_DIM_NOT_FOUND" | "INVALID_BEZIER_DEGREE" | "CANNOT_DELETE_BEZIER_DEGREE_DIMENSION" | "DERIVED_NO_INSTANCING_SM" | "DERIVED_SM_AUTO_INSERT" | "ASSEMBLY_PATTERN_WRONG_REFERENCE_WAS_SELECTED" | "ASSEMBLY_PATTERN_REFERENCE_COULD_NOT_BE_FOUND" | "DERIVED_NO_ACTIVE_SM_COMPOSITE" | "PARTIAL_FILLET_INVALID_BOUND_ENTITY" | "FGS_THICKNESS_UNCLOSED_INPUT" | "FGS_THICKNESS_INTERNAL_ERROR" | "SKETCH_SPLIT_NO_BEZIER" | "SKETCH_TRIM_NO_BEZIER" | "EXPORT_NO_PARTS" | "SHEET_METAL_FILLET_OPTIONS_USE_CORNER_BREAK" | "SHEET_METAL_CHAMFER_OPTIONS_USE_CORNER_BREAK" | "SHEET_METAL_ATTRIBUTE_CORNER_BREAK_UNSUPPORTED_SELECTION" | "SHEET_METAL_USE_CORNER_BREAK_INFO" | "DRAWING_VIEW_CORRESPONDENCE_FAILED" | "EDIT_CURVE_SELECT_PLANE" | "EDIT_CURVE_SELECT_WIRE" | "EDIT_CURVE_MULTIPLE_EDGES" | "EDIT_CURVE_DEGREE_TOO_HIGH" | "EDIT_CURVE_INDEX_TOO_LARGE" | "EDIT_CURVE_PERIODICITY_CHANGE" | "EDIT_CURVE_FAILED" | "EDIT_CURVE_NOT_WIRE" | "EDIT_CURVE_CANNOT_EDIT_SKETCH_WIRE" | "EDIT_CURVE_LOCK_ENDS_PERIODIC" | "EDIT_CURVE_NO_BEST_FIT" | "PARTIAL_FILLET_OFFSET_BOUNDARY_TOO_LARGE" | "ASSEMBLY_MIRROR_INVALID_SEED" | "FLATTEN_COULD_NOT_FLATTEN" | "FLATTEN_SELECT_CONTIGUOUS_REGION" | "RULED_SURFACE_BAD_VERTEX" | "EDIT_CURVE_TOO_MANY_CONTROL_POINTS" | "EDIT_CURVE_NO_END_OVERLAP" | "EDIT_CURVE_APPROXIMATION_DEGREE_TOO_SMALL" | "EDIT_CURVE_CLOSED_APPROXIMATION_NO_DERIVATIVE" | "CONFIGURATION_PARAMETER_HAS_BAD_VISIBILITY_CONDITION" | "SHEET_METAL_FORMED_REBUILD_FAILED" | "SKETCH_PROFILE_ANALYSIS_FAILED" | "FORMED_SPLIT_PART" | "LOFT_NO_DIRECTION_FOR_START" | "LOFT_NO_DIRECTION_FOR_END" | "TOO_MANY_SAMPLES" | "FORMED_TOOL_NOT_NORMAL_TO_FACE" | "SHEET_METAL_ACTIVE_MODEL_NEEDED" | "SHEET_METAL_SELECT_PARTS" | "SHEET_METAL_INACTIVE_MODEL_SELECTED" | "FORMED_NOT_SAME_LOCATION" | "SIMULATION_MASS_OVERRIDE_WILL_BE_IGNORED" | "SIMULATION_MASS_OVERRIDE_ARE_IGNORED" | "FORMED_TAG_FORM_SELECT_SKETCH_WITH_WIRE_POINT" | "FORMED_TAG_FORM_BODIES_ALREADY_TAGGED" | "FORMED_TAG_FORM_POSITIVE_PART_NOT_SOLID" | "FORMED_TAG_FORM_NEGATIVE_PART_NOT_SOLID" | "FORMED_TAG_FORM_POSITIVE_PART_CONSUMED" | "FORMED_TAG_FORM_NEGATIVE_PART_CONSUMED" | "FORMED_BOOLEAN_UNION_NO_OP" | "FORMED_BOOLEAN_SUBTRACT_NO_OP" | "FORMED_FAILED_TO_DERIVE" | "TWO_WIDTH_MATECONNECTORS_NEEDED" | "ONE_TAB_MATECONNECTOR_NEEDED" | "TWO_TAB_MATECONNECTORS_NEEDED" | "FORMED_TAG_FORM_ORIGIN_OUTSIDE_TOOLS_BBOX" | "FORMED_TOOLS_INTERSECT_CANNOT_CUT" | "ROUTING_CURVE_AT_LEAST_TWO_DISTINCT_POINTS" | "ROUTING_CURVE_ORTHO_PATH_ALREADY_AXIS_ALIGNED" | "ROUTING_CURVE_INVALID_PATH" | "ROUTING_CURVE_CSV_INVALID_DATA" | "ROUTING_CURVE_CSV_NOT_ENOUGH_COLUMNS" | "EXTEND_TO_PART_FAILED" | "EXTEND_OFFSET_FAILED" | "SKETCH_PATTERN_NEEDS_SEED" | "WRAP_NEEDS_DIFFERENT_ANCHOR" | "CANNOT_RESOLVE_PART_STUDIO" | "CANNOT_RESOLVE_ASSEMBLY" | "NO_MESH_FOUND" | "CONSTRAINED_SURFACE_TOO_FEW_POINTS" | "CONSTRAINED_SURFACE_BAD_TOLERANCE" | "CONSTRAINED_SURFACE_BAD_POSITION" | "CONSTRAINED_SURFACE_FAILED_TOLERANCE" | "CONSTRAINED_SURFACE_FAILED" | "CONSTRAINED_SURFACE_SELECT_MESH" | "ROUTING_CURVE_SELECT_CURVE" | "ROUTING_CURVE_AT_LEAST_THREE_DISTINCT_POINTS" | "ASSEMBLY_MIRROR_HAS_REFERENCE_ERRORS" | "ASSEMBLY_MIRROR_HAS_NO_REFERENCE_ERRORS" | "FEATURE_NOT_PROVIDED" | "TOLERANT_OFFSET_END_CONSUMED" | "TOLERANT_OFFSET_NOT_TO_FACE" | "TOLERANT_DEPTH_NO_SECOND" | "TOLERANT_DEPTH_END_CONSUMED" | "MIXED_THICKNESS_TOLERANCE" | "DOUBLE_THICKNESS_TOLERANCE" | "TOLERANT_ANGLE_NO_SECOND" | "TOLERANT_ANGLE_END_CONSUMED" | "TOLERANT_THICKNESS_NEEDS_PLANE" | "TOLERANT_SOLID_ONLY" | "TOLERANT_INVALID_OFFSET_TARGET" | "SHEET_METAL_HEM_ADJACENT_CONE" | "SHEET_METAL_FLANGE_ADJACENT_CONE" | "SHEET_METAL_BEND_RELIEF_CONE" | "SHEET_METAL_ACTIVE_MODEL_CANNOT_OFFSET" | "TRIM_TO_MULTI_FAILED_FOR_UPTO_BODY" | "LOFT_CONNECTION_EDGE_PARAMETER_MISMATCH" | "SHEET_METAL_NO_CONE_APEX" | "SIMULATION_MATERIAL_PROPERTY_OUTSIDE_REQUIRED_BOUNDS" | "FGS_CONNECTIONS_ASSEMBLY_TOO_COMPLEX" | "THIN_EXTRUDE_NOT_PARALLEL_PLANES" | "WIDTH_AND_TAB_MATECONNECTORS_ON_SAME_OCCURRENCE" | "MIRROR_INVALID_SEED_ASSEMBLY" | "CANNOT_COMPUTE_MAX_DEVIATION" | "CANNOT_COMPUTE_MIN_DEVIATION" | "ASSEMBLY_MIRROR_INVOLVES_FIXED_OCCURRENCES" | "QUERY_VARIABLE_EMPTY_NAME" | "FEATURES_WITH_CYCLIC_DEPENDENCY_DETECTED" | "ASSEMBLY_MIRROR_RECURSIVE_SEED" | "QUERY_VARIABLE_NAME_ALREADY_USED_IN_NON_QUERY_VARIABLE" | "QUERY_VARIABLE_EMPTY_SELECTION" | "QUERY_VARIABLE_NAME_CANNOT_START_WITH_POUND" | "VARIABLE_NAME_ALREADY_USED_IN_QUERY_VARIABLE" | "ASSEMBLY_MIRROR_TARGET_PART_MISSING" | "ASSEMBLY_MIRROR_TARGET_FEATURE_MISSING" | "ASSEMBLY_MIRROR_TARGET_ELEMENT_MISSING" | "ASSEMBLY_MIRROR_DERIVED_ELEMENT_CONFIGURATIONS_INVALID" | "ASSEMBLY_DERIVED_MIRROR_REFERENCE_MISSING" | "INVALID_SUPPRESSION_EXPRESSION" | "ASSEMBLY_MIRROR_CHILD_HAS_REFERENCE_ERROR" | "THICKNESS_NO_CLOSED_COMPOSITES" | "VALUE_WITH_UNITS_ERROR" | "ROW_INDEX_RANGE_ERROR" | "ROW_INDEX_MIN_ERROR" | "ROW_INDEX_MAX_ERROR" | "ROW_INDEX_ERROR" | "ROW_LABEL_INDEX_ERROR" | "COL_INDEX_RANGE_ERROR" | "COL_INDEX_MIN_ERROR" | "COL_INDEX_MAX_ERROR" | "COL_INDEX_ERROR" | "COL_LABEL_INDEX_ERROR" | "QUERY_VARIABLE_NAME_CANNOT_CONTAIN_QUOTE" | "DRAWING_EMPTY_SECTION_TARGET_BODY" | "SKETCH_CANNOT_EVALUATE_PATTERN_PARAMETER" | "TL_SELF_INTERSECTING_BODY" | "SKETCH_PATTERN_MISSING_PARAMETER" | "SKETCH_PATTERN_INVALID_VALUE" | "TL_PROFILES_TRANSFORMED" | "TOLERANT_RADIUS_NO_VARIABLE_RADIUS" | "TOLERANT_RADIUS_NO_ASYMMETRY" | "TL_CONE_NEEDS_TANGENT_POLYLINES" | "ASSEMBLY_MIRROR_TARGET_FEATURE_SUPPRESSED" | "REVOLVE_UP_TO_FAILED" | "REVOLVE_UP_TO_NEXT_FAILED" | "REVOLVE_UP_TO_THIN_FAILED" | "REVOLVE_UP_TO_NEXT_NO_TARGET" | "DEVIATION_ANALYSIS_FAILED" | "REVOLVE_SELECT_TERMINATING_BODY" | "REVOLVE_SELECT_TERMINATING_SURFACE" | "REVOLVE_SELECT_TERMINATING_VERTEX" | "FGS_GENERATIVE_SEW_SEGMENTS_FAILED" | "FGS_GENERATIVE_BUILD_MIXED_BODY_FAILED" | "FGS_GENERATIVE_BUILD_BODY_FAILED" | "FGS_GENERATIVE_REPLACE_WITH_FACE_FAILED" | "TL_NO_INTERSECTING_PROFILES" | "SHEET_METAL_LOFT_PROFILES_TOUCH" | "SHEET_METAL_LOFT_ORTHOGONAL_PROFILE" | "SHEET_METAL_LOFT_DISJOINT_RESULT" | "ASSEMBLY_MIRROR_NO_ACTIVE_SM_COMPOSITE" | "CANNOT_FIND_ROW" | "CANNOT_FIND_COLUMN" | "SELECT_CSV_DATA" | "INVALID_ROW_REGEX" | "INVALID_COLUMN_REGEX" | "SHEET_METAL_LOFT_MERGE_SCOPE_SHIFT" | "LOFT_GUIDE_NOT_SMOOTH" | "DERIVED_NO_CLOSED_COMPOSITE_WITH_SM_WARNING" | "DERIVED_NO_CLOSED_COMPOSITE_WITH_SM_ERROR" | "SWEEP_TWIST_REQUIRE_TANGENT_PATH" | "SWEEP_SCALE_REQUIRE_TANGENT_PATH" | "SWEEP_TWIST_SCALE_REQUIRE_TANGENT_PATH" | "SWEEP_MULTIPROFILE_SCALE_NOT_ALLOWED" | "SWEEP_TWIST_ANGLE_EXCEEDS_LIMITS" | "SWEEP_TWIST_PITCH_EXCEEDS_LIMITS" | "SIMULATION_BOUNDARY_CONDITION_INSTANCE_NOT_SPECIFIED" | "SIMULATION_BOUNDARY_CONDITION_REGION_QUERY_FAILED" | "SIMULATION_BOUNDARY_CONDITION_REGION_QUERY_EMPTY" | "SIMULATION_BOUNDARY_CONDITION_INSTANCE_SUPPRESSED" | "SIMULATION_BOUNDARY_CONDITION_DIRECTION_QUERY_FAILED" | "SIMULATION_BOUNDARY_CONDITION_DIRECTION_NOT_SPECIFIED" | "SM_BEND_ANGLE_TOO_SMALL" | "PCB_HOLE_NO_BASE_PLANE" | "PCB_HOLE_NO_INTERIOR_FACE" | "PCB_HOLE_DUPLICATE_HOLE_ID" | "PCB_HOLE_INTERIOR_FACES_MUST_BELONG_TO_SAME_BODY" | "PCB_HOLE_LESS_THAN_2_PARALLEL_FACES" | "PCB_HOLE_MORE_THAN_2_PARALLEL_FACES" | "PCB_HOLE_FACE_ON_OUTLINE_OF_REGION" | "PCB_HOLE_INTERIOR_FACES_MUST_BELONG_TO_SAME_HOLE" | "PCB_HOLE_ALREADY_TAGGED" | "MATE_CONNECTOR_STACKED_AND_MULTIPLE_ENTITIES" | "CYCLE_OF_ONLY_MATE_CONNECTORS" | "SKETCH_CURVE_WITH_NON_PERIODIC_UNBOUNDED_GEOMETRY" | "DRAWING_EMPTY_VIEW_CORRESPONDENCE_FAILED" | "RENDERER_FAILED_TO_LOAD_DISPLAY_DATA" | "SHEET_METAL_DERIP_FAILED" | "REST_ASSEMBLY_MISSING_MATE_FEATURE_ID" | "REST_ASSEMBLY_MISSING_MATE_OWNER_OCCURRENCE_PATH" | "FGS_TS_SOLVER_ISSUE_INTERNAL_ERROR_NO_CLEAR_USER_FIX" | "SIMULATION_FEATURE_HAS_ERROR" | "ASSEMBLY_COSMETIC_CONFIG_NOT_SUPPORTED" | "SHEET_METAL_FAILED_TO_GET_FLAT_TRANSFORM" | "PCB_PARTS_TO_UNFOLD_MISMATCH" | "EXPORT_ASSEMBLY_TOO_LARGE" | "SWEEP_TWIST_NON_MANIFOLD" | "FIT_SPLINE_NEGATIVE_TARGET_LENGTH" | "FIT_SPLINE_LENGTH_NO_DOF" | "FIT_SPLINE_LENGTH_CONVERGENCE_FAILURE" | "GENERATIVE_KEEP_IN_CONFLICTS_WITH_KEEP_OUT" | "GENERATIVE_KEEP_OUT_CONFLICTS_WITH_PART_INSTANCE" | "SIMULATION_LOAD_HAS_ERROR" | "FIT_SPLINE_LENGTH_NO_LINE" | "SWEEP_SCALE_LESS_THAN_ZERO" | "SWEEP_EXTEND_HAS_NO_EFFECT" | "ANNOTATION_SYMBOL_NOT_SUPPORTED" | "SHEET_METAL_UNFOLD_NO_PART_SELECTED" | "SHEET_METAL_UNFOLD_NO_BEND_OR_ROLLED_WALL_SELECTED" | "SHEET_METAL_UNFOLD_SELECT_FROM_SAME_PART" | "SHEET_METAL_UNFOLD_NOTHING_TO_UNFOLD" | "SHEET_METAL_UNFOLD_NO_HOLD_ENTITY" | "SHEET_METAL_UNFOLD_SINGLE_HOLD_ENTITY" | "SHEET_METAL_UNFOLD_HOLD_ENTITY_NOT_ON_PART" | "SHEET_METAL_UNFOLD_ENTITY_NOT_WALL_OR_JOINT" | "SHEET_METAL_UNFOLD_JOINT_NO_TYPE" | "SHEET_METAL_UNFOLD_JOINT_NOT_A_BEND" | "SHEET_METAL_UNFOLD_HOLD_ENTITY_NOT_WALL_OR_BOUNDARY_EDGE" | "REST_EMPTY_REQUEST_BODY" | "MUTUAL_TRIM_NON_CONTIGUOUS_FACE_SELECTION" | "BSURF_INCONSISTENT_BOUNDARY_TANGENT" | "BSURF_INCONSISTENT_BOUNDARY_CURVATURE" | "BSURF_BOUNDARY_CONDITIONS_RELAXED_INFO" | "ASYNC_SIMULATION_VERSION_NOT_SELECTED" | "ASYNC_SIMULATION_INVALID_POSITION" | "FIXED_PART_REQUIRED_FOR_SIMULATION_NO_BOUNDARY_CONDITION" | "UNKNOWN";
         /**
          * @description Determines export resolution of fine, medium, or coarse
          * @default FINE
@@ -20293,7 +20589,7 @@ export interface components {
         /** @enum {string} */
         GBTPType: "UNDEFINED" | "BOOLEAN" | "NUMBER" | "STRING" | "ARRAY" | "MAP" | "BOX" | "BUILTIN" | "FUNCTION" | "UNKNOWN";
         /** @enum {string} */
-        GBTParameterLibraryRelationType: "NONE" | "CONTROLLED" | "OVERRIDE" | "UNKNOWN";
+        GBTParameterLibraryRelationType: "DEFAULT" | "IGNORE_LIBRARY_VALUES" | "UNKNOWN";
         /** @enum {string} */
         GBTParameterVisibilityLogicalOp: "NOT" | "AND" | "OR" | "UNKNOWN";
         /**
@@ -20304,6 +20600,8 @@ export interface components {
         GBTParasolidEncodingType: "TEXT" | "BINARY" | "UNKNOWN";
         /** @enum {string} */
         GBTPartColorCycleVersion: "COLOR_CYCLE_0" | "COLOR_CYCLE_1" | "UNKNOWN";
+        /** @enum {string} */
+        GBTPartFaultVisibility: "UNSPECIFIED" | "HIDDEN" | "VISIBLE" | "UNKNOWN";
         /** @enum {string} */
         GBTPartStudioDisplayDataVersion: "V0_ORIGINAL_VERSION" | "V1_SMOOTH_EDGES_RENDERING_OPTIONS" | "V2_SMOOTH_EDGES_TOLERANCE_CHANGED" | "UNKNOWN";
         /** @enum {string} */
@@ -20320,7 +20618,7 @@ export interface components {
          */
         GBTPreProcessParasolidOption: "NO_PRE_PROCESSING" | "USE_BODYSHOP_PRE_PROCESSING_ADVANCED" | "USE_TRANSLATOR_PRE_PROCESSING" | "USE_BODYSHOP_PRE_PROCESSING" | "USE_BODYSHOP_PRE_PROCESSING_ADVANCED_WITH_SURFS_TO_BSURFS_CONVERTING" | "UNKNOWN";
         /** @enum {string} */
-        GBTQuantityType: "UNKNOWN" | "INTEGER" | "REAL" | "LENGTH" | "ANGLE" | "MASS" | "TIME" | "TEMPERATURE" | "CURRENT" | "ANYTHING" | "ANYTHING_WITH_UNITS" | "FORCE" | "PRESSURE" | "MOMENT" | "ACCELERATION" | "ANGULAR_VELOCITY" | "ENERGY" | "AREA" | "VOLUME" | "BOOLEAN" | "STRING" | "DENSITY";
+        GBTQuantityType: "UNKNOWN" | "INTEGER" | "REAL" | "LENGTH" | "ANGLE" | "MASS" | "TIME" | "TEMPERATURE" | "CURRENT" | "ANYTHING" | "ANYTHING_WITH_UNITS" | "FORCE" | "PRESSURE" | "MOMENT" | "ACCELERATION" | "ANGULAR_VELOCITY" | "ENERGY" | "AREA" | "VOLUME" | "BOOLEAN" | "STRING" | "DENSITY" | "FREQUENCY";
         /** @enum {string} */
         GBTRadiusDisplay: "NONE" | "RADIAL" | "DIAMETRAL" | "UNKNOWN";
         /** @enum {string} */
@@ -20381,93 +20679,93 @@ export interface components {
         /** @enum {string} */
         GBTWeldType: "NONE" | "SQUARE_GROOVE" | "V_GROOVE" | "U_GROOVE" | "J_GROOVE" | "BEVEL_GROOVE" | "SINGLE_BEVEL_BUTT_BROAD_ROOT" | "V_FLARE_GROOVE" | "BEVEL_FLARE_GROOVE" | "BEAD_JOINT" | "FILLET_JOINT" | "PLUG_OR_SLOT_JOINT" | "SEAM_JOINT" | "SPOT_JOINT" | "UNKNOWN";
         GlTF: {
-            accessors?: components["schemas"]["Accessor"][];
-            animations?: components["schemas"]["Animation"][];
-            asset?: components["schemas"]["Asset"];
-            bufferViews?: components["schemas"]["BufferView"][];
-            buffers?: components["schemas"]["Buffer"][];
-            cameras?: components["schemas"]["Camera"][];
-            extensions?: {
+            accessors: components["schemas"]["Accessor"][];
+            animations: components["schemas"]["Animation"][];
+            asset: components["schemas"]["Asset"];
+            bufferViews: components["schemas"]["BufferView"][];
+            buffers: components["schemas"]["Buffer"][];
+            cameras: components["schemas"]["Camera"][];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extensionsRequired?: string[];
-            extensionsUsed?: string[];
-            extras?: Record<string, never>;
-            images?: components["schemas"]["Image"][];
-            materials?: components["schemas"]["Material"][];
-            meshes?: components["schemas"]["Mesh"][];
-            nodes?: components["schemas"]["Node"][];
-            samplers?: components["schemas"]["Sampler"][];
+            extensionsRequired: string[];
+            extensionsUsed: string[];
+            extras: Record<string, never>;
+            images: components["schemas"]["Image"][];
+            materials: components["schemas"]["Material"][];
+            meshes: components["schemas"]["Mesh"][];
+            nodes: components["schemas"]["Node"][];
+            samplers: components["schemas"]["Sampler"][];
             /** Format: int32 */
-            scene?: number;
-            scenes?: components["schemas"]["Scene"][];
-            skins?: components["schemas"]["Skin"][];
-            textures?: components["schemas"]["Texture"][];
+            scene: number;
+            scenes: components["schemas"]["Scene"][];
+            skins: components["schemas"]["Skin"][];
+            textures: components["schemas"]["Texture"][];
         };
         GlobalPermissionInfo: {
-            accessReports?: boolean;
-            adminEnterprise?: boolean;
-            allowAppStoreAccess?: boolean;
-            allowPublicDocumentsAccess?: boolean;
-            approveReleases?: boolean;
-            branchLockPermissions?: boolean;
-            createDocumentsInRoot?: boolean;
-            createProject?: boolean;
-            createReleases?: boolean;
-            createTasks?: boolean;
-            deletePermanently?: boolean;
-            exportFiles?: boolean;
-            importFiles?: boolean;
-            manageGuestUsers?: boolean;
-            manageNonGeometricItems?: boolean;
-            manageRbac?: boolean;
-            manageStandardContentMetadata?: boolean;
-            manageUsers?: boolean;
-            manageWorkflows?: boolean;
-            shareForAnonymousAccess?: boolean;
-            transferDocumentsFromEnterprise?: boolean;
-            useRevisionTools?: boolean;
+            accessReports: boolean;
+            adminEnterprise: boolean;
+            allowAppStoreAccess: boolean;
+            allowPublicDocumentsAccess: boolean;
+            approveReleases: boolean;
+            branchLockPermissions: boolean;
+            createDocumentsInRoot: boolean;
+            createProject: boolean;
+            createReleases: boolean;
+            createTasks: boolean;
+            deletePermanently: boolean;
+            exportFiles: boolean;
+            importFiles: boolean;
+            manageGuestUsers: boolean;
+            manageNonGeometricItems: boolean;
+            manageRbac: boolean;
+            manageStandardContentMetadata: boolean;
+            manageUsers: boolean;
+            manageWorkflows: boolean;
+            shareForAnonymousAccess: boolean;
+            transferDocumentsFromEnterprise: boolean;
+            useRevisionTools: boolean;
         };
         Header: {
-            deprecated?: boolean;
-            description?: string;
-            example?: Record<string, never>;
-            examples?: {
+            deprecated: boolean;
+            description: string;
+            example: Record<string, never>;
+            examples: {
                 [key: string]: components["schemas"]["Example"];
             };
-            explode?: boolean;
-            extensions?: {
+            explode: boolean;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
-            required?: boolean;
-            schema?: components["schemas"]["Schema"];
-            style?: components["schemas"]["StyleEnum"];
+            get$ref: string;
+            required: boolean;
+            schema: components["schemas"]["Schema"];
+            style: components["schemas"]["StyleEnum"];
         };
         Image: {
             /** Format: int32 */
-            bufferView?: number;
-            extensions?: {
+            bufferView: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            mimeType?: string;
-            name?: string;
-            uri?: string;
+            extras: Record<string, never>;
+            mimeType: string;
+            name: string;
+            uri: string;
         };
         /** @enum {string} */
         In: "COOKIE" | "HEADER" | "QUERY";
         Info: {
-            contact?: components["schemas"]["Contact"];
-            description?: string;
-            extensions?: {
+            contact: components["schemas"]["Contact"];
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            license?: components["schemas"]["License"];
-            summary?: string;
-            termsOfService?: string;
-            title?: string;
-            version?: string;
+            license: components["schemas"]["License"];
+            summary: string;
+            termsOfService: string;
+            title: string;
+            version: string;
         };
         /** @enum {string} */
         Interpolation: "STEP" | "LINEAR" | "CATMULLROMSPLINE" | "CUBICSPLINE";
@@ -20477,600 +20775,611 @@ export interface components {
          */
         JobType: "SYNC_ITEM" | "SYNC_BOM" | "SYNC_RELEASE_CANDIDATE";
         License: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            identifier?: string;
-            name?: string;
-            url?: string;
+            identifier: string;
+            name: string;
+            url: string;
         };
         Lines: Record<string, never>;
         Link: {
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
-            headers?: {
+            get$ref: string;
+            headers: {
                 [key: string]: components["schemas"]["Header"];
             };
-            operationId?: string;
-            operationRef?: string;
-            parameters?: {
+            operationId: string;
+            operationRef: string;
+            parameters: {
                 [key: string]: string;
             };
-            requestBody?: Record<string, never>;
-            server?: components["schemas"]["Server"];
+            requestBody: Record<string, never>;
+            server: components["schemas"]["Server"];
         };
         Material: {
             /** Format: float */
-            alphaCutoff?: number;
-            alphaMode?: string;
-            doubleSided?: boolean;
-            emissiveFactor?: number[];
-            emissiveTexture?: components["schemas"]["TextureInfo"];
-            extensions?: {
+            alphaCutoff: number;
+            alphaMode: string;
+            doubleSided: boolean;
+            emissiveFactor: number[];
+            emissiveTexture: components["schemas"]["TextureInfo"];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            normalTexture?: components["schemas"]["MaterialNormalTextureInfo"];
-            occlusionTexture?: components["schemas"]["MaterialOcclusionTextureInfo"];
-            pbrMetallicRoughness?: components["schemas"]["MaterialPbrMetallicRoughness"];
+            extras: Record<string, never>;
+            name: string;
+            normalTexture: components["schemas"]["MaterialNormalTextureInfo"];
+            occlusionTexture: components["schemas"]["MaterialOcclusionTextureInfo"];
+            pbrMetallicRoughness: components["schemas"]["MaterialPbrMetallicRoughness"];
         };
         MaterialNormalTextureInfo: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            index?: number;
+            index: number;
             /** Format: float */
-            scale?: number;
+            scale: number;
             /** Format: int32 */
-            texCoord?: number;
+            texCoord: number;
         };
         MaterialOcclusionTextureInfo: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            index?: number;
+            index: number;
             /** Format: float */
-            strength?: number;
+            strength: number;
             /** Format: int32 */
-            texCoord?: number;
+            texCoord: number;
         };
         MaterialPbrMetallicRoughness: {
-            baseColorFactor?: number[];
-            baseColorTexture?: components["schemas"]["TextureInfo"];
-            extensions?: {
+            baseColorFactor: number[];
+            baseColorTexture: components["schemas"]["TextureInfo"];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: float */
-            metallicFactor?: number;
-            metallicRoughnessTexture?: components["schemas"]["TextureInfo"];
+            metallicFactor: number;
+            metallicRoughnessTexture: components["schemas"]["TextureInfo"];
             /** Format: float */
-            roughnessFactor?: number;
+            roughnessFactor: number;
         };
         MediaType: {
-            encoding?: {
+            encoding: {
                 [key: string]: components["schemas"]["Encoding"];
             };
-            example?: Record<string, never>;
-            exampleSetFlag?: boolean;
-            examples?: {
+            example: Record<string, never>;
+            exampleSetFlag: boolean;
+            examples: {
                 [key: string]: components["schemas"]["Example"];
             };
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            schema?: components["schemas"]["Schema"];
+            schema: components["schemas"]["Schema"];
         };
         Mesh: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            primitives?: components["schemas"]["MeshPrimitive"][];
-            weights?: number[];
+            extras: Record<string, never>;
+            name: string;
+            primitives: components["schemas"]["MeshPrimitive"][];
+            weights: number[];
         };
         MeshPrimitive: {
-            attributes?: {
+            attributes: {
                 [key: string]: number;
             };
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            indices?: number;
+            indices: number;
             /** Format: int32 */
-            material?: number;
+            material: number;
             /** Format: int32 */
-            mode?: number;
-            targets?: {
+            mode: number;
+            targets: {
                 [key: string]: number;
             }[];
         };
         NextCharge: {
             /** Format: int64 */
-            amount?: number;
+            amount: number;
             /** Format: date-time */
-            currentPeriodEnd?: string;
-            interval?: string;
+            currentPeriodEnd: string;
+            interval: string;
             /** Format: int64 */
-            total?: number;
+            total: number;
         };
         Node: {
             /** Format: int32 */
-            camera?: number;
-            children?: number[];
-            extensions?: {
+            camera: number;
+            children: number[];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            matrix?: number[];
+            extras: Record<string, never>;
+            matrix: number[];
             /** Format: int32 */
-            mesh?: number;
-            name?: string;
-            rotation?: number[];
-            scale?: number[];
+            mesh: number;
+            name: string;
+            rotation: number[];
+            scale: number[];
             /** Format: int32 */
-            skin?: number;
-            translation?: number[];
-            weights?: number[];
+            skin: number;
+            translation: number[];
+            weights: number[];
         };
         OAuthFlow: {
-            authorizationUrl?: string;
-            extensions?: {
+            authorizationUrl: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            refreshUrl?: string;
-            scopes?: {
-                extensions?: {
+            refreshUrl: string;
+            scopes: {
+                extensions: {
                     [key: string]: Record<string, never>;
                 };
-                empty?: boolean;
+                empty: boolean;
             } & {
                 [key: string]: string;
             };
-            tokenUrl?: string;
+            tokenUrl: string;
         };
         OAuthFlows: {
-            authorizationCode?: components["schemas"]["OAuthFlow"];
-            clientCredentials?: components["schemas"]["OAuthFlow"];
-            extensions?: {
+            authorizationCode: components["schemas"]["OAuthFlow"];
+            clientCredentials: components["schemas"]["OAuthFlow"];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            implicit?: components["schemas"]["OAuthFlow"];
-            password?: components["schemas"]["OAuthFlow"];
+            implicit: components["schemas"]["OAuthFlow"];
+            password: components["schemas"]["OAuthFlow"];
         };
         ObjectId: {
             /** Format: date-time */
-            date?: string;
+            date: string;
             /** Format: int32 */
-            timestamp?: number;
+            timestamp: number;
         };
         OpenAPI: {
-            components?: components["schemas"]["Components"];
-            extensions?: {
+            components: components["schemas"]["Components"];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalDocs?: components["schemas"]["ExternalDocumentation"];
-            info?: components["schemas"]["Info"];
-            jsonSchemaDialect?: string;
-            openapi?: string;
-            paths?: {
-                extensions?: {
+            externalDocs: components["schemas"]["ExternalDocumentation"];
+            info: components["schemas"]["Info"];
+            jsonSchemaDialect: string;
+            openapi: string;
+            paths: {
+                extensions: {
                     [key: string]: Record<string, never>;
                 };
-                empty?: boolean;
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["PathItem"];
             };
-            security?: components["schemas"]["SecurityRequirement"][];
-            servers?: components["schemas"]["Server"][];
-            tags?: components["schemas"]["Tag"][];
-            webhooks?: {
+            security: components["schemas"]["SecurityRequirement"][];
+            servers: components["schemas"]["Server"][];
+            tags: components["schemas"]["Tag"][];
+            webhooks: {
                 [key: string]: components["schemas"]["PathItem"];
             };
         };
         Operation: {
-            callbacks?: {
+            callbacks: {
                 [key: string]: components["schemas"]["Callback"];
             };
-            deprecated?: boolean;
-            description?: string;
-            extensions?: {
+            deprecated: boolean;
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalDocs?: components["schemas"]["ExternalDocumentation"];
-            operationId?: string;
-            parameters?: components["schemas"]["Parameter"][];
-            requestBody?: components["schemas"]["RequestBody"];
-            responses?: {
-                extensions?: {
+            externalDocs: components["schemas"]["ExternalDocumentation"];
+            operationId: string;
+            parameters: components["schemas"]["Parameter"][];
+            requestBody: components["schemas"]["RequestBody"];
+            responses: {
+                extensions: {
                     [key: string]: Record<string, never>;
                 };
-                default?: components["schemas"]["ApiResponse"];
-                empty?: boolean;
+                default: components["schemas"]["ApiResponse"];
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["ApiResponse"];
             };
-            security?: components["schemas"]["SecurityRequirement"][];
-            servers?: components["schemas"]["Server"][];
-            summary?: string;
-            tags?: string[];
+            security: components["schemas"]["SecurityRequirement"][];
+            servers: components["schemas"]["Server"][];
+            summary: string;
+            tags: string[];
         };
         Parameter: {
-            allowEmptyValue?: boolean;
-            allowReserved?: boolean;
-            content?: {
-                empty?: boolean;
+            allowEmptyValue: boolean;
+            allowReserved: boolean;
+            content: {
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["MediaType"];
             };
-            deprecated?: boolean;
-            description?: string;
-            example?: Record<string, never>;
-            examples?: {
+            deprecated: boolean;
+            description: string;
+            example: Record<string, never>;
+            examples: {
                 [key: string]: components["schemas"]["Example"];
             };
-            explode?: boolean;
-            extensions?: {
+            explode: boolean;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
-            in?: string;
-            name?: string;
-            required?: boolean;
-            schema?: components["schemas"]["Schema"];
-            style?: components["schemas"]["StyleEnum"];
+            get$ref: string;
+            in: string;
+            name: string;
+            required: boolean;
+            schema: components["schemas"]["Schema"];
+            style: components["schemas"]["StyleEnum"];
         };
         PathItem: {
-            delete?: components["schemas"]["Operation"];
-            description?: string;
-            extensions?: {
+            delete: components["schemas"]["Operation"];
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get?: components["schemas"]["Operation"];
-            get$ref?: string;
-            head?: components["schemas"]["Operation"];
-            options?: components["schemas"]["Operation"];
-            parameters?: components["schemas"]["Parameter"][];
-            patch?: components["schemas"]["Operation"];
-            post?: components["schemas"]["Operation"];
-            put?: components["schemas"]["Operation"];
-            servers?: components["schemas"]["Server"][];
-            summary?: string;
-            trace?: components["schemas"]["Operation"];
+            get: components["schemas"]["Operation"];
+            get$ref: string;
+            head: components["schemas"]["Operation"];
+            options: components["schemas"]["Operation"];
+            parameters: components["schemas"]["Parameter"][];
+            patch: components["schemas"]["Operation"];
+            post: components["schemas"]["Operation"];
+            put: components["schemas"]["Operation"];
+            servers: components["schemas"]["Server"][];
+            summary: string;
+            trace: components["schemas"]["Operation"];
+        };
+        /** @description Standard metadata properties of the item. */
+        Property: {
+            /** @description The property ID. */
+            id: string;
+            /** @description The property name. */
+            name: string;
+            /** @description The data type of the property. */
+            type: string;
+            /** @description The property value. */
+            value: string;
         };
         ProratedCharges: {
             /** Format: int64 */
-            amount?: number;
+            amount: number;
             /** Format: date-time */
-            date?: string;
-            description?: string;
+            date: string;
+            description: string;
         };
         RequestBody: {
-            content?: {
-                empty?: boolean;
+            content: {
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["MediaType"];
             };
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            get$ref?: string;
-            required?: boolean;
+            get$ref: string;
+            required: boolean;
         };
         RoleMapEntry: {
-            identities?: components["schemas"]["BTIdentityInfo"][];
-            role?: components["schemas"]["BTRbacRoleInfo"];
+            identities: components["schemas"]["BTIdentityInfo"][];
+            role: components["schemas"]["BTRbacRoleInfo"];
         };
         Sampler: {
-            input?: components["schemas"]["AccessorModel"];
-            interpolation?: components["schemas"]["Interpolation"];
-            output?: components["schemas"]["AccessorModel"];
+            input: components["schemas"]["AccessorModel"];
+            interpolation: components["schemas"]["Interpolation"];
+            output: components["schemas"]["AccessorModel"];
         };
         Scene: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
-            nodes?: number[];
+            extras: Record<string, never>;
+            name: string;
+            nodes: number[];
         };
         Schema: {
-            additionalItems?: components["schemas"]["Schema"];
-            additionalProperties?: Record<string, never>;
-            allOf?: components["schemas"]["Schema"][];
-            anyOf?: components["schemas"]["Schema"][];
-            booleanSchemaValue?: boolean;
-            const?: Record<string, never>;
-            contains?: components["schemas"]["Schema"];
-            contentEncoding?: string;
-            contentMediaType?: string;
-            contentSchema?: components["schemas"]["Schema"];
-            default?: Record<string, never>;
-            dependentRequired?: {
+            additionalItems: components["schemas"]["Schema"];
+            additionalProperties: Record<string, never>;
+            allOf: components["schemas"]["Schema"][];
+            anyOf: components["schemas"]["Schema"][];
+            booleanSchemaValue: boolean;
+            const: Record<string, never>;
+            contains: components["schemas"]["Schema"];
+            contentEncoding: string;
+            contentMediaType: string;
+            contentSchema: components["schemas"]["Schema"];
+            default: Record<string, never>;
+            dependentRequired: {
                 [key: string]: string[];
             };
-            dependentSchemas?: {
+            dependentSchemas: {
                 [key: string]: components["schemas"]["Schema"];
             };
-            deprecated?: boolean;
-            description?: string;
-            discriminator?: components["schemas"]["Discriminator"];
-            else?: components["schemas"]["Schema"];
-            enum?: Record<string, never>[];
-            example?: Record<string, never>;
-            exampleSetFlag?: boolean;
-            examples?: Record<string, never>[];
-            exclusiveMaximum?: boolean;
-            exclusiveMaximumValue?: number;
-            exclusiveMinimum?: boolean;
-            exclusiveMinimumValue?: number;
-            extensions?: {
+            deprecated: boolean;
+            description: string;
+            discriminator: components["schemas"]["Discriminator"];
+            else: components["schemas"]["Schema"];
+            enum: Record<string, never>[];
+            example: Record<string, never>;
+            exampleSetFlag: boolean;
+            examples: Record<string, never>[];
+            exclusiveMaximum: boolean;
+            exclusiveMaximumValue: number;
+            exclusiveMinimum: boolean;
+            exclusiveMinimumValue: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalDocs?: components["schemas"]["ExternalDocumentation"];
-            format?: string;
-            get$anchor?: string;
-            get$comment?: string;
-            get$id?: string;
-            get$ref?: string;
-            get$schema?: string;
-            if?: components["schemas"]["Schema"];
-            items?: components["schemas"]["SchemaObject"];
-            jsonSchema?: {
+            externalDocs: components["schemas"]["ExternalDocumentation"];
+            format: string;
+            get$anchor: string;
+            get$comment: string;
+            get$id: string;
+            get$ref: string;
+            get$schema: string;
+            if: components["schemas"]["Schema"];
+            items: components["schemas"]["SchemaObject"];
+            jsonSchema: {
                 [key: string]: Record<string, never>;
             };
-            jsonSchemaImpl?: Record<string, never>;
+            jsonSchemaImpl: Record<string, never>;
             /** Format: int32 */
-            maxContains?: number;
+            maxContains: number;
             /** Format: int32 */
-            maxItems?: number;
+            maxItems: number;
             /** Format: int32 */
-            maxLength?: number;
+            maxLength: number;
             /** Format: int32 */
-            maxProperties?: number;
-            maximum?: number;
+            maxProperties: number;
+            maximum: number;
             /** Format: int32 */
-            minContains?: number;
+            minContains: number;
             /** Format: int32 */
-            minItems?: number;
+            minItems: number;
             /** Format: int32 */
-            minLength?: number;
+            minLength: number;
             /** Format: int32 */
-            minProperties?: number;
-            minimum?: number;
-            multipleOf?: number;
-            not?: components["schemas"]["Schema"];
-            nullable?: boolean;
-            oneOf?: components["schemas"]["Schema"][];
-            pattern?: string;
-            patternProperties?: {
+            minProperties: number;
+            minimum: number;
+            multipleOf: number;
+            not: components["schemas"]["Schema"];
+            nullable: boolean;
+            oneOf: components["schemas"]["Schema"][];
+            pattern: string;
+            patternProperties: {
                 [key: string]: components["schemas"]["Schema"];
             };
-            prefixItems?: components["schemas"]["Schema"][];
-            properties?: {
+            prefixItems: components["schemas"]["Schema"][];
+            properties: {
                 [key: string]: components["schemas"]["Schema"];
             };
-            propertyNames?: components["schemas"]["Schema"];
-            readOnly?: boolean;
-            required?: string[];
-            then?: components["schemas"]["Schema"];
-            title?: string;
-            type?: string;
-            types?: string[];
-            unevaluatedItems?: components["schemas"]["Schema"];
-            unevaluatedProperties?: components["schemas"]["Schema"];
-            uniqueItems?: boolean;
-            writeOnly?: boolean;
-            xml?: components["schemas"]["XML"];
+            propertyNames: components["schemas"]["Schema"];
+            readOnly: boolean;
+            required: string[];
+            then: components["schemas"]["Schema"];
+            title: string;
+            type: string;
+            types: string[];
+            unevaluatedItems: components["schemas"]["Schema"];
+            unevaluatedProperties: components["schemas"]["Schema"];
+            uniqueItems: boolean;
+            writeOnly: boolean;
+            xml: components["schemas"]["XML"];
         };
         SchemaObject: {
-            additionalItems?: components["schemas"]["Schema"];
-            additionalProperties?: Record<string, never>;
-            allOf?: components["schemas"]["Schema"][];
-            anyOf?: components["schemas"]["Schema"][];
-            booleanSchemaValue?: boolean;
-            const?: Record<string, never>;
-            contains?: components["schemas"]["Schema"];
-            contentEncoding?: string;
-            contentMediaType?: string;
-            contentSchema?: components["schemas"]["Schema"];
-            default?: Record<string, never>;
-            dependentRequired?: {
+            additionalItems: components["schemas"]["Schema"];
+            additionalProperties: Record<string, never>;
+            allOf: components["schemas"]["Schema"][];
+            anyOf: components["schemas"]["Schema"][];
+            booleanSchemaValue: boolean;
+            const: Record<string, never>;
+            contains: components["schemas"]["Schema"];
+            contentEncoding: string;
+            contentMediaType: string;
+            contentSchema: components["schemas"]["Schema"];
+            default: Record<string, never>;
+            dependentRequired: {
                 [key: string]: string[];
             };
-            deprecated?: boolean;
-            description?: string;
-            discriminator?: components["schemas"]["Discriminator"];
-            else?: components["schemas"]["Schema"];
-            enum?: Record<string, never>[];
-            example?: Record<string, never>;
-            exampleSetFlag?: boolean;
-            examples?: Record<string, never>[];
-            exclusiveMaximum?: boolean;
-            exclusiveMaximumValue?: number;
-            exclusiveMinimum?: boolean;
-            exclusiveMinimumValue?: number;
-            extensions?: {
+            deprecated: boolean;
+            description: string;
+            discriminator: components["schemas"]["Discriminator"];
+            else: components["schemas"]["Schema"];
+            enum: Record<string, never>[];
+            example: Record<string, never>;
+            exampleSetFlag: boolean;
+            examples: Record<string, never>[];
+            exclusiveMaximum: boolean;
+            exclusiveMaximumValue: number;
+            exclusiveMinimum: boolean;
+            exclusiveMinimumValue: number;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalDocs?: components["schemas"]["ExternalDocumentation"];
-            format?: string;
-            get$anchor?: string;
-            get$comment?: string;
-            get$id?: string;
-            get$ref?: string;
-            get$schema?: string;
-            if?: components["schemas"]["Schema"];
-            items?: components["schemas"]["SchemaObject"];
-            jsonSchema?: {
+            externalDocs: components["schemas"]["ExternalDocumentation"];
+            format: string;
+            get$anchor: string;
+            get$comment: string;
+            get$id: string;
+            get$ref: string;
+            get$schema: string;
+            if: components["schemas"]["Schema"];
+            items: components["schemas"]["SchemaObject"];
+            jsonSchema: {
                 [key: string]: Record<string, never>;
             };
-            jsonSchemaImpl?: Record<string, never>;
+            jsonSchemaImpl: Record<string, never>;
             /** Format: int32 */
-            maxContains?: number;
+            maxContains: number;
             /** Format: int32 */
-            maxItems?: number;
+            maxItems: number;
             /** Format: int32 */
-            maxLength?: number;
+            maxLength: number;
             /** Format: int32 */
-            maxProperties?: number;
-            maximum?: number;
+            maxProperties: number;
+            maximum: number;
             /** Format: int32 */
-            minContains?: number;
+            minContains: number;
             /** Format: int32 */
-            minItems?: number;
+            minItems: number;
             /** Format: int32 */
-            minLength?: number;
+            minLength: number;
             /** Format: int32 */
-            minProperties?: number;
-            minimum?: number;
-            multipleOf?: number;
-            not?: components["schemas"]["Schema"];
-            nullable?: boolean;
-            oneOf?: components["schemas"]["Schema"][];
-            pattern?: string;
-            prefixItems?: components["schemas"]["Schema"][];
-            propertyNames?: components["schemas"]["Schema"];
-            readOnly?: boolean;
-            required?: string[];
-            then?: components["schemas"]["Schema"];
-            title?: string;
-            type?: string;
-            types?: string[];
-            unevaluatedItems?: components["schemas"]["Schema"];
-            unevaluatedProperties?: components["schemas"]["Schema"];
-            uniqueItems?: boolean;
-            writeOnly?: boolean;
-            xml?: components["schemas"]["XML"];
+            minProperties: number;
+            minimum: number;
+            multipleOf: number;
+            not: components["schemas"]["Schema"];
+            nullable: boolean;
+            oneOf: components["schemas"]["Schema"][];
+            pattern: string;
+            prefixItems: components["schemas"]["Schema"][];
+            propertyNames: components["schemas"]["Schema"];
+            readOnly: boolean;
+            required: string[];
+            then: components["schemas"]["Schema"];
+            title: string;
+            type: string;
+            types: string[];
+            unevaluatedItems: components["schemas"]["Schema"];
+            unevaluatedProperties: components["schemas"]["Schema"];
+            uniqueItems: boolean;
+            writeOnly: boolean;
+            xml: components["schemas"]["XML"];
         };
         SecurityRequirement: {
-            empty?: boolean;
+            empty: boolean;
         } & {
             [key: string]: string[];
         };
         SecurityScheme: {
-            bearerFormat?: string;
-            description?: string;
-            extensions?: {
+            bearerFormat: string;
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            flows?: components["schemas"]["OAuthFlows"];
-            get$ref?: string;
-            in?: components["schemas"]["In"];
-            name?: string;
-            openIdConnectUrl?: string;
-            scheme?: string;
-            type?: components["schemas"]["Type"];
+            flows: components["schemas"]["OAuthFlows"];
+            get$ref: string;
+            in: components["schemas"]["In"];
+            name: string;
+            openIdConnectUrl: string;
+            scheme: string;
+            type: components["schemas"]["Type"];
         };
         Server: {
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            url?: string;
-            variables?: {
-                extensions?: {
+            url: string;
+            variables: {
+                extensions: {
                     [key: string]: Record<string, never>;
                 };
-                empty?: boolean;
+                empty: boolean;
             } & {
                 [key: string]: components["schemas"]["ServerVariable"];
             };
         };
         ServerVariable: {
-            default?: string;
-            description?: string;
-            enum?: string[];
-            extensions?: {
+            default: string;
+            description: string;
+            enum: string[];
+            extensions: {
                 [key: string]: Record<string, never>;
             };
         };
         Skin: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            inverseBindMatrices?: number;
-            joints?: number[];
-            name?: string;
+            inverseBindMatrices: number;
+            joints: number[];
+            name: string;
             /** Format: int32 */
-            skeleton?: number;
+            skeleton: number;
         };
         /** @enum {string} */
         Status: "DB_TIMEOUT" | "DB_MAX_NUMBER_ITEMS_EXCEEDED";
         /** @enum {string} */
         StyleEnum: "FORM" | "SPACE_DELIMITED" | "PIPE_DELIMITED" | "DEEP_OBJECT";
         Tag: {
-            description?: string;
-            extensions?: {
+            description: string;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            externalDocs?: components["schemas"]["ExternalDocumentation"];
-            name?: string;
+            externalDocs: components["schemas"]["ExternalDocumentation"];
+            name: string;
         };
         Texture: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
-            name?: string;
+            extras: Record<string, never>;
+            name: string;
             /** Format: int32 */
-            sampler?: number;
+            sampler: number;
             /** Format: int32 */
-            source?: number;
+            source: number;
         };
         TextureInfo: {
-            extensions?: {
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            extras?: Record<string, never>;
+            extras: Record<string, never>;
             /** Format: int32 */
-            index?: number;
+            index: number;
             /** Format: int32 */
-            texCoord?: number;
+            texCoord: number;
         };
         TransformGroup: {
-            instances?: components["schemas"]["BTAssemblyInstanceDefinitionParams"][];
-            transform?: number[];
+            instances: components["schemas"]["BTAssemblyInstanceDefinitionParams"][];
+            transform: number[];
         };
         /** @enum {string} */
         Type: "APIKEY" | "HTTP" | "OAUTH2" | "OPENIDCONNECT" | "MUTUALTLS";
         UpdateParams: {
-            fromReference?: components["schemas"]["BTUniqueDocumentItemParams"];
-            idsToUpdate?: string[];
-            ignoreChildren?: boolean;
-            toReference?: components["schemas"]["BTUniqueDocumentItemParams"];
+            fromReference: components["schemas"]["BTUniqueDocumentItemParams"];
+            idsToUpdate: string[];
+            ignoreChildren: boolean;
+            toReference: components["schemas"]["BTUniqueDocumentItemParams"];
         };
         /** @enum {string} */
         UserRolePriority: "OWNER" | "ADMIN" | "MEMBER" | "GUEST";
         /** @enum {string} */
         VersionAlias: "LAST_MINOR" | "LAST_BUILD";
         Versions: {
-            availableVersions?: components["schemas"]["BTApiVersion"][];
-            specifiedVersion?: components["schemas"]["BTApiVersion"];
+            availableVersions: components["schemas"]["BTApiVersion"][];
+            specifiedVersion: components["schemas"]["BTApiVersion"];
         };
         XML: {
-            attribute?: boolean;
-            extensions?: {
+            attribute: boolean;
+            extensions: {
                 [key: string]: Record<string, never>;
             };
-            name?: string;
-            namespace?: string;
-            prefix?: string;
-            wrapped?: boolean;
+            name: string;
+            namespace: string;
+            prefix: string;
+            wrapped: boolean;
         };
     };
     responses: never;
@@ -23961,7 +24270,7 @@ export interface operations {
     getCompanyUsers: {
         parameters: {
             query?: {
-                /** @description `createdAt | modifiedAt | name | light | lastLoginTime | userRole | state` */
+                /** @description `createdAt | modifiedAt | name | firstName | lastName | email | light | lastLoginTime | userRole | state` */
                 sortColumn?: string;
                 /** @description `desc` (descending, default) | `asc` (ascending) */
                 sortOrder?: string;
@@ -23973,6 +24282,12 @@ export interface operations {
                 offset?: number;
                 /** @description Number of results to return per page. Default value is 20 (also the maximum). */
                 limit?: number;
+                /** @description Filter by user role ordinal: `0` (OWNER), `1` (ADMIN), `2` (MEMBER). Multiple values allowed. Defaults to all roles. */
+                roleFilter?: number[];
+                /** @description Filter users added after this date (ISO 8601, e.g. 2026-01-01T00:00:00Z). */
+                afterDateAdded?: string;
+                /** @description Filter users added before this date (ISO 8601, e.g. 2026-12-31T23:59:59Z). */
+                beforeDateAdded?: string;
             };
             header?: never;
             path: {
@@ -24830,6 +25145,33 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8; qs=0.09": Record<string, never>;
+                };
+            };
+        };
+    };
+    updateDocumentNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the document to update */
+                did: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTDocumentNotesParams"];
+            };
+        };
+        responses: {
+            /** @description default response */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTGlobalTreeNodeSummaryInfo"];
                 };
             };
         };
@@ -26361,8 +26703,6 @@ export interface operations {
     getOpenApi: {
         parameters: {
             query?: {
-                /** @description Force reload the OpenApi definition. Only works when asking for the latest version. */
-                forceReload?: boolean;
                 /** @description Specify a version of Onshape from which the OpenAPI is generated. If '*' is specified in any of the version fields, that indicates any version if acceptable. */
                 version?: string;
                 /** @description Version aliases based on the currently released version. */
@@ -28068,6 +28408,49 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTTranslationRequestInfo"];
+                };
+            };
+        };
+    };
+    getWhereUsed: {
+        parameters: {
+            query?: {
+                /** @description Document that contains the part or assembly. */
+                documentId?: string;
+                /** @description Element that contains the part or assembly. */
+                elementId?: string;
+                /** @description Version that contains the part or assembly. One of `versionId` and `useLatestVersion` is required. */
+                versionId?: string;
+                /** @description URL-encoded string of configuration values (separated by `;`). See the [Configurations API Guide](https://onshape-public.github.io/docs/api-adv/configs/) for details. */
+                configuration?: string;
+                /** @description Part to find. When `elementId` is a Part Studio, `partId` or `partNumber` is required. Call [getPartsWMVE](https://cad.onshape.com/glassworks/explorer/#/Part/getPartsWMVE) to get a list of parts in the Part Studio. */
+                partId?: string;
+                /** @description Part to find. When `elementId` is a Part Studio, `partId` or `partNumber` is required. Call [getPartsWMVE](https://cad.onshape.com/glassworks/explorer/#/Part/getPartsWMVE) to get a list of parts in the Part Studio. */
+                partNumber?: string;
+                /** @description If true, include metadata properties for each result item. */
+                includeProperties?: boolean;
+                /** @description Filter results by one of the following:  `0: LATEST_REVISION, 1: ALL_REVISIONS, 2: ALL_VERSIONS (default), 3: ALL, 5: LATEST_VERSIONS, 6: MOST_RECENT_REVISION`. */
+                filter?: number;
+                /** @description If `true`, include the list of document versions in which the queried item has been referenced by other documents. Each entry contains the version ID and name. */
+                includeVersionInfo?: boolean;
+                /** @description If `true`, automatically resolves to the most recent referenced document version for the queried item. One of `versionId` and `useLatestVersion` is required. */
+                useLatestVersion?: boolean;
+                /** @description Comma-separated list of element types to limit results to. Valid values: `0: PARTSTUDIO, 1: ASSEMBLY, 2: DRAWING`. */
+                limitToTypes?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success! */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8; qs=0.09": components["schemas"]["BTWhereUsedItemInfoList"];
                 };
             };
         };
@@ -30144,3 +30527,305 @@ export interface operations {
 type WithRequired<T, K extends keyof T> = T & {
     [P in K]-?: T[P];
 };
+export enum ApiPaths {
+    getPlanPurchases = "/accounts/plans/{planId}/purchases",
+    getPurchases = "/accounts/purchases",
+    consumePurchase = "/accounts/purchases/{pid}/consume",
+    cancelPurchaseNew = "/accounts/{aid}/purchases/{pid}",
+    getAliasesInCompany = "/aliases",
+    createAlias = "/aliases",
+    getAlias = "/aliases/{aid}",
+    updateAlias = "/aliases/{aid}",
+    deleteAlias = "/aliases/{aid}",
+    getAliasMembers = "/aliases/{aid}/members",
+    createElement = "/appelements/d/{did}/w/{wid}",
+    bulkCreateElement = "/appelements/d/{did}/w/{wid}/bulkcreate",
+    downloadBlobSubelementWorkspace = "/appelements/d/{did}/w/{wid}/e/{eid}/blob/{bid}",
+    uploadBlobSubelement = "/appelements/d/{did}/w/{wid}/e/{eid}/blob/{bid}",
+    deleteBlobSubelement = "/appelements/d/{did}/w/{wid}/e/{eid}/blob/{bid}",
+    copyAssociativeData = "/appelements/d/{did}/w/{wid}/e/{eid}/copyassociativedata",
+    getElementTransactions = "/appelements/d/{did}/w/{wid}/e/{eid}/transactions",
+    startTransaction = "/appelements/d/{did}/w/{wid}/e/{eid}/transactions",
+    abortTransaction = "/appelements/d/{did}/w/{wid}/e/{eid}/transactions/{tid}",
+    commitTransactions = "/appelements/d/{did}/w/{wid}/transactions",
+    downloadBlobSubelement = "/appelements/d/{did}/{vm}/{vmid}/e/{eid}/blob/{bid}",
+    getAssociativeData = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/associativedata",
+    postAssociativeData = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/associativedata",
+    deleteAssociativeData = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/associativedata",
+    getBlobSubelementIds = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/blob",
+    compareAppElementJson = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/compare",
+    getSubElementContent = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content",
+    updateAppElement = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content",
+    getAppElementHistory = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/history",
+    getSubelementIds = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/ids",
+    getJson = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/json",
+    getJsonPaths = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/jsonpaths",
+    getSubElementContentBatch = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/subelements",
+    deleteAppElementContentBatch = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/subelements",
+    deleteAppElementContent = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/content/subelements/{sid}",
+    createReference = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/references",
+    resolveReference = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/references/{rid}",
+    updateReference = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/references/{rid}",
+    deleteReference = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/references/{rid}",
+    resolveReferences = "/appelements/d/{did}/{wvm}/{wvmid}/e/{eid}/resolvereferences",
+    resolveAllElementReferences = "/appelements/d/{did}/{wvm}/{wvmid}/resolvereferences",
+    getCompanyAppSettings = "/applications/clients/{cid}/settings/companies/{cpid}",
+    updateAppCompanySettings = "/applications/clients/{cid}/settings/companies/{cpid}",
+    deleteCompanyAppSettings = "/applications/clients/{cid}/settings/companies/{cpid}",
+    getUserAppSettings = "/applications/clients/{cid}/settings/users/{uid}",
+    updateAppSettings = "/applications/clients/{cid}/settings/users/{uid}",
+    deleteAppSettings = "/applications/clients/{cid}/settings/users/{uid}",
+    getApplicableExtensionsForClient = "/applications/extensions/user/{uid}/client/{cid}",
+    getNamedViews = "/assemblies/d/{did}/e/{eid}/namedViews",
+    createAssembly = "/assemblies/d/{did}/w/{wid}",
+    getOrCreateBillOfMaterialsElement = "/assemblies/d/{did}/w/{wid}/e/{eid}/bomelement",
+    updateFeature = "/assemblies/d/{did}/w/{wid}/e/{eid}/features/featureid/{fid}",
+    deleteFeature = "/assemblies/d/{did}/w/{wid}/e/{eid}/features/featureid/{fid}",
+    deleteInstance = "/assemblies/d/{did}/w/{wid}/e/{eid}/instance/nodeid/{nid}",
+    createInstance = "/assemblies/d/{did}/w/{wid}/e/{eid}/instances",
+    updateMateValues = "/assemblies/d/{did}/w/{wid}/e/{eid}/matevalues",
+    modify = "/assemblies/d/{did}/w/{wid}/e/{eid}/modify",
+    transformOccurrences = "/assemblies/d/{did}/w/{wid}/e/{eid}/occurrencetransforms",
+    insertTransformedInstances = "/assemblies/d/{did}/w/{wid}/e/{eid}/transformedinstances",
+    getAssemblyDefinition = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    getBillOfMaterials = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/bom",
+    getAssemblyBoundingBoxes = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/boundingboxes",
+    getDisplayStates = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/displaystates",
+    getExplodedViews = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/explodedviews",
+    getFeatures = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/features",
+    addFeature = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/features",
+    getFeatureSpecs = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/featurespecs",
+    getAssemblyMassProperties = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/massproperties",
+    getNamedPositions = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/namedpositions",
+    getAssemblyShadedViews = "/assemblies/d/{did}/{wvm}/{wvmid}/e/{eid}/shadedviews",
+    createAssemblyExportGltf = "/assemblies/d/{did}/{wv}/{wvid}/e/{eid}/export/gltf",
+    createAssemblyExportObj = "/assemblies/d/{did}/{wv}/{wvid}/e/{eid}/export/obj",
+    createAssemblyExportStep = "/assemblies/d/{did}/{wv}/{wvid}/e/{eid}/export/step",
+    getMateValues = "/assemblies/d/{did}/{wv}/{wvid}/e/{eid}/matevalues",
+    translateFormat = "/assemblies/d/{did}/{wv}/{wvid}/e/{eid}/translations",
+    getClientPlans = "/billing/plans/client/{cid}",
+    uploadFileCreateElement = "/blobelements/d/{did}/w/{wid}",
+    downloadFileWorkspace = "/blobelements/d/{did}/w/{wid}/e/{eid}",
+    uploadFileUpdateElement = "/blobelements/d/{did}/w/{wid}/e/{eid}",
+    updateUnits = "/blobelements/d/{did}/w/{wid}/e/{eid}/units",
+    createBlobTranslation = "/blobelements/d/{did}/{wv}/{wvid}/e/{eid}/translations",
+    getComments = "/comments",
+    createComment = "/comments",
+    getComment = "/comments/{cid}",
+    updateComment = "/comments/{cid}",
+    deleteComment = "/comments/{cid}",
+    addAttachment = "/comments/{cid}/attachment",
+    deleteAttachments = "/comments/{cid}/attachment",
+    getAttachment = "/comments/{cid}/attachment/{fdid}.{ext}",
+    reopen = "/comments/{cid}/reopen",
+    resolve = "/comments/{cid}/resolve",
+    findCompany = "/companies",
+    getCompany = "/companies/{cid}",
+    getDocumentsByName = "/companies/{cid}/documentsbyname",
+    addGlobalPermissionsForIdentity = "/companies/{cid}/globalpermission/{type}/{id}",
+    clearGlobalPermissions = "/companies/{cid}/globalpermission/{type}/{id}",
+    getCompanyUsers = "/companies/{cid}/users",
+    addUserToCompany = "/companies/{cid}/users",
+    updateCompanyUser = "/companies/{cid}/users/{uid}",
+    removeUserFromCompany = "/companies/{cid}/users/{uid}",
+    getDocuments = "/documents",
+    createDocument = "/documents",
+    downloadExternalData = "/documents/d/{did}/externaldata/{fid}",
+    getDocumentVersions = "/documents/d/{did}/versions",
+    createVersion = "/documents/d/{did}/versions",
+    getVersion = "/documents/d/{did}/versions/{vid}",
+    updateExternalReferencesToLatestDocuments = "/documents/d/{did}/w/{wid}/e/{eid}/latestdocumentreferences",
+    moveElementsToDocument = "/documents/d/{did}/w/{wid}/moveelement",
+    revertUnchangedToRevisions = "/documents/d/{did}/w/{wid}/revertunchangedtorevisions",
+    syncAppElements = "/documents/d/{did}/w/{wid}/syncAppElements",
+    getDocumentWorkspaces = "/documents/d/{did}/workspaces",
+    createWorkspace = "/documents/d/{did}/workspaces",
+    deleteWorkspace = "/documents/d/{did}/workspaces/{wid}",
+    getDocumentHistory = "/documents/d/{did}/{wm}/{wmid}/documenthistory",
+    getDocumentContents = "/documents/d/{did}/{wvm}/{wvmid}/contents",
+    getElementsInDocument = "/documents/d/{did}/{wvm}/{wvmid}/elements",
+    getUnitInfo = "/documents/d/{did}/{wvm}/{wvmid}/unitinfo",
+    getCurrentMicroversion = "/documents/d/{did}/{wv}/{wvid}/currentmicroversion",
+    export2Json = "/documents/d/{did}/{wv}/{wvid}/e/{eid}/export",
+    getInsertables = "/documents/d/{did}/{wv}/{wvid}/insertables",
+    search = "/documents/search",
+    getDocument = "/documents/{did}",
+    updateDocumentAttributes = "/documents/{did}",
+    deleteDocument = "/documents/{did}",
+    getDocumentAcl = "/documents/{did}/acl",
+    updateAnonymousAccess = "/documents/{did}/acl/anonymousAccess",
+    updatePublicAccess = "/documents/{did}/acl/public",
+    updateDocumentNotes = "/documents/{did}/notes",
+    getDocumentPermissionSet = "/documents/{did}/permissionset",
+    shareDocument = "/documents/{did}/share",
+    unShareDocument = "/documents/{did}/share/{eid}",
+    shareWithSupport = "/documents/{did}/shareWithSupport",
+    unshareFromSupport = "/documents/{did}/shareWithSupport",
+    mergePreview = "/documents/{did}/w/{wid}/mergePreview",
+    restoreFromHistory = "/documents/{did}/w/{wid}/restore/{vm}/{vmid}",
+    copyWorkspace = "/documents/{did}/workspaces/{wid}/copy",
+    mergeIntoWorkspace = "/documents/{did}/workspaces/{wid}/merge",
+    createDrawingAppElement = "/drawings/d/{did}/w/{wid}/create",
+    modifyDrawing = "/drawings/d/{did}/w/{wid}/e/{eid}/modify",
+    getDrawingTranslatorFormats = "/drawings/d/{did}/w/{wid}/e/{eid}/translationformats",
+    getDrawingViews_1 = "/drawings/d/{did}/{wvm}/{wvmid}/e/{eid}/views",
+    getDrawingViewJsonGeometry_1 = "/drawings/d/{did}/{wvm}/{wvmid}/e/{eid}/views/{viewid}/jsongeometry",
+    createDrawingTranslation = "/drawings/d/{did}/{wv}/{wvid}/e/{eid}/translations",
+    getModificationStatus = "/drawings/modify/status/{mrid}",
+    copyElementFromSourceDocument = "/elements/copyelement/{did}/workspace/{wid}",
+    encodeConfigurationMap = "/elements/d/{did}/e/{eid}/configurationencodings",
+    deleteElement = "/elements/d/{did}/w/{wid}/e/{eid}",
+    updateReferences = "/elements/d/{did}/w/{wid}/e/{eid}/updatereferences",
+    getConfiguration = "/elements/d/{did}/{wvm}/{wvmid}/e/{eid}/configuration",
+    updateConfiguration = "/elements/d/{did}/{wvm}/{wvmid}/e/{eid}/configuration",
+    decodeConfiguration = "/elements/d/{did}/{wvm}/{wvmid}/e/{eid}/configurationencodings/{cid}",
+    getElementTranslatorFormatsByVersionOrWorkspace = "/elements/translatorFormats/{did}/{wv}/{wvid}/{eid}",
+    getValidRuleOptions = "/exportrules/options/{cu}/{cuid}",
+    createFeatureStudio = "/featurestudios/d/{did}/w/{wid}",
+    getFeatureStudioContents = "/featurestudios/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    updateFeatureStudioContents = "/featurestudios/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    getFeatureStudioSpecs = "/featurestudios/d/{did}/{wvm}/{wvmid}/e/{eid}/featurespecs",
+    getFolderAcl = "/folders/{fid}/acl",
+    share = "/folders/{fid}/share",
+    unShare = "/folders/{fid}/share/{eid}",
+    getLatestInDocument = "/insertables/d/{did}/latest",
+    getItems = "/items",
+    createItem = "/items",
+    getItem = "/items/{iid}",
+    updateItem = "/items/{iid}",
+    deleteItem = "/items/{iid}",
+    getWMVEsMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e",
+    getWMVEMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    updateWVEMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    getFullAssemblyMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}/assembly-debug",
+    getWMVEPsMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}/p",
+    getWMVEPMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}/{iden}/{pid}",
+    updateWVEPMetadata = "/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}/{iden}/{pid}",
+    getWVMetadata = "/metadata/d/{did}/{wv}/{wvid}",
+    updateWVMetadata = "/metadata/d/{did}/{wv}/{wvid}",
+    updateVEOPStandardContentPartMetadata = "/metadata/standardcontent/d/{did}",
+    getVEOPStandardContentMetadata = "/metadata/standardcontent/d/{did}/v/{vid}/e/{eid}/p/{pid}",
+    getCategoryProperties = "/metadatacategory/categoryproperties",
+    nextNumbers = "/numberingscheme/nextnumbers",
+    getOpenApi = "/openapi",
+    getTags = "/openapi/tags",
+    updateNextNumbers = "/partnumber/nextnumbers",
+    getPartsWMV = "/parts/d/{did}/{wvm}/{wvmid}",
+    getPartsWMVE = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}",
+    getBodyDetails = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/bodydetails",
+    getBoundingBoxes = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/boundingboxes",
+    exportPartGltf = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/gltf",
+    getMassProperties = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/massproperties",
+    exportPS = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/parasolid",
+    getPartShadedViews = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/shadedviews",
+    getBendTable = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/sheetmetal/bendtable",
+    exportStl = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/stl",
+    getEdges = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/tessellatededges",
+    getFaces_1 = "/parts/d/{did}/{wvm}/{wvmid}/e/{eid}/partid/{partid}/tessellatedfaces",
+    getPartStudioNamedViews = "/partstudios/d/{did}/e/{eid}/namedViews",
+    createPartStudio = "/partstudios/d/{did}/w/{wid}",
+    updatePartStudioFeature = "/partstudios/d/{did}/w/{wid}/e/{eid}/features/featureid/{fid}",
+    deletePartStudioFeature = "/partstudios/d/{did}/w/{wid}/e/{eid}/features/featureid/{fid}",
+    updateRollback = "/partstudios/d/{did}/w/{wid}/e/{eid}/features/rollback",
+    updateFeatures = "/partstudios/d/{did}/w/{wid}/e/{eid}/features/updates",
+    getPartStudioBodyDetails = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/bodydetails",
+    getPartStudioBoundingBoxes = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/boundingboxes",
+    comparePartStudios = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/compare",
+    getPartStudioFeatures = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/features",
+    addPartStudioFeature = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/features",
+    evalFeatureScript = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/featurescript",
+    getFeatureScriptRepresentation = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/featurescriptrepresentation",
+    getPartStudioFeatureSpecs = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/featurespecs",
+    getFeatureScriptTable = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/fstable",
+    exportPartStudioGltf = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/gltf",
+    translateIds = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/idtranslations",
+    getPartStudioMassProperties = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/massproperties",
+    exportParasolid = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/parasolid",
+    getPartStudioShadedViews = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/shadedviews",
+    getSketchInfo = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/sketches",
+    getSketchBoundingBoxes = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/sketches/{sid}/boundingboxes",
+    getTessellatedEntities = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/sketches/{sid}/tessellatedentities",
+    exportPartStudioStl = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/stl",
+    getPartStudioEdges = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/tessellatededges",
+    getPartStudioFaces = "/partstudios/d/{did}/{wvm}/{wvmid}/e/{eid}/tessellatedfaces",
+    createPartStudioExportGltf = "/partstudios/d/{did}/{wv}/{wvid}/e/{eid}/export/gltf",
+    createPartStudioExportObj = "/partstudios/d/{did}/{wv}/{wvid}/e/{eid}/export/obj",
+    createPartStudioExportStep = "/partstudios/d/{did}/{wv}/{wvid}/e/{eid}/export/step",
+    createPartStudioTranslation = "/partstudios/d/{did}/{wv}/{wvid}/e/{eid}/translations",
+    getWhereUsed = "/productstructure/whereused",
+    createPublication = "/publications",
+    updatePublicationAttributes = "/publications/{pid}",
+    deletePublication = "/publications/{pid}",
+    addItemToPublication = "/publications/{pid}/item",
+    deletePublicationItem = "/publications/{pid}/item/{iid}",
+    getPublicationItems = "/publications/{pid}/items",
+    addItemsToPublication = "/publications/{pid}/items",
+    createObsoletionPackage = "/releasepackages/obsoletion/{wfid}",
+    createReleasePackage = "/releasepackages/release/{wfid}",
+    getReleasePackage = "/releasepackages/{rpid}",
+    updateReleasePackage = "/releasepackages/{rpid}",
+    getRevisionByPartNumber = "/revisions/c/{cid}/partnumber/{pnum}",
+    enumerateRevisions = "/revisions/companies/{cid}",
+    getRevisionHistoryInCompanyByElementId = "/revisions/companies/{cid}/d/{did}/{wv}/{wvid}/e/{eid}",
+    getRevisionHistoryInCompanyByPartId = "/revisions/companies/{cid}/d/{did}/{wv}/{wvid}/e/{eid}/p/{pid}",
+    getRevisionHistoryInCompanyByPartNumber = "/revisions/companies/{cid}/partnumber/{pnum}",
+    deleteRevisionHistory = "/revisions/companies/{cid}/partnumber/{pnum}/elementType/{et}",
+    getAllInDocument = "/revisions/d/{did}",
+    getAllInDocumentVersion = "/revisions/d/{did}/v/{vid}",
+    getLatestInDocumentOrCompany = "/revisions/{cd}/{cdid}/p/{pnum}/latest",
+    setCustomParameters = "/standardcontent/d/{did}/customparameters",
+    getParameterValuesForId = "/standardcontent/d/{did}/parametervalues",
+    getStandardContentList = "/standardcontent/list",
+    createTableTemplate = "/tabletemplates",
+    getByCompanyId = "/tabletemplates/companies/{cid}",
+    getByDocumentId = "/tabletemplates/d/{did}",
+    getTableTemplate = "/tabletemplates/{tid}",
+    deleteTableTemplate = "/tabletemplates/{tid}",
+    getActionItems = "/tasks",
+    createTask = "/tasks",
+    getTask = "/tasks/{tid}",
+    updateTask = "/tasks/{tid}",
+    transitionTask = "/tasks/{tid}/{transition}",
+    find = "/teams",
+    getTeam = "/teams/{tid}",
+    getMembers = "/teams/{tid}/members",
+    getThumbnailForDocument = "/thumbnails/d/{did}",
+    getThumbnailForDocumentAndVersion = "/thumbnails/d/{did}/v/{vid}",
+    getDocumentThumbnail = "/thumbnails/d/{did}/w/{wid}",
+    getElementThumbnailWithApiConfiguration = "/thumbnails/d/{did}/w/{wid}/e/{eid}/ac/{cid}/s/{sz}",
+    getDocumentThumbnailWithSize = "/thumbnails/d/{did}/w/{wid}/s/{sz}",
+    getElementThumbnail = "/thumbnails/d/{did}/{wv}/{wvid}/e/{eid}",
+    setApplicationElementThumbnail = "/thumbnails/d/{did}/{wv}/{wvid}/e/{eid}",
+    deleteApplicationThumbnails = "/thumbnails/d/{did}/{wv}/{wvid}/e/{eid}",
+    getElementThumbnailWithSize = "/thumbnails/d/{did}/{wv}/{wvid}/e/{eid}/s/{sz}",
+    getThumbnailForDocumentOld = "/thumbnails/document/{did}",
+    getThumbnailForDocumentAndVersionOld = "/thumbnails/document/{did}/version/{vid}",
+    getDocumentTranslations = "/translations/d/{did}",
+    createTranslation = "/translations/d/{did}/w/{wid}",
+    getAllTranslatorFormats = "/translations/translationformats",
+    getTranslation = "/translations/{tid}",
+    deleteTranslation = "/translations/{tid}",
+    session = "/users/session",
+    sessionInfo = "/users/sessioninfo",
+    getUserSettingsCurrentLoggedInUser = "/users/settings",
+    getUserSettings = "/users/{uid}/settings",
+    setVariables = "/variables/d/{did}/w/{wid}/e/{eid}/variables",
+    setVariableStudioReferences = "/variables/d/{did}/w/{wid}/e/{eid}/variablestudioreferences",
+    setVariableStudioScope = "/variables/d/{did}/w/{wid}/e/{eid}/variablestudioscope",
+    createVariableStudio = "/variables/d/{did}/w/{wid}/variablestudio",
+    getVariables = "/variables/d/{did}/{wv}/{wvid}/e/{eid}/variables",
+    getVariableStudioReferences = "/variables/d/{did}/{wv}/{wvid}/e/{eid}/variablestudioreferences",
+    getVariableStudioScope = "/variables/d/{did}/{wv}/{wvid}/e/{eid}/variablestudioscope",
+    getAllVersions = "/versions",
+    getWebhooks = "/webhooks",
+    createWebhook = "/webhooks",
+    getWebhook = "/webhooks/{webhookid}",
+    updateWebhook = "/webhooks/{webhookid}",
+    unregisterWebhook = "/webhooks/{webhookid}",
+    pingWebhook = "/webhooks/{webhookid}/ping",
+    getActiveWorkflows = "/workflow/active",
+    getAllowedApprovers = "/workflow/c/{companyId}/approvers",
+    enumerateObjectWorkflows = "/workflow/companies/{cid}/objects",
+    getWorkflowById = "/workflow/obj/{objectId}",
+    getAuditLog = "/workflow/obj/{objectId}/auditlog"
+}

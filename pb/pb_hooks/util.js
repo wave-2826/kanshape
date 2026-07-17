@@ -13,7 +13,18 @@ function parseJSONFile(path) {
     return parseJSON($os.readFile(path));
 }
 
+/**
+ * @param {number} mode 
+ * @returns fs.FileMode
+ */
+function fileMode(mode) {
+    return /** @type os.FileMode */(/** @type unknown */(0o755));
+}
+fileMode.rwx = fileMode(0o755);
+fileMode.rw = fileMode(0o644);
+
 module.exports = {
     parseJSON,
-    parseJSONFile
+    parseJSONFile,
+    fileMode
 };

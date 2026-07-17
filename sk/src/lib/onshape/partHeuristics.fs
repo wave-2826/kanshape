@@ -394,7 +394,7 @@ function(tl_context is Context, queries) {
 
     //         for(var body in evaluateQuery(context, definition.body)) {
     //             var res = rpa(context, body, T, lambda);   
-    //             opMateConnector(context, id + "_" + transientQueriesToStrings([ body ])[0] + "principalFrame", {
+    //             opMateConnector(context, id ~ "_" ~ transientQueriesToStrings([ body ])[0] ~ "principalFrame", {
     //                 "coordSystem" : res.cs,
     //                 "owner"       : body
     //             });
@@ -417,7 +417,7 @@ function(tl_context is Context, queries) {
     //         for(var body in evaluateQuery(context, definition.body)) {
     //             const frame = inertialFrame(context, body);
         
-    //             opMateConnector(context, id + "_" + transientQueriesToStrings([body])[0] + "inertialFrame", {
+    //             opMateConnector(context, id ~ "_" ~ transientQueriesToStrings([body])[0] ~ "inertialFrame", {
     //                 "coordSystem": frame.cs,
     //                 "owner" : body
     //             });
@@ -504,19 +504,27 @@ function(tl_context is Context, queries) {
         // This is getting hacky, but it works for every part I've tried!
 
         const inertialFrame = inertialFrame(context, body);
-        const rpaFrame = rpa(context, body, 50, 2.5);
         const pctFrame = pctFrame(context, body);
 
         const inertialFaces = testAxisType(context, body, inertialFrame.cs);
-        const rpaFaces = testAxisType(context, body, rpaFrame.cs);
         const pctFaces = testAxisType(context, body, pctFrame.cs);
 
         const outlierFrame = inertialFaces != undefined ? calculateOutlierCs(context, inertialFaces.bbox, inertialFrame.cs) : undefined;
         const outlierFaces = outlierFrame != undefined ? testAxisType(context, body, outlierFrame) : undefined;
 
-        var candidates = [ inertialFaces, outlierFaces, rpaFaces, pctFaces ];
+        var candidates = [ inertialFaces, outlierFaces, pctFaces ];
         candidates = filter(candidates, function(c) { return c != undefined; });
-        if(size(candidates) == 0) return undefined;
+        if(size(candidates) == 0) {
+            // rpa is slow, so we use it as a fallback. unfortunate, but necessary for
+            // reasonable performance.
+            const rpaFrame = rpa(context, body, 50, 2.5);
+            const rpaFaces = testAxisType(context, body, rpaFrame.cs);
+            if(rpaFaces == undefined) {
+                debug(context, "Failed to find end faces for part " ~ partID[0], DebugColor.RED);
+                return undefined;
+            }
+            candidates = [ rpaFaces ];
+        }
 
         // Pick the one with the widest end face separation as our best guess for the principal axis
         var best = candidates[0];
@@ -651,8 +659,8 @@ function(tl_context is Context, queries) {
     // );
 
     const results = evaluateQuery(tl_context, qOwnerBody(qTransient('{{selectionID}}')));
-    if(size(results) == 0) return undefined;
+    if(size(results) == 0) return { 'error': 'No body selected' };
     const body = results[0];
-    if(size(qBodyType(body, BodyType.SOLID)) == 0) return undefined;
+    if(size(qBodyType(body, BodyType.SOLID)) == 0) return { 'error': 'Selected body is not a solid' };
     return runHeuristics(tl_context, body);
 }

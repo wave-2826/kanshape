@@ -212,8 +212,8 @@ export const boardTypes: {
         description: "A board for manufacturing part tasks. Boards of this type are defaulted to when adding parts from Onshape and associate part IDs with all cards.",
         fields: {
             "onshape_part_id": {
-                name: "Linked part",
-                description: "The associated Onshape part",
+                name: "Linked part or assembly",
+                description: "The associated Onshape part or assembly",
                 allowsClearing: true,
                 type: { base: "onshape_part" }
             },

@@ -18,7 +18,7 @@
         try {
             const scene = new THREE.Scene();
         
-            const frustumSize = 1;
+            const frustumSize = 1.3;
             const aspect = canvas.clientWidth / canvas.clientHeight;
             const camera = new THREE.OrthographicCamera(
                 frustumSize * aspect / -2, frustumSize * aspect / 2,
@@ -56,13 +56,25 @@
             });
             resizeObserver.observe(canvas);
 
-            renderer.setAnimationLoop(() => {
-                controls.update();
-                renderer.render(scene, camera);
-            });
+            const intersectionObserver = new IntersectionObserver((entries) => {
+                for(const entry of entries) {
+                    if(entry.target === canvas) {
+                        if(entry.isIntersecting) {
+                            renderer.setAnimationLoop(() => {
+                                controls.update();
+                                renderer.render(scene, camera);
+                            });
+                        } else {
+                            renderer.setAnimationLoop(null);
+                        }
+                    }
+                }
+            }, { threshold: 0.1 });
+            intersectionObserver.observe(canvas);
 
             return () => {
                 resizeObserver.disconnect();
+                intersectionObserver.disconnect();
                 renderer.setAnimationLoop(null);
                 renderer.dispose();
             };

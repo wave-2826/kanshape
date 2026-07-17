@@ -36,7 +36,7 @@
         <option value="checkbox">Checkbox</option>
         <option value="url">URL</option>
         <option value="date">Date</option>
-        <option value="onshape_part">Onshape Part</option>
+        <option value="onshape_part">Onshape Part or Assembly</option>
         <option value="user">User(s)</option>
         <option value="group">Group(s)</option>
         <option value="file">File(s)</option>

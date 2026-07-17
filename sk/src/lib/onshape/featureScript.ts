@@ -86,6 +86,11 @@ export async function evalFeatureScript<T = any>(
         let data = data_ as EvalResponse;
         if(!data.result) {
             console.error("FeatureScript evaluation failed", data);
+            for(const notice of data.notices ?? []) {
+                if(notice.level === "ERROR") {
+                    console.error(`FeatureScript error: ${notice.message}`);
+                }
+            }
             return null;
         }
         return parseFSValue(data.result as FeatureScriptValue) as T;

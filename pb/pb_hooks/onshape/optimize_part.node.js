@@ -1,18 +1,38 @@
-// @ts-nocheck
+// @ts-check
 import fs from 'fs';
+import { WriteStream } from 'fs';
+import { createHash } from 'crypto';
+import path from 'path';
+/**
+ * @import { BTExportTessellatedFacesResponse, AssemblyData, PartModelHeader, AssemblyModelHeader } from "./part_types";
+ */
 
+const PART_HEADER_MAGIC = "ONSH"; // onsh is for... onshape, i guess?
+const ASSEMBLY_HEADER_MAGIC = "ONSA"; // onshape assembly... i guess
+
+/** @param {string | string[]} value */
 function decodeOnshapeColor(value) {
+    // i believe the onshape schema is wrong that it can be string[], but we check it nonetheless
+    if(Array.isArray(value)) value = value[0];
     const bytes = atob(value);
     const hex = (bytes.charCodeAt(0) << 16) | (bytes.charCodeAt(1) << 8) | bytes.charCodeAt(2);
     return hex;
 }
 
+/** @param {any} appearance */
 function materialKey(appearance) {
     if(!appearance) return "default";
     return `${appearance.color}-${appearance.opacity ?? 255}`;
 }
 
-/** encode 3D vector to 2*int8 octahedral normals */
+/**
+ * encode 3D vector to 2*int8 octahedral normals
+ * see 
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @returns {{u: number, v: number}} u, v in [0, 255]
+ */
 function encodeOct8(x, y, z) {
     const inv = 1.0 / (Math.abs(x) + Math.abs(y) + Math.abs(z));
 
@@ -20,8 +40,8 @@ function encodeOct8(x, y, z) {
     let v = y * inv;
     if(z < 0) {
         const ou = u;
-        u = (1 - Math.abs(v)) * Math.sign(ou);
-        v = (1 - Math.abs(ou)) * Math.sign(v);
+        u = (1 - Math.abs(v)) * (ou >= 0 ? 1 : -1);
+        v = (1 - Math.abs(ou)) * (v >= 0 ? 1 : -1);
     }
 
     return {
@@ -30,7 +50,17 @@ function encodeOct8(x, y, z) {
     };
 }
 
-function convertOnshapeToBinary(data, outputPath) {
+/**
+ * Converts Onshape data to binary format and writes to the specified stream
+ * @param {WriteStream} stream
+ * @param {BTExportTessellatedFacesResponse} data
+ * @returns {{ encodeScale: number }} the scale factor used for encoding positions
+ */
+function writePartBinary(stream, data) {
+    if(!data || !data.bodies || !data.facetPoints) {
+        throw new Error("Invalid Onshape data: missing bodies or facetPoints");
+    }
+
     const positions = [];
     const normals = [];
     const materialGroups = [];
@@ -97,7 +127,7 @@ function convertOnshapeToBinary(data, outputPath) {
                     const nx = n.x;
                     const ny = n.z;
                     const nz = -n.y;
-                    
+
                     normals.push(nx, ny, nz);
                 }
             }
@@ -117,7 +147,8 @@ function convertOnshapeToBinary(data, outputPath) {
     const centerY = (minY + maxY) / 2;
     const centerZ = (minZ + maxZ) / 2;
 
-    let maxAbs = 0; // furthest point from the center for scaling
+    let maxAbs = 0; // furthest point from the center in any axis for scaling
+    let maxEuclideanSq = 0; // furthest point from the center in euclidean distance for camera distance
     for(let i = 0; i < positions.length; i += 3) {
         positions[i] -= centerX;
         positions[i + 1] -= centerY;
@@ -128,6 +159,10 @@ function convertOnshapeToBinary(data, outputPath) {
             Math.abs(positions[i]), 
             Math.abs(positions[i + 1]), 
             Math.abs(positions[i + 2])
+        );
+        maxEuclideanSq = Math.max(
+            maxEuclideanSq,
+            positions[i] * positions[i] + positions[i + 1] * positions[i + 1] + positions[i + 2] * positions[i + 2]
         );
     }
 
@@ -149,27 +184,30 @@ function convertOnshapeToBinary(data, outputPath) {
 
     // quantize normals to 2*int8 (-128 to 127) since they don't need as much precision
     // since naive quantization of normals leads to artifacts, we use octahedral encoding
-    const quantizedNormals = new Int8Array(normals.length / 3 * 2);
+    const quantizedNormals = new Uint8Array(normals.length / 3 * 2);
     for(let i = 0; i < normals.length; i += 3) {
         const nx = normals[i];
         const ny = normals[i + 1];
         const nz = normals[i + 2];
         const { u, v } = encodeOct8(nx, ny, nz);
-        quantizedNormals[(i / 3) * 2] = u - 128; // shift to signed range
-        quantizedNormals[(i / 3) * 2 + 1] = v - 128; // shift to signed range
+        quantizedNormals[(i / 3) * 2] = u;
+        quantizedNormals[(i / 3) * 2 + 1] = v;
     }
 
     // json header
     const materialsArray = Array.from(materialMap.values());
     const hasTransparent = materialsArray.some(m => m.transparent);
+    /** @type {PartModelHeader} */
     const header = {
+        version: 1,
         materials: Array.from(materialMap.values()),
         groups: materialGroups,
-        hasTransparent: Array.from(materialMap.values()).some(m => m.transparent),
+        hasTransparent,
         boundingBoxSize,
         decodeScale,
         vertexCount: positions.length / 3,
-        hasNormals: normals.length > 0
+        hasNormals: normals.length > 0,
+        maxDistance: Math.sqrt(maxEuclideanSq)
     };
 
     let headerString = JSON.stringify(header);
@@ -182,26 +220,118 @@ function convertOnshapeToBinary(data, outputPath) {
     const headerBuffer = Buffer.from(headerString, 'utf-8');
 
     // full payload
-    const magic = Buffer.from("ONSH", 'utf-8');
+    const magic = Buffer.from(PART_HEADER_MAGIC, 'utf-8');
     const lengthBuffer = Buffer.alloc(4);
     lengthBuffer.writeUInt32LE(headerBuffer.length, 0);
 
-    const finalFile = Buffer.concat([
-        magic, 
-        lengthBuffer, 
-        headerBuffer, 
-        Buffer.from(quantizedPositions.buffer),
-        Buffer.from(quantizedNormals.buffer)
-    ]);
+    stream.write(magic);
+    stream.write(lengthBuffer);
+    stream.write(headerBuffer);
+    stream.write(Buffer.from(quantizedPositions.buffer));
+    stream.write(Buffer.from(quantizedNormals.buffer));
 
-    console.log("Final file size:", finalFile.length, "bytes");
+    console.log(`Element: ${data.elementId}`)
     console.log("- Header size:", headerBuffer.length, "bytes");
     console.log("- Positions size:", quantizedPositions.byteLength, "bytes");
     console.log("- Normals size:", quantizedNormals.byteLength, "bytes");
     console.log("- Materials count:", materialsArray.length);
     console.log("- Groups count:", materialGroups.length);
 
-    fs.writeFileSync(outputPath, finalFile);
+    return { encodeScale };
+}
+
+/**
+ * Get the data of the given part file.
+ * @param {string} dir The parent directory.
+ * @param {string} file The name of the file.
+ * @returns {BTExportTessellatedFacesResponse} content of the part file
+ */
+function getPartFile(dir, file) {
+    const filePath = `${dir}/${file}`;
+    if(!fs.existsSync(filePath)) {
+        throw new Error(`Part file not found: ${filePath}`);
+    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
+/**
+ * Encode a column-major 4x4 matrix representing a rigid transformation matrix as a
+ * compact 7-number representation. Since Onshape only uses rigid transformations,
+ * a full 4x4 matrix stores a lot of unnecessary data.
+ * @param {WriteStream} stream
+ * @param {number[]} transform
+ * @param {number} encodeScale
+ */
+function encodeTransformation(stream, transform, encodeScale) {
+    if(!transform || transform.length !== 16) {
+        throw new Error("Invalid transform matrix: must be a 4x4 matrix");
+    }
+
+    // encode translation as fixed-point int16
+    const quantizedTx = Math.round(transform[12] * encodeScale);
+    const quantizedTy = Math.round(transform[13] * encodeScale);
+    const quantizedTz = Math.round(transform[14] * encodeScale);
+
+    // encode rotation as single precision quaternion
+    
+}
+
+/**
+ * Write a binary assembly file for the given Onshape assembly data.  
+ * Finds all of the parts in the document and reads their respective files from their hashed path.  
+ * All hashed part json files should be the direct response from Onshape
+ * @param {WriteStream} stream
+ * @param {string} inputFile
+ * @param {AssemblyData} data
+ */
+function writeAssemblyBinary(stream, inputFile, data) {
+    if(!data || !data.parts) {
+        throw new Error("Invalid Onshape assembly data: missing parts");
+    }
+
+    // json header
+    /** @type {AssemblyModelHeader} */
+    const header = {
+        version: 1,
+        parts: data.parts.map(part => ({
+            // the rest of the data is in individual parts
+            count: part.transformations.length
+        }))
+    };
+
+    let headerString = JSON.stringify(header);
+    let headerByteLength = Buffer.byteLength(headerString, 'utf-8');
+    
+    // pad with spaces until the length is a multiple of 4 because javascript
+    const padding = (4 - (headerByteLength % 4)) % 4;
+    headerString += ' '.repeat(padding);
+    
+    const headerBuffer = Buffer.from(headerString, 'utf-8');
+
+    // full payload
+    const magic = Buffer.from(ASSEMBLY_HEADER_MAGIC, 'utf-8');
+    const lengthBuffer = Buffer.alloc(4);
+    lengthBuffer.writeUInt32LE(headerBuffer.length, 0);
+
+    stream.write(magic);
+    stream.write(lengthBuffer);
+    stream.write(headerBuffer);
+
+    console.log(`Assembly: ${inputFile}`)
+    console.log("- Header size:", headerBuffer.length, "bytes");
+    console.log("- Parts count:", data.parts.length);
+
+    // Write each individual part as:
+    // - normal part data
+    // - transformations (encoded)
+    const directory = path.dirname(inputFile);
+    for(const part of data.parts) {
+        if(!part.file) throw new Error(`Part ${part.partId} is missing file reference`);
+        const partData = getPartFile(directory, part.file);
+        const { encodeScale } = writePartBinary(stream, partData);
+
+        // write transformations
+    }
 }
 
 // entrypoint
@@ -213,6 +343,16 @@ if(process.argv.length < 4) {
 const inputPath = process.argv[2];
 const outputPath = process.argv[3];
 
+/** @type {BTExportTessellatedFacesResponse | AssemblyData} */
 const inputData = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
-console.log("Input size:", fs.statSync(inputPath).size, "bytes");
-convertOnshapeToBinary(inputData, outputPath);
+// btType
+if("btType" in inputData && inputData["btType"].startsWith("BTExportTessellatedFacesResponse")) {
+    console.log("Detected part input");
+    console.log("Input size:", fs.statSync(inputPath).size, "bytes");
+    writePartBinary(fs.createWriteStream(outputPath), inputData);
+} else if("type" in inputData && inputData["type"] === "assembly") {
+    console.log("Detected assembly input");
+    writeAssemblyBinary(fs.createWriteStream(outputPath), inputPath, inputData);
+} else {
+    console.error("Unknown input data type. Expected BTExportTessellatedFacesResponse or BTAssemblyDefinitionInfo.");
+}

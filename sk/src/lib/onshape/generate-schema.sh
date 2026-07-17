@@ -1,0 +1,1 @@
+npx openapi-typescript https://api.onshape.com/api/v16/openapi -o ./schema.d.ts --properties-required-by-default --make-paths-enum --array-length

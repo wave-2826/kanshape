@@ -39,15 +39,17 @@
     // TODO: all the alerts in here should be error popups in the UI instead of alert()
     async function getPartSelection(): Promise<{
         wvm: "w" | "v" | "m";
+        type: "part" | "assembly";
         wvmId: string;
         documentId: string;
         elementId: string;
-        partId: string;
+        partId?: string;
     } | null> {
         if(onshapeCtx.location === "right-panel-part-studio" || onshapeCtx.location === "right-panel-assembly") {
             const selections = await onshapeCtx.client?.requestSelection("Select a part to create a card for.", ["BODY"]);
             return selections && selections.length > 0 ? {
                 wvm: onshapeCtx.wvm ?? "w",
+                type: "part",
                 wvmId: onshapeCtx.wvmId ?? "",
                 documentId: onshapeCtx.documentId ?? "",
                 elementId: onshapeCtx.partStudioId ?? "",
@@ -59,7 +61,6 @@
                 selectParts: true
             });
             if(!selection) return null;
-
             console.log("Onshape selection:", selection);
 
             // sanity checks
@@ -75,12 +76,12 @@
             if(selection.isComposite) {
                 // probably fine. uh, maybe
             }
-            if(selection.elementType !== "partstudio" || !selection.elementId) {
-                alert("Please select a part from a part studio.");
+            if((selection.elementType !== "partstudio" || !selection.elementId) && selection.elementType !== "assembly") {
+                alert("Please select a part from a part studio or assembly.");
                 return null;
             }
             if(selection.itemType !== "part") {
-                alert("Please select a part, not a part studio or assembly.");
+                alert("Please select a part, not a part studio.");
                 return null;
             }
 
@@ -92,12 +93,12 @@
 
             let elementId = selection.elementId;
             if(!elementId) {
-                alert("No part studio found for selected part.");
+                alert("No part studio or assembly found for selected item.");
                 return null;
             }
 
             let partId = selection.idTag;
-            if(!partId) {
+            if(selection.itemType === "part" && !partId) {
                 alert("No part found for selected part (???).");
                 return null;
             }
@@ -118,7 +119,14 @@
                 // still return the part
             }
 
-            return { wvm, wvmId, documentId, elementId, partId };
+            return {
+                type: selection.elementType === "partstudio" ? "part" : "assembly",
+                wvm,
+                wvmId,
+                documentId,
+                elementId,
+                partId
+            };
         }
         return null;
     }
@@ -131,22 +139,34 @@
 
         console.log("Selected part:", sel);
 
-        // Run part heuristics
-        const heuristics = await getPartHeuristics(sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
-        if(!heuristics) {
-            alert("Failed to gather part heuristics. Please try again.");
-            return;
-        }
-        sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
-
-        console.log("Collected part heuristics:", heuristics);
-
-        // Make sure there isn't already a part with this ID in the database
-        const existing = await query(Collections.Parts, {
+        let existing = await query(Collections.Parts, {
             filter: `part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
         }).catch(() => null);
-
         console.log("Existing parts in database:", existing);
+
+        // Run part heuristics
+        let partData;
+        if(sel.type === "part" && sel.partId) {
+            const heuristics = await getPartHeuristics(sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
+            if(!heuristics || "error" in heuristics) {
+                alert(`Failed to gather part heuristics: ${
+                    heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
+                }. Please try again.`);
+                return;
+            }
+            partData = heuristics;
+
+            sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
+    
+            // check again after heuristic id detection
+            if(!existing || existing.length === 0) existing = await query(Collections.Parts, {
+                filter: `part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+            }).catch(() => null);
+    
+            console.log("Existing parts in database:", existing);
+        } else {
+
+        }
 
         let record: PartsResponse | null = null;
         if(existing && existing.length > 0) {
@@ -163,7 +183,7 @@
                 wvm: sel.wvm,
                 wvm_id: sel.wvmId,
                 current_card: cardId,
-                part_heuristic_result: heuristics,
+                part_data: partData,
                 past_revision_cards,
                 revision: existing[0].revision + 1
             }, { create: false });
@@ -176,7 +196,7 @@
                 wvm: sel.wvm,
                 wvm_id: sel.wvmId,
                 current_card: cardId,
-                part_heuristic_result: heuristics,
+                part_data: partData,
                 past_revision_cards: [],
                 revision: 1
             }, { create: true });
@@ -202,11 +222,11 @@
 
 <Portal target="[data-modal-target]">
     <div class="modal-preview">
-        <Modal bind:this={expandedModal} id="part-preview-modal">
+        <Modal bind:this={expandedModal} id="part-preview-modal-{part?.id ?? ""}">
             {#if part !== null}
                 <div class="part-info">
-                    <span class="name">{part.part_heuristic_result?.name ?? "Unknown"}</span>
-                    <span class="number">{part.part_heuristic_result?.part_number ?? ""}</span>
+                    <span class="name">{part.part_data?.name ?? "Unknown"}</span>
+                    <span class="number">{part.part_data?.part_number ?? ""}</span>
                 </div>
                 {@const canOpenInTab = onshapeCtx.onOnshape && onshapeCtx.documentId === part.document_id}
                 <button class="open" onclick={() => {
@@ -236,15 +256,16 @@
     {#if part !== null}
         <button class="part" onclick={(e) => {
             if(e.target instanceof HTMLElement && e.target.closest("[data-part-preview]")) return;
-            expandedModal?.open()
+            expandedModal?.open();
         }}>
+            <span class="part-type">{part.type === "part" ? "Part" : "Assembly"}</span>
             <div class="preview" data-part-preview>
                 <!-- holy fetch waterfall -->
                 <PartPreviewRenderer {part} />
             </div>
-            <div class="part-name">{part.part_heuristic_result?.name ?? "Unknown"}</div>
-            <div class="part-id">{part.part_id}</div>
-            <div class="part-number">{part.part_heuristic_result?.part_number ?? ""}</div>
+            <span class="part-name">{part.part_data?.name ?? "Unknown"}</span>
+            <span class="part-number">{part.part_data?.part_number ?? ""}</span>
+            <span class="part-id">{part.part_id}</span>
         </button>
     {:else}
         <div class="part missing">Loading part...</div>
@@ -280,14 +301,14 @@
 
 .part {
     display: grid;
-    grid-template-rows: 0.25rem 1rem 1rem 0.25rem; // ""padding""
+    grid-template-rows: 1.25rem 1rem 1rem 0.25rem; // ""padding""
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
-        "preview . ."
+        "preview type type"
         "preview name name"
         "preview number id"
         "preview . .";
-    gap: 0.5rem;
+    gap: 0.25rem 0.5rem;
     position: relative;
 
     text-align: left;
@@ -304,6 +325,12 @@
         aspect-ratio: 1 / 1;
     }
 
+    .part-type {
+        grid-area: type;
+        font-size: var(--font-tiny);
+        color: var(--text-tertiary);
+        align-self: end;
+    }
     .part-name {
         grid-area: name;
         font-weight: bold;
@@ -311,6 +338,7 @@
     .part-number {
         grid-area: number;
         font-size: var(--font-small);
+        color: var(--text-secondary);
     }
     .part-id {
         grid-area: id;

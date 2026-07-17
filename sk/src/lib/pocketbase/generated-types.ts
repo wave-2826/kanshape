@@ -371,17 +371,24 @@ export const PartsWvmOptions = {
 	"m": "m",
 } as const
 export type PartsWvmOptions = typeof PartsWvmOptions[keyof typeof PartsWvmOptions]
-export type PartsRecord<Tpart_heuristic_result = unknown> = {
+
+export const PartsTypeOptions = {
+	"part": "part",
+	"assembly": "assembly",
+} as const
+export type PartsTypeOptions = typeof PartsTypeOptions[keyof typeof PartsTypeOptions]
+export type PartsRecord<Tpart_data = unknown> = {
 	created: IsoAutoDateString
 	current_card?: RecordIdString
 	document_id: string
 	element_id: string
 	id: string
-	part_heuristic_result?: null | Tpart_heuristic_result
-	part_id: string
+	part_data?: null | Tpart_data
+	part_id?: string
 	past_revision_cards?: RecordIdString[]
 	preview_model?: FileNameString
 	revision?: number
+	type?: PartsTypeOptions
 	updated: IsoAutoDateString
 	wvm: PartsWvmOptions
 	wvm_id: string
@@ -482,7 +489,7 @@ export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord>
 export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransactionsRecord> & BaseSystemFields<Texpand>
 export type OnshapeApiCacheResponse<Tbody = unknown, Theaders = unknown, Texpand = unknown> = Required<OnshapeApiCacheRecord<Tbody, Theaders>> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
-export type PartsResponse<Tpart_heuristic_result = unknown, Texpand = unknown> = Required<PartsRecord<Tpart_heuristic_result>> & BaseSystemFields<Texpand>
+export type PartsResponse<Tpart_data = unknown, Texpand = unknown> = Required<PartsRecord<Tpart_data>> & BaseSystemFields<Texpand>
 export type ProjectOverviewResponse<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<ProjectOverviewRecord<Tboards, Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count, Tsubprojects>> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
 export type SectionsResponse<Texpand = unknown> = Required<SectionsRecord> & BaseSystemFields<Texpand>

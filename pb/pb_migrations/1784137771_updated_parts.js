@@ -2,27 +2,10 @@
 migrate((app) => {
   const collection = app.findCollectionByNameOrId("pbc_2718308629")
 
-  // add field
-  collection.fields.addAt(11, new Field({
-    "help": "",
-    "hidden": false,
-    "id": "select2363381545",
-    "maxSelect": 0,
-    "name": "type",
-    "presentable": false,
-    "required": false,
-    "system": false,
-    "type": "select",
-    "values": [
-      "part",
-      "assembly"
-    ]
-  }))
-
   // update field
   collection.fields.addAt(3, new Field({
     "autogeneratePattern": "",
-    "help": "Onshape internal part ID",
+    "help": "Onshape internal part ID. Unset for assemblies.",
     "hidden": false,
     "id": "text1289964524",
     "max": 0,
@@ -36,19 +19,9 @@ migrate((app) => {
     "type": "text"
   }))
 
-  app.save(collection);
-
-  // set the type of all existing parts to "part"
-  const parts = app.findAllRecords(collection);
-  for (const part of parts) {
-    part.set("type", "part");
-    app.save(part);
-  }
+  return app.save(collection)
 }, (app) => {
   const collection = app.findCollectionByNameOrId("pbc_2718308629")
-
-  // remove field
-  collection.fields.removeById("select2363381545")
 
   // update field
   collection.fields.addAt(3, new Field({
@@ -62,7 +35,7 @@ migrate((app) => {
     "pattern": "",
     "presentable": false,
     "primaryKey": false,
-    "required": true,
+    "required": false,
     "system": false,
     "type": "text"
   }))

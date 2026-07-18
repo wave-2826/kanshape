@@ -57,6 +57,9 @@ importers:
       svelte-check:
         specifier: ^4.4.8
         version: 4.4.8(picomatch@4.0.4)(svelte@5.55.5)(typescript@5.9.3)
+      svelte-css-rune:
+        specifier: ^0.3.0
+        version: 0.3.0(svelte@5.55.5)
       svelte-preprocess:
         specifier: ^6.0.3
         version: 6.0.3(postcss@8.5.14)(sass@1.99.0)(svelte@5.55.5)(typescript@5.9.3)
@@ -984,6 +987,11 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
+
+  svelte-css-rune@0.3.0:
+    resolution: {integrity: sha512-Cap2cE11oxBJA0RqN1r4BSbCRLQXHXd1ikrpSvMDYFnX97vdMk/AFaoSBf0nWXDGlS39zjZclyepi/Ix6h+vGA==}
+    peerDependencies:
+      svelte: 5.x
 
   svelte-preprocess@6.0.3:
     resolution: {integrity: sha512-PLG2k05qHdhmRG7zR/dyo5qKvakhm8IJ+hD2eFRQmMLHp7X3eJnjeupUtvuRpbNiF31RjVw45W+abDwHEmP5OA==}
@@ -1950,6 +1958,11 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-css-rune@0.3.0(svelte@5.55.5):
+    dependencies:
+      magic-string: 0.30.21
+      svelte: 5.55.5
 
   svelte-preprocess@6.0.3(postcss@8.5.14)(sass@1.99.0)(svelte@5.55.5)(typescript@5.9.3):
     dependencies:

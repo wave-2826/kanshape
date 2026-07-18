@@ -4,13 +4,14 @@
     import { onDestroy, type Snippet } from "svelte";
     import { fade, fly } from "svelte/transition";
 
-    const { id, children, forceOpen = false }: {
+    const { id, children, forceOpen = false, class: _class = "" }: {
         id: string,
         children: Snippet<[{
             open: () => void,
             close: () => void
         }]>,
-        forceOpen?: boolean
+        forceOpen?: boolean,
+        class?: string
     } = $props();
 
     const openKey = $derived(`modal-${id}-open`);
@@ -48,7 +49,7 @@
         close();
     }
 }} transition:fade={{ duration: 100 }}>
-    <dialog class="modal" open transition:fly={{ duration: 250, y: -20 }} closedby="none">
+    <dialog class={_class} open transition:fly={{ duration: 250, y: -20 }} closedby="none">
         {@render children({ open, close })}
     </dialog>
 </div>

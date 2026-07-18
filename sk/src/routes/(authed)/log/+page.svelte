@@ -28,7 +28,7 @@
                             alert("Failed to clear activity log.");
                         });
                     }
-                }} class="clear-log"><Trash /> Clear log</button>
+                }} class="clear-log"><Trash class={$css("icon")} /> Clear log</button>
             {/if}
         </header>
         {#if $changes.items.length > 0}
@@ -70,7 +70,7 @@ header {
         justify-self: end;
         color: var(--error);
 
-        :global(svg) {
+        .icon {
             width: 1em;
             height: 1em;
         }

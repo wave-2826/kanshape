@@ -20,7 +20,7 @@
 <header>
     {#if loading}
         <p>Loading...</p>
-        <LoaderCircle class="animate-spin" />
+        <LoaderCircle class={$css("animate-spin")} />
     {:else if selectedIDs && selectedIDs.length > 0}
         <p>
             Entity selected.
@@ -71,7 +71,7 @@ header {
         white-space: nowrap;
     }
 
-    :global(.animate-spin) {
+    .animate-spin {
         animation: spin 1s linear infinite;
     }
 }

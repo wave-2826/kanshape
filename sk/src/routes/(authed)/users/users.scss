@@ -30,7 +30,7 @@ tr {
     padding: 0.25rem 0.5rem;
     gap: var(--table-gap);
 }
-:global(tbody) tr:nth-child(odd) {
+tbody tr:nth-child(odd) {
     background-color: var(--bg-secondary);
 }
 

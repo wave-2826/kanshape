@@ -78,17 +78,21 @@
                         nav(`/projects/${task.project_id}/boards/${task.board_id}`);
                     }} class:critical={task.priority === "critical"}>
                         <span class="path">
-                            <Folder />
+                            <Folder class={$css("icon")} />
                             <span style="color: {task.project_color ?? "var(--text-primary)"}">{task.project_title}</span> /
                             <span style="color: {task.project_color ?? "var(--text-primary)"}">{task.board_title}</span> /
                             <span style="color: {task.section_color ?? "var(--text-primary)"}">{task.section_title}</span>
                         </span>
                         <span class="title">{task.title}</span>
                         {#if task.priority && task.priority !== "low"}
-                            <span class="priority" style="color: {getPriorityColor(task.priority)}"><Flag /> {task.priority}</span>
+                            <span class="priority" style="color: {getPriorityColor(task.priority)}">
+                                <Flag class={$css("icon")} /> {task.priority}
+                            </span>
                         {/if}
                         {#if task.due_by}
-                            <span class="due" class:overdue={new Date(task.due_by) < new Date()}><Clock /> Due {relativeTime(new Date(task.due_by))}</span>
+                            <span class="due" class:overdue={new Date(task.due_by) < new Date()}>
+                                <Clock class={$css("icon")} /> Due {relativeTime(new Date(task.due_by))}
+                            </span>
                         {/if}
                     </button>
                 {/each}
@@ -147,19 +151,19 @@
                         <ul>
                             {#each project.boards as board}
                                 <!-- todo: link to board -->
-                                <li><a href="/projects/{project.id}/boards/{board.id}"><Kanban /> {board.title}</a></li>
+                                <li><a href="/projects/{project.id}/boards/{board.id}"><Kanban class={$css("icon")} /> {board.title}</a></li>
                             {/each}
                         </ul>
                         <ul>
                             {#each project.subprojects as subproject}
                                 <!-- todo: link to subproject -->
-                                <li><a href="/projects/{project.id}/subprojects/{subproject.id}"><Tag /> {subproject.name}</a></li>
+                                <li><a href="/projects/{project.id}/subprojects/{subproject.id}"><Tag class={$css("icon")} /> {subproject.name}</a></li>
                             {/each}
                         </ul>
                         {#if project.overdue_card_count > 0}
-                            <span class="due overdue"><Clock /> {project.overdue_card_count} overdue</span>
+                            <span class="due overdue"><Clock class={$css("icon")} /> {project.overdue_card_count} overdue</span>
                         {:else if project.next_due}
-                            <span class="due"><Clock /> next due {relativeTime(new Date(project.next_due))}</span>
+                            <span class="due"><Clock class={$css("icon")} /> next due {relativeTime(new Date(project.next_due))}</span>
                         {/if}
                     </div>
                 {/each}
@@ -192,6 +196,11 @@
     max-height: 100%;
 }
 
+.icon {
+    width: 0.8em;
+    height: 0.8em;
+}
+
 .card {
     display: grid;
     grid-template-rows: 1.125rem auto;
@@ -219,11 +228,6 @@
         gap: 0.25rem;
         white-space: nowrap;
         overflow: hidden;
-
-        :global(svg) {
-            width: 0.8em;
-            height: 0.8em;
-        }
     }
 
     .title {
@@ -242,11 +246,6 @@
         align-self: flex-start;
         color: var(--text-secondary);
         font-size: var(--font-small);
-
-        :global(svg) {
-            width: 0.8em;
-            height: 0.8em;
-        }
     }
 
     .overdue {
@@ -299,9 +298,7 @@
             align-items: center;
             gap: 0.25rem;
 
-            :global(svg) {
-                width: 0.8em;
-                height: 0.8em;
+            .icon {
                 color: var(--text-secondary);
             }
         }

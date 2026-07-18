@@ -11,17 +11,17 @@
 
 {#if linkedProject && linkedProject.type !== LinkedProjectType.Unregistered && documentId}
     <div class="onshape-header">
-        <PopoverButton class="linked-project">
+        <PopoverButton class={$css("linked-project")}>
             <!-- TODO: we can store this ourselves -->
             <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
             
             {#if linkedProject.type === LinkedProjectType.Unlinked}
-                <Unlink /> Unlinked
+                <Unlink class={$css("icon")} /> Unlinked
             {:else}
-                <Link /> Linked
+                <Link class={$css("icon")} /> Linked
             {/if}
 
-            <ChevronDown />
+            <ChevronDown class={$css("icon")} />
 
             {#snippet content()}
                 <div class="popover-content">
@@ -42,7 +42,7 @@
                     <button onclick={() => {
                         deleteRecord(Collections.OnshapeDocuments, documentId);
                     }} title="Allows you to select a new project or subproject to link">
-                        <Unlink />{linkedProject.type === LinkedProjectType.Unlinked ? "Relink" : "Unlink"}
+                        <Unlink class={$css("icon")} />{linkedProject.type === LinkedProjectType.Unlinked ? "Relink" : "Unlink"}
                     </button>
                 </div>
             {/snippet}
@@ -57,13 +57,13 @@
     img {
         vertical-align: middle;
     }
-    :global(svg) {
+    .icon {
         width: 1em;
         height: 1em;
         color: var(--text-secondary);
     }
     
-    :global(.linked-project) {
+    .linked-project {
         font-size: var(--font-small);
 
         display: flex;
@@ -74,7 +74,6 @@
         padding: 0.25em 0.5em;
         border-radius: 4px;
     }
-
 }
 
 .name {

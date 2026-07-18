@@ -105,7 +105,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     <div class="files">
         {#snippet capsule(file: MetadataFile)}
             <div class="file-capsule">
-                <FileIcon />
+                <FileIcon class={$css("file-icon")} />
                 <a
                     href={getFileUrl(file as MetadataFile)}
                     target="_blank"
@@ -266,7 +266,7 @@ cases where the expected type doesn't match the value type by displaying a reset
             a {
                 color: var(--text-primary);
             }
-            > :global(svg) {
+            .file-icon {
                 width: 1em;
                 height: 1em;
                 margin-right: 0.25rem;

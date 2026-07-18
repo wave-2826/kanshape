@@ -191,7 +191,7 @@
                     {@const categoryColors = ["#ff6e64", "#ffb473", "#ffdc73", "#deff73", "#73ff9e", "#73fff0", "#73b3ff", "#b473ff", "#ff73f0"]}
                     <div class:category={category.name !== ""} style="--category-color: {category.color ?? categoryColors[i % categoryColors.length]}">
                         {#if category.name !== ""}
-                            <span class="label-col category-label"><Tag />{category.name}</span>
+                            <span class="label-col category-label"><Tag class={$css("category-tag")} />{category.name}</span>
                         {/if}
                         {#each category.items as item (item.id)}
                             <div class="row">
@@ -383,12 +383,11 @@ button {
         color: var(--text-primary);
 
         border-left: 1px solid var(--category-color);
-
-        > :global(svg) {
-            width: 0.75rem;
-            height: 0.75rem;
-            margin-right: 0.25rem;
-        }
+    }
+    .category-tag {
+        width: 0.75rem;
+        height: 0.75rem;
+        margin-right: 0.25rem;
     }
 }
 

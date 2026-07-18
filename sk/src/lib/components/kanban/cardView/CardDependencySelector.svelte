@@ -29,7 +29,7 @@
             <div class="dependency">
                 <button class="remove-dependency" onclick={() => {
                     dependencies = dependencies.filter((id) => id !== depId);
-                }} aria-label="Remove dependency"><Trash /></button>
+                }} aria-label="Remove dependency"><Trash class={$css("remove")} /></button>
                 <KanbanListEntry {card} {subprojects} onclick={() => {
                     onopendependency?.(card.id);
                 }} />
@@ -68,7 +68,7 @@
 }
 .remove-dependency {
     padding: 0.25rem;
-    > :global(svg) {
+    .remove {
         width: 1em;
         height: 1em;
     }

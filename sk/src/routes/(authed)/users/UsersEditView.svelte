@@ -56,7 +56,7 @@
             </div>
 
             <div class="field">
-                <dt>Verified <span class="info" title="This doesn't mean much except that they have a valid oauth method or signed in with email and verified"><Info /></span></dt>
+                <dt>Verified <span class="info" title="This doesn't mean much except that they have a valid oauth method or signed in with email and verified"><Info class={$css("info-icon")}/></span></dt>
                 <dd class:active={user.verified} class="boolean">{user.verified ? "Yes" : "No"}</dd>
             </div>
 
@@ -146,7 +146,7 @@ dl {
         color: var(--text-secondary);
     }
 
-    .info :global(svg) {
+    .info .info-icon {
         width: 1em;
         height: 1em;
         margin-left: 0.25rem;

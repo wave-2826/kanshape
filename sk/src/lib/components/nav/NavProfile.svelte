@@ -9,41 +9,35 @@
 </script>
 
 {#if $authModel}
-    <div class="nav-profile">
-        <!-- TODO: better hint than title text, especially for when collapsed -->
-        <PopoverButton title="{$authModel.name || $authModel.email || "Unknown User"}
-    Name or avatar changed? Sign out and back in to refresh.">
-            {#if $authModel.avatar}
-                <img class="avatar" src={client.files.getUrl($authModel, $authModel.avatar, { thumb: '100x100' })} alt="Avatar" />
-            {:else}
-                <div class="avatar fallback">
-                    <User />
-                </div>
-            {/if}
-            {#if !collapsed}
-                <span class="name">{$authModel.name || $authModel.email || "Unknown User"}</span>
-            {/if}
+    <!-- TODO: better hint than title text, especially for when collapsed -->
+    <PopoverButton title="{$authModel.name || $authModel.email || "Unknown User"}
+Name or avatar changed? Sign out and back in to refresh." class={$css("profile-button")}>
+        {#if $authModel.avatar}
+            <img class="avatar" src={client.files.getUrl($authModel, $authModel.avatar, { thumb: '100x100' })} alt="Avatar" />
+        {:else}
+            <div class="avatar fallback">
+                <User class={$css("icon")} />
+            </div>
+        {/if}
+        {#if !collapsed}
+            <span class="name">{$authModel.name || $authModel.email || "Unknown User"}</span>
+        {/if}
 
-            {#snippet content()}
-                <UserProfilePopover />
-            {/snippet}
-        </PopoverButton>
-    </div>
+        {#snippet content()}
+            <UserProfilePopover />
+        {/snippet}
+    </PopoverButton>
 {/if}
 
 <style lang="scss">
-.nav-profile {
-    display: content;
-    
-    > :global(button) {
-        --bg-color: transparent;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--text-primary);
-        font-size: var(--font-text);
-    }
+.profile-button {
+    --bg-color: transparent;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-size: var(--font-text);
 }
 
 .avatar {
@@ -59,7 +53,7 @@
         justify-content: center;
         background-color: var(--bg-secondary);
 
-        :global(svg) {
+        .icon {
             width: 1.1em;
             height: 1.1em;
             color: var(--text-secondary);

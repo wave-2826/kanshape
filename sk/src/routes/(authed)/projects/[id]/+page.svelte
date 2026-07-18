@@ -84,7 +84,7 @@
                             <div class="button board" use:link={`/projects/${$project.id}/boards/${board.id}`}>
                                 <h3>{board.title}</h3>
                                 <div class="nav">
-                                    <BoardButtons projectId={$project.id} boardId={board.id} />
+                                    <BoardButtons projectId={$project.id} boardId={board.id} buttonClass={$css("nav-button")} />
                                 </div>
                                 
                                 <div class="info">
@@ -217,7 +217,7 @@
         justify-self: end;
         margin-bottom: -0.25rem;
 
-        > :global(button) {
+        .nav-button {
             padding: 0.25rem 0.5rem;
         }
     }

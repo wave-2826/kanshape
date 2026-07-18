@@ -87,7 +87,7 @@
                     onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
                 />
                 <span class="url-text">{@render url(urlParts)}</span>
-                <ExternalLink />
+                <ExternalLink class={$css("link-icon")} />
             </a>
         {:else}
             <span class="placeholder">No URL</span>
@@ -139,7 +139,7 @@
         min-width: 0;
         padding-left: 0.5rem;
 
-        > :global(svg) {
+        .link-icon {
             vertical-align: center;
             width: 1em;
             height: 1em;

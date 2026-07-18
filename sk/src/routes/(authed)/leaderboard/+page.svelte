@@ -54,7 +54,7 @@
                 class:selected={selectedProjectId === null}
                 onclick={() => selectedProjectId = null}
             >
-                <Globe /> Global
+                <Globe class={$css("icon")} /> Global
             </button>
             {#if $projects}
                 {#each $projects.items as project}
@@ -64,7 +64,7 @@
                         onclick={() => selectedProjectId = project.id}
                         style={project.color ? `color: ${project.color}` : ""}
                     >
-                        <Folder /> {project.title}
+                        <Folder class={$css("icon")} /> {project.title}
                     </button>
                 {/each}
             {/if}
@@ -90,9 +90,9 @@
                         <!-- TODO: link to user profiles or something -->
                         <div class="entry" class:current-user={isCurrentUser} class:top-three={i < 3}>
                             <div class="rank {getRankClass(i)}">
-                                {#if i === 0}<Trophy />
-                                {:else if i === 1}<Medal />
-                                {:else if i === 2}<Medal />
+                                {#if i === 0}<Trophy class={$css("icon")} />
+                                {:else if i === 1}<Medal class={$css("icon")} />
+                                {:else if i === 2}<Medal class={$css("icon")} />
                                 {:else}#{i + 1}
                                 {/if}
                             </div>
@@ -148,7 +148,7 @@ header {
             color: var(--text-primary);
         }
     
-        :global(svg) {
+        .icon {
             width: 1em;
             height: 1em;
         }
@@ -204,9 +204,9 @@ header {
 
     &.top-three {
         .rank {
-            &.gold :global(svg) { color: #ffd700; }
-            &.silver :global(svg) { color: #c0c0c0; }
-            &.bronze :global(svg) { color: #cd7f32; }
+            &.gold .icon { color: #ffd700; }
+            &.silver .icon { color: #c0c0c0; }
+            &.bronze .icon { color: #cd7f32; }
         }
 
         .stat-label {
@@ -244,7 +244,7 @@ header {
     font-size: var(--font-medium);
     color: var(--text-secondary);
 
-    :global(svg) {
+    .icon {
         width: var(--icon-size);
         height: var(--icon-size);
     }

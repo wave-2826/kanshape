@@ -13,8 +13,8 @@
         children: Snippet,
         content: Snippet,
         /**
-         * Note that styling this element will require :global() on the calling side
-         * because of e.g. https://github.com/sveltejs/svelte/issues/2870
+         * Note that styling this element will require :global() OR $css() with svelte-css-rune on
+         * the calling side because of e.g. https://github.com/sveltejs/svelte/issues/2870
          */
         class?: string,
         title?: string

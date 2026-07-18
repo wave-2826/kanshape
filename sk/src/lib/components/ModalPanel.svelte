@@ -39,7 +39,7 @@
         >
             {#if mobileLayout}
                 <button onclick={onclose} class="mobile-close">
-                    <X />
+                    <X class={$css("close")} />
                 </button>
             {/if}
             {@render children()}
@@ -78,7 +78,7 @@
     right: 0;
     -webkit-tap-highlight-color: transparent;
 
-    > :global(svg) {
+    .close {
         width: 1.5rem;
         height: 1.5rem;
     }

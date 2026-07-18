@@ -2,9 +2,11 @@
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import type { AssemblyData, TypedPartsResponse } from "$lib/data/parts";
     import { getPartHeuristics, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
-    import { client, query, save, watchOne } from "$lib/pocketbase";
+    import { client, deleteRecord, query, save, watchOne } from "$lib/pocketbase";
     import { Collections, type PartsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
+    import { Sparkles } from "lucide-svelte";
+    import PopoverButton from "../PopoverButton.svelte";
     import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";
 
@@ -135,11 +137,13 @@
         console.log("Selected part:", sel);
 
         let existing = await query(Collections.Parts, {
-            filter: sel.type === "part" ?
-                `type="part" && part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}" && configuration="${sel.configuration}"` :
-                `type="assembly" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}" && configuration="${sel.configuration}"`
+            filter: 
+                (sel.type === "part" ?
+                    `type="part" && part_id="${sel.partId}"` :
+                    `type="assembly"`)
+                + `&& document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+                + (sel.configuration !== "default" ? ` && configuration="${sel.configuration}"` : "")
         }).catch(() => null);
-        console.log("Existing parts in database:", existing);
 
         // Run part heuristics
         let partData: PartHeuristicsResult | AssemblyData;
@@ -197,6 +201,15 @@
 
         let record: PartsResponse | null = null;
         if(existing && existing.length > 0) {
+            // if there are more than 1 existing parts, delete all except the first (which we'll update)
+            // this shouldn't really happen but can if configuration information changes
+            if(existing.length > 1) {
+                console.log(`Deleting ${existing.length - 1} extra existing part records`);
+                for(let i = 1; i < existing.length; i++) {
+                    await deleteRecord(Collections.Parts, existing[i].id).catch(() => null);
+                }
+            }
+
             // Update the existing record
             let past_revision_cards = existing[0].past_revision_cards;
             if(existing[0].current_card != cardId && !past_revision_cards.includes(existing[0].current_card)) {
@@ -257,16 +270,27 @@
         <CardPartModal {part} bind:this={modal} />
 
         <button class="part" onclick={(e) => {
-            if(e.target instanceof HTMLElement && e.target.closest("[data-part-preview]")) return;
+            if(e.target instanceof HTMLElement && (
+                e.target.closest("[data-part-preview]") || e.target.closest("button") !== e.currentTarget
+            )) return;
             modal?.open();
         }}>
             <span class="part-type">{part.type === "part" ? "Part" : "Assembly"}</span>
             <div class="preview" data-part-preview>
                 <!-- holy fetch waterfall -->
-                <PartPreviewRenderer {part} />
+                <PartPreviewRenderer {part} edges={false} />
             </div>
             <span class="part-name">{part.part_data?.name ?? "Unknown"}</span>
             <span class="part-number">{part.part_data?.part_number ?? ""}</span>
+            {#if part.type === "part"}
+                <PopoverButton class={$css("heuristic-result")}>
+                    {#snippet content()}
+                        <p>Heuristic result</p>
+                    {/snippet}
+                    <Sparkles />
+                    Detected as plate
+                </PopoverButton>
+            {/if}
             <span class="part-id">{part.part_id}</span>
         </button>
     {:else}
@@ -362,6 +386,10 @@
     .preview:hover + .expand-preview, .expand-preview:hover {
         opacity: 1;
         translate: 0 0;
+    }
+
+    .heuristic-result {
+        --bg-color: var(--success);
     }
 }
 </style>

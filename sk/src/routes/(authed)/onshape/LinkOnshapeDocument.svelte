@@ -1,7 +1,7 @@
 <script lang="ts">
     import { query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { Kanban, SquareKanban } from "lucide-svelte";
+    import { SquareKanban, Tag } from "lucide-svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
 
     const { allowUnlinked = false }: {
@@ -63,7 +63,7 @@
 <!-- TODO: This will need to scroll -->
 
 <div class="list">
-    <h2>Select a project or subproject to link to this document:</h2>
+    <h2>Select a project or subproject to link:</h2>
     <dl>
         {#each projects as project}
             <dt>
@@ -80,7 +80,7 @@
                         <button
                             onclick={() => linkDocumentToProject(project.id, subproject.id)}
                         >
-                            <Kanban /> Link to {subproject.name}
+                            <Tag /> Link to {subproject.name}
                         </button>
                     </dd>
                 {/each}

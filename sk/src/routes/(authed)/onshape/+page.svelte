@@ -113,7 +113,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1rem 1.5rem 1rem;
     overflow-y: auto;
     min-height: 0;
 }

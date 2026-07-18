@@ -7,6 +7,7 @@
     import { deasyncify } from "$lib/util";
     import { readable, type Readable } from "svelte/store";
     import CardPart from "./CardPart.svelte";
+    import { RefreshCw } from "lucide-svelte";
 
     let {
         value = $bindable(),
@@ -21,8 +22,13 @@
     $effect(() => {
         if(hasValue) {
             const store = deasyncify(
-                (watchOne(Collections.Parts, value!) as Promise<Readable<TypedPartsResponse | { error: string } | null>>)
-                .catch(() => readable({ error: `Failed to watch part with ID ${value}.` }))
+                (watchOne(Collections.Parts, value!, {
+                    requestKey: null
+                }) as Promise<Readable<TypedPartsResponse | { error: string } | null>>)
+                .catch((e) => {
+                    console.error(e);
+                    return readable({ error: `Failed to get part with ID ${value}.` });
+                })
             );
             const unsub = store.subscribe((v) => {
                 part = v;
@@ -31,10 +37,11 @@
         }
     });
 
+    let status = $state<"display" | "loading" | "existing" | "error">("display");
+
     const onshapeCtx = getOnshapeContext();
-    
-    // TODO: all the alerts in here should be error popups in the UI instead of alert()
-    async function getPartSelection(): Promise<{
+
+    type PartSelection = {
         wvm: "w" | "v" | "m";
         type: "part" | "assembly";
         wvmId: string;
@@ -42,7 +49,10 @@
         elementId: string;
         partId?: string;
         configuration: string;
-    } | null> {
+    };
+    
+    // TODO: all the alerts in here should be error popups in the UI instead of alert()
+    async function getPartSelection(): Promise<PartSelection | null> {
         if(onshapeCtx.location === "right-panel-part-studio" || onshapeCtx.location === "right-panel-assembly") {
             const selections = await onshapeCtx.client?.requestSelection("Select a part to create a card for.", ["BODY"]);
             return selections && selections.length > 0 ? {
@@ -127,79 +137,11 @@
         return null;
     }
 
-    async function addPart() {
-        if(!onshapeCtx.client) return;
-
-        // TOOD: check for an existing part immediately and prompt the user to update it
-        // TODO: better feedback for this loading state
-        const sel = await getPartSelection();
-        if(!sel) return;
-
-        console.log("Selected part:", sel);
-
-        let existing = await query(Collections.Parts, {
-            filter: 
-                (sel.type === "part" ?
-                    `type="part" && part_id="${sel.partId}"` :
-                    `type="assembly"`)
-                + `&& document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
-                + (sel.configuration !== "default" ? ` && configuration="${sel.configuration}"` : "")
-        }).catch(() => null);
-
-        // Run part heuristics
-        let partData: PartHeuristicsResult | AssemblyData;
-        if(sel.type === "part" && sel.partId) {
-            const heuristics = await getPartHeuristics(onshapeCtx.client, sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
-            if(!heuristics || "error" in heuristics) {
-                alert(`Failed to gather part heuristics: ${
-                    heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
-                }. Please try again.`);
-                return;
-            }
-            partData = heuristics;
-
-            sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
-    
-            // check again after heuristic id detection
-            if(!existing || existing.length === 0) existing = await query(Collections.Parts, {
-                filter: `type="part" && part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
-            }).catch(() => null);
-    
-            console.log("Existing parts in database:", existing);
-        } else {
-            const { data, error } = await onshapeCtx.client.requests.GET("/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}", {
-                params: {
-                    path: {
-                        did: sel.documentId,
-                        wvm: sel.wvm,
-                        wvmid: sel.wvmId,
-                        eid: sel.elementId
-                    },
-                    query: {
-                        inferMetadataOwner: false,
-                        depth: "1",
-                        includeComputedProperties: true,
-                        includeComputedAssemblyProperties: false,
-                        thumbnail: false,
-                        configuration: sel.configuration
-                    }
-                }
-            });
-
-            if(!data) {
-                alert(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}. Please try again.`);
-                return;
-            }
-
-            let name = data.properties?.find(p => p.name === "Name" && p.value)?.value as string | undefined;
-            let part_number = data.properties?.find(p => p.name === "Part number" && p.value)?.value as string | undefined;
-
-            partData = {
-                name: name ?? "Unknown assembly",
-                part_number: part_number ?? ""
-            };
-        }
-
+    async function updatePartRecord(
+        existing: PartsResponse[] | null,
+        sel: PartSelection,
+        partData: PartHeuristicsResult | AssemblyData | null
+    ): Promise<PartsResponse | null> {
         let record: PartsResponse | null = null;
         if(existing && existing.length > 0) {
             // if there are more than 1 existing parts, delete all except the first (which we'll update)
@@ -224,12 +166,13 @@
                 wvm: sel.wvm,
                 wvm_id: sel.wvmId,
                 current_card: cardId,
-                part_data: partData,
+                part_data: partData ?? undefined,
                 past_revision_cards,
                 configuration: sel.configuration,
                 revision: existing[0].revision + 1
             }, { create: false });
         } else {
+            if(!partData) throw new Error("Part data required for creating new part.");
             // Create a new record
             record = await save(Collections.Parts, {
                 part_id: sel.partId,
@@ -248,10 +191,84 @@
 
         if(!record) {
             alert("Failed to save part. Please try again.");
-            return;
+            return null;
         }
 
-        console.log("Saved part to database:", record);
+        return record;
+    }
+
+    async function getPartData(sel: PartSelection): Promise<PartHeuristicsResult | AssemblyData | null> {
+        if(!onshapeCtx.client) return null;
+
+        if(sel.type === "part" && sel.partId) {
+            const heuristics = await getPartHeuristics(onshapeCtx.client, sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
+            if(!heuristics || "error" in heuristics) {
+                alert(`Failed to gather part heuristics: ${
+                    heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
+                }. Please try again.`);
+                return null;
+            }
+            sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
+            return heuristics;
+        } else {
+            const { data, error } = await onshapeCtx.client.requests.GET("/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}", {
+                params: {
+                    path: { did: sel.documentId, wvm: sel.wvm, wvmid: sel.wvmId, eid: sel.elementId },
+                    query: {
+                        inferMetadataOwner: false,
+                        depth: "1",
+                        includeComputedProperties: true,
+                        includeComputedAssemblyProperties: false,
+                        thumbnail: false,
+                        configuration: sel.configuration
+                    }
+                }
+            });
+
+            if(!data) {
+                alert(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}. Please try again.`);
+                return null;
+            }
+
+            let name = data.properties?.find(p => p.name === "Name" && p.value)?.value as string | undefined;
+            let part_number = data.properties?.find(p => p.name === "Part number" && p.value)?.value as string | undefined;
+
+            return {
+                name: name ?? "Unknown assembly",
+                part_number: part_number ?? ""
+            };
+        }
+    }
+
+    async function queryExistingParts(sel: PartSelection) {
+        return await query(Collections.Parts, {
+            filter: 
+                (sel.type === "part" ?
+                    `type="part" && part_id="${sel.partId}"` :
+                    `type="assembly"`)
+                + `&& document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+                + (sel.configuration !== "default" ? ` && configuration="${sel.configuration}"` : "")
+        }).catch(() => null);
+    }
+
+    async function refreshPart(sel: PartSelection, existing: PartsResponse[] | null) {
+        // Run part heuristics or collect assembly data
+        let partData = await getPartData(sel);
+        if(!partData) return;
+        
+        if("heuristic" in partData) {
+            // check again after heuristic id detection
+            if(!existing || existing.length === 0) existing = await query(Collections.Parts, {
+                filter: `type="part" && part_id="${sel.partId}" && document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+            }).catch(() => null);
+    
+            console.log("Existing parts in database:", existing);
+        }
+
+        const record = await updatePartRecord(existing, sel, partData);
+        if(!record) return;
+
+        status = "display";
 
         // regenerate the preview
         client.send("/api/parts/generate_preview", {
@@ -262,32 +279,96 @@
         value = record.id;
         part = record as TypedPartsResponse | null; // early update
     }
+
+    async function addPart() {
+        if(status !== "display") return;
+        if(!onshapeCtx.client) return;
+
+        const sel = await getPartSelection();
+        if(!sel) return;
+
+        status = "loading";
+
+        let existing = await queryExistingParts(sel);
+        if(existing && existing.length > 0) {
+            status = "existing";
+
+            const record = await updatePartRecord(existing, sel, null);
+            if(!record) {
+                status = "error";
+                return;
+            }
+
+            value = record.id;
+            part = record as TypedPartsResponse;
+            return;
+        }
+
+        await refreshPart(sel, existing);
+    }
 </script>
 
-{#if hasValue}
-    {#if part !== null}
-        {#if "error" in part}
-            <div class="part missing">Error loading part: {part.error}</div>
+<!-- holy conditional tree -->
+{#if status === "error"}
+    <div class="placeholder">
+        Error loading part
+        <button onclick={() => {
+            status = "display";
+            part = null;
+            value = null;
+        }}><RefreshCw /> Retry</button>
+    </div>
+{:else if status === "loading"}
+    <div class="placeholder">Loading part...</div>
+{:else}
+    {#if hasValue}
+        {#if part !== null}
+            {#if "error" in part}
+                <div class="placeholder">Error loading part: {part.error}</div>
+            {:else}
+                <div class="part-wrapepr">
+                    <CardPart {part} />
+                    {#if status === "existing"}
+                        <div class="placeholder existing">
+                            <span>This part has already been added. Refresh its inforamtion?</span>
+                            <button onclick={async () => {
+                                if(!part || "error" in part) return;
+                                const sel: PartSelection = {
+                                    type: part.type,
+                                    documentId: part.document_id,
+                                    elementId: part.element_id,
+                                    configuration: part.configuration,
+                                    wvm: part.wvm,
+                                    wvmId: part.wvm_id,
+                                    partId: part.part_id
+                                };
+                                status = "loading";
+                                let existing = await queryExistingParts(sel);
+                                await refreshPart(sel, existing);
+                            }}><RefreshCw /> Refresh</button>
+                            <button onclick={() => status = "display"}>Close</button>
+                        </div>
+                    {/if}
+                </div>
+            {/if}
         {:else}
-            <CardPart {part} />
+            <div class="placeholder">Loading part...</div>
         {/if}
     {:else}
-        <div class="part missing">Loading part...</div>
-    {/if}
-{:else}
-    {#if onshapeCtx.onOnshape}
-        <button class="add" onclick={addPart}>
-            + Add part
-            <!-- TODO: we can store this ourselves -->
-            <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
-        </button>
-    {:else}
-        <!-- TODO: allow selecting existing parts -->
-        <!-- svelte-ignore a11y_no_static_element_interactions - for testing -->
-        <div class="add missing" ondblclick={() => {
-            const id = prompt("Enter part ID to link to this card:");
-            if(id) value = id;
-        }}>No part selected. Add one from Onshape!</div>
+        {#if onshapeCtx.onOnshape}
+            <button class="add" onclick={addPart}>
+                + Add part
+                <!-- TODO: we can store this ourselves -->
+                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+            </button>
+        {:else}
+            <!-- TODO: allow selecting existing parts when not on onshape maybe? -->
+            <!-- svelte-ignore a11y_no_static_element_interactions - for testing -->
+            <div class="add missing" ondblclick={() => {
+                const id = prompt("Enter part ID to link to this card:");
+                if(id) value = id;
+            }}>No part selected. Add one from Onshape!</div>
+        {/if}
     {/if}
 {/if}
 
@@ -295,6 +376,31 @@
 <style lang="scss">
 @use "../kanban/cardView/props.scss";
 
+.part-wrapepr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+.placeholder {
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &.existing {
+        margin-left: 0.5rem;
+    }
+    span {
+        flex: 1;
+    }
+    button {
+        --bg-color: var(--bg-primary);
+        padding: 0.25rem 0.5rem;
+    }
+}
 .add {
     gap: 0.5rem;
 }

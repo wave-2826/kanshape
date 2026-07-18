@@ -33,22 +33,25 @@
             <span class="name">{part.part_data?.name ?? "Unknown"}</span>
             <span class="number">{part.part_data?.part_number ?? ""}</span>
         </div>
-        <button class="open" onclick={() => {
-            if(!part) return;
-            if(canOpenInTab) {
-                onshapeCtx.client?.openAnotherElementInCurrentWorkspace(part.element_id);
-            } else {
-                open(`${config.onshape.baseDomain}/documents/${part.document_id}/${part.wvm}/${part.wvm_id}/e/${part.element_id}`, "_blank");
-            }
-        }}>
-            <!-- TODO: we can store this ourselves -->
-            <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
-            {#if canOpenInTab}
-                Open tab <ArrowRight class={$css("icon")} />
-            {:else}
-                Open in Part Studio <ExternalLink class={$css("icon")} />
-            {/if}
-        </button>
+        <!-- don't show "open tab" if it's this tab -->
+        {#if onshapeCtx.documentId !== part.document_id || onshapeCtx.elementId !== part.element_id}
+            <button class="open" onclick={() => {
+                if(!part) return;
+                if(canOpenInTab) {
+                    onshapeCtx.client?.openAnotherElementInCurrentWorkspace(part.element_id);
+                } else {
+                    open(`${config.onshape.baseDomain}/documents/${part.document_id}/${part.wvm}/${part.wvm_id}/e/${part.element_id}`, "_blank");
+                }
+            }}>
+                <!-- TODO: we can store this ourselves -->
+                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                {#if canOpenInTab}
+                    Open tab <ArrowRight class={$css("icon")} />
+                {:else}
+                    Open in Part Studio <ExternalLink class={$css("icon")} />
+                {/if}
+            </button>
+        {/if}
         <button class="close" onclick={() => expandedModal?.close()}><X /></button>
         {#if modelInfo}
             <div class="model-info">

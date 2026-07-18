@@ -31,7 +31,7 @@
         [entityType: string]: {
             [field: string]: {
                 label: string,
-                type: "name" | "description" | "string" | "duration" | "due" | "color" | "priority" | "section" | "assignment" | "any"
+                type: "name" | "description" | "string" | "duration" | "due" | "color" | "priority" | "section" | "assignment" | "any" | "card_metadata"
             }
         }
     } = {
@@ -43,7 +43,7 @@
             subprojects: { label: "subprojects", type: "any" },
             board: { label: "board", type: "any" },
             priority: { label: "priority", type: "priority" },
-            metadata: { label: "metadata", type: "any" },
+            metadata: { label: "metadata", type: "card_metadata" },
             due_by: { label: "due date", type: "due" },
             duration_days: { label: "duration", type: "duration" },
             dependencies: { label: "dependencies", type: "any" },
@@ -155,6 +155,13 @@
                     action: definite ? `updated the ${fieldData.label} of` : `updated its ${fieldData.label}`,
                     oldValue: change.old ? String(change.old) : null,
                     newValue: change.new ? String(change.new) : "none"
+                }
+            case "card_metadata":
+                // TODO: better logic here. I'd like to refactor this first though
+                return {
+                    action: definite ? `updated the board fields of` : `updated its board fields`,
+                    oldValue: null,
+                    newValue: null
                 }
             default:
                 return {

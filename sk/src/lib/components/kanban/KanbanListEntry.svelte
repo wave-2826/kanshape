@@ -22,7 +22,7 @@
 
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="main">
-        <h3>{card.title}</h3>
+        <h3 class:untitled={!card.title.trim()}>{card.title.trim() ? card.title : "Untitled"}</h3>
         {#if showBoard && card.board_name}
             <span class="meta-pill" style="color: {boardColor}"><Kanban /><span>{card.board_name}</span></span>
         {/if}
@@ -109,6 +109,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        &.untitled {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
     }
 }
 

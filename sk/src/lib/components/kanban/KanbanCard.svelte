@@ -18,7 +18,7 @@
 
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="header">
-        <h3>{card.title}</h3>
+        <h3 class:untitled={!card.title.trim()}>{card.title.trim() ? card.title : "Untitled"}</h3>
         {#each card.subprojects as subproject}
             <span class="meta-pill subproject"><Tag />{subproject.name}</span>
         {/each}
@@ -92,6 +92,10 @@
     h3 {
         font-size: var(--font-small);
         display: inline;
+        &.untitled {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
     }
     .subproject {
         display: inline-flex;

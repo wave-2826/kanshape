@@ -83,7 +83,7 @@
                             <span style="color: {task.project_color ?? "var(--text-primary)"}">{task.board_title}</span> /
                             <span style="color: {task.section_color ?? "var(--text-primary)"}">{task.section_title}</span>
                         </span>
-                        <span class="title">{task.title}</span>
+                        <span class="title" class:untitled={!task.title.trim()}>{task.title.trim() ? task.title : "Untitled"}</span>
                         {#if task.priority && task.priority !== "low"}
                             <span class="priority" style="color: {getPriorityColor(task.priority)}">
                                 <Flag class={$css("icon")} /> {task.priority}
@@ -150,13 +150,11 @@
                         </span>
                         <ul>
                             {#each project.boards as board}
-                                <!-- todo: link to board -->
                                 <li><a href="/projects/{project.id}/boards/{board.id}"><Kanban class={$css("icon")} /> {board.title}</a></li>
                             {/each}
                         </ul>
                         <ul>
                             {#each project.subprojects as subproject}
-                                <!-- todo: link to subproject -->
                                 <li><a href="/projects/{project.id}/subprojects/{subproject.id}"><Tag class={$css("icon")} /> {subproject.name}</a></li>
                             {/each}
                         </ul>
@@ -234,6 +232,11 @@
         grid-area: title;
         font-weight: bold;
         color: var(--text-primary);
+
+        &.untitled {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
     }
 
     .priority { grid-area: priority; }

@@ -108,7 +108,9 @@ textarea {
     resize: vertical;
 }
 button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.unstyled) {
+    // &:not(:has(button:hover)):not(:has(.button:hover)) {
     transform: translateY(-1px);
+    // }
 }
 
 .multi-button {

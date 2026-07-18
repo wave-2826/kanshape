@@ -1,4 +1,4 @@
-import { get, type Readable } from "svelte/store";
+import { type Readable } from "svelte/store";
 
 export function deepEqual(a: any, b: any): boolean {
     if(a === b) return true;

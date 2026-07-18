@@ -8,6 +8,7 @@
         children,
         content,
         class: className,
+        contentClass,
         title
     }: {
         children: Snippet,
@@ -16,7 +17,8 @@
          * Note that styling this element will require :global() OR $css() with svelte-css-rune on
          * the calling side because of e.g. https://github.com/sveltejs/svelte/issues/2870
          */
-        class?: string,
+        class?: string | string[],
+        contentClass?: string,
         title?: string
     } = $props();
 
@@ -31,14 +33,17 @@
     }
 }} />
 
-<button class={className} onclick={() => open = !open} bind:this={button} {title}>
+<button class={className} onclick={(e) => {
+    open = !open;
+    e.stopPropagation();
+}} bind:this={button} {title}>
     {@render children()}
     {#if open}
         <Portal target="body">
             <div
-                class="popover-content"
+                class={["popover-content", contentClass]}
                 transition:fly={{ y: 5, duration: 150 }}
-                use:anchor={{ element: button, placement: "bottom-end", offset: 5 }}
+                use:anchor={{ element: button, placement: "vauto-end", offset: 5 }}
                 bind:this={popover}
             >
                 {@render content()}

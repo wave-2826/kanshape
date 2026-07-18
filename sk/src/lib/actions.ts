@@ -1,4 +1,4 @@
-import { goto } from "$app/navigation";
+import { getContrastRatio, parseRgb } from "./color";
 import { nav } from "./navigation";
 
 export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, maxHeight: number = 300) {
@@ -183,5 +183,42 @@ export function anchor(
             window.removeEventListener("scroll", onScrollResize);
             if(resizeObserver) resizeObserver.disconnect();
         }
+    };
+}
+
+/**
+ * Add a background to text if it doesn't have sufficient contrast with its background.
+ */
+export function contrastStyle(node: HTMLElement, styleText: string) {
+    function update() {
+        const style = getComputedStyle(node);
+        const color = style.color;
+        let backgroundColor = style.backgroundColor;
+
+        let parent = node.parentElement;
+        while(!backgroundColor || backgroundColor === "rgba(0, 0, 0, 0)" || backgroundColor === "transparent") {
+            if(!parent) break;
+            const parentStyle = getComputedStyle(parent);
+            backgroundColor = parentStyle.backgroundColor;
+            parent = parent.parentElement;
+        }
+
+        if(!color || !backgroundColor) return;
+
+        const colorRgb = parseRgb(color);
+        const backgroundRgb = parseRgb(backgroundColor);
+
+        if(!colorRgb || !backgroundRgb) return;
+
+        const contrast = getContrastRatio(colorRgb, backgroundRgb);
+        if(contrast < 4.5) {
+            node.style.cssText += `;${styleText}`;
+        }
+    }
+
+    update();
+
+    return {
+        update
     };
 }

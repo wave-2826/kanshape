@@ -621,11 +621,15 @@ function(tl_context is Context, queries) {
         }
 
         const aabb = evBox3d(context, { "topology": body, "tight": true });
+        const material = getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL });
 
         return {
             'partID': partID[0],
             'name': getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
-            'material': getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL }),
+            'material': material != undefined ? {
+                'density': material.density / (kilogram / meter ^ 3),
+                'name': material.name
+            } : undefined,
             'appearance': getProperty(context, { entity: body, propertyType: PropertyType.APPEARANCE }),
             'description': getProperty(context, { entity: body, propertyType: PropertyType.DESCRIPTION }),
             'part_number': getProperty(context, { entity: body, propertyType: PropertyType.PART_NUMBER }),

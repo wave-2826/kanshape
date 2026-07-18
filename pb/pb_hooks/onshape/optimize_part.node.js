@@ -107,7 +107,6 @@ function writePartBinary(stream, data) {
             currentMaterial = key;
 
             for(const facet of face.facets) {
-                // rotateX(-Math.PI / 2) can be turned into (x, y, z) -> (x, z, -y)
                 const pts = [
                     data.facetPoints[facet.indices[0]],
                     data.facetPoints[facet.indices[1]],
@@ -115,8 +114,7 @@ function writePartBinary(stream, data) {
                 ];
 
                 for(const p of pts) {
-                    const x = p.x, y = p.z, z = -p.y;
-
+                    const x = p.x, y = p.y, z = p.z;
                     positions.push(x, y, z);
 
                     // Update bounds
@@ -127,8 +125,8 @@ function writePartBinary(stream, data) {
 
                 for(const n of facet.normals) {
                     const nx = n.x;
-                    const ny = n.z;
-                    const nz = -n.y;
+                    const ny = n.y;
+                    const nz = n.z;
 
                     normals.push(nx, ny, nz);
                 }
@@ -266,13 +264,12 @@ function getPartFile(dir, file) {
 }
 
 /**
- * extract the translation in our rotated world-space coordinates from a matrix.
+ * extract the translation from a matrix.
  * @param {number[]} matrix
  */
 function getTranslation(matrix) {
-    // we transform (x, y, z) -> (x, z, -y)
     const x = matrix[3], y = matrix[7], z = matrix[11]; // model space
-    return { x, y: z, z: -y }; // world space
+    return { x, y, z }; // world space
 }
 
 /**
@@ -484,7 +481,7 @@ function writeAssemblyBinary(stream, inputFile, data) {
     const centerX = (minX + maxX) / 2, centerY = (minY + maxY) / 2, centerZ = (minZ + maxZ) / 2;
 
     // for debugging aabbs
-    // const translateAABB = /** @param {AABB} aabb */ (aabb) => ({ minX: aabb.minX - centerX, minY: aabb.minY - centerY, minZ: aabb.minZ - centerZ, maxX: aabb.maxX - centerX, maxY: aabb.maxY - centerY, maxZ: aabb.maxZ - centerZ });
+    const translateAABB = /** @param {AABB} aabb */ (aabb) => ({ minX: aabb.minX - centerX, minY: aabb.minY - centerY, minZ: aabb.minZ - centerZ, maxX: aabb.maxX - centerX, maxY: aabb.maxY - centerY, maxZ: aabb.maxZ - centerZ });
     // header["aabb"] = translateAABB({ minX, minY, minZ, maxX, maxY, maxZ });
     // header["aabbs"] = allAABBs.map(translateAABB);
 

@@ -184,7 +184,7 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
                 for(let i = 0; i < count; i++) {
                     const { tx, ty, tz, qx, qy, qz, qw, length: posLength } = decodePosition(buffer.subarray(pos));
                     pos += posLength;
-                    
+
                     const instance = mesh.clone();
                     instance.position.set(tx, ty, tz);
                     instance.quaternion.set(qx, qy, qz, qw);
@@ -216,7 +216,7 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
         }
 
         // we're generally okay with zooming in on assemblies a little more
-        return { cameraDistance: (header.maxDistance ?? 1) / 1.25 };
+        return { cameraDistance: (header.maxDistance ?? 1) / 1.1 };
     } else {
         throw new Error("Invalid model format");
     }
@@ -234,8 +234,9 @@ export async function loadScene(THREE: THREE, scene: THREE.Scene, camera: THREE.
     directional.target.position.set(0, 0, 0);
     camera.add(directional);
 
-    const d = 10 / Math.sqrt(3);
-    camera.position.set(size * d, size * d, size * d);
+    // const d = 10 / Math.sqrt(3);
+    camera.position.set(size * 10, 0, 0);
+    camera.up.set(0, 0, 1);
     camera.near = size / 10;
     camera.far = size * 20;
     camera.zoom = 1 / size / 2;

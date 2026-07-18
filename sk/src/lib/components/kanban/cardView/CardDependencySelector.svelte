@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-    import type { SectionsRecord, SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Trash } from "lucide-svelte";
     import KanbanListEntry from "../KanbanListEntry.svelte";
     import type { TypedCardsResponse } from "$lib/data/cards";
@@ -8,15 +7,11 @@
     let {
         dependencies = $bindable(),
         boardCards,
-        sections,
-        subprojects,
         onopendependency,
         onselectcard
     }: {
         dependencies: string[],
         boardCards: TypedCardPreviewResponse[],
-        sections: SectionsRecord[],
-        subprojects: SubprojectsRecord[],
         onopendependency?: (id: string) => void,
         onselectcard?: (message: string, cb: (card: TypedCardPreviewResponse, originalCard: TypedCardsResponse) => void) => void
     } = $props();
@@ -30,7 +25,7 @@
                 <button class="remove-dependency" onclick={() => {
                     dependencies = dependencies.filter((id) => id !== depId);
                 }} aria-label="Remove dependency"><Trash class={$css("remove")} /></button>
-                <KanbanListEntry {card} {subprojects} onclick={() => {
+                <KanbanListEntry {card} onclick={() => {
                     onopendependency?.(card.id);
                 }} />
             </div>

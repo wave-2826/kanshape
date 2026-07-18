@@ -34,8 +34,10 @@
             const frustumSize = 1.3;
             const aspect = canvas.clientWidth / canvas.clientHeight;
             const camera = new THREE.OrthographicCamera(
-                frustumSize * aspect / -2, frustumSize * aspect / 2,
-                frustumSize / 2, frustumSize / -2,
+                ...(
+                    aspect > 1 ? [frustumSize * aspect / -2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / -2]
+                    : [frustumSize / -2, frustumSize / 2, frustumSize / aspect / 2, frustumSize / aspect / -2]
+                ),
                 0.001, 1000
             );
 
@@ -79,10 +81,17 @@
             
             const resizeObserver = new ResizeObserver(() => {
                 const aspect = canvas!.clientWidth / canvas!.clientHeight;
-                camera.left = frustumSize * aspect / -2;
-                camera.right = frustumSize * aspect / 2;
-                camera.top = frustumSize / 2;
-                camera.bottom = frustumSize / -2;
+                if(aspect > 1) {
+                    camera.left = frustumSize * aspect / -2;
+                    camera.right = frustumSize * aspect / 2;
+                    camera.top = frustumSize / 2;
+                    camera.bottom = frustumSize / -2;
+                } else {
+                    camera.left = frustumSize / -2;
+                    camera.right = frustumSize / 2;
+                    camera.top = frustumSize / aspect / 2;
+                    camera.bottom = frustumSize / aspect / -2;
+                }
                 camera.updateProjectionMatrix();
         
                 renderer.setSize(canvas!.clientWidth, canvas!.clientHeight);

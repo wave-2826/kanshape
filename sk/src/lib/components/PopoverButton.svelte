@@ -57,7 +57,8 @@ button {
     position: relative;
     z-index: 100;
 }
-.popover-content {
+// 0 specificity to allow overriding
+:where(.popover-content) {
     min-width: 150px;
     max-width: 90vw;
     margin-top: 0.25rem;

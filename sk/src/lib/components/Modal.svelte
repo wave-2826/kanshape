@@ -68,7 +68,8 @@
 
     z-index: 100;
 }
-dialog {
+// 0 specificity to allow overriding
+:where(dialog) {
     background-color: var(--bg-primary);
     border-radius: 4px;
     border: 1px solid var(--border);

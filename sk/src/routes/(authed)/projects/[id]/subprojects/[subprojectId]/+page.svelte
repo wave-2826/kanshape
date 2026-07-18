@@ -13,7 +13,6 @@
     import type { ListResult } from "pocketbase";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import KanbanMenu from "$lib/components/kanban/KanbanMenu.svelte";
-    import KanbanCard from "$lib/components/kanban/KanbanCard.svelte";
     import Masonry from "$lib/components/Masonry.svelte";
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
     import { untrack } from "svelte";
@@ -125,11 +124,6 @@
                                         <KanbanListEntry
                                             showBoard boardColor={$project.color}
                                             card={card}
-                                            // All cards are guarenteed to be this subproject
-                                            // This does break dependencies' subproject display, but...
-                                            // whatever for now
-                                            // TODO: find an efficient way to fix that
-                                            subprojects={[subproject]}
                                             onclick={() => openCardId = card.id}
                                         />
                                     {/each}

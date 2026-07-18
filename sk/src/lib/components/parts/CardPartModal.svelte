@@ -63,7 +63,7 @@
 
 <style lang="scss">
 .modal {
-    width: min(calc(100% - 4rem), 800px);
+    width: min(calc(100% - 1rem), 800px);
     height: min(calc(100% - 4rem), 600px);
     padding: 0;
     position: relative;

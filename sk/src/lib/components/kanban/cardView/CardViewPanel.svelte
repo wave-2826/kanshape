@@ -84,7 +84,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
             board: preview.board,
             section: preview.section,
-            subprojects: preview.subprojects,
+            subprojects: preview.subprojects.map(sp => sp.id),
             
             metadata: {},
             files: [],
@@ -398,7 +398,6 @@ save. This allows us to keep user edits intact while still reflecting remote upd
                     <CardDependencySelector
                         bind:dependencies={localCard.dependencies}
                         {boardCards}
-                        {sections} {subprojects}
                         onopendependency={(id) => {
                             // Open the dependency card instead of the current card
                             card = boardCards.find((c) => c.id === id) ?? null;

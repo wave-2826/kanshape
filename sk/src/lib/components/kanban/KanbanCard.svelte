@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Tag, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
@@ -8,11 +7,9 @@
 
     const {
         card,
-        subprojects,
         onclick
     }: {
         card: TypedCardPreviewResponse;
-        subprojects: SubprojectsRecord[];
         onclick: () => void;
     } = $props();
 
@@ -22,8 +19,8 @@
 <button class="card" {onclick} class:critical={card.priority === "critical"}>
     <div class="header">
         <h3>{card.title}</h3>
-        {#each card.subprojects as subprojectId}
-            <span class="meta-pill subproject"><Tag />{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+        {#each card.subprojects as subproject}
+            <span class="meta-pill subproject"><Tag />{subproject.name}</span>
         {/each}
     </div>
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Clock, Flag, Kanban, Tag, TextInitial, Users } from "lucide-svelte";
     import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
@@ -8,13 +7,11 @@
     
     const {
         card,
-        subprojects,
         onclick,
         showBoard = false,
         boardColor = "var(--text-tertiary)"
     }: {
         card: TypedCardPreviewResponse;
-        subprojects: SubprojectsRecord[];
         onclick: () => void;
         showBoard?: boolean;
         boardColor?: string;
@@ -30,10 +27,10 @@
             <span class="meta-pill" style="color: {boardColor}"><Kanban /><span>{card.board_name}</span></span>
         {/if}
 
-        {#each card.subprojects as subprojectId}
+        {#each card.subprojects as subproject}
             <span class="meta-pill subproject">
                 <Tag />
-                <span>{subprojects.find((sp) => sp.id === subprojectId)?.name ?? subprojectId}</span>
+                <span>{subproject.name}</span>
             </span>
         {/each}
 
@@ -84,7 +81,7 @@
 
 <style lang="scss">
 .card {
-    --bg-color: var(--bg-secondary);
+    flex-shrink: 0;
 
     display: flex;
     flex-direction: column;
@@ -92,6 +89,7 @@
     overflow: hidden;
     text-align: left;
 
+    --bg-color: var(--bg-secondary);
     padding: 0.25rem 0.7rem;
     font-size: var(--font-tiny);
 

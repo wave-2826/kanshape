@@ -27,6 +27,7 @@ export const Collections = {
 	OauthTransactions: "oauth_transactions",
 	OnshapeApiCache: "onshape_api_cache",
 	OnshapeDocuments: "onshape_documents",
+	PartCards: "part_cards",
 	Parts: "parts",
 	ProjectOverview: "project_overview",
 	Projects: "projects",
@@ -240,7 +241,7 @@ export const CardPreviewPriorityOptions = {
 	"critical": "critical",
 } as const
 export type CardPreviewPriorityOptions = typeof CardPreviewPriorityOptions[keyof typeof CardPreviewPriorityOptions]
-export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown> = {
+export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Tsubprojects = unknown> = {
 	assignment_data?: null | Tassignment_data
 	assignment_name_cache?: null | Tassignment_name_cache
 	board: RecordIdString
@@ -258,7 +259,7 @@ export type CardPreviewRecord<Tassignment_data = unknown, Tassignment_name_cache
 	section: RecordIdString
 	section_color?: string
 	section_name?: string
-	subprojects?: RecordIdString[]
+	subprojects?: null | Tsubprojects
 	title?: string
 	updated: IsoAutoDateString
 }
@@ -363,6 +364,36 @@ export type OnshapeDocumentsRecord = {
 	title?: string
 	updated: IsoAutoDateString
 	workspace_id?: string
+}
+
+export const PartCardsPriorityOptions = {
+	"low": "low",
+	"medium": "medium",
+	"high": "high",
+	"critical": "critical",
+} as const
+export type PartCardsPriorityOptions = typeof PartCardsPriorityOptions[keyof typeof PartCardsPriorityOptions]
+export type PartCardsRecord<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Tsubprojects = unknown> = {
+	assignment_data?: null | Tassignment_data
+	assignment_name_cache?: null | Tassignment_name_cache
+	board: RecordIdString
+	board_name?: string
+	created: IsoAutoDateString
+	created_by?: RecordIdString
+	dependencies?: RecordIdString[]
+	description?: null | Tdescription
+	due_by?: IsoDateString
+	duration_days?: number
+	id: string
+	moved_at?: IsoDateString
+	position?: number
+	priority: PartCardsPriorityOptions
+	section: RecordIdString
+	section_color?: string
+	section_name?: string
+	subprojects?: null | Tsubprojects
+	title?: string
+	updated: IsoAutoDateString
 }
 
 export const PartsWvmOptions = {
@@ -480,7 +511,7 @@ export type AssignedCardsResponse<Tpriority_number = unknown, Texpand = unknown>
 export type BoardOverviewResponse<Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Texpand = unknown> = Required<BoardOverviewRecord<Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count>> & BaseSystemFields<Texpand>
 export type BoardsResponse<Tcustom_card_fields = unknown, Tlinked_sites = unknown, Texpand = unknown> = Required<BoardsRecord<Tcustom_card_fields, Tlinked_sites>> & BaseSystemFields<Texpand>
 export type CardAssignmentCacheResponse<Texpand = unknown> = Required<CardAssignmentCacheRecord> & BaseSystemFields<Texpand>
-export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tdescription>> & BaseSystemFields<Texpand>
+export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tdescription, Tsubprojects>> & BaseSystemFields<Texpand>
 export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
@@ -490,6 +521,7 @@ export type LeaderboardResponse<Texpand = unknown> = Required<LeaderboardRecord>
 export type OauthTransactionsResponse<Texpand = unknown> = Required<OauthTransactionsRecord> & BaseSystemFields<Texpand>
 export type OnshapeApiCacheResponse<Tbody = unknown, Theaders = unknown, Texpand = unknown> = Required<OnshapeApiCacheRecord<Tbody, Theaders>> & BaseSystemFields<Texpand>
 export type OnshapeDocumentsResponse<Texpand = unknown> = Required<OnshapeDocumentsRecord> & BaseSystemFields<Texpand>
+export type PartCardsResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<PartCardsRecord<Tassignment_data, Tassignment_name_cache, Tdescription, Tsubprojects>> & BaseSystemFields<Texpand>
 export type PartsResponse<Tpart_data = unknown, Texpand = unknown> = Required<PartsRecord<Tpart_data>> & BaseSystemFields<Texpand>
 export type ProjectOverviewResponse<Tboards = unknown, Tcard_count = unknown, Tfinished_card_count = unknown, Tnext_due = unknown, Toverdue_card_count = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<ProjectOverviewRecord<Tboards, Tcard_count, Tfinished_card_count, Tnext_due, Toverdue_card_count, Tsubprojects>> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Tlinked_sites = unknown, Texpand = unknown> = Required<ProjectsRecord<Tlinked_sites>> & BaseSystemFields<Texpand>
@@ -522,6 +554,7 @@ export type CollectionRecords = {
 	oauth_transactions: OauthTransactionsRecord
 	onshape_api_cache: OnshapeApiCacheRecord
 	onshape_documents: OnshapeDocumentsRecord
+	part_cards: PartCardsRecord
 	parts: PartsRecord
 	project_overview: ProjectOverviewRecord
 	projects: ProjectsRecord
@@ -553,6 +586,7 @@ export type CollectionResponses = {
 	oauth_transactions: OauthTransactionsResponse
 	onshape_api_cache: OnshapeApiCacheResponse
 	onshape_documents: OnshapeDocumentsResponse
+	part_cards: PartCardsResponse
 	parts: PartsResponse
 	project_overview: ProjectOverviewResponse
 	projects: ProjectsResponse

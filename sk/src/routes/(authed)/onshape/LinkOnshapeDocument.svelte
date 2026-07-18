@@ -4,6 +4,10 @@
     import { Kanban, SquareKanban } from "lucide-svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
 
+    const { allowUnlinked = false }: {
+        allowUnlinked?: boolean
+    } = $props();
+
     const projects = await query(Collections.Projects, { expand: "subprojects" });
 
     const onshapeCtx = getOnshapeContext();
@@ -41,14 +45,24 @@
             ...record
         };
     }
+
+    async function saveUnlinked() {
+        const record = await save(Collections.OnshapeDocuments, {
+            id: onshapeCtx.documentId ?? "",
+            workspace_id: onshapeCtx.wvmId ?? ""
+        }, { create: true, expand: "project,subproject" });
+        if(!record) return;
+
+        onshapeCtx.linkedProject = {
+            type: LinkedProjectType.Unlinked,
+            ...record
+        };
+    }
 </script>
 
 <!-- TODO: This will need to scroll -->
 
 <div class="list">
-    {#if onshapeCtx.linkedProject?.type === LinkedProjectType.Unlinked}
-        <p>This document is registered but not linked to a particular Onshape document. Link it to use the document tab.</p>
-    {/if}
     <h2>Select a project or subproject to link to this document:</h2>
     <dl>
         {#each projects as project}
@@ -73,6 +87,9 @@
             {/if}
         {/each}
     </dl>
+    {#if allowUnlinked}
+        <button onclick={() => saveUnlinked()}>Continue with no linked project</button>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -90,6 +107,7 @@ dl {
     flex-wrap: wrap;
     justify-content: flex-start;
     gap: 0.5em;
+    margin: 0;
 }
 dt {
     font-weight: bold;

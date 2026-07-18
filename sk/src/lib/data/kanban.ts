@@ -9,6 +9,7 @@ export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     CardAssignmentData, // assignment_data
     string[], // assignment_name_cache
     string, // description (truncated)
+    { id: string, name: string }[], // subprojects
     {} // expand
 >, "assignment_data" | "assignment_name_cache">;
 
@@ -115,6 +116,7 @@ export async function moveCard(
             description: fullCard.description ? fullCard.description.substring(0, 100) : "",
             assignment_name_cache: oldNameCache,
             assignment_data: fullCard.assignment_data as CardAssignmentData,
+            subprojects: [],
             section_name: "",
             section_color: "",
             board_name: "",

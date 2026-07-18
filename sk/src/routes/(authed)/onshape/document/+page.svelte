@@ -26,7 +26,9 @@
         if(!linkedProject) return;
         if(linkedProject.type === LinkedProjectType.Unregistered) return; // Unlinked
         if(linkedProject.type === LinkedProjectType.Unlinked) {
-            // Require the user to re-link for the document page
+            // Go to the home page
+            console.log("goin home");
+            nav("/");
             return;
         }
         nav(linkedProject.subproject ?
@@ -35,19 +37,20 @@
     }
     $effect(() => {
         if(!page.url.searchParams.has("onshape")) return;
-        if(linkedProject?.type !== LinkedProjectType.Unlinked) redirect();
+        redirect();
     });
 </script>
 
-{#if linkedProject === null}
-    <p>Loading...</p>
-{:else if linkedProject.type === LinkedProjectType.Unregistered || linkedProject.type === LinkedProjectType.Unlinked}
-    <div class="container">
-        <LinkOnshapeDocument />
-    </div>
-{:else}
-    <p>Redirecting to project...</p>
-{/if}
+<div class="container">
+    {#if linkedProject === null}
+        <p>Loading...</p>
+    {:else if linkedProject.type === LinkedProjectType.Unregistered}
+        <LinkOnshapeDocument allowUnlinked />
+    {:else}
+        <!-- redirecting -->
+        <p>Redirecting to project...</p>
+    {/if}
+</div>
 
 
 <style lang="scss">

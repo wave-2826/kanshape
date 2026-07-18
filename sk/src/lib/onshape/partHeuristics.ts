@@ -53,7 +53,7 @@ export function appearanceToHex(appearance: PartHeuristicsResult["appearance"]):
 
 export async function getPartHeuristics(
     client: OnshapeClient,
-    documentId: string, wvm: "w" | "v" | "m", wvmId: string, partStudioId: string,
+    documentId: string, wvm: "w" | "v" | "m", wvmId: string, elementId: string,
     transientSelectionID: string
 ): Promise<PartHeuristicsResult | null> {
     return await evalTemplatedFS<PartHeuristicsResult>(
@@ -61,6 +61,6 @@ export async function getPartHeuristics(
         heuristicScript, {
             selectionID: transientSelectionID
         },
-        documentId, wvm, wvmId, partStudioId,
+        documentId, wvm, wvmId, elementId,
     );
 }

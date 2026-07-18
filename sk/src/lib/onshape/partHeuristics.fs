@@ -59,6 +59,7 @@ function(tl_context is Context, queries) {
     */
     const computePCA = function(pts is array) returns map {
         const n = size(pts);
+        if(n < 3) throw regenError("PCA requires at least 3 points");
 
         // Centroid
         var ox = 0; var oy = 0; var oz = 0;
@@ -119,6 +120,7 @@ function(tl_context is Context, queries) {
 
     const addFaceSamples = function(context is Context, face is Query, count is number, pts is array) returns array {
         const grid = ceil(sqrt(count));
+        if(grid < 1) return pts;
 
         var uvSamples = [];
         for(var iu = 0; iu < grid; iu += 1) {
@@ -167,6 +169,8 @@ function(tl_context is Context, queries) {
             faceAreas = append(faceAreas, area);
             totalArea += area;
         }
+
+        if(totalArea == 0 * meter ^ 2) return pts;
 
         for(var i = 0; i < size(faces); i += 1) {
             const face = faces[i];
@@ -329,6 +333,17 @@ function(tl_context is Context, queries) {
             pts = append(pts, point / meter);
         }
 
+        if(size(pts) < 3) {
+            // sample some points from the faces of the part to get a better estimate of the principal axis
+            const faces = evaluateQuery(context, qOwnedByBody(body, EntityType.FACE));
+            for(var face in faces) {
+                pts = addFaceSamples(context, face, SURFACE_SAMPLES, pts);
+            }
+
+            // give up if still not enough points
+            if(size(pts) < 3) return { "cs": coordSystem(vector(0, 0, 0), vector(1, 0, 0), vector(0, 0, 1)) };
+        }
+
         const pca = computePCA(pts);
 
         const originPt = pca.origin * meter; // restore length units
@@ -450,7 +465,9 @@ function(tl_context is Context, queries) {
                 "topology": face
             });
             const center = 0.5 * (fb.minCorner + fb.maxCorner);
-            const t = dot(center - cs.origin, cs.xAxis) / (bbox.maxCorner[0] - bbox.minCorner[0]);
+            const size = bbox.maxCorner[0] - bbox.minCorner[0];
+            if(size < 1e-6 * meter) continue; // skip degenerate cases
+            const t = dot(center - cs.origin, cs.xAxis) / size;
 
             if(t < minT) { minT = t; minFace = face; }
             if(t > maxT) { maxT = t; maxFace = face; }
@@ -521,9 +538,10 @@ function(tl_context is Context, queries) {
             const rpaFaces = testAxisType(context, body, rpaFrame.cs);
             if(rpaFaces == undefined) {
                 debug(context, "Failed to find end faces for part " ~ partID[0], DebugColor.RED);
-                return undefined;
+                candidates = [ { 'certainty': 0.0 } ];
+            } else {
+                candidates = [ rpaFaces ];
             }
-            candidates = [ rpaFaces ];
         }
 
         // Pick the one with the widest end face separation as our best guess for the principal axis
@@ -587,6 +605,10 @@ function(tl_context is Context, queries) {
             const r60Size = hypot(r60Box.maxCorner[1] - r60Box.minCorner[1], r60Box.maxCorner[2] - r60Box.minCorner[2]);
             const r45Size = hypot(r45Box.maxCorner[1] - r45Box.minCorner[1], r45Box.maxCorner[2] - r45Box.minCorner[2]);
             const originalSize = hypot(best.bbox.maxCorner[1] - best.bbox.minCorner[1], best.bbox.maxCorner[2] - best.bbox.minCorner[2]);
+            if(originalSize < 1e-6 * meter) {
+                debug(context, "Degenerate part " ~ partID[0] ~ " with zero non-principal size", DebugColor.RED);
+                return undefined;
+            }
             const dimRatio60 = r60Size / originalSize;
             const dimRatio45 = r45Size / originalSize;
             const nonPrincipalDim = max(best.bbox.maxCorner[1] - best.bbox.minCorner[1], best.bbox.maxCorner[2] - best.bbox.minCorner[2]);

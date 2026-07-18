@@ -56,7 +56,7 @@
             {#if listCards.length > 0}
                 <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards}>
                     {#each listCards as card (card.id)}
-                        <KanbanListEntry {card} {subprojects} onclick={() => openCardId = card.id} />
+                        <KanbanListEntry {card} onclick={() => openCardId = card.id} />
                     {/each}
                 </Masonry>
             {:else}

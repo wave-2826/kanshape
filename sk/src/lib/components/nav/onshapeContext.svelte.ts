@@ -26,7 +26,7 @@ export type OnshapeContext = {
     documentId: string | null;
     wvm?: "w" | "v" | "m";
     wvmId?: string;
-    partStudioId?: string;
+    elementId?: string;
     client: OnshapeClient | null;
     location: "right-panel-part-studio" | "right-panel-assembly" | "tab" | null;
     onOnshape: boolean;
@@ -40,7 +40,7 @@ export function addOnshapeContext(): OnshapeContext {
         documentId: null,
         wvm: undefined,
         wvmId: undefined,
-        partStudioId: undefined,
+        elementId: undefined,
         client: null,
         location: null,
         onOnshape: false // set by the parent layout
@@ -68,11 +68,11 @@ export function watchOnshapeContext(
     if(wvm && wvmId && elementId) {
         onshapeContext.wvm = wvm === "v" ? "v" : "w";
         onshapeContext.wvmId = wvmId;
-        onshapeContext.partStudioId = elementId;
+        onshapeContext.elementId = elementId;
     } else {
         onshapeContext.wvm = undefined;
         onshapeContext.wvmId = undefined;
-        onshapeContext.partStudioId = undefined;
+        onshapeContext.elementId = undefined;
     }
 
     untrack(() => {

@@ -3,7 +3,7 @@ import { client, save } from ".";
 import type { AuthProviderInfo, RecordService } from "pocketbase";
 import { invalidateAll } from "$app/navigation";
 import { page } from "$app/state";
-import type { UsersResponse } from "./generated-types";
+import { Collections, type UsersResponse } from "./generated-types";
 import { nav } from "$lib/navigation";
 
 export const authWritable = readable<UsersResponse | null>(
@@ -22,6 +22,17 @@ export const authWritable = readable<UsersResponse | null>(
 );
 export const authModel = readonly(authWritable);
 
+if(client.authStore.isValid) reloadAuth();
+
+export async function reloadAuth() {
+    try {
+        await client.collection(Collections.Users).authRefresh();
+    } catch (error) {
+        // Handle invalid/expired tokens
+        await logout();
+    }
+}
+
 export async function login(
     email: string,
     password: string,
@@ -30,9 +41,9 @@ export async function login(
 ) {
     if(register) {
         const user = { ...rest, email, password, confirmPassword: password };
-        await client.collection("users").create({ ...user, metadata: {} });
+        await client.collection(Collections.Users).create({ ...user, metadata: {} });
     }
-    await client.collection("users").authWithPassword(email, password);
+    await client.collection(Collections.Users).authWithPassword(email, password);
 }
 
 export async function logout() {

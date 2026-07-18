@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import { onshapeOAuth } from "$lib/onshape/oauth";
     import { authModel } from "$lib/pocketbase/auth";
     import type { UsersResponse } from "$lib/pocketbase/generated-types";
@@ -10,14 +9,9 @@
     const oauth = $derived(($authModel as UsersResponse & {
         onshape_auth_expiry?: string;
     } | null)?.onshape_auth_expiry);
-    const documentId = $derived(getOnshapeContext().documentId);
 </script>
 
-{#if !documentId}
-    <div class="container">
-        <p>Missing Onshape parameters. Are you accessing this page directly?</p>
-    </div>
-{:else if !oauth}
+{#if !oauth}
     <div class="container">
         <p>You must authenticate with Onshape before using document features.</p>
         <button onclick={() => onshapeOAuth()}>

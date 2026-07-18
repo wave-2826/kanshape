@@ -13,7 +13,7 @@ export async function nav(path: string, options?: Parameters<typeof goto>[1] & {
     /** A list of query parameters to maintain from the current URL */
     keepParams?: string[]
 }) {
-    const url = new URL(path, window.location.origin);
+    const url = new URL(path, window.location.href);
 
     const paramsToKeep = options?.keepParams ?? [];
     const currentParams = new URLSearchParams(window.location.search);

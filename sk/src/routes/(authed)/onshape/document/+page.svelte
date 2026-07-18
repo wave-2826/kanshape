@@ -26,8 +26,7 @@
         if(!linkedProject) return;
         if(linkedProject.type === LinkedProjectType.Unregistered) return; // Unlinked
         if(linkedProject.type === LinkedProjectType.Unlinked) {
-            // Go to the home page
-            console.log("goin home");
+            // Navigate to the home page if unlinked
             nav("/");
             return;
         }

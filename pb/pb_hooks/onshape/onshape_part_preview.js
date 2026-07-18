@@ -127,8 +127,11 @@ function hashPart(path) {
 function downloadPartTessellation(app, modelPath, path, configuration, authRecord) {
     const { fileMode } = /** @type typeof import("../util.js") */ (require(`${__hooks}/util.js`));
     const { did, wvm, wvmId, eid, partId, linkDocumentId } = path;
+    if(!did || !wvm || !wvmId || !eid || !partId.trim()) {
+        throw new BadRequestError("Missing required Onshape identifiers for part");
+    }
 
-    const lod = "coarse"; // coarse, medium, fine
+    const lod = "medium"; // coarse, medium, fine
 
     const jsonPath = `${modelPath}/${hashPart(path)}.json`;
     // if the file already exists, skip the request to onshape
@@ -188,6 +191,10 @@ function downloadPartTessellation(app, modelPath, path, configuration, authRecor
  */
 function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) {
     const { fileMode } = /** @type typeof import("../util.js") */ (require(`${__hooks}/util.js`));
+    if(!path || !path.did || !path.wvm || !path.wvmId || !path.eid) {
+        throw new BadRequestError("Missing required Onshape identifiers for assembly");
+    }
+
     const { did, wvm, wvmId, eid } = path;
 
     const jsonPath = `${modelPath}/${hashPart(path)}.json`;
@@ -225,6 +232,10 @@ function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) 
 
         // download tessellation data for each part in the assembly
         for(const part of assemblyData.parts) {
+            if(part.partId.trim().length === 0) {
+                throw new BadRequestError(`Part in assembly is missing partId`);
+            }
+
             const partPath = {
                 did: part.documentId,
                 // i don't know if this is the right handling for wvm data

@@ -91,12 +91,12 @@ routerAdd("POST", "/api/parts/generate_preview", (e) => {
 
     // delete all files in the temp directory that don't start with _ or . (just for testing)
     try {
-        // const files = $os.readDir(modelPath);
-        // for(const file of files) {
-        //     if(!file.name().startsWith("_") && !file.name().startsWith(".")) {
-        //         $os.remove(`${modelPath}/${file.name()}`);
-        //     }
-        // }
+        const files = $os.readDir(modelPath);
+        for(const file of files) {
+            if(!file.name().startsWith("_") && !file.name().startsWith(".")) {
+                $os.remove(`${modelPath}/${file.name()}`);
+            }
+        }
     } catch(err) {
         console.warn("Failed to delete temporary files:", err);
     }

@@ -1,11 +1,16 @@
+/**
+ * this file should be imported lazily to avoid loading three.js in the main bundle!
+ */
+
 // definitely something...
-// we lazy-load three, so these are just types
-import type * as THREE from "three";
-type THREE = typeof import("three");
+// we lazy-load so these are just types
+import * as THREE from "three";
 
 export type PartModelHeader = {
     /** backward-compatible version */
     version?: 1;
+    /** ISO 8601 formatted timestamp */
+    generated?: string; // next version: make required
     vertexCount: number;
     hasNormals: boolean;
     hasTransparent: boolean;
@@ -20,6 +25,8 @@ export type PartModelHeader = {
 export type AssemblyModelHeader = {
     /** backward-compatible version */
     version?: 1;
+    /** ISO 8601 formatted timestamp */
+    generated?: string; // next version: make required
     parts: {
         count: number;
     }[];
@@ -45,7 +52,7 @@ function decodeOct8(u8: number, v8: number) {
     };
 }
 
-export async function loadOnshapeModel(THREE: THREE, buffer: Uint8Array) {
+export async function loadOnshapeModel(buffer: Uint8Array) {
     const magicString = new TextDecoder().decode(buffer.subarray(0, 4));
     if(magicString !== "ONSH") throw new Error("Invalid part model format");
 
@@ -102,14 +109,17 @@ export async function loadOnshapeModel(THREE: THREE, buffer: Uint8Array) {
         geometry, materials,
         cameraDistance: header.maxDistance || header.boundingBoxSize,
         length,
-        pivot: header.pivot
+        pivot: header.pivot,
+        generated: header.generated
     };
 }
 
-function createEdgeOverlay(THREE: THREE, geometry: THREE.BufferGeometry) {
+function createEdgeOverlay(geometry: THREE.BufferGeometry, scene: THREE.Scene) {
     // threshold in degrees (??)
     const edges = new THREE.EdgesGeometry(geometry, 40);
-    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
+    const material = new THREE.LineBasicMaterial({ color: 0x000000 });
+    const line = new THREE.LineSegments(edges, material);
+
     return line;
 }
 
@@ -127,19 +137,83 @@ function decodePosition(buffer: Uint8Array) {
     return { tx, ty, tz, qx, qy, qz, qw, length: 14 };
 }
 
-async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
+const CACHE_NAME = 'kanshape-model-cache';
+const CACHE_SIZE_LIMIT = 50 * 1024 * 1024;
+
+/** Downloads a model file or returns a cached file. */
+async function downloadModelFile(url: string): Promise<Uint8Array> {
+    // Try cache first
+    try {
+        const cache = await caches.open(CACHE_NAME);
+        const cached = await cache.match(url);
+        if(cached) return new Uint8Array(await cached.arrayBuffer());
+    } catch(e) {
+        // just fetch
+    }
+
     const response = await fetch(url);
     const buffer = new Uint8Array(await response.arrayBuffer());
+
+    try {
+        // cache responses
+        const cache = await caches.open(CACHE_NAME);
+        const headers = new Headers({
+            'Content-Type': 'application/octet-stream',
+            'X-Cache-Date': Date.now().toString(),
+            'X-Cache-Size': buffer.byteLength.toString(),
+        });
+        await cache.put(url, new Response(buffer, { headers }));
+
+        // remove oldest entries if cache exceeds limit
+        const keys = await cache.keys();
+        let totalSize = 0;
+        const entries: { url: string; size: number; date: number }[] = [];
+        for(const req of keys) {
+            const res = await cache.match(req);
+            if(!res) continue;
+            const size = parseInt(res.headers.get('X-Cache-Size') || '0', 10);
+            const date = parseInt(res.headers.get('X-Cache-Date') || '0', 10);
+            totalSize += size;
+            entries.push({ url: req.url, size, date });
+        }
+        entries.sort((a, b) => a.date - b.date); // oldest first
+        for(const entry of entries) {
+            if(totalSize <= CACHE_SIZE_LIMIT) break;
+            await cache.delete(entry.url);
+            totalSize -= entry.size;
+        }
+    } catch {
+        // caching failed, but still return the buffer
+    }
+
+    return buffer;
+}
+
+async function loadModel(
+    url: string, scene: THREE.Scene, settings: { edges: boolean }
+): Promise<{
+    cameraDistance: number;
+    modelInfo: { size: number, generated: string };
+}> {
+    const buffer = await downloadModelFile(url);
+    const fileSize = buffer.byteLength;
 
     const magicString = new TextDecoder().decode(buffer.subarray(0, 4));
     if(magicString === "ONSH") {
         // part model
-        const { geometry, materials, cameraDistance } = await loadOnshapeModel(THREE, buffer);
+        const { geometry, materials, cameraDistance, generated } = await loadOnshapeModel(buffer);
         const mesh = new THREE.Mesh(geometry, materials);
         scene.add(mesh);
-        mesh.add(createEdgeOverlay(THREE, mesh.geometry));
+        // edges can be quite expensive on large models, so we do it in an idle callback to show
+        // the model as quickly as possibly
+        if(settings.edges) requestIdleCallback(() => {
+            mesh.add(createEdgeOverlay(mesh.geometry, scene));
+        });
 
-        return { cameraDistance };
+        return {
+            cameraDistance,
+            modelInfo: { size: fileSize, generated: generated ?? "" }
+        };
     } else if(magicString === "ONSA") {
         // assembly model
         const dataView = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
@@ -150,13 +224,13 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
         let pos = 8 + jsonLength;
         for(const { count } of header.parts) {
             const partBuffer = buffer.subarray(pos);
-            const { geometry, materials, pivot, length } = await loadOnshapeModel(THREE, partBuffer);
+            const { geometry, materials, pivot, length } = await loadOnshapeModel(partBuffer);
             pos += length;
 
             if(count > 10) {
                 // use instancing
-                const edges = createEdgeOverlay(THREE, geometry);
                 const instancedMesh = new THREE.InstancedMesh(geometry, materials, count);
+                let matrices = [];
                 for(let i = 0; i < count; i++) {
                     const { tx, ty, tz, qx, qy, qz, qw, length: posLength } = decodePosition(buffer.subarray(pos));
                     pos += posLength;
@@ -170,26 +244,50 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
                     matrix.multiply(new THREE.Matrix4().makeTranslation(-(pivot?.x ?? 0), -(pivot?.y ?? 0), -(pivot?.z ?? 0)));
                     instancedMesh.setMatrixAt(i, matrix);
                     
-                    // sad
-                    const edgeInstance = edges.clone();
-                    edgeInstance.applyMatrix4(matrix);
-                    scene.add(edgeInstance);
+                    matrices.push(matrix);
                 }
+
+
+                // sadly, there's no easy way to instance edges.
+                // if this ever becomes a performance problem, we can try to create a custom instancing
+                // setup but i don't suspect it will be. for now, if there are over 100 instances (unlikely),
+                // we stop showing edges
+                if(count < 100 && settings.edges) {
+                    requestIdleCallback(() => {
+                        const edges = createEdgeOverlay(geometry, scene);
+                        for(const matrix of matrices) {
+                            const edgeInstance = edges.clone(false);
+                            edgeInstance.applyMatrix4(matrix);
+                            scene.add(edgeInstance);
+                        }
+                    });
+                }
+                
                 scene.add(instancedMesh);
             } else {
                 // use individual meshes
                 const mesh = new THREE.Mesh(geometry, materials);
                 if(pivot) mesh.pivot = new THREE.Vector3(pivot.x, pivot.y, pivot.z);
-                mesh.add(createEdgeOverlay(THREE, mesh.geometry));
+
+                let meshes = [];
                 for(let i = 0; i < count; i++) {
                     const { tx, ty, tz, qx, qy, qz, qw, length: posLength } = decodePosition(buffer.subarray(pos));
                     pos += posLength;
 
-                    const instance = mesh.clone();
+                    const instance = mesh.clone(false);
                     instance.position.set(tx, ty, tz);
                     instance.quaternion.set(qx, qy, qz, qw);
                     scene.add(instance);
+                    meshes.push(instance);
                 }
+
+                if(settings.edges) requestIdleCallback(() => {
+                    const edgeOverlay = createEdgeOverlay(mesh.geometry, scene);
+                    for(const instance of meshes) {
+                        const edgeInstance = edgeOverlay.clone(false);
+                        instance.add(edgeInstance);
+                    }
+                });
             }
         }
 
@@ -215,18 +313,24 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
             }
         }
 
-        // we're generally okay with zooming in on assemblies a little more
-        return { cameraDistance: (header.maxDistance ?? 1) / 1.1 };
+        return {
+            // we're generally okay with zooming in on assemblies a little more
+            cameraDistance: (header.maxDistance ?? 1) / 1.1,
+            modelInfo: { size: fileSize, generated: header.generated ?? "" }
+        };
     } else {
         throw new Error("Invalid model format");
     }
 }
 
-export async function loadScene(THREE: THREE, scene: THREE.Scene, camera: THREE.OrthographicCamera, url: string) {
+export async function loadScene(
+    scene: THREE.Scene, camera: THREE.OrthographicCamera, url: string,
+    settings: { edges: boolean }
+): Promise<{ info: { size: number, generated: string } }> {
     // Lights
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-    const { cameraDistance: size } = await loadModel(THREE, url, scene);
+    const { cameraDistance: dist, modelInfo: info } = await loadModel(url, scene, settings);
 
     // onshape does lights by connecting them to the camera; replicate that
     const directional = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -234,12 +338,11 @@ export async function loadScene(THREE: THREE, scene: THREE.Scene, camera: THREE.
     directional.target.position.set(0, 0, 0);
     camera.add(directional);
 
-    // const d = 10 / Math.sqrt(3);
-    camera.position.set(size * 10, 0, 0);
+    camera.position.set(dist * 10 / Math.SQRT2, 0, dist * 10 / Math.SQRT2);
     camera.up.set(0, 0, 1);
-    camera.near = size / 10;
-    camera.far = size * 20;
-    camera.zoom = 1 / size / 2;
+    camera.near = dist / 10;
+    camera.far = dist * 20;
+    camera.zoom = 1 / dist / 2;
     camera.updateProjectionMatrix();
     scene.add(camera);
 
@@ -249,4 +352,6 @@ export async function loadScene(THREE: THREE, scene: THREE.Scene, camera: THREE.
     //     new THREE.MeshBasicMaterial({ color: 0xff0000 })
     // );
     // scene.add(originSphere);
+
+    return { info };
 }

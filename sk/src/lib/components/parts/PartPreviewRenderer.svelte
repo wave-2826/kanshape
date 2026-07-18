@@ -1,21 +1,27 @@
 <script lang="ts">
     import type { TypedPartsResponse } from "$lib/data/parts";
     import { client } from "$lib/pocketbase";
-    import { loadScene } from "./renderer";
 
     const {
         part,
-        stats: showStats = false
+        stats: showStats = false,
+        onload,
+        edges = true
     }: {
         part: TypedPartsResponse;
-        stats?: boolean
+        stats?: boolean,
+        onload?: (info: { size: number, generated: string }) => void,
+        edges?: boolean
     } = $props();
     let canvas: HTMLCanvasElement | null = $state(null);
 
     let fileUrl = $derived(part.preview_model ? client.files.getURL(part, part.preview_model) : null);
+
+    let loading = $state(true);
     
     // lazy load three.js to avoid increasing the initial bundle size
     const THREE = await import("three");
+    const { loadScene } = await import("./renderer");
     const { TrackballControls } = await import("./CustomTrackballControls");
     const Stats = (await import("three/examples/jsm/libs/stats.module.js")).default;
 
@@ -48,10 +54,7 @@
             renderer.setPixelRatio(window.devicePixelRatio);
         
             const controls = new TrackballControls(camera, renderer.domElement);
-            // controls.enableDamping = true;
-            // // auto-rotate camera if reduce motion is not enabled
-            // controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            // controls.autoRotateSpeed = 1.5;
+            
             controls.staticMoving = false;
             controls.dynamicDampingFactor = 0.25;
             controls.rotateSpeed = 0.01;
@@ -63,10 +66,16 @@
             };
             // controls.noPan = true;
             controls.target.set(0, 0, 0);
-            controls.autoRotate = true;
+
+            // // auto-rotate camera if reduce motion is not enabled
+            controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             controls.autoRotateSpeed = 0.02;
         
-            loadScene(THREE, scene, camera, fileUrl);
+            loading = true;
+            loadScene(scene, camera, fileUrl, { edges }).then(({ info }) => {
+                loading = false;
+                if(onload) onload(info);
+            });
             
             const resizeObserver = new ResizeObserver(() => {
                 const aspect = canvas!.clientWidth / canvas!.clientHeight;
@@ -114,14 +123,35 @@
 
 {#if part.preview_model}
     <!-- {fileUrl} -->
-    <canvas bind:this={canvas}></canvas>
+    <div class="part-preview-renderer">
+        <canvas bind:this={canvas}></canvas>
+        {#if loading}
+            <p class="loading">Loading model...</p>
+        {/if}
+    </div>
 {/if}
 
 <style lang="scss">
+.part-preview-renderer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 canvas {
     // don't expand based on the canvas's width/height attributes, which are used for the renderer's resolution
     width: 100% !important;
     height: 100% !important;
     display: block;
+}
+.loading {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: 0;
+    font-size: var(--font-tiny);
+    color: var(--text-tertiary);
+    pointer-events: none;
+    padding: 0.5rem;
+    overflow: hidden;
 }
 </style>

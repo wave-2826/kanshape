@@ -5,11 +5,8 @@
     import { client, query, save, watchOne } from "$lib/pocketbase";
     import { Collections, type PartsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-    import { ArrowRight, ExternalLink, X } from "lucide-svelte";
+    import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";
-    import Modal from "../Modal.svelte";
-    import Portal from "../Portal.svelte";
-    import { getConfig } from "$lib/config";
 
     let {
         value = $bindable(),
@@ -18,8 +15,6 @@
         value: string | null | undefined;
         cardId: string;
     } = $props();
-
-    let expandedModal: Modal;
 
     const hasValue = $derived(value !== null && value !== undefined && value !== "");
     let part = $state<TypedPartsResponse | null>(null);
@@ -33,7 +28,6 @@
         }
     });
 
-    const config = getConfig();
     const onshapeCtx = getOnshapeContext();
     
     // TODO: all the alerts in here should be error popups in the UI instead of alert()
@@ -218,6 +212,7 @@
                 current_card: cardId,
                 part_data: partData,
                 past_revision_cards,
+                configuration: sel.configuration,
                 revision: existing[0].revision + 1
             }, { create: false });
         } else {
@@ -231,6 +226,7 @@
                 current_card: cardId,
                 part_data: partData,
                 past_revision_cards: [],
+                configuration: sel.configuration,
                 revision: 1,
                 type: sel.type
             }, { create: true });
@@ -252,45 +248,17 @@
         value = record.id;
         part = record as TypedPartsResponse | null; // early update
     }
-</script>
 
-<Portal target="[data-modal-target]">
-    <div class="modal-preview">
-        <Modal bind:this={expandedModal} id="part-preview-modal-{part?.id ?? ""}">
-            {#if part !== null}
-                <div class="part-info">
-                    <span class="name">{part.part_data?.name ?? "Unknown"}</span>
-                    <span class="number">{part.part_data?.part_number ?? ""}</span>
-                </div>
-                {@const canOpenInTab = onshapeCtx.onOnshape && onshapeCtx.documentId === part.document_id}
-                <button class="open" onclick={() => {
-                    if(!part) return;
-                    if(canOpenInTab) {
-                        onshapeCtx.client?.openAnotherElementInCurrentWorkspace(part.element_id);
-                    } else {
-                        open(`${config.onshape.baseDomain}/documents/${part.document_id}/${part.wvm}/${part.wvm_id}/e/${part.element_id}`, "_blank");
-                    }
-                }}>
-                    <!-- TODO: we can store this ourselves -->
-                    <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
-                    {#if canOpenInTab}
-                        Open tab <ArrowRight />
-                    {:else}
-                        Open in Part Studio <ExternalLink />
-                    {/if}
-                </button>
-                <button class="close" onclick={() => expandedModal?.close()}><X /></button>
-                <PartPreviewRenderer {part} />
-            {/if}
-        </Modal>
-    </div>
-</Portal>
+    let modal: CardPartModal | null = $state(null);
+</script>
 
 {#if hasValue}
     {#if part !== null}
+        <CardPartModal {part} bind:this={modal} />
+
         <button class="part" onclick={(e) => {
             if(e.target instanceof HTMLElement && e.target.closest("[data-part-preview]")) return;
-            expandedModal?.open();
+            modal?.open();
         }}>
             <span class="part-type">{part.type === "part" ? "Part" : "Assembly"}</span>
             <div class="preview" data-part-preview>
@@ -394,58 +362,6 @@
     .preview:hover + .expand-preview, .expand-preview:hover {
         opacity: 1;
         translate: 0 0;
-    }
-}
-
-.modal-preview {
-    display: content;
-
-    :global(dialog) {
-        width: min(calc(100% - 4rem), 800px);
-        height: min(calc(100% - 4rem), 600px);
-        padding: 0;
-        position: relative;
-    }
-
-    .part-info {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-
-        .name {
-            font-size: var(--font-large);
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-        .number {
-            font-size: var(--font-small);
-            color: var(--text-secondary);
-        }
-    }
-
-    .close {
-        --bg-color: transparent;
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        padding: 0.5rem;
-    }
-
-    .open {
-        --bg-color: var(--bg-secondary);
-        position: absolute;
-        bottom: 0.5rem;
-        left: 0.5rem;
-        font-size: var(--font-medium);
-
-        :global(svg) {
-            width: 1em;
-            height: 1em;
-        }
     }
 }
 </style>

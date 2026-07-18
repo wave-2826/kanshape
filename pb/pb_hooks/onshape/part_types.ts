@@ -1,6 +1,6 @@
 import { components } from "../../../sk/src/lib/onshape/schema";
 
-import { PartModelHeader, AssemblyModelHeader } from "../../../sk/src/lib/components/parts/renderer";
+import type { PartModelHeader, AssemblyModelHeader } from "../../../sk/src/lib/components/parts/renderer";
 export type { PartModelHeader, AssemblyModelHeader };
 
 export type _schemas = components["schemas"];

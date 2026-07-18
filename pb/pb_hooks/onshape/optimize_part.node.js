@@ -204,6 +204,7 @@ function writePartBinary(stream, data) {
     /** @type {PartModelHeader} */
     const header = {
         version: 1,
+        generated: new Date().toISOString(),
         materials: Array.from(materialMap.values()),
         groups: materialGroups,
         hasTransparent,
@@ -419,6 +420,7 @@ function writeAssemblyBinary(stream, inputFile, data) {
     /** @type {AssemblyModelHeader} */
     const header = {
         version: 1,
+        generated: new Date().toISOString(),
         parts: data.parts.map(part => ({
             // the rest of the data is in individual parts
             count: part.transformations.length

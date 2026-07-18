@@ -23,6 +23,7 @@ export type AssemblyModelHeader = {
     parts: {
         count: number;
     }[];
+    maxDistance?: number; // next version: make required
 };
 
 /** decode 2*int8 octahedral normals to 3D vector */
@@ -88,7 +89,10 @@ export async function loadOnshapeModel(THREE: THREE, buffer: Uint8Array) {
             opacity: matData.opacity,
             transparent: matData.transparent,
             depthWrite: !matData.transparent,
-            side: header.hasTransparent ? THREE.DoubleSide : THREE.FrontSide
+            side: header.hasTransparent ? THREE.DoubleSide : THREE.FrontSide,
+            
+            metalness: 0.0,
+            roughness: 0.5
         })
     );
     // materials.forEach(mat => mat.updateMeshOnBeforeRender(mesh));
@@ -149,7 +153,7 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
             const { geometry, materials, pivot, length } = await loadOnshapeModel(THREE, partBuffer);
             pos += length;
 
-            if(count > 3) {
+            if(count > 10) {
                 // use instancing
                 const edges = createEdgeOverlay(THREE, geometry);
                 const instancedMesh = new THREE.InstancedMesh(geometry, materials, count);
@@ -182,7 +186,6 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
                     pos += posLength;
                     
                     const instance = mesh.clone();
-                    console.log(tx, ty, tz);
                     instance.position.set(tx, ty, tz);
                     instance.quaternion.set(qx, qy, qz, qw);
                     scene.add(instance);
@@ -190,7 +193,30 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
             }
         }
 
-        return { cameraDistance: 1 };
+        // if header["aabb"] exists, add a box helper to visualize the bounding box
+        // @ts-ignore
+        if(header["aabb"]) {
+            // @ts-ignore
+            const { minX, minY, minZ, maxX, maxY, maxZ } = header["aabb"];
+            const box = new THREE.Box3(new THREE.Vector3(minX, minY, minZ), new THREE.Vector3(maxX, maxY, maxZ));
+            const boxHelper = new THREE.Box3Helper(box, 0xffff00);
+            scene.add(boxHelper);
+        }
+
+        // if header["aabbs"] exists, draw individual instance aabbs
+        // @ts-ignore
+        if(header["aabbs"]) {
+            // @ts-ignore
+            for(const aabb of header["aabbs"]) {
+                const { minX, minY, minZ, maxX, maxY, maxZ } = aabb;
+                const box = new THREE.Box3(new THREE.Vector3(minX, minY, minZ), new THREE.Vector3(maxX, maxY, maxZ));
+                const boxHelper = new THREE.Box3Helper(box, 0x00ff00);
+                scene.add(boxHelper);
+            }
+        }
+
+        // we're generally okay with zooming in on assemblies a little more
+        return { cameraDistance: (header.maxDistance ?? 1) / 1.25 };
     } else {
         throw new Error("Invalid model format");
     }
@@ -198,21 +224,28 @@ async function loadModel(THREE: THREE, url: string, scene: THREE.Scene) {
 
 export async function loadScene(THREE: THREE, scene: THREE.Scene, camera: THREE.OrthographicCamera, url: string) {
     // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
     const { cameraDistance: size } = await loadModel(THREE, url, scene);
 
     // onshape does lights by connecting them to the camera; replicate that
-    const directional = new THREE.DirectionalLight(0xffffff, 1);
+    const directional = new THREE.DirectionalLight(0xffffff, 1.5);
+    directional.position.set(0, 1, 1);
     directional.target.position.set(0, 0, 0);
-    directional.position.set(0, 0, 0);
     camera.add(directional);
 
-    const d = 1.1 / Math.sqrt(3);
+    const d = 10 / Math.sqrt(3);
     camera.position.set(size * d, size * d, size * d);
     camera.near = size / 10;
-    camera.far = size * 10;
+    camera.far = size * 20;
     camera.zoom = 1 / size / 2;
     camera.updateProjectionMatrix();
     scene.add(camera);
+
+    // debugging origin sphere
+    // const originSphere = new THREE.Mesh(
+    //     new THREE.SphereGeometry(size / 100, 16, 16),
+    //     new THREE.MeshBasicMaterial({ color: 0xff0000 })
+    // );
+    // scene.add(originSphere);
 }

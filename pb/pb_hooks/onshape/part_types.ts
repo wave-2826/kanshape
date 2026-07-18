@@ -45,3 +45,5 @@ export type AssemblyData = {
     type: "assembly";
     parts: PartGroup[];
 };
+
+export type AABB = { minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number };

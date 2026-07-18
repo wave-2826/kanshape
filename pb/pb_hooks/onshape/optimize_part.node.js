@@ -2,8 +2,9 @@
 import fs from 'fs';
 import { WriteStream } from 'fs';
 import path from 'path';
+import { Writable } from 'stream';
 /**
- * @import { BTExportTessellatedFacesResponse, AssemblyData, PartModelHeader, AssemblyModelHeader } from "./part_types";
+ * @import { BTExportTessellatedFacesResponse, AssemblyData, PartModelHeader, AssemblyModelHeader, AABB } from "./part_types";
  */
 
 const PART_HEADER_MAGIC = "ONSH"; // onsh is for... onshape, i guess?
@@ -51,10 +52,12 @@ function encodeOct8(x, y, z) {
 
 /**
  * Converts Onshape data to binary format and writes to the specified stream
- * @param {WriteStream} stream
+ * @param {Writable} stream
  * @param {BTExportTessellatedFacesResponse} data
  * @returns {{
- *      centerTranslation: { x: number, y: number, z: number }
+ *      centerTranslation: { x: number, y: number, z: number },
+ *      maxDistance: number,
+ *      aabb: AABB
  * }}
  */
 function writePartBinary(stream, data) {
@@ -112,16 +115,14 @@ function writePartBinary(stream, data) {
                 ];
 
                 for(const p of pts) {
-                    const x = p.x;
-                    const y = p.z;
-                    const z = -p.y;
+                    const x = p.x, y = p.z, z = -p.y;
 
                     positions.push(x, y, z);
 
                     // Update bounds
-                    if (x < minX) minX = x; if (x > maxX) maxX = x;
-                    if (y < minY) minY = y; if (y > maxY) maxY = y;
-                    if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+                    if(x < minX) minX = x; if(x > maxX) maxX = x;
+                    if(y < minY) minY = y; if(y > maxY) maxY = y;
+                    if(z < minZ) minZ = z; if(z > maxZ) maxZ = z;
                 }
 
                 for(const n of facet.normals) {
@@ -167,6 +168,9 @@ function writePartBinary(stream, data) {
         );
     }
 
+    maxX -= centerX; maxY -= centerY; maxZ -= centerZ;
+    minX -= centerX; minY -= centerY; minZ -= centerZ;
+
     const sizeX = maxX - minX;
     const sizeY = maxY - minY;
     const sizeZ = maxZ - minZ;
@@ -198,6 +202,7 @@ function writePartBinary(stream, data) {
     // json header
     const materialsArray = Array.from(materialMap.values());
     const hasTransparent = materialsArray.some(m => m.transparent);
+    const maxDistance = Math.sqrt(maxEuclideanSq);
     /** @type {PartModelHeader} */
     const header = {
         version: 1,
@@ -208,7 +213,7 @@ function writePartBinary(stream, data) {
         decodeScale,
         vertexCount: positions.length / 3,
         hasNormals: normals.length > 0,
-        maxDistance: Math.sqrt(maxEuclideanSq),
+        maxDistance,
         pivot: { x: -centerX, y: -centerY, z: -centerZ }
     };
 
@@ -240,7 +245,9 @@ function writePartBinary(stream, data) {
     console.log("  - Groups count:", materialGroups.length);
 
     return {
-        centerTranslation: { x: centerX, y: centerY, z: centerZ }
+        centerTranslation: { x: centerX, y: centerY, z: centerZ },
+        maxDistance,
+        aabb: { minX, minY, minZ, maxX, maxY, maxZ }
     };
 }
 
@@ -259,15 +266,25 @@ function getPartFile(dir, file) {
 }
 
 /**
+ * extract the translation in our rotated world-space coordinates from a matrix.
+ * @param {number[]} matrix
+ */
+function getTranslation(matrix) {
+    // we transform (x, y, z) -> (x, z, -y)
+    const x = matrix[3], y = matrix[7], z = matrix[11]; // model space
+    return { x, y: z, z: -y }; // world space
+}
+
+/**
  * Encode a row-major 4x4 matrix representing a rigid transformation matrix as a
  * compact 7-number representation. Since Onshape only uses rigid transformations,
  * a full 4x4 matrix stores a lot of unnecessary data.
- * @param {WriteStream} stream
+ * @param {Writable} stream
  * @param {number[]} transform
- * @param { { x: number, y: number, z: number } } centerTranslation Since we center parts,
+ * @param { { x: number, y: number, z: number } } translationOffset Since we center parts,
  * we need to account for that shift when encoding positions.
  */
-function encodeTransformation(stream, transform, centerTranslation) {
+function encodeTransformation(stream, transform, translationOffset) {
     if(!transform || transform.length !== 16) {
         throw new Error("Invalid transform matrix: must be a 4x4 matrix");
     }
@@ -281,13 +298,12 @@ function encodeTransformation(stream, transform, centerTranslation) {
     }
 
     // encode translation as half precision f16 and write
-    const tx = transform[3], ty = transform[7], tz = transform[11];
+    const { x: tlx, y: tly, z: tlz } = getTranslation(transform);
     const translationBuffer = Buffer.alloc(6);
     const tlbView = new DataView(translationBuffer.buffer);
-    // we transform (x, y, z) -> (x, z, -y)
-    tlbView.setFloat16(0, tx + centerTranslation.x, true);
-    tlbView.setFloat16(2, tz + centerTranslation.y, true);
-    tlbView.setFloat16(4, -ty + centerTranslation.z, true);
+    tlbView.setFloat16(0, tlx + translationOffset.x, true);
+    tlbView.setFloat16(2, tly + translationOffset.y, true);
+    tlbView.setFloat16(4, tlz + translationOffset.z, true);
     stream.write(translationBuffer);
 
     // encode rotation as single precision quaternion
@@ -340,6 +356,56 @@ function encodeTransformation(stream, transform, centerTranslation) {
 }
 
 /**
+ * Get the corners of the given axis-aligned bounding box.
+ * @param {AABB} aabb
+ * @returns {{ x: number, y: number, z: number }[]}
+ */
+function getAABBCorners(aabb) {
+    return [
+        { x: aabb.minX, y: aabb.minY, z: aabb.minZ },
+        { x: aabb.minX, y: aabb.minY, z: aabb.maxZ },
+        { x: aabb.minX, y: aabb.maxY, z: aabb.minZ },
+        { x: aabb.minX, y: aabb.maxY, z: aabb.maxZ },
+        { x: aabb.maxX, y: aabb.minY, z: aabb.minZ },
+        { x: aabb.maxX, y: aabb.minY, z: aabb.maxZ },
+        { x: aabb.maxX, y: aabb.maxY, z: aabb.minZ },
+        { x: aabb.maxX, y: aabb.maxY, z: aabb.maxZ }
+    ];
+}
+
+/**
+ * Constructs the axis-aligned bounding box encompassing the given AABB after transforming it.
+ * @param {AABB} aabb
+ * @param {number[]} transform
+ * @param {{ x: number, y: number, z: number }} translation
+ * @returns {AABB}
+ */
+function transformAABB(aabb, transform, translation = { x: 0, y: 0, z: 0 }) {
+    const corners = getAABBCorners(aabb);
+
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+
+    const { x: tlx, y: tly, z: tlz } = getTranslation(transform);
+
+    for(const corner of corners) {
+        const x = corner.x + translation.x, y = corner.y + translation.y, z = corner.z + translation.z;
+        const tx = transform[0] * x + transform[1] * y + transform[2] * z + tlx;
+        const ty = transform[4] * x + transform[5] * y + transform[6] * z + tly;
+        const tz = transform[8] * x + transform[9] * y + transform[10] * z + tlz;
+
+        minX = Math.min(minX, tx);
+        minY = Math.min(minY, ty);
+        minZ = Math.min(minZ, tz);
+        maxX = Math.max(maxX, tx);
+        maxY = Math.max(maxY, ty);
+        maxZ = Math.max(maxZ, tz);
+    }
+
+    return { minX, minY, minZ, maxX, maxY, maxZ };
+}
+
+/**
  * Write a binary assembly file for the given Onshape assembly data.  
  * Finds all of the parts in the document and reads their respective files from their hashed path.  
  * All hashed part json files should be the direct response from Onshape
@@ -361,6 +427,99 @@ function writeAssemblyBinary(stream, inputFile, data) {
             count: part.transformations.length
         }))
     };
+    
+    console.log(`Assembly: ${inputFile}`)
+
+    // Write each individual part as:
+    // - normal part data
+    // - transformations (encoded)
+
+    // we unfortunately need to do 2 passes for centering
+
+    /** @type {Buffer[]} */
+    let chunks = [];
+    /** @type {{
+     *     chunks: Buffer[];
+     *     translationOffset: { x: number, y: number, z: number };
+     *     aabbs: AABB[];
+     *  }[]}
+     */
+    const parts = [];
+    const partStream = new Writable({
+        write(chunk, _encoding, callback) {
+            chunks.push(chunk);
+            callback();
+        }
+    });
+
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+
+    const directory = path.dirname(inputFile);
+    // let allAABBs = [];
+    for(const part of data.parts) {
+        if(!part.file) throw new Error(`Part ${part.partId} is missing file reference`);
+        const partData = getPartFile(directory, part.file);
+        const { centerTranslation, aabb } = writePartBinary(partStream, partData);
+
+        let aabbs = [];
+        for(const transform of part.transformations) {
+            const aabb_ = transformAABB(aabb, transform, centerTranslation);
+            // allAABBs.push(aabb_);
+            aabbs.push(aabb_);
+
+            // update the overall bounding box
+            minX = Math.min(minX, aabb_.minX);
+            minY = Math.min(minY, aabb_.minY);
+            minZ = Math.min(minZ, aabb_.minZ);
+            maxX = Math.max(maxX, aabb_.maxX);
+            maxY = Math.max(maxY, aabb_.maxY);
+            maxZ = Math.max(maxZ, aabb_.maxZ);
+        }
+
+        parts.push({ chunks, translationOffset: centerTranslation, aabbs });
+        chunks = [];
+    }
+
+    const centerX = (minX + maxX) / 2, centerY = (minY + maxY) / 2, centerZ = (minZ + maxZ) / 2;
+
+    // for debugging aabbs
+    // const translateAABB = /** @param {AABB} aabb */ (aabb) => ({ minX: aabb.minX - centerX, minY: aabb.minY - centerY, minZ: aabb.minZ - centerZ, maxX: aabb.maxX - centerX, maxY: aabb.maxY - centerY, maxZ: aabb.maxZ - centerZ });
+    // header["aabb"] = translateAABB({ minX, minY, minZ, maxX, maxY, maxZ });
+    // header["aabbs"] = allAABBs.map(translateAABB);
+
+    // The maximum distance from the origin to the edge of a part's bounding sphere.
+    // This isn't technically the perfect maximum vertex distance, but it's cheaper to compute than
+    // transforming all vertices for every instance.
+    let maximumDistance = 0;
+
+    // center and write transformations
+    for(const [idx, part] of data.parts.entries()) {
+        let { translationOffset } = parts[idx];
+        translationOffset = {
+            x: translationOffset.x - centerX,
+            y: translationOffset.y - centerY,
+            z: translationOffset.z - centerZ
+        };
+
+        // write transformations
+        for(const transform of part.transformations) {
+            encodeTransformation(partStream, transform, translationOffset);
+
+            // compute the maximum distance from the origin to the transformed bounding box
+            const aabb = parts[idx].aabbs.shift();
+            if(!aabb) throw new Error("Missing AABB for part transformation");
+            const corners = getAABBCorners(aabb);
+            for(const corner of corners) {
+                const distance = Math.hypot(corner.x - centerX, corner.y - centerY, corner.z - centerZ);
+                maximumDistance = Math.max(maximumDistance, distance);
+            }
+        }
+        parts[idx].chunks.push(...chunks);
+        chunks = [];
+    }
+
+    header.maxDistance = maximumDistance;
 
     let headerString = JSON.stringify(header);
     let headerByteLength = Buffer.byteLength(headerString, 'utf-8');
@@ -379,25 +538,14 @@ function writeAssemblyBinary(stream, inputFile, data) {
     stream.write(magic);
     stream.write(lengthBuffer);
     stream.write(headerBuffer);
-
-    console.log(`Assembly: ${inputFile}`)
-    console.log("- Header size:", headerBuffer.length, "bytes");
-    console.log("- Part count:", data.parts.length);
-
-    // Write each individual part as:
-    // - normal part data
-    // - transformations (encoded)
-    const directory = path.dirname(inputFile);
-    for(const part of data.parts) {
-        if(!part.file) throw new Error(`Part ${part.partId} is missing file reference`);
-        const partData = getPartFile(directory, part.file);
-        const { centerTranslation } = writePartBinary(stream, partData);
-
-        // write transformations
-        for(const transform of part.transformations) {
-            encodeTransformation(stream, transform, centerTranslation);
+    for(const part of parts) {
+        for(const chunk of part.chunks) {
+            stream.write(chunk);
         }
     }
+
+    console.log("- Header size:", headerBuffer.length, "bytes");
+    console.log("- Part count:", data.parts.length);
 }
 
 // entrypoint

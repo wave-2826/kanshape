@@ -16,7 +16,7 @@
     
     // lazy load three.js to avoid increasing the initial bundle size
     const THREE = await import("three");
-    const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
+    const { TrackballControls } = await import("./CustomTrackballControls");
     const Stats = (await import("three/examples/jsm/libs/stats.module.js")).default;
 
     $effect(() => {
@@ -47,12 +47,24 @@
             renderer.setSize(canvas.clientWidth, canvas.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
         
-            const controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            // auto-rotate camera if reduce motion is not enabled
-            controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            controls.autoRotateSpeed = 1.5;
+            const controls = new TrackballControls(camera, renderer.domElement);
+            // controls.enableDamping = true;
+            // // auto-rotate camera if reduce motion is not enabled
+            // controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            // controls.autoRotateSpeed = 1.5;
+            controls.staticMoving = false;
+            controls.dynamicDampingFactor = 0.25;
+            controls.rotateSpeed = 0.01;
+            controls.panSpeed = 1.0;
+            controls.mouseButtons = {
+                LEFT: THREE.MOUSE.ROTATE,
+                MIDDLE: THREE.MOUSE.DOLLY,
+                RIGHT: THREE.MOUSE.PAN
+            };
+            // controls.noPan = true;
             controls.target.set(0, 0, 0);
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.02;
         
             loadScene(THREE, scene, camera, fileUrl);
             
@@ -68,12 +80,15 @@
             });
             resizeObserver.observe(canvas);
 
+            let lastTime = performance.now();
+
             const intersectionObserver = new IntersectionObserver((entries) => {
                 for(const entry of entries) {
                     if(entry.target === canvas) {
                         if(entry.isIntersecting) {
-                            renderer.setAnimationLoop(() => {
-                                controls.update();
+                            renderer.setAnimationLoop((time) => {
+                                const delta = Math.min((time - lastTime) / 1000, 0.1);
+                                controls.update(delta);
                                 renderer.render(scene, camera);
                                 if(stats) stats.update();
                             });

@@ -5,6 +5,9 @@
  * @import { BTAssemblyDefinitionInfo, BTAssemblyInstanceInfo, AssemblyData, PartGroup, TransformMatrix4x4 } from "./part_types";
  */
 
+// 1 api request per part is harsh, so we limit the number of unique parts for now
+const MAX_ASSEMBLY_PARTS = 20;
+
 /**
  * Extract the parts from an Onshape assembly data structure.
  * @param {BTAssemblyDefinitionInfo} onshapeData
@@ -216,13 +219,17 @@ function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) 
         const data = res.body;
         const assemblyData = extractAssemblyParts(data);
 
+        if(assemblyData.parts.length > MAX_ASSEMBLY_PARTS) {
+            throw new BadRequestError(`Assembly has too many unique parts (${assemblyData.parts.length}), maximum allowed is ${MAX_ASSEMBLY_PARTS}`);
+        }
+
         // download tessellation data for each part in the assembly
         for(const part of assemblyData.parts) {
             const partPath = {
                 did: part.documentId,
                 // i don't know if this is the right handling for wvm data
-                wvm: wvm,
-                wvmId: wvmId,
+                wvm: part.documentMicroversion ? "m" : wvm,
+                wvmId: part.documentMicroversion || wvmId,
                 eid: part.elementId,
                 partId: part.partId,
                 linkDocumentId: did

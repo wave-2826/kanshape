@@ -280,7 +280,7 @@
                     {/if}
                 </button>
                 <button class="close" onclick={() => expandedModal?.close()}><X /></button>
-                <PartPreviewRenderer {part} stats />
+                <PartPreviewRenderer {part} />
             {/if}
         </Modal>
     </div>

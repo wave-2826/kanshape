@@ -100,7 +100,7 @@ function onshapeRequest(authRecord, method, path, extraHeaders, body) {
             "Accept": extraHeaders?.["Accept"] ?? "application/json;charset=UTF-8; qs=0.09"
         },
         body,
-        timeout: 10,
+        timeout: 120
     });
 
     if(!res) throw new InternalServerError("No response from Onshape");

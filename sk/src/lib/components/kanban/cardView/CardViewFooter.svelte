@@ -3,7 +3,7 @@
     import { deleteRecord, queryOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Trash } from "lucide-svelte";
-    import { getUsername } from "./usernameCache";
+    import { getUsername } from "./nameCache";
 
     const { card }: { card: TypedCardsResponse } = $props();
 

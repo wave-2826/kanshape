@@ -20,8 +20,8 @@ cases where the expected type doesn't match the value type by displaying a reset
         type: CardMetadataFieldType<false>,
         value: CardMetadata[string]["value"],
         addFile: (name: string, file: File) => void,
-        getFileUrl: (file: MetadataFile) => string,
-        cardId: string
+        getFileUrl?: (file: MetadataFile) => string,
+        cardId?: string
     } = $props();
 
     function get<T>(): T {
@@ -106,25 +106,29 @@ cases where the expected type doesn't match the value type by displaying a reset
         {#snippet capsule(file: MetadataFile)}
             <div class="file-capsule">
                 <FileIcon class={$css("file-icon")} />
-                <a
-                    href={getFileUrl(file as MetadataFile)}
-                    target="_blank"
-                    onclick={(e) => {
-                        // manual download handler to set the filename properly
-                        // progressive enhancement; the link will work normally too
-                        e.preventDefault();
-                        const url = getFileUrl(file as MetadataFile);
-                        // TODO: Download progress indicator
-                        // TODO: Handle errors
-                        fetch(url).then(async (res) => {
-                            const blob = await res.blob();
-                            const a = document.createElement("a");
-                            a.href = URL.createObjectURL(blob);
-                            a.download = (file as MetadataFile).name;
-                            a.click();
-                        });
-                    }}
-                >{(file as MetadataFile).name}</a>
+                {#if getFileUrl}
+                    <a
+                        href={getFileUrl(file as MetadataFile)}
+                        target="_blank"
+                        onclick={(e) => {
+                            // manual download handler to set the filename properly
+                            // progressive enhancement; the link will work normally too
+                            e.preventDefault();
+                            const url = getFileUrl(file as MetadataFile);
+                            // TODO: Download progress indicator
+                            // TODO: Handle errors
+                            fetch(url).then(async (res) => {
+                                const blob = await res.blob();
+                                const a = document.createElement("a");
+                                a.href = URL.createObjectURL(blob);
+                                a.download = (file as MetadataFile).name;
+                                a.click();
+                            });
+                        }}
+                    >{(file as MetadataFile).name}</a>
+                {:else}
+                    <span>{(file as MetadataFile).name}</span>
+                {/if}
                 <button onclick={() => {
                     if(type.multi) {
                         set((value as MetadataFile[]).filter(f => f.id !== (file as MetadataFile).id));

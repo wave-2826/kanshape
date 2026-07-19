@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { autoSize } from "$lib/actions";
-    import { getPriorityColor, priorities, type CardAssignmentData, type CardMetadata, type TypedCardsResponse } from "$lib/data/cards";
-    import type { SectionsRecord, SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { autofocus, autoSize } from "$lib/actions";
+    import { getPriorityColor, priorities, type CardAssignmentData, type CardMetadata, type TypedCardsCreate, type TypedCardsResponse } from "$lib/data/cards";
+    import type { SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
@@ -11,35 +11,35 @@
     import { getCardMetadataItems, getExtraMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
     import type { ExpandResponse } from "$lib/pocketbase";
     import CardFieldCategory from "./CardFieldCategory.svelte";
-    import CardViewFooter from "./CardViewFooter.svelte";
-    import { tick } from "svelte";
     import type { CardSelectState } from "./CardViewPanel.svelte";
 
     let {
         board,
         card = $bindable(),
-        preview,
-        sections,
         subprojects,
         loading,
 
         boardCards,
         onopendependency,
         onselectdependency,
-        allowSelectingDependencies
+        allowSelectingDependencies,
+
+        autofocusTitle = false
     }: {
         board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
-        card: TypedCardsResponse,
-        preview: TypedCardPreviewResponse,
-        sections: SectionsRecord[],
+        card: TypedCardsResponse | TypedCardsCreate,
         subprojects: SubprojectsRecord[],
         loading: boolean,
 
         boardCards?: TypedCardPreviewResponse[],
         onopendependency?: (id: string | null) => void,
         onselectdependency?: (state: CardSelectState) => void,
-        allowSelectingDependencies: boolean
+        allowSelectingDependencies: boolean,
+
+        autofocusTitle?: boolean
     } = $props();
+
+    const sections = $derived(board.expand.sections ?? []);
 
     const metadataItems = $derived(getCardMetadataItems(board, {
         board: $state.snapshot(board) as TypedBoardsResponse,
@@ -49,7 +49,14 @@
 </script>
 
 <header>
-    <input type="text" bind:value={card.title} class="title" placeholder="Card title" disabled={loading} />
+    <input
+        type="text"
+        bind:value={card.title}
+        class="title"
+        placeholder="Card title"
+        disabled={loading}
+        use:autofocus={autofocusTitle}
+    />
 </header>
 
 <div class="card-content">
@@ -126,10 +133,7 @@
                     </button>
                 {/if}
             </span>
-            <CardAssignmentValue
-                bind:assignmentData={card.assignment_data as CardAssignmentData}
-                nameCache={preview?.assignment_name_cache ?? []}
-            />
+            <CardAssignmentValue bind:assignmentData={card.assignment_data as CardAssignmentData} />
         </div>
     </div>
 
@@ -169,13 +173,14 @@
         <div class="property dependencies">
             <span class="prop-label"><ListTree /> Dependencies</span>
             <div class="prop-value">
-                {#if boardCards}
+                {#if boardCards && "id" in card}
                     <CardDependencySelector
                         bind:dependencies={card.dependencies}
                         {boardCards}
                         onopendependency={onopendependency}
                         onselectcard={allowSelectingDependencies ? async (message, callback) => {
                             if(!onopendependency) return;
+                            if(!("id" in card)) return;
                             onselectdependency?.({
                                 message, callback,
                                 originalSelection: card.id
@@ -202,10 +207,6 @@
         <CardFieldCategory fields={extraItems} bind:card />
     {/if}
 </div>
-
-<hr />
-
-<CardViewFooter {card} />
 
 <style lang="scss">
 @use "props.scss";
@@ -283,16 +284,5 @@ h3 {
 
 .dependencies {
     grid-column: 1 / -1;
-}
-
-hr {
-    margin: 0 0 1rem 0;
-}
-
-.empty {
-    color: var(--text-tertiary);
-    font-style: italic;
-    font-size: var(--font-small);
-    margin-left: 0.5rem;
 }
 </style>

@@ -4,6 +4,7 @@
     import type { ExpandResponse } from "$lib/pocketbase";
     import type { SectionsRecord } from "$lib/pocketbase/generated-types";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import type { TypedBoardsResponse } from "$lib/data/project";
 
     const {
         project,
@@ -12,7 +13,7 @@
         cards
     }: {
         project: ExpandResponse<"projects", "subprojects">,
-        board?: ExpandResponse<"boards", "sections">,
+        board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         sections?: SectionsRecord[],
         cards: TypedCardPreviewResponse[]
     } = $props();
@@ -47,7 +48,11 @@
 </menu>
 
 {#if board && sections}
-    <NewCardModal bind:this={newCardModal} {sections} boardCards={cards} projectId={project.id} boardId={board.id} />
+    <NewCardModal
+        bind:this={newCardModal}
+        {sections} subprojects={project.expand.subprojects ?? []}
+        boardCards={cards} {board}
+    />
 {/if}
 
 <style lang="scss">

@@ -237,3 +237,7 @@ export function contrastStyle(node: HTMLElement, styleText: string) {
         update
     };
 }
+
+export function autofocus(node: HTMLElement, enabled: boolean) {
+    if(enabled) node.focus();
+}

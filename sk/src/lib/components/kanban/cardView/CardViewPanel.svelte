@@ -3,7 +3,8 @@
     import { type TypedCardsResponse } from "../../../data/cards";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     
-    type UploadContext = {
+    // todo: there's probably a better place for this type
+    export type UploadContext = {
         queueUpload(name: string, file: File): void;
         update(): void;
     };
@@ -25,19 +26,18 @@
     import CardView from "./CardView.svelte";
     import { readable, type Readable } from "svelte/store";
     import { applyDiff, createDiff } from "./diff";
+    import CardViewFooter from "./CardViewFooter.svelte";
     
     let {
         board,
         boardCards,
         card: cardId = $bindable(),
-        sections,
         subprojects
     }: {
         board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         boardCards: TypedCardPreviewResponse[],
         card: string | null,
-
-        sections: SectionsRecord[], subprojects: SubprojectsRecord[]
+        subprojects: SubprojectsRecord[]
     } = $props();
 
     /**
@@ -193,7 +193,7 @@
         // file in the card's files array.
         let removedFiles = card.files.filter(f => !metadataFiles.some(mf => f.startsWith(mf)));
 
-        // 3. construct an array of Files of new files to upload with the changed names
+        // 3. construct an array of Files to upload with the changed names
         let newFiles = uploadQueue
             .filter(f => !card!.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
             .map(f => new File([f.file], f.name, { type: f.file.type, lastModified: f.file.lastModified }));
@@ -241,12 +241,12 @@
 
 <ModalPanel open={cardId !== null} onclose={() => cardId = null} collapse={selectingCard !== null}>
     {#if preview}
+        {@const _card = card ?? previewPlaceholder(preview)}
         <CardView
             {board}
-            {preview}
             loading={card === null}
             bind:card={
-                () => card ?? previewPlaceholder(preview),
+                () => _card,
                 (v) => {
                     if(card === null) {
                         console.warn("Tried to update card view while it was loading");
@@ -262,8 +262,10 @@
                 selectingCard = state;
             }}
             {boardCards}
-            {sections} {subprojects}
+            {subprojects}
         />
+        <hr />
+        <CardViewFooter card={_card} />
     {:else}
         <p>Error displaying card: unknown preview</p>
     {/if}
@@ -300,5 +302,9 @@
             --bg-color: var(--bg-primary);
         }
     }    
+}
+
+hr {
+    margin: 0 0 1rem 0;
 }
 </style>

@@ -14,7 +14,7 @@
         cardId
     }: {
         value: string | null | undefined;
-        cardId: string;
+        cardId?: string;
     } = $props();
 
     const hasValue = $derived(value !== null && value !== undefined && value !== "");
@@ -281,6 +281,12 @@
     }
 
     async function addPart() {
+        if(!cardId) {
+            // temporary until i figure out this handling
+            alert("No card ID provided. Cannot add part.");
+            return;
+        }
+
         if(status !== "display") return;
         if(!onshapeCtx.client) return;
 
@@ -363,11 +369,7 @@
             </button>
         {:else}
             <!-- TODO: allow selecting existing parts when not on onshape maybe? -->
-            <!-- svelte-ignore a11y_no_static_element_interactions - for testing -->
-            <div class="add missing" ondblclick={() => {
-                const id = prompt("Enter part ID to link to this card:");
-                if(id) value = id;
-            }}>No part selected. Add one from Onshape!</div>
+            <div class="add empty">No part selected. Add one from Onshape!</div>
         {/if}
     {/if}
 {/if}

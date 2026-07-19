@@ -1,7 +1,13 @@
-import type { CardsPriorityOptions, CardsResponse } from "$lib/pocketbase/generated-types";
+import type { CardsPriorityOptions, CardsResponse, Create } from "$lib/pocketbase/generated-types";
 import type { CardMetadataFieldType, MetadataValue } from "./project";
 
 export type TypedCardsResponse<Expand = {}> = CardsResponse<CardAssignmentData, CardMetadata, Expand>;
+export type TypedCardsCreate = Required<
+    Omit<Create<"cards">, "id" | "moved_at">
+> & {
+    assignment_data: CardAssignmentData,
+    metadata: CardMetadata | null
+};
 
 export const priorities: { [key in CardsPriorityOptions]: {
     label: string;

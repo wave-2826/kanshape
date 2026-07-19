@@ -1,14 +1,14 @@
 <script lang="ts">
     import type { CardMetadataSection } from "$lib/data/project";
     import CardFieldEditor from "./CardFieldEditor.svelte";
-    import type { TypedCardsResponse } from "$lib/data/cards";
+    import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
     import { Trash } from "lucide-svelte";
 
     let {
         fields, card = $bindable()
     }: {
         fields: CardMetadataSection["fields"],
-        card: TypedCardsResponse
+        card: TypedCardsResponse | TypedCardsCreate
     } = $props();
 </script>
 

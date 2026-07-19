@@ -43,7 +43,7 @@
     <CardViewPanel
         boardCards={listCards}
         bind:card={openCardId}
-        {sections} {subprojects}
+        {subprojects}
         {board}
     />
 

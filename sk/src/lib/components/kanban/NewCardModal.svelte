@@ -1,115 +1,112 @@
 <script lang="ts">
-    import { save } from "$lib/pocketbase";
-    import { CardsPriorityOptions, Collections, type SectionsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
-    import { priorities } from "../../data/cards";
-    import { nextCardPosition, type TypedCardPreviewResponse } from "$lib/data/kanban";
+    import { type TypedCardPreviewResponse } from "$lib/data/kanban";
     import { authModel } from "$lib/pocketbase/auth";
+    import CardView from "./cardView/CardView.svelte";
+    import type { TypedBoardsResponse } from "$lib/data/project";
+    import { save, type ExpandResponse } from "$lib/pocketbase";
+    import { setUploadContext, type UploadContext } from "./cardView/CardViewPanel.svelte";
+    import { Plus, X } from "lucide-svelte";
+    import type { TypedCardsCreate } from "$lib/data/cards";
 
     let {
-        projectId,
-        boardId,
+        board,
         sections,
-        boardCards,
-        forceOpen = false
+        subprojects,
+        boardCards
     }: {
-        projectId: string,
-        boardId: string,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         sections: SectionsRecord[],
+        subprojects: SubprojectsRecord[],
         boardCards: TypedCardPreviewResponse[],
-        forceOpen?: boolean
     } = $props();
-
-    let title = $state("");
-    // svelte-ignore state_referenced_locally
-    let sectionId = $state(sections[0]?.id ?? "");
-    let description = $state("");
-    let priority: CardsPriorityOptions = $state("low");
 
     let modal: Modal;
     async function create() {
-        if(title.length === 0) return;
+        if(cardData.title.length === 0) return;
 
-        await save(Collections.Cards, {
-            title,
-            board: boardId,
-            section: sectionId,
-            position: nextCardPosition(boardCards, sectionId),
-            moved_at: new Date().toISOString(),
-            created_by: $authModel?.id,
-            description,
-            priority
-        }, { create: true }).catch((err) => {
+        await save(Collections.Cards, cardData, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);
             return null;
         });
 
-        title = "";
-        description = "";
         modal.close();
     }
 
+    function getDefaultCardData(): TypedCardsCreate {
+        return {
+            assignment_data: null,
+            board: board.id,
+            created_by: $authModel?.id ?? "",
+            dependencies: [],
+            description: "",
+            due_by: "",
+            duration_days: 0,
+            files: [],
+            metadata: null,
+            position: 0,
+            priority: "low",
+            section: sections[0].id,
+            subprojects: [],
+            title: "New card"
+        };
+    }
+    
+    let cardData = $state<TypedCardsCreate>(getDefaultCardData());
+
     export function open(defaultSectionId?: string) {
-        if(defaultSectionId) sectionId = defaultSectionId;
-        else sectionId = sections[0]?.id ?? "";
+        cardData = getDefaultCardData();
+        cardData.section = defaultSectionId ?? sections[0]?.id ?? "";
         modal.open();
     }
 
-    function focus(node: HTMLElement) {
-        node.focus();
-    }
+    let uploadContext: UploadContext = {
+        queueUpload(name: string, file: File) {
+            const namedFile = new File([file], name, { type: file.type, lastModified: file.lastModified });
+            cardData.files!.push(namedFile);
+        },
+        update() {}
+    };
+    setUploadContext(uploadContext);
 </script>
 
-<Modal id="new-card" bind:this={modal} {forceOpen}>
+<Modal id="new-card" bind:this={modal} class={$css("modal")}>
     {#snippet children({ close })}
-        <h2>New Card</h2>
-        
-        <form onsubmit={(e) => { e.preventDefault(); create(); }}>
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" placeholder="Card title" bind:value={title} use:focus />
-            
-            <label for="section">Section</label>
-            <select id="section" name="section" bind:value={sectionId}>
-                {#each sections as section}
-                    <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
-                {/each}
-            </select>
+        <div class="content">
+            <CardView
+                {board}
+                {subprojects}
+                {boardCards}
+                loading={false}
+                bind:card={cardData}
+                autofocusTitle
 
-            <label for="priority">Priority</label>
-            <select id="priority" name="priority" bind:value={priority}>
-                {#each Object.entries(priorities) as [key, v]}
-                    <option value={key} style="color: {v.color}">{v.label}</option>
-                {/each}
-            </select>
-
-            <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Card description" bind:value={description}></textarea>
-
-            <div class="buttons">
-                <button onclick={close}>Close</button>
-                <button type="submit" disabled={title.length === 0}>Create</button>
-            </div>
-        </form>
+                allowSelectingDependencies={false}
+            />
+        </div>
+        <div class="buttons">
+            <button onclick={close}><X /> Cancel</button>
+            <button type="submit" disabled={cardData.title.length === 0} onclick={create}><Plus /> Create</button>
+        </div>
     {/snippet}
 </Modal>
 
 <style lang="scss">
-h2 {
-    margin-top: 0;
-}
-form {
+.modal {
+    padding: 1rem;
+    width: calc(min(100%, 800px) - 2rem);
+    max-height: calc(min(90%, 800px) - 2rem);
+    gap: 0.5rem;
+
     display: flex;
     flex-direction: column;
-    min-width: 300px;
-}
-label {
-    margin-top: 1rem;
-    font-weight: 500;
-    color: var(--text-secondary);
 }
 
+.content {
+    overflow-y: auto;
+}
 .buttons {
-    margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;

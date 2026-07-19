@@ -53,3 +53,10 @@ button.add {
     text-align: left;
     width: 100%;
 }
+
+.empty {
+    color: var(--text-tertiary);
+    font-style: italic;
+    font-size: var(--font-small);
+    margin-left: 0.5rem;
+}

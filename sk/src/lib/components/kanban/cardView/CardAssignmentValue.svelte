@@ -6,19 +6,33 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { authModel } from "$lib/pocketbase/auth";
     import { Flag } from "lucide-svelte";
+    import { getUsername } from "./nameCache";
 
     let {
-        assignmentData = $bindable(),
-        nameCache
+        assignmentData = $bindable()
     }: {
         assignmentData: CardAssignmentData;
-        nameCache: string[]
     } = $props();
 
     function canClaimGroupAssignment(data: CardAssignmentData | null) {
         if(!$authModel) return false;
         return data?.type === "groups" && $authModel.groups.some((groupId) => data.ids.includes(groupId));
     }
+
+    let nameCache = $state<string[]>([]);
+    $effect(() => {
+        if(assignmentData?.type === "users") {
+            Promise.all(assignmentData.ids.map(getUsername)).then(names => {
+                nameCache = names;
+            });
+        } else if(assignmentData?.type === "groups") {
+            Promise.all(assignmentData.ids.map(getUsername)).then(names => {
+                nameCache = names;
+            });
+        } else {
+            nameCache = [];
+        }
+    });
 </script>
 
 <!-- TODO: Card only saves once when changing this -->

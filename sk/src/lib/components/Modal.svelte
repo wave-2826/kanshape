@@ -26,7 +26,7 @@
     $effect(() => {
         return () => {
             // don't push a history item, just change the state to closed
-            page.state[openKey] = false;
+            // page.state[openKey] = false;
         };
     });
 

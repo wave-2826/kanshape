@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { TypedCardsResponse } from "$lib/data/cards";
+    import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
     import { type CardMetadataField, checkMetadataValue, defaultMetadataFieldValue } from "$lib/data/project";
     import { TriangleAlert } from "lucide-svelte";
     import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
@@ -10,7 +10,7 @@
         field, card = $bindable()
     }: {
         field: CardMetadataField<false> & { id: string },
-        card: TypedCardsResponse
+        card: TypedCardsResponse | TypedCardsCreate
     } = $props();
 
     const metadataItem = $derived(card.metadata && card.metadata[field.id] ? card.metadata[field.id] : {
@@ -73,15 +73,15 @@ Remove this field?" onclick={() => {
         addFile={async (name: string, file: File) => {
             uploadContext.queueUpload(name, file);
         }}
-        getFileUrl={(file) => {
+        getFileUrl={"id" in card ? (file) => {
             // Files are given random suffixes by pocketbase, so we just find the file
             // in the card's files array. could be a little cleaner, but whatever.
             const foundFile = card.files.find(f => f.startsWith(file.id)) ?? file.id;
             const url = new URL(client.files.getURL(card, foundFile));
             url.searchParams.set("download", "1");
             return url.toString();
-        }}
-        cardId={card.id}
+        } : undefined}
+        cardId={"id" in card ? card.id : undefined}
     />
 </div>
 

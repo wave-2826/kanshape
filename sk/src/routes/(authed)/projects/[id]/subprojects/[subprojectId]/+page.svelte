@@ -53,8 +53,8 @@
     // on the open card, so we need to do a bunch of fetching to gather that information. It's not
     // the worst, at least.
     const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
-        expand: "sections,subprojects"
-    })) : null) as Readable<TypedBoardsResponse & ExpandResponse<"boards", "sections,subprojects"> | null> | null;
+        expand: "sections"
+    })) : null) as Readable<TypedBoardsResponse & ExpandResponse<"boards", "sections"> | null> | null;
     // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
     // a separate cached card loading system or something
     // TODO: Don't fetch all board cards
@@ -103,7 +103,7 @@
                             openCardId = id;
                         }
                     }
-                    sections={$openCardBoard?.expand.sections ?? []} subprojects={$openCardBoard?.expand.subprojects ?? []}
+                    subprojects={$project.expand.subprojects ?? []}
                 />
             {/if}
     

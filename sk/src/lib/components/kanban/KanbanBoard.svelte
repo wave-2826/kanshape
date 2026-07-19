@@ -128,7 +128,7 @@
         {board}
         {boardCards}
         bind:card={openCardId}
-        {sections} {subprojects}
+        {subprojects}
     />
 
     {#if cards !== null && $cards !== null}

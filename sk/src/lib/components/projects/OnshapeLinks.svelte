@@ -20,6 +20,7 @@
         (async () => {
             links = await watch(Collections.OnshapeDocuments, {
                 filter: "subprojects" in linkedTo ? `project = "${linkedTo.id}"` : `subproject = "${linkedTo.id}"`,
+                requestKey: `onshape-links-${linkedTo.id}`,
             }, 1, 5);
         })();
     });

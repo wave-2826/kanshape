@@ -1,75 +1,60 @@
-<!--
-This component has a bit more state management than you'd expect because we want to reasonably
-handle concurrent edits and not create update loops when the card is updated externally during
-saving. The localCard represents the current editable state of the card, while the dirtyMap
-tracks which fields have unsaved local changes. When a new card prop is received, we merge it
-into localCard but do not overwrite any fields that have been edited locally after the last
-save. This allows us to keep user edits intact while still reflecting remote updates.
--->
-
 <script lang="ts" module>
-    import { createContext, onDestroy, tick, untrack } from "svelte";
+    import { createContext, untrack } from "svelte";
+    import { type TypedCardsResponse } from "../../../data/cards";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     
     type UploadContext = {
         queueUpload(name: string, file: File): void;
         update(): void;
     };
     export const [getUploadContext, setUploadContext] = createContext<UploadContext>();
+
+    export type CardSelectState = {
+        message: string;
+        callback: (selected: TypedCardPreviewResponse, self: TypedCardsResponse) => void;
+        originalSelection: string;
+    };
 </script>
 
 <script lang="ts">
-    import { autoSize } from "$lib/actions";
-    import { client, queryOne, save, stripExpand, type ExpandResponse } from "$lib/pocketbase";
+    import { client, save, stripExpand, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
-    import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsResponse, type CardMetadata } from "../../../data/cards";
-    import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
-    import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-    import { DirtyTracker } from "./dirtyTracker.svelte";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-    import InlineSelector from "$lib/components/InlineSelector.svelte";
-    import { getCardMetadataItems, getExtraMetadataItems, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
-    import CardFieldCategory from "./CardFieldCategory.svelte";
-    import { debounce } from "$lib/util";
-    import CardViewFooter from "./CardViewFooter.svelte";
-    import CardDependencySelector from "./CardDependencySelector.svelte";
-
+    import { walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
+    import { deasyncify, debounce, deepEqual } from "$lib/util";
+    import CardView from "./CardView.svelte";
+    import { readable, type Readable } from "svelte/store";
+    import { applyDiff, createDiff } from "./diff";
+    
     let {
         board,
         boardCards,
-        card = $bindable(),
+        card: cardId = $bindable(),
         sections,
-        subprojects,
-        onclose
+        subprojects
     }: {
-        board: TypedBoardsResponse & ExpandResponse<"boards", "sections"> | null,
+        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         boardCards: TypedCardPreviewResponse[],
-        card: TypedCardPreviewResponse | null,
-        sections: SectionsRecord[],
-        subprojects: SubprojectsRecord[],
-        onclose: () => void
-    } = $props();
+        card: string | null,
 
-    let selectingCard = $state<{
-        message: string;
-        callback: (card: TypedCardPreviewResponse, originalCard: TypedCardsResponse) => void;
-        originalSelection: string;
-    } | null>(null);
+        sections: SectionsRecord[], subprojects: SubprojectsRecord[]
+    } = $props();
 
     /**
      * This panel shows a full card, but the card we get is a preview (with limited fields so we
      * don't send unnecessary data for the full board). This constructs a partial full card from
-     * the preview data to use as our local editable state.
+     * the preview data to use as a preview while the full data is loading.
      */
-    function constructPartialFullCard(preview: TypedCardPreviewResponse): TypedCardsResponse {
-        return {
+    function previewPlaceholder(preview: TypedCardPreviewResponse): TypedCardsResponse {
+        // this doesn't actually need to be reactive (it can never change while loading), but
+        // it is to avoid reactivity warnings
+        const v = $state({
             collectionId: Collections.Cards,
             collectionName: Collections.Cards,
 
             id: preview.id,
             title: preview.title,
-            description: "Loading...", // don't show a truncated description while loading the full one
+            description: "Loading...",
             priority: preview.priority,
             due_by: preview.due_by,
             duration_days: preview.duration_days,
@@ -90,118 +75,101 @@ save. This allows us to keep user edits intact while still reflecting remote upd
             files: [],
 
             expand: {}
-        };
+        });
+        return v;
     }
 
-    const saveDebounce = 200;
+    let selectingCard = $state<CardSelectState | null>(null);
 
-    let tracker = $state<DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse> | null>(null);
-    let saveTimer: ReturnType<typeof setTimeout> | null = null;
-
-    // Initialize or merge incoming `card` prop changes
+    // the card on the server currently. doesn't include any local changes.
+    let serverCard = $state<TypedCardsResponse | null>(null);
     $effect(() => {
-        let newSelected: TypedCardPreviewResponse | null = null;
-        untrack(() => {
-            if(card && selectingCard) {
-                // Re-select the original card and run the callback
-                const originalCard = boardCards.find((c) => c.id === selectingCard!.originalSelection);
-                newSelected = card;
-                if(originalCard) {
-                    card = originalCard;
-                }
-            }
-        });
-
-        if(card == null) {
-            if(tracker) {
-                tracker.destroy();
-                tracker = null;
-            }
-            if(saveTimer) {
-                clearTimeout(saveTimer);
-                saveTimer = null;
-            }
-        } else if(!tracker) {
-            console.log("Card selected, initializing tracker");
+        if(untrack(() => selectingCard !== null)) {
             untrack(() => {
-                tracker = new DirtyTracker<TypedCardsResponse, TypedCardPreviewResponse>(
-                    $state.snapshot(card!),
-                    {
-                        transformExternal: (ext) => constructPartialFullCard($state.snapshot(ext)),
-                        fetchFull: async (id) => {
-                            return await queryOne(Collections.Cards, id) as TypedCardsResponse;
-                        }
+                if(cardId) {
+                    if(card?.id !== selectingCard?.originalSelection) {
+                        console.warn("Card changed while selecting a dependency; cancelling selection");
+                        selectingCard = null;
+                        cardId = null;
+                        return;
                     }
-                );
+    
+                    const selected = boardCards.find(c => c.id === cardId);
+                    // card should still be correct right now
+                    if(selected && card) {
+                        selectingCard!.callback(selected, card);
+                    }
+                    cardId = selectingCard!.originalSelection;
+                    selectingCard = null;
+                } else {
+                    selectingCard = null;
+                }
             });
+        }
+
+        if(cardId) {
+            const store = deasyncify(
+                (watchOne(Collections.Cards, cardId, {
+                    requestKey: null
+                }) as Promise<Readable<TypedCardsResponse | null>>)
+                .catch((e) => {
+                    console.error(e);
+                    return readable(null);
+                })
+            );
+            const unsub = store.subscribe((v) => {
+                serverCard = v;
+            });
+            return () => unsub();
         } else {
-            console.log("Card updated externally, merging changes");
-            tracker.updateExternal($state.snapshot(card));
+            serverCard = null;
         }
-
-        untrack(async () => {
-            await tick();
-            await tick();
-            await tick();
-            if(tracker && newSelected && selectingCard) {
-                selectingCard.callback(newSelected, tracker.current);
-                selectingCard = null;
-            }
-        });
     });
-
-    onDestroy(() => {
-        if(tracker) tracker.destroy();
-        if(saveTimer) clearTimeout(saveTimer);
-    });
-
-    // Auto-save when dirty
+    
+    // a snapshot of the last server card value for diffing; doesn't need to be reactive
+    let lastServerCard: TypedCardsResponse | null = null;
+    // the local card, or null if we haven't loaded yet the server card.
+    let card = $state<TypedCardsResponse | null>(null);
+    
+    // update the local card based on server card changes
     $effect(() => {
-        if(!tracker) return;
+        if(!serverCard) return;
 
-        // Trigger reactivity on deeply nested properties
-        JSON.stringify(tracker.current);
+        const diff = createDiff(
+            lastServerCard,
+            $state.snapshot(serverCard as any) // tsc errors without as any ???
+        );
+        lastServerCard = $state.snapshot(serverCard as any);
+        card = applyDiff(diff, untrack(() => $state.snapshot(card)));
+    });
 
-        if(tracker.shouldSave) {
-            debounceSave();
+    const preview = $derived(boardCards.find(c => c.id === cardId));
+
+    function performSave() {
+        if(!card) return;
+
+        save(Collections.Cards, {
+            ...stripExpand($state.snapshot(card)),
+            files: undefined // don't update files, since it's handled separately
+        }, {
+            create: false,
+            expand: ""
+        });
+        lastServerCard = $state.snapshot(card as any);
+    }
+    let saveDebounced = debounce(performSave, 250, true);
+
+    $effect(() => {
+        if(!deepEqual(
+            $state.snapshot(card),
+            untrack(() => $state.snapshot(serverCard))
+        )) {
+            saveDebounced();
         }
     });
 
-    function debounceSave() {
-        if(saveTimer) clearTimeout(saveTimer);
-        saveTimer = setTimeout(() => performSave(), saveDebounce);
-    }
-    
-    async function performSave() {
-        if(!tracker) return;
-
-        try {
-            await save(Collections.Cards, {
-                ...stripExpand(tracker.current),
-                files: undefined // don't update files, since it's handled separately
-            }, {
-                create: false,
-                expand: ""
-            });
-            tracker?.clearDirty();
-        } finally {
-            if(saveTimer) {
-                clearTimeout(saveTimer);
-                saveTimer = null;
-            }
-        }
-    }
-
-    const metadataItems = $derived(board ? getCardMetadataItems(board, {
-        board: $state.snapshot(board) as TypedBoardsResponse,
-        metadata: $state.snapshot(tracker ? tracker.current.metadata ?? null : null) as CardMetadata | null
-    }, true) : []);
-    const extraItems = $derived(getExtraMetadataItems(metadataItems, tracker ? tracker.current.metadata ?? null : null));
-    
     let uploadQueue: { name: string, file: File }[] = [];
-
     async function updateCardFiles() {
-        const card = tracker?.current;
         if(!card) return;
 
         // 1. check what files the metadata still contains
@@ -227,7 +195,7 @@ save. This allows us to keep user edits intact while still reflecting remote upd
 
         // 3. construct an array of Files of new files to upload with the changed names
         let newFiles = uploadQueue
-            .filter(f => !card.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
+            .filter(f => !card!.files.some(cf => cf.startsWith(f.name.split(".").slice(0, -1).join(".") as FileNameString)))
             .map(f => new File([f.file], f.name, { type: f.file.type, lastModified: f.file.lastModified }));
         uploadQueue = [];
 
@@ -271,291 +239,66 @@ save. This allows us to keep user edits intact while still reflecting remote upd
     </div>
 {/if}
 
-<ModalPanel open={tracker !== null} {onclose}>
-{#if tracker}
-    {@const localCard = tracker.current}
-    <header>
-        <input type="text" bind:value={localCard.title} class="title" placeholder="Card title" disabled={tracker.loadingFull} />
-    </header>
-
-    <div class="card-content">
-        <div class="field-group">
-            <!-- Screenreader only -->
-            <label for="description" aria-hidden="false" style="display: none;">Description</label>
-            <textarea
-                id="description"
-                class="description"
-                bind:value={localCard.description}
-                placeholder="Add a more detailed description..."
-                use:autoSize={localCard.description}
-                disabled={tracker.loadingFull}
-            ></textarea>
-        </div>
-
-        <h3><SquareKanban /> Task</h3>
-        <div class="properties">
-            <div class="property">
-                <span class="prop-label"><ChartColumnBig />Section</span>
-                <div class="prop-value">
-                    <select
-                        id="section"
-                        name="section"
-                        bind:value={localCard.section}
-                        style="color: {sections.find(s => s.id === localCard?.section)?.color ?? 'inherit'}"
-                        disabled={tracker.loadingFull}
-                    >
-                        {#each sections as section}
-                            <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
-                        {/each}
-                    </select>
-                </div>
-            </div>
-
-            <div class="property">
-                <span class="prop-label"><Flag />Priority</span>
-                <div class="prop-value">
-                    <select
-                        id="priority"
-                        name="priority"
-                        bind:value={localCard.priority}
-                        style="color: {getPriorityColor(localCard.priority)}"
-                        disabled={tracker.loadingFull}
-                    >
-                        {#each Object.entries(priorities) as [key, v]}
-                            <option value={key} style="color: {v.color}">{v.label}</option>
-                        {/each}
-                    </select>
-                </div>
-            </div>
-
-            {#if subprojects.length > 0}
-                <div class="property">
-                    <span class="prop-label"><Kanban />Subprojects</span>
-                    <div class="prop-value">
-                        <InlineSelector
-                            values={localCard.subprojects?.map(id => ({ id, name: subprojects.find(s => s.id === id)?.name ?? "Unknown Subproject" })) ?? []}
-                            data={subprojects.map(s => ({ id: s.id, name: s.name ?? "Unknown subproject" }))}
-                            onchange={(ids) => localCard.subprojects = ids}
-                            itemName="subprojects"
-                        />
-                    </div>
-                </div>
-            {/if}
-
-            <div class="property assignment">
-                <span class="prop-label">
-                    <Users />
-                    Assignment
-                    {#if localCard.assignment_data}
-                        <button class="clear" onclick={() => localCard.assignment_data = null} title="Clear assignment">
-                            <Trash />
-                        </button>
-                    {/if}
-                </span>
-                <CardAssignmentValue
-                    bind:assignmentData={localCard.assignment_data as CardAssignmentData}
-                    nameCache={card?.assignment_name_cache ?? []}
-                />
-            </div>
-        </div>
-
-        <h3><Timer />Scheduling</h3>
-        <div class="properties">
-            <div class="property due-date">
-                <span class="prop-label">
-                    <Calendar />
-                    Due date
-                    {#if localCard.due_by}
-                        <button class="clear" onclick={() => localCard.due_by = ""} title="Clear due date">
-                            <Trash />
-                        </button>
-                    {/if}
-                </span>
-                <div class="prop-value">
-                    {#if localCard.due_by}
-                        <input id="due_date" type="datetime-local" bind:value={
-                            () => zonedToLocal(localCard.due_by),
-                            (v) => localCard.due_by = localToZoned(v) ?? ""
-                        } />
-                        <div class="timetip">
-                            {new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(localCard.due_by))}
-                        </div>
-                    {:else}
-                        <button class="add" onclick={() => localCard.due_by = tomorrowDate().toISOString()}>+ Assign Due Date</button>
-                    {/if}
-                </div>
-            </div>
-            <div class="property">
-                <span class="prop-label"><Clock /> Duration</span>
-                <div class="prop-value duration">
-                    <input type="number" min="0" bind:value={localCard.duration_days} placeholder="Duration in days" />
-                    <span>days</span>
-                </div>
-            </div>
-            <div class="property dependencies">
-                <span class="prop-label"><ListTree /> Dependencies</span>
-                <div class="prop-value">
-                    <CardDependencySelector
-                        bind:dependencies={localCard.dependencies}
-                        {boardCards}
-                        onopendependency={(id) => {
-                            // Open the dependency card instead of the current card
-                            card = boardCards.find((c) => c.id === id) ?? null;
-                        }}
-                        onselectcard={async (message, callback) => {
-                            // close ourself and wait for a new card to be selected, then
-                            // re-select this card and return it
-                            const id = localCard.id;
-                            card = null;
-                            await tick();
-                            selectingCard = {
-                                message, callback,
-                                originalSelection: id
-                            };
-                        }}
-                    />
-                </div>
-            </div>
-        </div>
-
-        {#each metadataItems as { icon, title, fields }}
-            <h3>
-                <!-- svelte-ignore svelte_component_deprecated - this could be a v4 component -->
-                {#if icon}<svelte:component this={icon} />{/if}
-                {title}
-            </h3>
-            <CardFieldCategory {fields} bind:card={
-                () => localCard,
+<ModalPanel open={cardId !== null} onclose={() => cardId = null} collapse={selectingCard !== null}>
+    {#if preview}
+        <CardView
+            {board}
+            {preview}
+            loading={card === null}
+            bind:card={
+                () => card ?? previewPlaceholder(preview),
                 (v) => {
-                    if(tracker) {
-                        tracker.current = v;
+                    if(card === null) {
+                        console.warn("Tried to update card view while it was loading");
+                        return;
                     }
-                    updateCardFilesDebounced();
+                    card = v;
                 }
-            } />
-        {/each}
-        {#if extraItems.length > 0}
-            <h3><FileQuestionMark /> Other</h3>
-            <CardFieldCategory fields={extraItems} bind:card={
-                () => localCard,
-                (v) => {
-                    if(tracker) {
-                        tracker.current = v;
-                    }
-                    updateCardFilesDebounced();
-                }
-            } />
-        {/if}
-    </div>
-
-    <hr />
-
-    <CardViewFooter card={localCard} />    
-{/if}
+            }
+            allowSelectingDependencies={true}
+            onopendependency={(id) => cardId = id}
+            onselectdependency={(state) => {
+                if(!card) return;
+                selectingCard = state;
+            }}
+            {boardCards}
+            {sections} {subprojects}
+        />
+    {:else}
+        <p>Error displaying card: unknown preview</p>
+    {/if}
 </ModalPanel>
 
 <style lang="scss">
-@use "props.scss";
 
 .selecting-card-overlay {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
     margin: 1rem;
+    pointer-events: none;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 10000;
 
     .selecting-card-message {
-        background-color: var(--bg-primary);
+        background-color: var(--bg-secondary);
         padding: 0.5rem 1rem;
         border-radius: 4px;
         text-align: center;
+        pointer-events: all;
 
         display: flex;
         align-items: center;
         gap: 0.5rem;
+
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+
+        button {
+            --bg-color: var(--bg-primary);
+        }
     }    
-}
-
-header {
-    margin-bottom: 0.5rem;
-
-    .title {
-        font-size: var(--font-large);
-        font-weight: 600;
-        width: 100%;
-        margin: 0;
-        padding: 0.25rem 0.5rem;
-        --bg-color: transparent;
-    }
-}
-
-.card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    padding-bottom: 3rem;
-}
-
-.description {
-    --bg-color: transparent;
-    padding: 0.25rem 0.75rem;
-    border-left: 1px solid var(--border);
-    border-radius: 0 4px 4px 0;
-    width: 100%;
-}
-
-h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    font-size: var(--font-medium);
-    font-weight: 500;
-}
-
-.assignment {
-    grid-column: span 2;
-}
-
-
-.due-date {
-    font-size: var(--font-tiny);
-
-    input {
-        width: min-content;
-    }
-    
-    .timetip {
-        color: var(--text-tertiary);
-        padding-left: 0.5rem;
-        padding-top: 0.25rem;
-    }
-}
-
-.duration {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex: 0
-    
-    span {
-        color: var(--text-tertiary);
-    }
-}
-
-.dependencies {
-    grid-column: 1 / -1;
-}
-
-hr {
-    margin: 0 0 1rem 0;
 }
 </style>

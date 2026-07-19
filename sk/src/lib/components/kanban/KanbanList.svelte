@@ -42,11 +42,7 @@
 
     <CardViewPanel
         boardCards={listCards}
-        bind:card={
-            () => openCardId ? listCards.find((c) => c.id === openCardId) ?? null : null,
-            (v) => openCardId = v?.id ?? null
-        }
-        onclose={() => openCardId = null}
+        bind:card={openCardId}
         {sections} {subprojects}
         {board}
     />

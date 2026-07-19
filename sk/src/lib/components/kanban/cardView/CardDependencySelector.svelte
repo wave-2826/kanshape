@@ -13,7 +13,7 @@
         dependencies: string[],
         boardCards: TypedCardPreviewResponse[],
         onopendependency?: (id: string) => void,
-        onselectcard?: (message: string, cb: (card: TypedCardPreviewResponse, originalCard: TypedCardsResponse) => void) => void
+        onselectcard?: (message: string, cb: (selected: TypedCardPreviewResponse, self: TypedCardsResponse) => void) => void
     } = $props();
 </script>
 
@@ -32,14 +32,16 @@
         {/if}
     {/each}
     
-    <button class="add" onclick={() => {
-        onselectcard?.("Select a card to add as a dependency", (card, originalCard) => {
-            console.log("Selected", card.title, "to add to", originalCard.title);
-            if(card.id === originalCard.id) return;
-            if(dependencies.includes(card.id)) return;
-            originalCard.dependencies = [...originalCard.dependencies, card.id];
-        });
-    }}>+ Add dependency</button>
+    {#if onselectcard}
+        <button class="add" onclick={() => {
+            onselectcard?.("Select a card to add as a dependency", (selected, self) => {
+                console.log("Selected", selected.title, "to add to", self.title);
+                if(selected.id === self.id) return;
+                if(dependencies.includes(selected.id)) return;
+                self.dependencies = [...self.dependencies, selected.id];
+            });
+        }}>+ Add dependency</button>
+    {/if}
 </div>
 
 <!-- svelte-ignore css_unused_selector - shared stylesheet -->

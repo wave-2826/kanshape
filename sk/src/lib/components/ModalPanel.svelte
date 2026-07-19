@@ -7,11 +7,14 @@
     const {
         open,
         onclose,
-        children
+        children,
+        /** If true, the panel moves out of the way and allows input through but keeps children rendered. */
+        collapse = false
     }: {
         open: boolean,
         onclose: () => void,
-        children: Snippet
+        children: Snippet,
+        collapse?: boolean
     } = $props();
 
     // TODO: shallow routing for this
@@ -30,7 +33,7 @@
 {#if open}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="backdrop" onclick={(e) => {
+    <div class="backdrop" class:collapse onclick={(e) => {
         if(e.target === e.currentTarget) onclose();
     }} transition:fade={{ duration: 200 }}>
         <div
@@ -52,13 +55,22 @@
     position: absolute;
     inset: 0;
     z-index: 100;
+    // we can't really transition backdrop-filter, but it's barely noticable anyway so whatever
+    transition: background-color 150ms;
+
+    &.collapse {
+        pointer-events: none;
+        backdrop-filter: unset;
+        background-color: transparent;
+    }
 }
 .panel {
     position: absolute;
     background-color: var(--bg-primary);
     border: 1px solid var(--border);
     border-right: none;
-    width: max(55%, 400px);
+    --width: max(45vw, 400px);
+    width: var(--width);
     right: 0;
     top: 0;
     bottom: 0;
@@ -69,6 +81,12 @@
     display: flex;
     flex-direction: column;
     padding: 1rem;
+
+    transition: translate 150ms;
+    translate: 0 0;
+}
+.collapse .panel {
+    translate: calc(var(--width) - 2rem) 0;
 }
 
 .mobile-close {
@@ -100,6 +118,9 @@
         border: 1px solid var(--border);
         border-bottom: none;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .collapse .panel {
+        translate: 0 calc(100% - 1rem);
     }
 }
 </style>

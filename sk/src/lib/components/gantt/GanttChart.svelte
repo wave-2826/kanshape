@@ -36,7 +36,7 @@
                 start, end,
                 due: card.due_by ? new Date(card.due_by) : undefined,
                 color: card.priority === "critical" ? "var(--error)" : undefined,
-                group: groupBy === "subproject" ? (subprojects.find((sp) => sp.id === card.subprojects?.[0])?.name ?? "No subproject") :
+                group: groupBy === "subproject" ? (card.subprojects?.[0]?.name ?? "No subproject") :
                     groupBy === "section" ? (sections.find((s) => s.id === card.section)?.title ?? "No section") :
                     groupBy === "priority" ? card.priority :
                     ""
@@ -66,11 +66,7 @@
     <CardViewPanel
         {board}
         boardCards={$cards?.items ?? []}
-        bind:card={
-            () => openCardId ? $cards?.items.find((c) => c.id === openCardId) ?? null : null,
-            (v) => openCardId = v?.id ?? null
-        }
-        onclose={() => openCardId = null}
+        bind:card={openCardId}
         {sections} {subprojects}
     />
 

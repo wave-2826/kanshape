@@ -15,7 +15,7 @@
     import { onMount } from "svelte";
     import { ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
-    import { getConfig, setConfig } from "$lib/config";
+    import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/nav/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
@@ -94,14 +94,14 @@
                 {/if}
             </button>
         {/if}
-        {#if config.site.logoUrl}
-            <img src={config.site.logoUrl} alt={config.site.name} />
-        {/if}
-        {#if !isMobile}
-            <a href="/">
+        <a href="/">
+            {#if config.site.logoUrl}
+                <img src={config.site.logoUrl} alt={config.site.name} />
+            {/if}
+            {#if !isMobile}
                 <h1>{config.site?.name}</h1>
-            </a>
-        {/if}
+            {/if}
+        </a>
         <!-- Dev build warning -->
         {#if dev}
             <span class="dev-build-warning" title="This instance is running a development build">[DEV]</span>
@@ -169,7 +169,12 @@ header {
         height: 2rem;
         margin-right: 0.5rem;
     }
-    a, h1 {
+    a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    h1 {
         color: var(--text-primary);
         text-decoration: none;
     }

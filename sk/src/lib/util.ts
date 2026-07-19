@@ -28,16 +28,24 @@ export function deepEqual(a: any, b: any): boolean {
     return true;
 }
 
-export function debounce(func: Function, wait: number) {
+export function debounce(func: Function, wait: number, leading: boolean = false) {
     let timeout: ReturnType<typeof setTimeout> | null = null;
+    let calls = 0;
 
     return function(this: any, ...args: any[]) {
+        calls += 1;
+
         if(timeout) {
             clearTimeout(timeout);
+        } else if(leading) {
+            func.apply(this, args);
+            calls = 0;
         }
 
         timeout = setTimeout(() => {
+            if(calls === 0) return;
             func.apply(this, args);
+            timeout = null;
         }, wait);
     };
 }

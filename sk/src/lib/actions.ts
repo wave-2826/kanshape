@@ -75,10 +75,11 @@ export function anchor(
         /** The node to anchor to */
         element: HTMLElement,
         placement: `${AnchorSide}-${AnchorPlacement}`,
-        offset: number
+        offset: number,
+        padding?: number
     }
 ) {
-    let { element, placement, offset } = options;
+    let { element, placement, offset, padding = 5 } = options;
     let resizeObserver: ResizeObserver | null = null;
 
     function parsePlacement(p: string) {
@@ -98,14 +99,20 @@ export function anchor(
 
         if(side === "vauto") {
             // Default to bottom unless the node doesn't fit (and it's more than 50% down the page)
-            if(parentRect.bottom + nodeRect.height + offset > window.innerHeight && parentRect.top > window.innerHeight / 2) {
+            if(
+                parentRect.bottom + nodeRect.height + offset > window.innerHeight - padding &&
+                parentRect.top > window.innerHeight / 2
+            ) {
                 side = "top";
             } else {
                 side = "bottom";
             }
         } else if(side === "hauto") {
             // Default to right unless the node doesn't fit (and it's more than 50% across the page)
-            if(parentRect.right + nodeRect.width + offset > window.innerWidth && parentRect.left > window.innerWidth / 2) {
+            if(
+                parentRect.right + nodeRect.width + offset > window.innerWidth - padding &&
+                parentRect.left > window.innerWidth / 2
+            ) {
                 side = "left";
             } else {
                 side = "right";
@@ -113,31 +120,39 @@ export function anchor(
         }
 
         let top = 0, left = 0;
+        const nodeHeight = Math.min(nodeRect.height, window.innerHeight - padding * 2);
+        const nodeWidth = Math.min(nodeRect.width, window.innerWidth - padding * 2);
         
         if(side === "top") {
-            top = parentRect.top + scrollY - nodeRect.height - offset;
+            top = parentRect.top + scrollY - nodeHeight - offset;
             if(align === "start") left = parentRect.left + scrollX;
-            else if(align === "center") left = parentRect.left + scrollX + (parentRect.width - nodeRect.width) / 2;
-            else left = parentRect.right + scrollX - nodeRect.width;
+            else if(align === "center") left = parentRect.left + scrollX + (parentRect.width - nodeWidth) / 2;
+            else left = parentRect.right + scrollX - nodeWidth;
         } else if(side === "bottom") {
             top = parentRect.bottom + scrollY + offset;
             if(align === "start") left = parentRect.left + scrollX;
-            else if(align === "center") left = parentRect.left + scrollX + (parentRect.width - nodeRect.width) / 2;
-            else left = parentRect.right + scrollX - nodeRect.width;
+            else if(align === "center") left = parentRect.left + scrollX + (parentRect.width - nodeWidth) / 2;
+            else left = parentRect.right + scrollX - nodeWidth;
         } else if(side === "left") {
-            left = parentRect.left + scrollX - nodeRect.width - offset;
+            left = parentRect.left + scrollX - nodeWidth - offset;
             if(align === "start") top = parentRect.top + scrollY;
-            else if(align === "center") top = parentRect.top + scrollY + (parentRect.height - nodeRect.height) / 2;
-            else top = parentRect.bottom + scrollY - nodeRect.height;
+            else if(align === "center") top = parentRect.top + scrollY + (parentRect.height - nodeHeight) / 2;
+            else top = parentRect.bottom + scrollY - nodeHeight;
         } else { // right
             left = parentRect.right + scrollX + offset;
             if(align === "start") top = parentRect.top + scrollY;
-            else if(align === "center") top = parentRect.top + scrollY + (parentRect.height - nodeRect.height) / 2;
-            else top = parentRect.bottom + scrollY - nodeRect.height;
+            else if(align === "center") top = parentRect.top + scrollY + (parentRect.height - nodeHeight) / 2;
+            else top = parentRect.bottom + scrollY - nodeHeight;
         }
 
+        if(left < padding) left = padding;
+        if(left + nodeWidth > window.innerWidth - padding) left = window.innerWidth - nodeWidth - padding;
+        if(top < padding) top = padding;
+        if(top + nodeHeight > window.innerHeight - padding) top = window.innerHeight - nodeHeight - padding;
         node.style.left = Math.round(left) + "px";
         node.style.top = Math.round(top) + "px";
+        if(nodeHeight < nodeRect.height) node.style.maxHeight = nodeHeight + "px";
+        if(nodeWidth < nodeRect.width) node.style.maxWidth = nodeWidth + "px";
     }
 
     const onScrollResize = () => requestAnimationFrame(position);

@@ -3,6 +3,7 @@
     import { deleteRecord, queryOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { Trash } from "lucide-svelte";
+    import { getUsername } from "./usernameCache";
 
     const { card }: { card: TypedCardsResponse } = $props();
 
@@ -12,20 +13,20 @@
         deleteRecord(Collections.Cards, id);
     }
 
-    const creationUser = $derived(card?.created_by ? queryOne(Collections.Users, card.created_by) : null);
+    const creationUsername = $derived(card?.created_by ? getUsername(card.created_by) : null);
 </script>
 
 <footer>
     <div class="metadata">
         <span>
             Created by
-            {#if creationUser === null}
+            {#if creationUsername === null}
                 Unknown User
             {:else}
-                {#await creationUser}
+                {#await creationUsername}
                     Loading user...
-                {:then user}
-                    {user?.name ?? "Unknown User"}
+                {:then name}
+                    {name ?? "Unknown User"}
                 {/await}
             {/if}
             on {new Date(card.created).toLocaleString()}

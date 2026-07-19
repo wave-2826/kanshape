@@ -97,7 +97,6 @@
 
 .assignment {
     display: flex;
-    flex-wrap: wrap;
     flex-direction: row;
     justify-content: flex-start;
     gap: 0.5rem;

@@ -37,9 +37,9 @@ function extractAssemblyParts(onshapeData) {
     
     // index sub-assembly instances
     if(onshapeData.subAssemblies) {
-        for(const subAss of onshapeData.subAssemblies) {
-            if(subAss.instances) {
-                indexInstances(subAss.instances);
+        for(const subAssembly of onshapeData.subAssemblies) {
+            if(subAssembly.instances) {
+                indexInstances(subAssembly.instances);
             }
         }
     }
@@ -187,9 +187,11 @@ function downloadPartTessellation(app, modelPath, path, configuration, authRecor
  * }} path
  * @param {string} configuration the assembly's configuration, or "default" if none
  * @param {core.Record} authRecord 
+ * @param {BTAssemblyDefinitionInfo} [assemblyData] optional assembly endpoint response to use instead of
+ * fetching from Onshape. Used if the assembly already needed to be fetched to avoid duplicated requests.
  * @returns {string} the path to the downloaded JSON file
  */
-function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) {
+function downloadAssemblyParts(app, modelPath, path, configuration, authRecord, assemblyData) {
     const { fileMode } = /** @type typeof import("../util.js") */ (require(`${__hooks}/util.js`));
     if(!path || !path.did || !path.wvm || !path.wvmId || !path.eid) {
         throw new BadRequestError("Missing required Onshape identifiers for assembly");
@@ -204,34 +206,38 @@ function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) 
 
         console.log(`Preview cache for assembly ${eid} already exists, skipping request to Onshape`);
     } catch {
-        const { URLSearchParams } = /** @type {typeof import("../url.js")} */ (require(`${__hooks}/url.js`));
-        const params = new URLSearchParams();
-        params.set("includeMateFeatures", "false");
-        params.set("includeNonSolids", "false");
-        params.set("includeMateConnectors", "false");
-        params.set("excludeSuppressed", "true");
-        if(configuration && configuration !== "default") {
-            params.set("configuration", configuration);
-        }
-        const url = `v16/assemblies/d/${did}/${wvm}/${wvmId}/e/${eid}?${params.toString()}`;
-        console.log(`Requesting assembly data from Onshape for assembly ${eid} at URL: ${url}`);
+        let data = assemblyData;
+        if(!data) {
+            const { URLSearchParams } = /** @type {typeof import("../url.js")} */ (require(`${__hooks}/url.js`));
+            const params = new URLSearchParams();
+            params.set("includeMateFeatures", "false");
+            params.set("includeNonSolids", "false");
+            params.set("includeMateConnectors", "false");
+            params.set("excludeSuppressed", "true");
+            if(configuration && configuration !== "default") {
+                params.set("configuration", configuration);
+            }
+            const url = `v16/assemblies/d/${did}/${wvm}/${wvmId}/e/${eid}?${params.toString()}`;
+            console.log(`Requesting assembly data from Onshape for assembly ${eid} at URL: ${url}`);
+        
+            const { onshapeRequest } = /** @type {typeof import("./onshape_proxy")} */ (require(`${__hooks}/onshape/onshape_proxy`));
+            const res = onshapeRequest(authRecord, "GET", url);
+            if(res.statusCode !== 200) {
+                app.logger().error(`Failed to fetch assembly data from Onshape for assembly ${eid}: ${res.statusCode} ${JSON.stringify(res.body)}`);
+                throw new InternalServerError(`Failed to fetch assembly data from Onshape: ${res.statusCode}`);
+            }
     
-        const { onshapeRequest } = /** @type {typeof import("./onshape_proxy")} */ (require(`${__hooks}/onshape/onshape_proxy`));
-        const res = onshapeRequest(authRecord, "GET", url);
-        if(res.statusCode !== 200) {
-            app.logger().error(`Failed to fetch assembly data from Onshape for assembly ${eid}: ${res.statusCode} ${JSON.stringify(res.body)}`);
-            throw new InternalServerError(`Failed to fetch assembly data from Onshape: ${res.statusCode}`);
+            data = /** @type {BTAssemblyDefinitionInfo} */(res.body);
         }
 
-        const data = res.body;
-        const assemblyData = extractAssemblyParts(data);
+        const parsedAssembly = extractAssemblyParts(data);
 
-        if(assemblyData.parts.length > MAX_ASSEMBLY_PARTS) {
-            throw new BadRequestError(`Assembly has too many unique parts (${assemblyData.parts.length}), maximum allowed is ${MAX_ASSEMBLY_PARTS}`);
+        if(parsedAssembly.parts.length > MAX_ASSEMBLY_PARTS) {
+            throw new BadRequestError(`Assembly has too many unique parts (${parsedAssembly.parts.length}), maximum allowed is ${MAX_ASSEMBLY_PARTS}`);
         }
 
         // download tessellation data for each part in the assembly
-        for(const part of assemblyData.parts) {
+        for(const part of parsedAssembly.parts) {
             if(part.partId.trim().length === 0) {
                 throw new BadRequestError(`Part in assembly is missing partId`);
             }
@@ -249,7 +255,7 @@ function downloadAssemblyParts(app, modelPath, path, configuration, authRecord) 
             part.file = file.replace(`${modelPath}/`, ""); // store relative path to the file
         }
 
-        $os.writeFile(jsonPath, JSON.stringify(assemblyData), fileMode.rw);
+        $os.writeFile(jsonPath, JSON.stringify(parsedAssembly), fileMode.rw);
     }
 
     return jsonPath;

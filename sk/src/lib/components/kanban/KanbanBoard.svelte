@@ -122,7 +122,7 @@
 </script>
 
 <div class="kanban" data-modal-target>
-    <KanbanMenu {project} {board} {sections} cards={boardCards} bind:this={kanbanMenu} />
+    <KanbanMenu {project} {board} cards={boardCards} bind:this={kanbanMenu} />
 
     <CardViewPanel
         {board}

@@ -1,10 +1,11 @@
+<!-- The full card field editor that shows warnings for mismatched types. -->
+
 <script lang="ts">
     import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
-    import { type CardMetadataField, checkMetadataValue, defaultMetadataFieldValue } from "$lib/data/project";
+    import { type CardMetadataField, checkMetadataValue, CREATE_SYMBOL, defaultMetadataFieldValue } from "$lib/data/project";
     import { TriangleAlert } from "lucide-svelte";
-    import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
-    import { client } from "$lib/pocketbase";
-    import { getUploadContext } from "./CardViewPanel.svelte";
+    import CardFieldEditor from "./CardFieldEditor.svelte";
+    import { getUploadContext } from "./uploadContext";
     
     let {
         field, card = $bindable()
@@ -17,9 +18,13 @@
         type: field.type,
         value: defaultMetadataFieldValue(field.type)
     });
-    const valueTypeIsValid = $derived(checkMetadataValue(field.type, metadataItem.value));
+    const valueTypeIsValid = $derived(
+        metadataItem.type.base === CREATE_SYMBOL || checkMetadataValue(field.type, metadataItem.value)
+    );
     // If the value isn't valid for the field type, we use the stored type instead
-    const usedType = $derived(valueTypeIsValid ? field.type : metadataItem.type);
+    const usedType = $derived(
+        valueTypeIsValid && metadataItem.type.base !== CREATE_SYMBOL ? field.type : metadataItem.type
+    );
 
     const uploadContext = getUploadContext();
 
@@ -68,19 +73,8 @@ Remove this field?" onclick={() => {
         </button>
     {/if}
 
-    <CardFieldTypeEditor
+    <CardFieldEditor
         type={usedType} bind:value={() => metadataItem.value, set}
-        addFile={async (name: string, file: File) => {
-            uploadContext.queueUpload(name, file);
-        }}
-        getFileUrl={"id" in card ? (file) => {
-            // Files are given random suffixes by pocketbase, so we just find the file
-            // in the card's files array. could be a little cleaner, but whatever.
-            const foundFile = card.files.find(f => f.startsWith(file.id)) ?? file.id;
-            const url = new URL(client.files.getURL(card, foundFile));
-            url.searchParams.set("download", "1");
-            return url.toString();
-        } : undefined}
         cardId={"id" in card ? card.id : undefined}
     />
 </div>

@@ -41,17 +41,17 @@
 }} />
 
 {#if isOpen || forceOpen}
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="modal-box backdrop" onclick={(e) => {
-    if(e.target === e.currentTarget) {
-        close();
-    }
-}} transition:fade={{ duration: 100 }}>
-    <dialog class={_class} open transition:fly={{ duration: 250, y: -20 }} closedby="none">
-        {@render children({ open, close })}
-    </dialog>
-</div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="modal-box backdrop" onclick={(e) => {
+        if(e.target === e.currentTarget) {
+            close();
+        }
+    }} transition:fade={{ duration: 100 }}>
+        <dialog class={_class} open transition:fly={{ duration: 250, y: -20 }} closedby="none">
+            {@render children({ open, close })}
+        </dialog>
+    </div>
 {/if}
 
 <style lang="scss">

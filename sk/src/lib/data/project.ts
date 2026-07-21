@@ -3,6 +3,7 @@ import type { BoardOverviewResponse, BoardsResponse, ProjectOverviewResponse, Pr
 import type { CardMetadata } from "./cards";
 import { CodeXml, Factory, Palette } from "lucide-svelte";
 import type { NonNullValuesExcept } from "./kanban";
+import type { CreationPart } from "$lib/components/parts/partData";
 
 // TODO: This database schema isn't very scalable. We should use back-relations instead of
 // forward relations on projects to allow cascade deletion and avoid having to update multiple records
@@ -36,10 +37,15 @@ export type MetadataCtx = {
     metadata: CardMetadata | null
 };
 
+export const CREATE_SYMBOL = Symbol("create");
 export type CardMetadataFieldType<Dynamic extends boolean = true> = {
     base: "text" | "longtext" | "number" | "date" | "checkbox" | "onshape_part" | "url";
 } | {
-    base: "user" | "group" | "file";
+    base: "user" | "group";
+    /** whether the field can have multiple values */
+    multi?: boolean;
+}| {
+    base: "file";
     /** whether the field can have multiple values */
     multi?: boolean;
 } | {
@@ -62,14 +68,28 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
 } | {
     base: "tuple";
     fields: CardMetadataFieldType<Dynamic>[];
+} | {
+    // Used only when creating a new card, to indicate that the value shouldn't persist
+    // maybe not the best solution but it's a pain to pass two sets of types everywhere
+    // this is a symbol to make sure it's obvious something is very wrong if this ever tries
+    // to be persisted
+    base: typeof CREATE_SYMBOL;
+    create: "onshape_part";
 };
 
+export type PartExportType = "step" | "dxf" | "gltf" | "obj";
 export type MetadataFile = {
     id: string;
     /** Original name of the file */
     name: string;
+} | {
+    // Used when creating a new card
+    id: typeof CREATE_SYMBOL,
+    name: string;
+    createType: "export" | "auto_export";
+    exportType: PartExportType
 };
-export type MetadataValue = string | number | boolean | MetadataValue[] | MetadataFile | null;
+export type MetadataValue = string | number | boolean | MetadataValue[] | MetadataFile | CreationPart | null;
 
 export function defaultMetadataFieldValue(type: CardMetadataFieldType<false>): MetadataValue {
     switch(type.base) {
@@ -95,7 +115,10 @@ export function defaultMetadataFieldValue(type: CardMetadataFieldType<false>): M
             return [defaultMetadataFieldValue(type.field)];
         case "tuple":
             return type.fields.map(f => defaultMetadataFieldValue(f));
-    }
+        case CREATE_SYMBOL:
+            if(type.create === "onshape_part") return null;
+        }
+        return null;
 }
 
 /**
@@ -126,7 +149,7 @@ export function checkMetadataValue(type: CardMetadataFieldType<false>, value: Me
         case "file":
             function isFile(v: MetadataValue): v is MetadataFile {
                 return typeof v === "object" && v !== null &&
-                    "id" in v && typeof v.id === "string" &&
+                    "id" in v && (typeof v.id === "string" || v.id === CREATE_SYMBOL) &&
                     "name" in v && typeof v.name === "string";
             }
             if(type.multi) {
@@ -176,6 +199,52 @@ export function walkMetadataValues(
     }
 }
 
+type MetadataNode = {
+    type: CardMetadataFieldType<false>;
+    value: MetadataValue;
+};
+
+export function transformMetadata(
+    type: CardMetadataFieldType<false>,
+    value: MetadataValue,
+    callback: (node: MetadataNode) => MetadataNode
+): MetadataNode {
+    ({ type, value } = callback({ type, value }));
+
+    switch(type.base) {
+        case "list":
+            if(Array.isArray(value)) {
+                const field = type.field;
+                const items = value.map(v =>
+                    transformMetadata(field, v, callback)
+                );
+
+                type = {
+                    ...type,
+                    field: items[0]?.type ?? type.field,
+                };
+                value = items.map(i => i.value);
+            }
+            break;
+        case "tuple":
+            if(Array.isArray(value)) {
+                const v = value;
+                const items = type.fields.map((field, i) =>
+                    transformMetadata(field, v[i], callback)
+                );
+
+                type = {
+                    ...type,
+                    fields: items.map(i => i.type),
+                };
+                value = items.map(i => i.value);
+            }
+            break;
+    }
+
+    return { type, value };
+}
+
 export type CardMetadataField<Dynamic extends boolean = true> = {
     name: string;
     description: string;
@@ -194,14 +263,7 @@ export type ProjectLinkedSite = {
     icon?: string | "site";
 };
 
-export const boardTypes: {
-    [key in BoardsResponse["type"]]: {
-        icon?: Component;
-        name: string;
-        description: string;
-        fields?: CustomCardFields | ((ctx: MetadataCtx) => CustomCardFields);
-    }
-} = {
+export const boardTypesConst = {
     "blank": {
         name: "Blank",
         description: "A blank board with no special features"
@@ -260,7 +322,22 @@ export const boardTypes: {
             }
         }
     }
+} as const satisfies {
+    [key in BoardsResponse["type"]]: {
+        icon?: Component;
+        name: string;
+        description: string;
+        fields?: CustomCardFields | ((ctx: MetadataCtx) => CustomCardFields);
+    }
 };
+export const boardTypes: {
+    [key in BoardsResponse["type"]]: {
+        icon?: Component;
+        name: string;
+        description: string;
+        fields?: CustomCardFields | ((ctx: MetadataCtx) => CustomCardFields);
+    }
+} = boardTypesConst;
 
 export function getTemplateSections() {
     return [

@@ -67,7 +67,7 @@ export function link(node: HTMLElement, href: string) {
 }
 
 type AnchorSide = "top" | "bottom" | "left" | "right" | "vauto" | "hauto";
-type AnchorPlacement = "start" | "center" | "end";
+type AnchorPlacement = "start" | "center" | "end" | "inner";
 export function anchor(
     /** The node to anchor */
     node: HTMLElement,
@@ -116,6 +116,15 @@ export function anchor(
                 side = "left";
             } else {
                 side = "right";
+            }
+        }
+
+        if(align === "inner") {
+            // Align toward the side of the parent that is closest to the edge of the viewport
+            if(side === "top" || side === "bottom") {
+                align = parentRect.left + parentRect.width / 2 < window.innerWidth / 2 ? "start" : "end";
+            } else {
+                align = parentRect.top + parentRect.height / 2 < window.innerHeight / 2 ? "start" : "end";
             }
         }
 

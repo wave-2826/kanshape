@@ -1,39 +1,41 @@
 <script lang="ts">
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
+    import { nav } from "$lib/navigation";
+    import type { OnshapeSelection } from "$lib/onshape/client";
     import { LoaderCircle } from "lucide-svelte";
 
     const {
-        selectedIDs
+        selections
     }: {
-        selectedIDs: string[] | null;
+        selections: OnshapeSelection[];
     } = $props();
 
     const onshapeCtx = getOnshapeContext();
     
     let loading = $state(false);
-
-    async function createCard() {
-        // TODO
-    }
 </script>
 
 <header>
     {#if loading}
         <p>Loading...</p>
         <LoaderCircle class={$css("animate-spin")} />
-    {:else if selectedIDs && selectedIDs.length > 0}
+    {:else if selections.length > 0}
         <p>
             Entity selected.
-            <span class="ids">entities {selectedIDs.join(", ")}</span>
+            <span class="ids">entities {selections.map(s => s.selectionId).join(", ")}</span>
         </p>
-        <button onclick={createCard}>Create card</button>
+        <button onclick={() => {
+            nav("/onshape/new" + (selections.length > 0 ? `?part=${JSON.stringify(selections[0])}` : ""))
+        }}>Create card</button>
     {:else}
         <p>
             No selected parts.
             {#if onshapeCtx.location === "right-panel-part-studio"}Select something to create a card.{/if}
         </p>
         {#if onshapeCtx.location === "right-panel-assembly"}
-            <button onclick={createCard}>Create card for assembly</button>
+            <button onclick={() => {
+                nav("/onshape/new?assembly=true")
+            }}>Create assembly card</button>
         {/if}
     {/if}
 </header>

@@ -1,13 +1,14 @@
 <script lang="ts">
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import type { AssemblyData, TypedPartsResponse } from "$lib/data/parts";
-    import { getPartHeuristics, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
+    import { type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
     import { client, deleteRecord, query, save, watchOne } from "$lib/pocketbase";
     import { Collections, type PartsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
     import { readable, type Readable } from "svelte/store";
     import CardPart from "./CardPart.svelte";
     import { RefreshCw } from "lucide-svelte";
+    import { getPartData, type PartSelection } from "./partData";
 
     let {
         value = $bindable(),
@@ -40,16 +41,6 @@
     let status = $state<"display" | "loading" | "existing" | "error">("display");
 
     const onshapeCtx = getOnshapeContext();
-
-    type PartSelection = {
-        wvm: "w" | "v" | "m";
-        type: "part" | "assembly";
-        wvmId: string;
-        documentId: string;
-        elementId: string;
-        partId?: string;
-        configuration: string;
-    };
     
     // TODO: all the alerts in here should be error popups in the UI instead of alert()
     async function getPartSelection(): Promise<PartSelection | null> {
@@ -197,49 +188,6 @@
         return record;
     }
 
-    async function getPartData(sel: PartSelection): Promise<PartHeuristicsResult | AssemblyData | null> {
-        if(!onshapeCtx.client) return null;
-
-        if(sel.type === "part" && sel.partId) {
-            const heuristics = await getPartHeuristics(onshapeCtx.client, sel.documentId, sel.wvm, sel.wvmId, sel.elementId, sel.partId);
-            if(!heuristics || "error" in heuristics) {
-                alert(`Failed to gather part heuristics: ${
-                    heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
-                }. Please try again.`);
-                return null;
-            }
-            sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
-            return heuristics;
-        } else {
-            const { data, error } = await onshapeCtx.client.requests.GET("/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}", {
-                params: {
-                    path: { did: sel.documentId, wvm: sel.wvm, wvmid: sel.wvmId, eid: sel.elementId },
-                    query: {
-                        inferMetadataOwner: false,
-                        depth: "1",
-                        includeComputedProperties: true,
-                        includeComputedAssemblyProperties: false,
-                        thumbnail: false,
-                        configuration: sel.configuration
-                    }
-                }
-            });
-
-            if(!data) {
-                alert(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}. Please try again.`);
-                return null;
-            }
-
-            let name = data.properties?.find(p => p.name === "Name" && p.value)?.value as string | undefined;
-            let part_number = data.properties?.find(p => p.name === "Part number" && p.value)?.value as string | undefined;
-
-            return {
-                name: name ?? "Unknown assembly",
-                part_number: part_number ?? ""
-            };
-        }
-    }
-
     async function queryExistingParts(sel: PartSelection) {
         return await query(Collections.Parts, {
             filter: 
@@ -252,8 +200,10 @@
     }
 
     async function refreshPart(sel: PartSelection, existing: PartsResponse[] | null) {
+        if(!onshapeCtx.client) return;
+
         // Run part heuristics or collect assembly data
-        let partData = await getPartData(sel);
+        let partData = await getPartData(onshapeCtx.client, sel);
         if(!partData) return;
         
         if("heuristic" in partData) {
@@ -362,11 +312,18 @@
         {/if}
     {:else}
         {#if onshapeCtx.onOnshape}
-            <button class="add" onclick={addPart}>
-                + Add part
-                <!-- TODO: we can store this ourselves -->
-                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
-            </button>
+            {#if cardId}
+                <button class="add" onclick={addPart}>
+                    + Add part
+                    <!-- TODO: we can store this ourselves -->
+                    <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                </button>
+            {:else}
+                <!-- TODO: there are some possible interfaces that could work for this, but right now
+                 we don't want to create additional part records before creating a card, so we disallow it.
+                 look into storing additional added parts before creation. -->
+                <span class="empty">Add additional parts after creating the card.</span>
+            {/if}
         {:else}
             <!-- TODO: allow selecting existing parts when not on onshape maybe? -->
             <div class="add empty">No part selected. Add one from Onshape!</div>

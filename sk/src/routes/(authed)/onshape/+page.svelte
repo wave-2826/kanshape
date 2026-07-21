@@ -8,18 +8,18 @@
     import { Plus } from "lucide-svelte";
     import { deasyncify } from "$lib/util";
     import CardPart from "$lib/components/parts/CardPart.svelte";
-    import type { TypedPartsResponse } from "$lib/data/parts";
-    import type { Readable } from "svelte/store";
-    import type { ListResult } from "pocketbase";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import { nav } from "$lib/navigation";
+    import { derived } from "svelte/store";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
     });
 
     const onshapeCtx = getOnshapeContext();
-    const selectedIDs = $derived(onshapeCtx.client?.selectedIDs);
+    const selections = $derived(onshapeCtx.client ? derived(onshapeCtx.client.selections, (selections) =>
+        selections.filter(s => ["BODY", "ENTITY", "OCCURRENCE"].includes(s.selectionType))
+    ) : null);
 
     const linkedProject = $derived(onshapeCtx.linkedProject);
 
@@ -28,23 +28,30 @@
     let parts = $derived(deasyncify(watch(Collections.Parts, {
         filter: filterToDocument ? `document_id = "${onshapeCtx.documentId}"` :
             `document_id = "${onshapeCtx.documentId}" && element_id = "${onshapeCtx.elementId}"`
-    })) as Readable<ListResult<TypedPartsResponse> | null>);
+    })));
 
     let cards = $derived(deasyncify(watch(Collections.PartCards, {
         query: {
             did: onshapeCtx.documentId,
             eid: filterToDocument ? undefined : onshapeCtx.elementId
         }
-    }))) as Readable<ListResult<TypedCardPreviewResponse> | null>;
+    })));
 </script>
 
 <div class="page">
-    <SelectionBanner selectedIDs={$selectedIDs ?? null} />
+    <SelectionBanner selections={$selections ?? []} />
     
     <menu>
-        <button class="add" onclick={async () => {
+        <button class="add" onclick={() => {
+            if($selections && $selections.length > 0) {
+                nav(`/onshape/new?part=${JSON.stringify($selections[0])}`)
+            } else if(onshapeCtx.location === "right-panel-assembly") {
+                nav(`/onshape/new?assembly=true`);
+            } else {
+                nav(`/onshape/new`);
+            }
         }}>
-            <Plus /> New card {$selectedIDs?.length ?? 0 > 0 ? "for selected part" : ""}
+            <Plus /> New card
         </button>
         
         <div class="multi-button filter-options">
@@ -95,7 +102,7 @@
             {#if linkedProject.type === LinkedProjectType.Unlinked}
                 <p>This document is registered but not linked to a particular project. Choose one to automatically select card boards.</p>
             {:else}
-                <p>This document is not registered. Link it to a project or subproject to create cards.</p>
+                <p>This document is not registered. cChoose one to automatically select card boards.</p>
             {/if}
             <LinkOnshapeDocument />
         </div>

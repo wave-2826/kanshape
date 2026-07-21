@@ -13,6 +13,26 @@ import { browser, dev } from "$app/environment";
 import { base } from "$app/paths";
 import { Collections, type CollectionRecords, type CollectionResponses, type RecordIdString, type TypedPocketBase, type Update, type Create as CreateRecord } from "./generated-types";
 
+import type { TypedBoardOverviewResponse, TypedBoardsResponse, TypedProjectOverviewResponse, TypedProjectsResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
+import type { TypedCardsResponse } from "$lib/data/cards";
+import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+import type { TypedPartsResponse } from "$lib/data/parts";
+/**
+ * Collection responses with type overrides.
+ * @extends {Record<Collections, any>}
+ */
+type TypedCollectionResponses = {
+    [Collections.Boards]: TypedBoardsResponse,
+    [Collections.Cards]: TypedCardsResponse,
+    [Collections.Projects]: TypedProjectsResponse,
+    [Collections.ProjectOverview]: TypedProjectOverviewResponse,
+    [Collections.CardPreview]: TypedCardPreviewResponse,
+    [Collections.SubprojectOverview]: TypedSubprojectOverviewResponse,
+    [Collections.BoardOverview]: TypedBoardOverviewResponse,
+    [Collections.Parts]: TypedPartsResponse,
+    [Collections.PartCards]: TypedCardPreviewResponse
+};
+
 /**
  * The collections that expand types reference for every collection.
  */
@@ -141,7 +161,9 @@ export type ExpandRecord<Collection extends Collections, Expand extends string> 
  * identical for most collections, but not all because of the auth system fields that only appear
  * in the response types).
  */
-export type ExpandResponse<Collection extends Collections, Expand extends string> = CollectionResponses[Collection] & { expand: ExpandResult<Collection, Expand> };
+export type ExpandResponse<Collection extends Collections, Expand extends string> = (
+    Collection extends keyof TypedCollectionResponses ? TypedCollectionResponses[Collection] : CollectionResponses[Collection]
+) & { expand: ExpandResult<Collection, Expand> };
 
 export function stripExpand<Record extends { expand?: any }>(record: Record): Omit<Record, "expand"> {
     const { expand, ...rest } = record;

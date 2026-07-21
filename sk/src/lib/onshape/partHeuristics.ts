@@ -25,6 +25,8 @@ export type PartHeuristicsResult = {
         size: [number, number];
         thickness: number;
         confidence: number;
+        principalAxis?: [number, number, number];
+        topFace?: { id: string, normal: [number, number, number] };
     };
     aabb: {
         min: [number, number, number];
@@ -33,9 +35,9 @@ export type PartHeuristicsResult = {
 };
 
 export function appearanceToHex(appearance: PartHeuristicsResult["appearance"]): string | undefined {
-    if (!appearance) return undefined;
+    if(!appearance) return undefined;
     const { red, green, blue, alpha } = appearance;
-    if (red === undefined || green === undefined || blue === undefined) return undefined;
+    if(red === undefined || green === undefined || blue === undefined) return undefined;
     const r = Math.round(red * 255);
     const g = Math.round(green * 255);
     const b = Math.round(blue * 255);
@@ -54,7 +56,9 @@ export function appearanceToHex(appearance: PartHeuristicsResult["appearance"]):
 export async function getPartHeuristics(
     client: OnshapeClient,
     documentId: string, wvm: "w" | "v" | "m", wvmId: string, elementId: string,
-    transientSelectionID: string
+    transientSelectionID: string,
+    linkDocumentId?: string,
+    configuration?: string
 ): Promise<PartHeuristicsResult | null> {
     return await evalTemplatedFS<PartHeuristicsResult>(
         client,
@@ -62,5 +66,7 @@ export async function getPartHeuristics(
             selectionID: transientSelectionID
         },
         documentId, wvm, wvmId, elementId,
+        linkDocumentId,
+        configuration
     );
 }

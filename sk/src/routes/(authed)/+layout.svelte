@@ -94,7 +94,7 @@
                 {/if}
             </button>
         {/if}
-        <a href="/">
+        <a href={onOnshape ? "" : "/"}>
             {#if config.site.logoUrl}
                 <img src={config.site.logoUrl} alt={config.site.name} />
             {/if}

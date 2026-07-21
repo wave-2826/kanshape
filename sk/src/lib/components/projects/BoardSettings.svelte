@@ -95,7 +95,7 @@
     import LeftPaneChooser from "../LeftPaneChooser.svelte";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
     import type { BatchService } from "pocketbase";
-    import { CancelBatch, deleteRecord, query, save, type ExpandRecord, type ExpandResponse } from "$lib/pocketbase";
+    import { CancelBatch, deleteRecord, query, save, type ExpandRecord } from "$lib/pocketbase";
     import { deepEqual } from "$lib/util";
     import { createPartIDString } from "$lib/parts";
     import CustomCardFieldDetails from "./CustomCardFieldDetails.svelte";

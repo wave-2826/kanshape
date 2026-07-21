@@ -54,7 +54,7 @@
     const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0, {
         // technically cards too but that's expensive
         pollOnChange: [Collections.Projects, Collections.Boards, Collections.Subprojects]
-    }))) as Readable<ListResult<TypedProjectOverviewResponse> | null>;
+    })));
 
     const changes = $derived(deasyncify(watch(Collections.ActivityLogPreview, {
         sort: "-date"

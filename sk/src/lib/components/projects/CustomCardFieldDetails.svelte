@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { CustomCardFields } from "$lib/data/project";
     import LeftPaneChooser from "../LeftPaneChooser.svelte";
-    import CardFieldSchemaEditor from "./CardFieldSchemaEditor.svelte";
+    import CardFieldSchemaEditor from "../kanban/cardView/schemaEditor/CardFieldSchemaEditor.svelte";
 
     let {
         customFields = $bindable(), background

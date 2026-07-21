@@ -30,7 +30,7 @@
     const subprojectOverview = $derived(subproject ?
         deasyncify(watchOne(Collections.SubprojectOverview, subproject.id)) :
         null
-    ) as Readable<TypedSubprojectOverviewResponse | null> | null;
+    );
 
     const cards = $derived(subproject ?
         deasyncify(watch(Collections.CardPreview, {
@@ -41,7 +41,7 @@
             pollOnChange: [Collections.Cards]
         })) :
         null
-    ) as Readable<ListResult<TypedCardPreviewResponse> | null> | null;
+    );
 
     let openCardId: string | null = $state(null);
     const openCard = $derived.by(() => {
@@ -54,7 +54,7 @@
     // the worst, at least.
     const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
         expand: "sections"
-    })) : null) as Readable<TypedBoardsResponse & ExpandResponse<"boards", "sections"> | null> | null;
+    })) : null);
     // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
     // a separate cached card loading system or something
     // TODO: Don't fetch all board cards
@@ -64,7 +64,7 @@
     }, 1, 500, {
         waitForConnection: true,
         pollOnChange: [Collections.Cards]
-    })) : null) as Readable<ListResult<TypedCardPreviewResponse> | null> | null;
+    })) : null);
 </script>
 
 {#if project && $project !== null && subproject !== null}

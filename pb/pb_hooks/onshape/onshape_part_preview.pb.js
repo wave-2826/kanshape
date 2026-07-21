@@ -10,6 +10,11 @@ routerAdd("POST", "/api/parts/generate_preview", (e) => {
         throw new BadRequestError("Missing part_id in request body");
     }
 
+    let assemblyData = null;
+    if(typeof body.assembly_data === "object" && body.assembly_data !== null) {
+        assemblyData = body.assembly_data;
+    }
+
     const partRecordId = body.part_id;
     let partRecord;
     try {
@@ -49,7 +54,7 @@ routerAdd("POST", "/api/parts/generate_preview", (e) => {
 
     let jsonPath;
     if(assembly) {
-        jsonPath = downloadAssemblyParts(e.app, modelPath, { did, wvm, wvmId, eid }, configuration, auth);
+        jsonPath = downloadAssemblyParts(e.app, modelPath, { did, wvm, wvmId, eid }, configuration, auth, assemblyData);
     } else {
         jsonPath = downloadPartTessellation(e.app, modelPath, { did, wvm, wvmId, eid, partId }, configuration, auth);
     }

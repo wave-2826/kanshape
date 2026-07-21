@@ -2,23 +2,22 @@
     import { Funnel, SquarePlus, View } from "lucide-svelte";
     import NewCardModal from "./NewCardModal.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
-    import type { SectionsRecord } from "$lib/pocketbase/generated-types";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
 
     const {
         project,
         board,
-        sections,
         cards
     }: {
         project: ExpandResponse<"projects", "subprojects">,
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
-        sections?: SectionsRecord[],
         cards: TypedCardPreviewResponse[]
     } = $props();
 
     let newCardModal: NewCardModal | null = $state(null);
+
+    const sections = $derived(board?.expand.sections ?? []);
 
     export function openNewCardModal(defaultSectionId?: string) {
         newCardModal?.open(defaultSectionId);
@@ -50,7 +49,7 @@
 {#if board && sections}
     <NewCardModal
         bind:this={newCardModal}
-        {sections} subprojects={project.expand.subprojects ?? []}
+        subprojects={project.expand.subprojects ?? []}
         boardCards={cards} {board}
     />
 {/if}

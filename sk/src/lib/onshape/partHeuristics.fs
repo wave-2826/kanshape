@@ -555,10 +555,23 @@ function(tl_context is Context, queries) {
         var isPlate = false;
         var size = [0 * meter, 0 * meter]; // of a tube or shaft
         var thickness = 0 * meter; // of a plate
+        var topFace = undefined;
         if(best.certainty > 0.9) {
             const minFace = best.minFace;
             const maxFace = best.maxFace;
             const endFaceAreas = [ evArea(context, { "entities": minFace }), evArea(context, { "entities": maxFace }) ];
+
+            // choose the end face with the largest area as the top face for export
+            var topFaceQuery = maxFace;
+            if(endFaceAreas[0] > endFaceAreas[1]) {
+                topFaceQuery = minFace;
+            }
+
+            var topFaceNormal = try(evPlane(context, { "face": topFaceQuery }).normal);
+            topFace = {
+                'id': transientQueriesToStrings([topFaceQuery])[0],
+                'normal': topFaceNormal != undefined ? [topFaceNormal[0], topFaceNormal[1], topFaceNormal[2]] : undefined
+            };
 
             // z faces outward, roughly along the principal axis
             const facePerpendicularCs = coordSystem(evFaceTangentPlane(context, {
@@ -660,7 +673,9 @@ function(tl_context is Context, queries) {
                 'partType': isShaft ? "shaft" : (isPlate ? "plate" : (isTube ? "tube" : "unknown")),
                 'size': [size[0] / meter, size[1] / meter],
                 'thickness': thickness / meter,
-                'confidence': best.certainty
+                'confidence': best.certainty,
+                'principalAxis': best.certainty > 0.9 ? [best.cs.xAxis[0], best.cs.xAxis[1], best.cs.xAxis[2]] : undefined,
+                'topFace': topFace != undefined ? topFace : undefined,
             },
             'aabb': {
                 'min': [aabb.minCorner[0] / meter, aabb.minCorner[1] / meter, aabb.minCorner[2] / meter],

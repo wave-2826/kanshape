@@ -21,7 +21,7 @@
     const projectOverview = $derived($project ?
         deasyncify(watchOne(Collections.ProjectOverview, $project.id)) :
         null
-    ) as Readable<TypedProjectOverviewResponse | null> | null;
+    );
 
     const boards = $derived($project ?
         deasyncify(watch(Collections.BoardOverview, {
@@ -31,7 +31,7 @@
             pollOnChange: [Collections.Boards]
         })) :
         null
-    ) as Readable<ListResult<TypedBoardOverviewResponse> | null> | null;
+    );
 
     const subprojects = $derived($project ?
         deasyncify(watch(Collections.SubprojectOverview, {
@@ -41,7 +41,7 @@
             pollOnChange: [Collections.Subprojects]
         })) :
         null
-    ) as Readable<ListResult<TypedSubprojectOverviewResponse> | null> | null;
+    );
 
     const changes = $derived($project ? deasyncify(watch(Collections.ActivityLogPreview, {
         filter: `project_id = "${$project.id}"`,

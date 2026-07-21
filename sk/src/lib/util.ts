@@ -87,3 +87,19 @@ export function deasyncify<T>(asyncReadable: Promise<Readable<T>>): Readable<T |
 
     return { subscribe };
 }
+
+export function formatDistance(m: number, decimals: number = 2): string {
+    // if in a locale that uses imperial units, convert to inches
+    // TODO: this should really be a user preference
+    if(navigator.language.startsWith("en-US") || navigator.language.startsWith("en-GB")) {
+        const inches = m * 39.3701;
+        return `${inches.toFixed(decimals)}"`;
+    } else {
+        if(m < 0.001) {
+            return `${(m * 1000).toFixed(decimals)}mm`;
+        } else if(m < 1) {
+            return `${(m * 100).toFixed(decimals)}cm`;
+        }
+        return `${m.toFixed(decimals)}m`;
+    }
+}

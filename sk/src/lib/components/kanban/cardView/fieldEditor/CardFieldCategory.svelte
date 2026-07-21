@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { CardMetadataSection } from "$lib/data/project";
-    import CardFieldEditor from "./CardFieldEditor.svelte";
+    import CardFieldEditorFull from "./CardFieldEditorFull.svelte";
     import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
     import { Trash } from "lucide-svelte";
 
@@ -28,7 +28,7 @@
                 {/if}
             </span>
             <div class="prop-value">
-                <CardFieldEditor {field} bind:card={card} />
+                <CardFieldEditorFull {field} bind:card={card} />
             </div>
         </div>
     {/each}
@@ -36,7 +36,7 @@
 
 <!-- svelte-ignore css_unused_selector - shared stylesheet -->
 <style lang="scss">
-@use "props.scss";
+@use "../props.scss";
 
 .property {
     // span at most 3 depending on the total columns

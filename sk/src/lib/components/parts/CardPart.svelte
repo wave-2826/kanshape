@@ -1,43 +1,36 @@
 <script lang="ts">
     import type { TypedPartsResponse } from "$lib/data/parts";
     import { appearanceToHex, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
-    import { Sparkles } from "lucide-svelte";
+    import { Box, Sparkles } from "lucide-svelte";
     import PopoverButton from "../PopoverButton.svelte";
     import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";
     import { contrastStyle } from "$lib/actions";
     import { opaqueHex } from "$lib/color";
     import { getLayoutParams } from "../../../routes/(authed)/+layout.svelte";
+    import type { CreationPart } from "./partData";
+    import { formatDistance } from "$lib/util";
 
     const { part }: {
-        part: TypedPartsResponse;
+        part: TypedPartsResponse | CreationPart;
     } = $props();
 
     const layoutParams = getLayoutParams();
 
-    function formatDistance(m: number): string {
-        // if in a locale that uses imperial units, convert to inches
-        // TODO: this should really be a user preference
-        if(navigator.language.startsWith("en-US") || navigator.language.startsWith("en-GB")) {
-            const inches = m * 39.3701;
-            return `${inches.toFixed(2)}"`;
-        } else {
-            if(m < 0.001) {
-                return `${(m * 1000).toFixed(2)}mm`;
-            } else if(m < 1) {
-                return `${(m * 100).toFixed(2)}cm`;
-            }
-            return `${m.toFixed(2)}m`;
-        }
-    }
-
     let modal: CardPartModal | null = $state(null);
+
+    const partData = $derived("id" in part ? part.part_data : part.partData);
+    const partId = $derived("id" in part ? part.part_id : part.partId);
 </script>
 
-<CardPartModal {part} bind:this={modal} />
+{#if "id" in part}
+    <CardPartModal {part} bind:this={modal} />
+{/if}
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex - it doesn't -->
 <div
-    class="part button"
+    class="part"
+    class:button={"id" in part}
     onclick={(e) => {
         if(e.target instanceof HTMLElement && e.target.closest("[data-part-preview]")) return;
         modal?.open();
@@ -45,22 +38,28 @@
     onkeydown={(e) => {
         if(e.key === "Enter" || e.key === " ") modal?.open();
     }}
-    role="button"
-    tabindex="0"
+    role={"id" in part ? "button" : "presentation"}
+    tabindex={"id" in part ? 0 : undefined}
 >
     <span class="part-type">{part.type === "part" ? "Part" : "Assembly"}</span>
     <div class="preview" data-part-preview>
-        <!-- holy fetch waterfall -->
-        <PartPreviewRenderer {part} edges={false} />
+        {#if "id" in part}
+            <!-- holy fetch waterfall -->
+            <PartPreviewRenderer {part} edges={false} />
+        {:else}
+            <div class="placeholder" title="Preview will generate after creation">
+                <Box class={$css("placeholder-icon")} />
+            </div>
+        {/if}
     </div>
-    <span class="part-name" title={part.part_data?.name ?? "Unknown"}>
-        {part.part_data?.name ?? "Unknown"}
+    <span class="part-name" title={partData?.name ?? "Unknown"}>
+        {partData?.name ?? "Unknown"}
     </span>
-    <span class="part-number" title={part.part_data?.part_number ?? "Unknown"}>
-        {part.part_data?.part_number ?? ""}
+    <span class="part-number" title={partData?.part_number ?? "Unknown"}>
+        {partData?.part_number ?? ""}
     </span>
     {#if part.type === "part"}
-        {@const data = part.part_data as PartHeuristicsResult}
+        {@const data = partData as PartHeuristicsResult}
         {@const hasType = data.heuristic.partType !== "unknown"}
         <PopoverButton
             class={[$css("heuristic-button"), hasType ? $css("autodetected") : ""]}
@@ -138,7 +137,7 @@
             {/if}
         </PopoverButton>
     {/if}
-    <span class="part-id">{part.part_id}</span>
+    <span class="part-id">{partId}</span>
 </div>
 
 <style lang="scss">
@@ -160,7 +159,7 @@
     
     background-color: var(--bg-secondary);
     border-radius: 4px;
-    width: 100%;
+    flex: 1;
     overflow: hidden;
     padding: 0 0.5rem 0 0;
     
@@ -168,6 +167,17 @@
         grid-area: preview;
         height: 100%;
         aspect-ratio: 1 / 1;
+    }
+    .placeholder {
+        display: grid;
+        place-items: center;
+        height: 100%;
+
+        .placeholder-icon {
+            width: 2rem;
+            height: 2rem;
+            color: var(--text-tertiary);
+        }
     }
 
     .part-type {

@@ -4,14 +4,14 @@ import createClient from "openapi-fetch";
 import { ONSHAPE_CUSTOM_BODY_SYMBOL, onshapeApiFetch } from "./requests";
 import type { paths } from "./schema";
 
-type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE";
+type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE" | "OCCURRENCE" | "ROLLBACKBAR" | "MATE_CONNECTOR";
 type OnshapeEntityType = "EDGE" | "FACE" | "VERTEX" | "DEGENERATE_EDGE" | "UNKNOWN";
 
-type OnshapeSelection = {
-    selectionId: string;
+export type OnshapeSelection = {
     selectionType: OnshapeSelectionType;
+    selectionId: string;
     entityType?: OnshapeEntityType;
-    occurrencePath?: string;
+    occurrencePath?: string[];
     workspaceMicroversionId: string;
 }
 
@@ -122,7 +122,7 @@ export class OnshapeClient {
     private keepAliveInterval: number | null = null;
 
     /** The transient entity IDs selected. */
-    public selectedIDs: Writable<string[]> = writable([]);
+    public selections: Writable<OnshapeSelection[]> = writable([]);
 
     public requests;
 
@@ -329,16 +329,7 @@ export class OnshapeClient {
         if(data && data.messageName) {
             switch(data.messageName) {
                 case "SELECTION":
-                    const selections = data.selections;
-                    let selectedIds: string[] = [];
-                    if(Array.isArray(selections) && selections.length > 0) {
-                        selectedIds = selections.map((s) => {
-                            if(typeof s === "string") return s;
-                            return s.selectionId;
-                        });
-                    }
-
-                    this.selectedIDs.set(selectedIds);
+                    this.selections.set(data.selections);
                     break;
                 default:
                     if(this.messageHandlers[data.messageName]) {

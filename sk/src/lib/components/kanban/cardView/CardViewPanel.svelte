@@ -1,25 +1,6 @@
-<script lang="ts" module>
-    import { createContext, untrack } from "svelte";
-    import { type TypedCardsResponse } from "../../../data/cards";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-    
-    // todo: there's probably a better place for this type
-    export type UploadContext = {
-        queueUpload(name: string, file: File): void;
-        update(): void;
-    };
-    export const [getUploadContext, setUploadContext] = createContext<UploadContext>();
-
-    export type CardSelectState = {
-        message: string;
-        callback: (selected: TypedCardPreviewResponse, self: TypedCardsResponse) => void;
-        originalSelection: string;
-    };
-</script>
-
 <script lang="ts">
     import { client, save, stripExpand, watchOne, type ExpandResponse } from "$lib/pocketbase";
-    import { Collections, type FileNameString, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type FileNameString, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
     import { walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
     import { deasyncify, debounce, deepEqual } from "$lib/util";
@@ -27,6 +8,10 @@
     import { readable, type Readable } from "svelte/store";
     import { applyDiff, createDiff } from "./diff";
     import CardViewFooter from "./CardViewFooter.svelte";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import type { TypedCardsResponse } from "$lib/data/cards";
+    import { setUploadContext, type CardSelectState, type UploadContext } from "./fieldEditor/uploadContext";
+    import { untrack } from "svelte";
     
     let {
         board,
@@ -223,6 +208,15 @@
         },
         update() {
             updateCardFilesDebounced();
+        },
+        getFileUrl(file) {
+            if(!card) return "";
+            // Files are given random suffixes by pocketbase, so we just find the file
+            // in the card's files array. could be a little cleaner, but whatever.
+            const foundFile = card.files.find(f => f.startsWith(file.id)) ?? file.id;
+            const url = new URL(client.files.getURL(card, foundFile));
+            url.searchParams.set("download", "1");
+            return url.toString();
         }
     };
     setUploadContext(uploadContext);
@@ -244,7 +238,7 @@
         {@const _card = card ?? previewPlaceholder(preview)}
         <CardView
             {board}
-            loading={card === null}
+            disabled={card === null}
             bind:card={
                 () => _card,
                 (v) => {

@@ -38,7 +38,7 @@
 </script>
 
 <div class="kanban-list" data-modal-target>
-    <KanbanMenu {project} {board} {sections} cards={listCards} />
+    <KanbanMenu {project} {board} cards={listCards} />
 
     <CardViewPanel
         boardCards={listCards}

@@ -8,8 +8,10 @@
         children,
         content,
         class: className,
+        style,
         contentClass,
-        title
+        title,
+        gap
     }: {
         children: Snippet,
         content: Snippet,
@@ -18,8 +20,10 @@
          * the calling side because of e.g. https://github.com/sveltejs/svelte/issues/2870
          */
         class?: string | string[],
+        style?: string,
         contentClass?: string,
-        title?: string
+        title?: string,
+        gap?: number
     } = $props();
 
     let open = $state(false);
@@ -36,14 +40,14 @@
 <button class={className} onclick={(e) => {
     open = !open;
     e.stopPropagation();
-}} bind:this={button} {title}>
+}} bind:this={button} {title} {style}>
     {@render children()}
     {#if open}
         <Portal target="body">
             <div
                 class={["popover-content", contentClass]}
                 transition:fly={{ y: 5, duration: 150 }}
-                use:anchor={{ element: button, placement: "vauto-end", offset: 5 }}
+                use:anchor={{ element: button, placement: "vauto-inner", offset: gap ?? 5 }}
                 bind:this={popover}
             >
                 {@render content()}
@@ -61,7 +65,6 @@ button {
 :where(.popover-content) {
     min-width: 150px;
     max-width: 90vw;
-    margin-top: 0.25rem;
     background-color: var(--bg-primary);
     border: 1px solid var(--border);
     border-radius: 4px;

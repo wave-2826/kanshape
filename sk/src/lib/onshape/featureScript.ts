@@ -59,7 +59,9 @@ export async function evalFeatureScript<T = any>(
     wvm: "w" | "v" | "m",
     wvmid: string,
     eid: string,
-    script: string
+    script: string,
+    linkDocumentId?: string,
+    configuration?: string
 ): Promise<T | null> {
     // Not sure why this typing doesn't work; oh well
     const { data } = await client.requests.POST(
@@ -70,7 +72,9 @@ export async function evalFeatureScript<T = any>(
                     did, wvm, wvmid, eid
                 },
                 query: {
-                    rollbackBarIndex: -1
+                    rollbackBarIndex: -1,
+                    configuration,
+                    linkDocumentId
                 }
             },
             body: { libraryVersion: 2960, script },
@@ -105,7 +109,9 @@ export async function evalTemplatedFS<T = any>(
     client: OnshapeClient,
     script: string,
     params: Record<string, string>,
-    did: string, wvm: "w" | "v" | "m", wvmid: string, eid: string
+    did: string, wvm: "w" | "v" | "m", wvmid: string, eid: string,
+    linkDocumentId?: string,
+    configuration?: string
 ): Promise<T | null> {
     const templatedScript = script.replace(/{{\s*([\w]+)\s*}}/g, (_, key) => {
         if(key in params) {
@@ -120,7 +126,8 @@ export async function evalTemplatedFS<T = any>(
     return evalFeatureScript(
         client,
         did, wvm, wvmid, eid,
-        stripCommentsAndWhitespace(templatedScript)
+        stripCommentsAndWhitespace(templatedScript),
+        linkDocumentId, configuration
     );
 }
 

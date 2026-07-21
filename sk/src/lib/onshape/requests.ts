@@ -96,6 +96,8 @@ export async function onshapeApiRequest<T>(
 
     // Check if the extension is installed
     if(await detectBridgeExtension()) {
+        console.log("Bridge extension handling onshape request");
+        
         // Check if still in rate limit backoff - fail fast
         if(Date.now() < rateLimitBackoffUntil) {
             const waitTime = rateLimitBackoffUntil - Date.now();

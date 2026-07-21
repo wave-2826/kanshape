@@ -1,6 +1,6 @@
 <script lang="ts">
     import { autofocus, autoSize } from "$lib/actions";
-    import { getPriorityColor, priorities, type CardAssignmentData, type CardMetadata, type TypedCardsCreate, type TypedCardsResponse } from "$lib/data/cards";
+    import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsCreate, type TypedCardsResponse } from "$lib/data/cards";
     import type { SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
@@ -10,14 +10,14 @@
     import CardDependencySelector from "./CardDependencySelector.svelte";
     import { getCardMetadataItems, getExtraMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
     import type { ExpandResponse } from "$lib/pocketbase";
-    import CardFieldCategory from "./CardFieldCategory.svelte";
-    import type { CardSelectState } from "./CardViewPanel.svelte";
+    import CardFieldCategory from "./fieldEditor/CardFieldCategory.svelte";
+    import type { CardSelectState } from "./fieldEditor/uploadContext";
 
     let {
         board,
         card = $bindable(),
         subprojects,
-        loading,
+        disabled = false,
 
         boardCards,
         onopendependency,
@@ -29,7 +29,7 @@
         board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         card: TypedCardsResponse | TypedCardsCreate,
         subprojects: SubprojectsRecord[],
-        loading: boolean,
+        disabled?: boolean,
 
         boardCards?: TypedCardPreviewResponse[],
         onopendependency?: (id: string | null) => void,
@@ -54,7 +54,7 @@
         bind:value={card.title}
         class="title"
         placeholder="Card title"
-        disabled={loading}
+        disabled={disabled}
         use:autofocus={autofocusTitle}
     />
 </header>
@@ -69,7 +69,7 @@
             bind:value={card.description}
             placeholder="Add a more detailed description..."
             use:autoSize={card.description}
-            disabled={loading}
+            disabled={disabled}
         ></textarea>
     </div>
 
@@ -83,7 +83,7 @@
                     name="section"
                     bind:value={card.section}
                     style="color: {sections.find(s => s.id === card.section)?.color ?? 'inherit'}"
-                    disabled={loading}
+                    disabled={disabled}
                 >
                     {#each sections as section}
                         <option value={section.id} style="color: {section.color ?? "inherit"}">{section.title}</option>
@@ -100,7 +100,7 @@
                     name="priority"
                     bind:value={card.priority}
                     style="color: {getPriorityColor(card.priority)}"
-                    disabled={loading}
+                    disabled={disabled}
                 >
                     {#each Object.entries(priorities) as [key, v]}
                         <option value={key} style="color: {v.color}">{v.label}</option>

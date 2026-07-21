@@ -5,22 +5,22 @@ cases where the expected type doesn't match the value type by displaying a reset
 <script lang="ts">
     import { autoSize } from "$lib/actions";
     import type { CardMetadata } from "$lib/data/cards";
-    import { defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataFile, type MetadataValue } from "$lib/data/project";
+    import { CREATE_SYMBOL, defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataFile, type MetadataValue } from "$lib/data/project";
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
-    import CardFieldTypeEditor from "./CardFieldTypeEditor.svelte";
-    import { FileIcon, Plus, X } from "lucide-svelte";
-    import CardPartEditor from "../../parts/CardPartEditor.svelte";
+    import CardFieldEditor from "./CardFieldEditor.svelte";
+    import { Plus, X } from "lucide-svelte";
+    import CardPartEditor from "../../../parts/CardPartEditor.svelte";
+    import CardPart from "$lib/components/parts/CardPart.svelte";
+    import type { CreationPart } from "$lib/components/parts/partData";
+    import CardFieldFilesEditor from "./CardFieldFilesEditor.svelte";
 
     let {
         type, value = $bindable(),
-        addFile, getFileUrl,
         cardId
     }: {
         type: CardMetadataFieldType<false>,
         value: CardMetadata[string]["value"],
-        addFile: (name: string, file: File) => void,
-        getFileUrl?: (file: MetadataFile) => string,
         cardId?: string
     } = $props();
 
@@ -49,8 +49,9 @@ cases where the expected type doesn't match the value type by displaying a reset
 {:else if type.base === "date"}
     <input type="date" bind:value={get, set<string>} />
 {:else if type.base === "onshape_part"}
-    <!-- TODO: Better selection for when user is in onshape -->
     <CardPartEditor bind:value={get, set<string>} {cardId} />
+{:else if type.base === CREATE_SYMBOL && type.create === "onshape_part"}
+    <CardPart part={value as CreationPart} />
 {:else if type.base === "user" || type.base === "group"}
     <div class="select">
         <CachedCollectionSelector
@@ -64,14 +65,14 @@ cases where the expected type doesn't match the value type by displaying a reset
     <div class="list">
         {#each (value as MetadataValue[]) as item, index (index)}
             <div class="list-item">
-                <CardFieldTypeEditor
+                <CardFieldEditor
                     type={type.field}
                     bind:value={() => item, (v) => {
                         let newValue = [...(value as MetadataValue[])];
                         newValue[index] = v;
                         set(newValue);
                     }}
-                    {addFile} {getFileUrl} {cardId}
+                    {cardId}
                 />
                 <button onclick={() => {
                     let newValue = [...(value as MetadataValue[])];
@@ -90,91 +91,19 @@ cases where the expected type doesn't match the value type by displaying a reset
 {:else if type.base === "tuple"}
     <div class="tuple">
         {#each type.fields as field, index}
-            <CardFieldTypeEditor
+            <CardFieldEditor
                 type={field}
                 bind:value={() => (value as MetadataValue[])[index], (v) => {
                     let newValue = [...(value as MetadataValue[])];
                     newValue[index] = v;
                     set(newValue);
                 }}
-                {addFile} {getFileUrl} {cardId}
+                {cardId}
             />
         {/each}
     </div>
 {:else if type.base === "file"}
-    <div class="files">
-        {#snippet capsule(file: MetadataFile)}
-            <div class="file-capsule">
-                <FileIcon class={$css("file-icon")} />
-                {#if getFileUrl}
-                    <a
-                        href={getFileUrl(file as MetadataFile)}
-                        target="_blank"
-                        onclick={(e) => {
-                            // manual download handler to set the filename properly
-                            // progressive enhancement; the link will work normally too
-                            e.preventDefault();
-                            const url = getFileUrl(file as MetadataFile);
-                            // TODO: Download progress indicator
-                            // TODO: Handle errors
-                            fetch(url).then(async (res) => {
-                                const blob = await res.blob();
-                                const a = document.createElement("a");
-                                a.href = URL.createObjectURL(blob);
-                                a.download = (file as MetadataFile).name;
-                                a.click();
-                            });
-                        }}
-                    >{(file as MetadataFile).name}</a>
-                {:else}
-                    <span>{(file as MetadataFile).name}</span>
-                {/if}
-                <button onclick={() => {
-                    if(type.multi) {
-                        set((value as MetadataFile[]).filter(f => f.id !== (file as MetadataFile).id));
-                    } else {
-                        set(null);
-                    }
-                }} class="remove unstyled"><X /></button>
-            </div>
-        {/snippet}
-        {#if type.multi}
-            {#each (value as MetadataFile[]) as file, index (index)}
-                {@render capsule(file)}
-            {/each}
-            <label class="button">
-                <Plus /> Add file(s)
-                <input type="file" multiple onchange={async (e) => {
-                    const files = (e.target as HTMLInputElement).files;
-                    if(files && files.length > 0) {
-                        for(const file of files) {
-                            // The actual name of the file isn't the uploaded name, but we store it
-                            const generatedName = crypto.randomUUID().replace(/-/g, "");
-                            addFile(generatedName + "." + file.name.split(".").pop(), file);
-                            set([...(value as MetadataValue[]), { name: file.name, id: generatedName }]);
-                        }
-                    }
-                }} />
-            </label>
-        {:else}
-            {#if (value as MetadataFile)?.id}
-                {@render capsule(value as MetadataFile)}
-            {:else}
-                <label class="button">
-                    <Plus /> Add file
-                    <input type="file" onchange={async (e) => {
-                        const files = (e.target as HTMLInputElement).files;
-                        if(files && files.length > 0) {
-                            const file = files[0];
-                            const generatedName = crypto.randomUUID().replace(/-/g, "");
-                            addFile(generatedName + "." + file.name.split(".").pop(), file);
-                            set({ name: file.name, id: generatedName });
-                        }
-                    }} />
-                </label>
-            {/if}
-        {/if}
-    </div>    
+    <CardFieldFilesEditor bind:value={get, set<MetadataFile | MetadataFile[] | null>} type={type} />
 {:else if type.base === "select"}
     {@const isOther = type.allow_other && typeof value === "string" && !type.options.some(o => o.id === value)}
     <div class="custom-select" class:is-other={isOther}>
@@ -202,6 +131,8 @@ cases where the expected type doesn't match the value type by displaying a reset
             <input type="text" bind:value={get, set<string>} placeholder="Custom value..." />
         {/if}
     </div>
+{:else if type.base === CREATE_SYMBOL}
+    <span>Unsupported field type: {type.create}</span>
 {:else}
     <span>Unsupported field type: {_exhaustiveCheck(type.base)}</span>
 {/if}
@@ -210,6 +141,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     input, textarea {
         flex: 1;
         padding: 0.25rem 0.5rem;
+        min-width: 0;
     }
 
     .select {
@@ -252,43 +184,6 @@ cases where the expected type doesn't match the value type by displaying a reset
         gap: 0.25rem;
         flex: 1;
         min-width: 0;
-    }
-
-    .files {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-
-        .file-capsule {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0 0 0 0.5rem;
-            background-color: var(--bg-secondary);
-            border-radius: 0.25rem;
-
-            a {
-                color: var(--text-primary);
-            }
-            .file-icon {
-                width: 1em;
-                height: 1em;
-                margin-right: 0.25rem;
-            }
-
-            .remove {
-                padding: 0.25rem;
-                color: var(--text-secondary);
-                transition: color 0.2s;
-            }
-            .remove:hover {
-                color: var(--text-primary);
-            }
-        }
-
-        input[type="file"] {
-            display: none;
-        }
     }
 
     .custom-select {

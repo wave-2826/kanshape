@@ -1,6 +1,6 @@
 import type { Component } from "svelte";
 import type { BoardOverviewResponse, BoardsResponse, ProjectOverviewResponse, ProjectsResponse, SubprojectOverviewResponse } from "../pocketbase/generated-types";
-import type { CardMetadata } from "./cards";
+import type { CardMetadata, TypedCardsCreate, TypedCardsResponse } from "./cards";
 import { CodeXml, Factory, Palette } from "lucide-svelte";
 import type { NonNullValuesExcept } from "./kanban";
 import type { CreationPart } from "$lib/components/parts/partData";
@@ -30,6 +30,8 @@ export type TypedSubprojectOverviewResponse = NonNullValuesExcept<SubprojectOver
     string | null, // next_due
     number // overdue_card_count
 >, "next_due">;
+
+// TODO: most of this metadata stuff is definitely more cards than projects
 
 /** Context object passed to functions that dynamically change metadata */
 export type MetadataCtx = {
@@ -78,6 +80,15 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
 };
 
 export type PartExportType = "step" | "dxf" | "gltf" | "obj";
+export const partExportTypes: {
+    [key in PartExportType]: { name: string; extension: string; }
+} = {
+    "step": { name: "STEP", extension: ".step" },
+    "dxf": { name: "DXF", extension: ".dxf" },
+    "gltf": { name: "glTF", extension: ".gltf" },
+    "obj": { name: "OBJ", extension: ".obj" }
+};
+
 export type MetadataFile = {
     id: string;
     /** Original name of the file */
@@ -196,6 +207,15 @@ export function walkMetadataValues(
                 }
             }
             break;
+    }
+}
+
+export function walkMetadata(
+    card: TypedCardsResponse | TypedCardsCreate,
+    callback: (type: CardMetadataFieldType<false>, value: MetadataValue) => void
+) {
+    if(card.metadata) for(const [k, v] of Object.entries(card.metadata)) {
+        walkMetadataValues(v.type, v.value, callback);
     }
 }
 

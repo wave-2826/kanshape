@@ -14,7 +14,7 @@
         gap
     }: {
         children: Snippet,
-        content: Snippet,
+        content: Snippet<[{ close: () => void }]>,
         /**
          * Note that styling this element will require :global() OR $css() with svelte-css-rune on
          * the calling side because of e.g. https://github.com/sveltejs/svelte/issues/2870
@@ -50,7 +50,7 @@
                 use:anchor={{ element: button, placement: "vauto-inner", offset: gap ?? 5 }}
                 bind:this={popover}
             >
-                {@render content()}
+                {@render content({ close: () => open = false })}
             </div>
         </Portal>
     {/if}

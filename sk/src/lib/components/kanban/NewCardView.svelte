@@ -5,10 +5,12 @@
     import { Collections, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import CardView from "./cardView/CardView.svelte";
-    import { CREATE_SYMBOL, transformMetadata, walkMetadataValues, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
+    import { CREATE_SYMBOL, transformMetadata, walkMetadata, walkMetadataValues, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { Snippet } from "svelte";
     import { setUploadContext, type UploadContext } from "./cardView/fieldEditor/uploadContext";
+    import type { TypedPartsResponse } from "$lib/data/parts";
+    import type { CreationPart } from "../parts/partData";
 
     const {
         board,
@@ -81,14 +83,12 @@
             if(typeof f.id !== "string") return;
             metadataFiles.add(f.name);
         };
-        if(cardData.metadata) for(const v of Object.values(cardData.metadata)) {
-            walkMetadataValues(v.type, v.value, (ty, val) => {
-                if(ty.base === "file") {
-                    if(Array.isArray(val)) for(const f of val) indexFile(f);
-                    else indexFile(val);
-                }
-            });
-        }
+        walkMetadata(cardData, (ty, val) => {
+            if(ty.base === "file") {
+                if(Array.isArray(val)) for(const f of val) indexFile(f);
+                else indexFile(val);
+            }
+        });
         const stripExtension = (name: string) => name.replace(/\.[^/.]+$/, "");
         cardData.files = cardData.files.filter(f => metadataFiles.has(stripExtension(f.name)));
 
@@ -125,13 +125,35 @@
         cb(cardData);
     }
 
-    let uploadContext: UploadContext = {
+    let uploadContext: UploadContext = $state({
         queueUpload(name: string, file: File) {
             const namedFile = new File([file], name, { type: file.type, lastModified: file.lastModified });
             cardData.files!.push(namedFile);
         },
         update() {}
-    };
+    });
+    $effect(() => {
+        if(board.type === "parts") {
+            uploadContext.partExport = {
+                async getParts() {
+                    let parts: (TypedPartsResponse | CreationPart)[] = [];
+                    walkMetadata(cardData, (ty, val) => {
+                        if(ty.base === CREATE_SYMBOL && ty.create === "onshape_part") {
+                            if(Array.isArray(val)) parts.push(...val as CreationPart[]);
+                            else parts.push(val as CreationPart);
+                        }
+                    });
+                    return parts;
+                },
+                queuePartExport(name, partRecord, type) {
+                    // TODO
+                    alert("Part export not implemented yet");
+                }
+            };
+        } else {
+            uploadContext.partExport = undefined;
+        }
+    });
     setUploadContext(uploadContext);
 </script>
 

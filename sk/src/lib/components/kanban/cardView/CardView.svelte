@@ -43,6 +43,8 @@
 
     const metadataItems = $derived(getCardMetadataItems(board, {
         board: $state.snapshot(board) as TypedBoardsResponse,
+        // svelte-ignore state_snapshot_uncloneable - symbols are ""unclonable"", but passing by reference
+        // is okay because they're immutable
         metadata: $state.snapshot(card.metadata as any) // tsc errors without as any ???
     }, true));
     const extraItems = $derived(getExtraMetadataItems(metadataItems, card.metadata));

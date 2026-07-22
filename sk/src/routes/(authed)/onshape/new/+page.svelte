@@ -147,6 +147,7 @@
                             formatDistance(heuristic?.thickness ?? 0)
                         }`]];
 
+                        // TODO: bad for i18n, though it's not like we do that anyway...
                         const partFileName = `${partData.partData.name.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
 
                         c.metadata = {
@@ -166,7 +167,7 @@
                                 type: boardTypesConst.parts.fields.files.type,
                                 value: [{
                                     id: CREATE_SYMBOL,
-                                    name: `${partFileName}.fbx`,
+                                    name: `${partFileName}.dxf`,
                                     createType: "auto_export",
                                     exportType: "dxf"
                                 }] satisfies MetadataFile[]

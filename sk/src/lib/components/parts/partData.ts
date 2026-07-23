@@ -1,5 +1,5 @@
 import type { AssemblyData } from "$lib/data/parts";
-import type { OnshapeClient, OnshapeSelection } from "$lib/onshape/client";
+import { generateRecordID, type OnshapeClient, type OnshapeSelection } from "$lib/onshape/client";
 import { getPartHeuristics, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
 import type { components } from "$lib/onshape/schema";
 import type { OnshapeContext } from "../nav/onshapeContext.svelte";
@@ -16,8 +16,10 @@ export type PartSelection = {
 
 /** Data for creating a new part when making a card */
 export type CreationPart = {
+    /** ID of the part that will be created */
+    id: string;
     type: "part" | "assembly",
-    partId?: string,
+    sel: PartSelection,
     partData: PartHeuristicsResult | AssemblyData,
     assemblyData?: BTAssemblyDefinitionInfo
 };
@@ -75,6 +77,15 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
         throw new Error("Expected occurrence path on assembly selection");
     }
 
+    const partSelection: PartSelection = {
+        documentId: ctx.documentId,
+        wvm: ctx.wvm,
+        wvmId: ctx.wvmId,
+        elementId: ctx.elementId,
+        type: inAssembly ? "assembly" : "part",
+        configuration: "default" // again, we don't really get a configuration so who knows
+    };
+
     // if we're in an assembly, we always need to fetch its inforamtion; either:
     // - this is a part (we need to know which one)
     // - this is a subassembly (again, need to know which one)
@@ -82,17 +93,12 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
     if(inAssembly) {
         if(sel.selectionId === "assemblyRoot") {
             // we don't need to fetch full assembly data for the root
-            const partData = await getPartData(ctx.client, {
-                documentId: ctx.documentId,
-                wvm: ctx.wvm,
-                wvmId: ctx.wvmId,
-                elementId: ctx.elementId,
-                type: "assembly",
-                configuration: "default" // again, we don't really get a configuration so who knows
-            });
+            const partData = await getPartData(ctx.client, partSelection);
             if(!partData) return null;
             return {
+                id: generateRecordID(),
                 type: "assembly",
+                sel: partSelection,
                 partData
             };
         }
@@ -125,9 +131,15 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
             throw new Error("Failed to get part data");
         }
 
+        if(selection.type === "part") {
+            selection.type = "part";
+            selection.partId = "partID" in partData ? partData.partID : undefined;
+        }
+
         return {
+            id: generateRecordID(),
             type: selection.type,
-            partId: selection.type === "part" && "partID" in partData ? partData.partID : undefined,
+            sel: selection,
             partData,
             assemblyData
         };
@@ -149,9 +161,13 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
             }`);
         }
 
+        // in case the original was a child entity
+        partSelection.partId = heuristics.partID ?? partSelection.partId;
+
         return {
+            id: generateRecordID(),
             type: "part",
-            partId: heuristics.partID,
+            sel: partSelection,
             partData: heuristics
         };
     }

@@ -1,16 +1,17 @@
 <script lang="ts">
     import type { TypedCardsCreate } from "$lib/data/cards";
-    import { save, type ExpandResponse } from "$lib/pocketbase";
+    import { client, save, type ExpandResponse } from "$lib/pocketbase";
     import { authModel } from "$lib/pocketbase/auth";
-    import { Collections, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { Collections, type PartsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import CardView from "./cardView/CardView.svelte";
-    import { CREATE_SYMBOL, transformMetadata, walkMetadata, walkMetadataValues, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
+    import { CREATE_SYMBOL, transformMetadata, walkMetadata, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { Snippet } from "svelte";
     import { setUploadContext, type UploadContext } from "./cardView/fieldEditor/uploadContext";
-    import type { TypedPartsResponse } from "$lib/data/parts";
+    import type { PartExport, TypedPartsResponse } from "$lib/data/parts";
     import type { CreationPart } from "../parts/partData";
+    import { queryExistingParts, generatePartPreview, updatePartRecord } from "../parts/CardPartEditor.svelte";
 
     const {
         board,
@@ -45,23 +46,61 @@
     async function create() {
         if(cardData.title.length === 0) return;
 
+        // exports can be slow, so we run them after card creation
+        let exports: PartExport[] = [];
+        // parts are created after the card since they require the card id and we'd prefer not to make two requests
+        let parts: { part: CreationPart, existingOrNewId: PartsResponse[] | string }[] = [];
+
         // transform creation metadata
         if(cardData.metadata) for(const [k, v] of Object.entries(cardData.metadata)) {
             function indexFile(f: MetadataValue): MetadataFile {
                 const file = f as MetadataFile;
-                if(file.id === CREATE_SYMBOL) return {
-                    id: "",
-                    name: file.name
-                };
+                if(file.id === CREATE_SYMBOL) {
+                    switch(file.createType) {
+                        case "auto_export":
+                        case "export":
+                            const id = crypto.randomUUID();
+                            exports.push({ type: file.exportType, partRecordId: file.partRecordId, id });
+                            return {
+                                id,
+                                name: file.name,
+                                type: file.createType
+                            };
+                        default:
+                            const _exhaustiveCheck: never = file.createType;
+                            console.error("Unknown creation type:", _exhaustiveCheck);
+                    }
+                }
                 return file;
             }
 
-            const { value, type } = transformMetadata(v.type, v.value, n => {
+            const { value, type } = await transformMetadata(v.type, v.value, async (n) => {
                 if(n.type.base === CREATE_SYMBOL) {
                     if(n.type.create === "onshape_part") {
+                        const part = n.value as CreationPart;
+                        const existing: PartsResponse[] | null = await queryExistingParts(part.sel);
+                        
+                        // If already adding this part, don't add multiple times
+                        const existingAddedPart = parts.find(p =>
+                            p.part.sel.documentId === part.sel.documentId &&
+                            p.part.sel.elementId === part.sel.elementId &&
+                            p.part.sel.partId === part.sel.partId
+                        );
+                        if(existingAddedPart) {
+                            const eid = existingAddedPart.existingOrNewId;
+                            return {
+                                type: { base: "onshape_part" },
+                                value: Array.isArray(eid) ? eid[0].id : eid
+                            };
+                        }
+                        
+
+                        const newId = existing && existing.length > 0 ? existing[0].id : part.id;
+                        parts.push({ part, existingOrNewId: existing && existing.length > 0 ? existing : newId })
+
                         return {
                             type: { base: "onshape_part" },
-                            value: "asdftodoidhere"
+                            value: newId
                         };
                     }
                     else throw new Error(`Unknown creation type: ${n.type.create}`);
@@ -92,9 +131,37 @@
         const stripExtension = (name: string) => name.replace(/\.[^/.]+$/, "");
         cardData.files = cardData.files.filter(f => metadataFiles.has(stripExtension(f.name)));
 
-        await save(Collections.Cards, cardData, { create: true }).catch((err) => {
+        const record = await save(Collections.Cards, cardData, { create: true }).catch((err) => {
             console.error("Failed to create card:", err);
             return null;
+        });
+
+        if(!record) {
+            console.error("Failed to create card, no record returned");
+            alert("Failed to create card");
+            return;
+        }
+
+        // create parts
+        for(const p of parts) {
+            const partRecord = await updatePartRecord(p.existingOrNewId, p.part.sel, p.part.partData, record.id);
+            if(!partRecord) {
+                console.error("Failed to create part:", p.part);
+                alert("Failed to create part");
+                return;
+            }
+
+            // regenerate the preview
+            generatePartPreview(partRecord.id);
+        }
+
+        // begin exports
+        client.send("/api/parts/export_all", {
+            method: "POST",
+            body: exports.map(e => ({
+                ...e,
+                cardId: record.id
+            }))
         });
 
         oncreate();
@@ -143,11 +210,17 @@
                             else parts.push(val as CreationPart);
                         }
                     });
-                    return parts;
+                    // deduplicate by id
+                    return [...new Map(parts.map(p => [p.id, p])).values()];
                 },
-                queuePartExport(name, partRecord, type) {
-                    // TODO
-                    alert("Part export not implemented yet");
+                hasParts() {
+                    let hasParts = false;
+                    walkMetadata(cardData, (ty, val) => {
+                        if(ty.base === CREATE_SYMBOL && ty.create === "onshape_part") {
+                            hasParts = true;
+                        }
+                    });
+                    return hasParts;
                 }
             };
         } else {

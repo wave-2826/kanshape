@@ -346,3 +346,25 @@ export class OnshapeClient {
         }
     }
 }
+
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+/**
+ * Generate a random record ID like pocketbase's internal IDs. Pocketbase may check if
+ * the ID doesn't already exist but we'd need to generate 66 billion random IDs for a 1%
+ * chance of collision, so... it's fine
+ */
+export function generateRecordID(length = 15) {
+    const resultChars: string[] = [];
+    const n = ALPHABET.length;
+    const maxMultiple = Math.floor(256 / n) * n; // largest multiple of n less than 256
+
+    const bytes = new Uint8Array(1);
+    while(resultChars.length < length) {
+        crypto.getRandomValues(bytes);
+        const v = bytes[0];
+        if(v >= maxMultiple) continue; // avoid modulo bias
+        resultChars.push(ALPHABET[v % n]);
+    }
+
+    return resultChars.join("");
+}

@@ -1,3 +1,87 @@
+<script lang="ts" module>
+    export async function queryExistingParts(sel: PartSelection) {
+        return await query(Collections.Parts, {
+            filter: 
+                (sel.type === "part" ?
+                    `type="part" && part_id="${sel.partId}"` :
+                    `type="assembly"`)
+                + `&& document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
+                + (sel.configuration !== "default" ? ` && configuration="${sel.configuration}"` : "")
+        }).catch(() => null);
+    }
+
+    export async function updatePartRecord(
+        existingOrNewId: PartsResponse[] | string | null,
+        sel: PartSelection,
+        partData: PartHeuristicsResult | AssemblyData | null,
+        cardId?: string
+    ): Promise<PartsResponse | null> {
+        let record: PartsResponse | null = null;
+        if(existingOrNewId && Array.isArray(existingOrNewId) && existingOrNewId.length > 0) {
+            const existing = existingOrNewId;
+
+            // if there are more than 1 existing parts, delete all except the first (which we'll update)
+            // this shouldn't really happen but can if configuration information changes
+            if(existing.length > 1) {
+                console.log(`Deleting ${existing.length - 1} extra existing part records`);
+                for(let i = 1; i < existing.length; i++) {
+                    await deleteRecord(Collections.Parts, existing[i].id).catch(() => null);
+                }
+            }
+
+            // Update the existing record
+            let past_revision_cards = existing[0].past_revision_cards;
+            if(existing[0].current_card != cardId && !past_revision_cards.includes(existing[0].current_card)) {
+                past_revision_cards = [...past_revision_cards, existing[0].current_card];
+            }
+            record = await save(Collections.Parts, {
+                id: existing[0].id,
+                part_id: sel.partId,
+                document_id: sel.documentId,
+                element_id: sel.elementId,
+                wvm: sel.wvm,
+                wvm_id: sel.wvmId,
+                current_card: cardId,
+                part_data: partData ?? undefined,
+                past_revision_cards,
+                configuration: sel.configuration,
+                revision: existing[0].revision + 1
+            }, { create: false });
+        } else {
+            if(!partData) throw new Error("Part data required for creating new part.");
+            // Create a new record
+            record = await save(Collections.Parts, {
+                id: typeof existingOrNewId === "string" ? existingOrNewId : undefined,
+                part_id: sel.partId,
+                document_id: sel.documentId,
+                element_id: sel.elementId,
+                wvm: sel.wvm,
+                wvm_id: sel.wvmId,
+                current_card: cardId,
+                part_data: partData,
+                past_revision_cards: [],
+                configuration: sel.configuration,
+                revision: 1,
+                type: sel.type
+            }, { create: true });
+        }
+
+        if(!record) {
+            alert("Failed to save part. Please try again.");
+            return null;
+        }
+
+        return record;
+    }
+
+    export async function generatePartPreview(partRecordId: string) {
+        return await client.send("/api/parts/generate_preview", {
+            method: "POST",
+            body: JSON.stringify({ part_id: partRecordId })
+        });;
+    }
+</script>
+
 <script lang="ts">
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import type { AssemblyData, TypedPartsResponse } from "$lib/data/parts";
@@ -128,77 +212,6 @@
         return null;
     }
 
-    async function updatePartRecord(
-        existing: PartsResponse[] | null,
-        sel: PartSelection,
-        partData: PartHeuristicsResult | AssemblyData | null
-    ): Promise<PartsResponse | null> {
-        let record: PartsResponse | null = null;
-        if(existing && existing.length > 0) {
-            // if there are more than 1 existing parts, delete all except the first (which we'll update)
-            // this shouldn't really happen but can if configuration information changes
-            if(existing.length > 1) {
-                console.log(`Deleting ${existing.length - 1} extra existing part records`);
-                for(let i = 1; i < existing.length; i++) {
-                    await deleteRecord(Collections.Parts, existing[i].id).catch(() => null);
-                }
-            }
-
-            // Update the existing record
-            let past_revision_cards = existing[0].past_revision_cards;
-            if(existing[0].current_card != cardId && !past_revision_cards.includes(existing[0].current_card)) {
-                past_revision_cards = [...past_revision_cards, existing[0].current_card];
-            }
-            record = await save(Collections.Parts, {
-                id: existing[0].id,
-                part_id: sel.partId,
-                document_id: sel.documentId,
-                element_id: sel.elementId,
-                wvm: sel.wvm,
-                wvm_id: sel.wvmId,
-                current_card: cardId,
-                part_data: partData ?? undefined,
-                past_revision_cards,
-                configuration: sel.configuration,
-                revision: existing[0].revision + 1
-            }, { create: false });
-        } else {
-            if(!partData) throw new Error("Part data required for creating new part.");
-            // Create a new record
-            record = await save(Collections.Parts, {
-                part_id: sel.partId,
-                document_id: sel.documentId,
-                element_id: sel.elementId,
-                wvm: sel.wvm,
-                wvm_id: sel.wvmId,
-                current_card: cardId,
-                part_data: partData,
-                past_revision_cards: [],
-                configuration: sel.configuration,
-                revision: 1,
-                type: sel.type
-            }, { create: true });
-        }
-
-        if(!record) {
-            alert("Failed to save part. Please try again.");
-            return null;
-        }
-
-        return record;
-    }
-
-    async function queryExistingParts(sel: PartSelection) {
-        return await query(Collections.Parts, {
-            filter: 
-                (sel.type === "part" ?
-                    `type="part" && part_id="${sel.partId}"` :
-                    `type="assembly"`)
-                + `&& document_id="${sel.documentId}" && element_id="${sel.elementId}" && wvm="${sel.wvm}" && wvm_id="${sel.wvmId}"`
-                + (sel.configuration !== "default" ? ` && configuration="${sel.configuration}"` : "")
-        }).catch(() => null);
-    }
-
     async function refreshPart(sel: PartSelection, existing: PartsResponse[] | null) {
         if(!onshapeCtx.client) return;
 
@@ -215,16 +228,13 @@
             console.log("Existing parts in database:", existing);
         }
 
-        const record = await updatePartRecord(existing, sel, partData);
+        const record = await updatePartRecord(existing, sel, partData, cardId);
         if(!record) return;
 
         status = "display";
 
         // regenerate the preview
-        client.send("/api/parts/generate_preview", {
-            method: "POST",
-            body: JSON.stringify({ part_id: record.id })
-        });
+        generatePartPreview(record.id);
 
         value = record.id;
         part = record as TypedPartsResponse | null; // early update
@@ -249,7 +259,7 @@
         if(existing && existing.length > 0) {
             status = "existing";
 
-            const record = await updatePartRecord(existing, sel, null);
+            const record = await updatePartRecord(existing, sel, null, cardId);
             if(!record) {
                 status = "error";
                 return;

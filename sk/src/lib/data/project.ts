@@ -4,6 +4,7 @@ import type { CardMetadata, TypedCardsCreate, TypedCardsResponse } from "./cards
 import { CodeXml, Factory, Palette } from "lucide-svelte";
 import type { NonNullValuesExcept } from "./kanban";
 import type { CreationPart } from "$lib/components/parts/partData";
+import type { PartExportType } from "./parts";
 
 // TODO: This database schema isn't very scalable. We should use back-relations instead of
 // forward relations on projects to allow cascade deletion and avoid having to update multiple records
@@ -79,26 +80,21 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
     create: "onshape_part";
 };
 
-export type PartExportType = "step" | "dxf" | "gltf" | "obj";
-export const partExportTypes: {
-    [key in PartExportType]: { name: string; extension: string; }
-} = {
-    "step": { name: "STEP", extension: ".step" },
-    "dxf": { name: "DXF", extension: ".dxf" },
-    "gltf": { name: "glTF", extension: ".gltf" },
-    "obj": { name: "OBJ", extension: ".obj" }
-};
-
 export type MetadataFile = {
     id: string;
     /** Original name of the file */
     name: string;
+    /** if present, this is a special type of file (only a visual difference) */
+    type?: "export" | "auto_export";
+    /** present if an export: the ID of the part record associated with this export. */
+    partRecordId?: string;
 } | {
     // Used when creating a new card
     id: typeof CREATE_SYMBOL,
     name: string;
     createType: "export" | "auto_export";
-    exportType: PartExportType
+    partRecordId: string;
+    exportType: PartExportType;
 };
 export type MetadataValue = string | number | boolean | MetadataValue[] | MetadataFile | CreationPart | null;
 
@@ -224,20 +220,20 @@ type MetadataNode = {
     value: MetadataValue;
 };
 
-export function transformMetadata(
+export async function transformMetadata(
     type: CardMetadataFieldType<false>,
     value: MetadataValue,
-    callback: (node: MetadataNode) => MetadataNode
-): MetadataNode {
-    ({ type, value } = callback({ type, value }));
+    callback: (node: MetadataNode) => MetadataNode | Promise<MetadataNode>
+): Promise<MetadataNode> {
+    ({ type, value } = await callback({ type, value }));
 
     switch(type.base) {
         case "list":
             if(Array.isArray(value)) {
                 const field = type.field;
-                const items = value.map(v =>
-                    transformMetadata(field, v, callback)
-                );
+                const items = await Promise.all(value.map(async (v) =>
+                    await transformMetadata(field, v, callback)
+                ));
 
                 type = {
                     ...type,
@@ -249,9 +245,9 @@ export function transformMetadata(
         case "tuple":
             if(Array.isArray(value)) {
                 const v = value;
-                const items = type.fields.map((field, i) =>
-                    transformMetadata(field, v[i], callback)
-                );
+                const items = await Promise.all(type.fields.map(async (field, i) =>
+                    await transformMetadata(field, v[i], callback)
+                ));
 
                 type = {
                     ...type,
@@ -365,23 +361,6 @@ export function getTemplateSections() {
         { title: "In Progress", description: "Items currently being worked on", color: "#fdcb6e", is_completed: false },
         { title: "Completed", description: "Items that have been completed", color: "#00b894", is_completed: true }
     ];
-}
-
-const ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
-export function generateRecordID(length = 15) {
-    const resultChars: string[] = [];
-    const n = ALPHABET.length;
-    const maxMultiple = Math.floor(256 / n) * n; // largest multiple of n less than 256
-
-    const bytes = new Uint8Array(1);
-    while(resultChars.length < length) {
-        crypto.getRandomValues(bytes);
-        const v = bytes[0];
-        if(v >= maxMultiple) continue; // avoid modulo bias
-        resultChars.push(ALPHABET[v % n]);
-    }
-
-    return resultChars.join("");
 }
 
 export type CardMetadataSection = {

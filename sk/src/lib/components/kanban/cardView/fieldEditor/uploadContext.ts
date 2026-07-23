@@ -16,13 +16,15 @@ export type UploadContext = {
      */
     partExport?: {
         /**
-         * get all parts that can be exported for this card.
+         * get all parts that can be exported for this card. async since we need to fetch them
+         * (technically we don't since we already fetch all of them but uh. caching is annoying)
+         * TODO: yeah that
          */
         getParts(): Promise<(TypedPartsResponse | CreationPart)[]>;
         /**
-         * upload a type of file based on the given part.
+         * if there are any parts currently added to the card
          */
-        queuePartExport(name: string, part: TypedPartsResponse | CreationPart, type: PartExportType): void;
+        hasParts(): boolean;
     }
 };
 export const [getUploadContext, setUploadContext] = createContext<UploadContext>();

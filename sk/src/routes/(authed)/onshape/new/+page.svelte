@@ -3,11 +3,11 @@
     import NewCardView from "$lib/components/kanban/NewCardView.svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
     import CardPart from "$lib/components/parts/CardPart.svelte";
-    import { getPartData, getSelectionPartData, type CreationPart } from "$lib/components/parts/partData";
+    import { getPartData, getSelectionPartData, type CreationPart, type PartSelection } from "$lib/components/parts/partData";
     import PopoverButton from "$lib/components/PopoverButton.svelte";
     import { boardTypesConst, CREATE_SYMBOL, type MetadataFile } from "$lib/data/project";
     import { nav } from "$lib/navigation";
-    import type { OnshapeSelection } from "$lib/onshape/client";
+    import { generateRecordID, type OnshapeSelection } from "$lib/onshape/client";
     import { watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify, formatDistance } from "$lib/util";
@@ -56,22 +56,26 @@
                     partData = { ...data, state: "loaded" };
                     return;
                 }
+
                 if(assembly && onshapeCtx.client && onshapeCtx.documentId && onshapeCtx.wvm && onshapeCtx.wvmId && onshapeCtx.elementId) {
-                    const data = await getPartData(onshapeCtx.client, {
+                    const sel: PartSelection = {
                         documentId: onshapeCtx.documentId,
                         wvm: onshapeCtx.wvm,
                         wvmId: onshapeCtx.wvmId,
                         elementId: onshapeCtx.elementId,
                         type: "assembly",
                         configuration: "default" // again, we don't really get a configuration so who knows
-                    });
+                    };
+                    const data = await getPartData(onshapeCtx.client, sel);
                     if(!data) {
                         partData = { state: "failed", message: "Failed to load assembly data" };
                         return;
                     }
                     partData = {
+                        id: generateRecordID(),
                         state: "loaded",
                         type: "assembly",
+                        sel,
                         partData: data
                     };
                     return;
@@ -168,6 +172,7 @@
                                 value: [{
                                     id: CREATE_SYMBOL,
                                     name: `${partFileName}.dxf`,
+                                    partRecordId: partData.id,
                                     createType: "auto_export",
                                     exportType: "dxf"
                                 }] satisfies MetadataFile[]
@@ -179,7 +184,7 @@
         }
     });
 </script>
-
+partRecordId
 <div class="page">
     <header>
         <button class="cancel" onclick={() => nav("/onshape")}>

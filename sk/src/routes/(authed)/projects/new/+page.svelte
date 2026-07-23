@@ -3,10 +3,11 @@
     import { batch, save } from "$lib/pocketbase";
     import { Collections, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
-    import { generateRecordID, getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
+    import { getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     import type { BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
     import { nav } from "$lib/navigation";
+    import { generateRecordID } from "$lib/onshape/client";
 
     $effect(() => {
         $metadata.title = "New project";

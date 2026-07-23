@@ -5,12 +5,13 @@
     import { Collections, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { metadata } from "$lib/metadata";
     import { deepEqual } from "$lib/util";
-    import { generateRecordID, type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
+    import { type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     import { boardCreationData, deleteBoard, saveBoardRecords, type BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";
     import SettingsPage from "../SettingsPage.svelte";
     import { deleteSubproject } from "$lib/components/projects/SubprojectSettings.svelte";
     import { nav } from "$lib/navigation";
+    import { generateRecordID } from "$lib/onshape/client";
     
     $effect(() => {
         $metadata.title = project ? `${project.title} Settings` : "Project Settings";

@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { CREATE_SYMBOL, partExportTypes, type CardMetadataFieldType, type MetadataFile, type PartExportType } from '$lib/data/project';
+    import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/project';
     import { Box, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
     import { getUploadContext } from './uploadContext';
     import PopoverButton from '$lib/components/PopoverButton.svelte';
+    import { partExportTypes, type PartExportType } from '$lib/data/parts';
 
     let {
         type, value = $bindable()
@@ -55,7 +56,7 @@
             {/if}
             <button onclick={() => {
                 if(type.multi) {
-                    value = (value as MetadataFile[]).filter(f => f.id !== (file as MetadataFile).id);
+                    value = (value as MetadataFile[]).filter(f => f !== file);
                 } else {
                     value = null;
                 }
@@ -72,7 +73,7 @@
         {/if}
     {/if}
 
-    {#if type.multi || !(value as MetadataFile).id}
+    {#if type.multi || !value}
         {#snippet uploadInput(close?: () => void)}
             {#if type.multi}
                 <input type="file" multiple onchange={async (e) => {
@@ -99,7 +100,7 @@
             {/if}
         {/snippet}
 
-        {#if uploadContext.partExport !== undefined}
+        {#if uploadContext.partExport !== undefined && uploadContext.partExport.hasParts()}
             <PopoverButton contentClass={$css("add-part-export-content")}>
                 <Plus /> Add {type.multi ? "file(s)" : "file"}
                 {#snippet content({ close })}
@@ -117,17 +118,17 @@
                                     class="part-action"
                                     onclick={() => {
                                         const name = (exportType.name + "." + exportType.extension).replace(/[^a-zA-Z0-9_.-]/g, "_");
-                                        uploadContext.partExport?.queuePartExport(name, part, k as PartExportType);
                                         value = [...(value as MetadataFile[]), {
                                             name,
                                             id: CREATE_SYMBOL,
+                                            partRecordId: part.id,
                                             createType: "export",
                                             exportType: k as PartExportType
                                         }];
                                         close();
                                     }}
                                 >
-                                    <SquareArrowRightExit /> Add {exportType.name}
+                                    <SquareArrowRightExit /> Add {exportType.name} export
                                 </button>
                             {/each}
                         {/each}

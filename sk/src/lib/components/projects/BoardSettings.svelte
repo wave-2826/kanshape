@@ -90,7 +90,7 @@
 </script>
 
 <script lang="ts">
-    import { boardTypes, generateRecordID, type CustomCardFields, type ProjectLinkedSite } from "$lib/data/project";
+    import { boardTypes, type CustomCardFields, type ProjectLinkedSite } from "$lib/data/project";
     import { BoardsTypeOptions } from "$lib/pocketbase/generated-types";
     import LeftPaneChooser from "../LeftPaneChooser.svelte";
     import LinkedSiteDetails from "./LinkedSiteDetails.svelte";
@@ -99,6 +99,7 @@
     import { deepEqual } from "$lib/util";
     import { createPartIDString } from "$lib/parts";
     import CustomCardFieldDetails from "./CustomCardFieldDetails.svelte";
+    import { generateRecordID } from "$lib/onshape/client";
 
     const {
         board = $bindable(),

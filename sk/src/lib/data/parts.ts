@@ -29,7 +29,7 @@ export const partExportTypes: {
     "step": { name: "STEP", extension: ".step", canBeAssembly: true },
     "dxf": { name: "DXF", extension: ".dxf", canBeAssembly: false },
     "gltf": { name: "glTF", extension: ".gltf", canBeAssembly: true },
-    "obj": { name: "OBJ", extension: ".obj", canBeAssembly: true }
+    "obj": { name: "OBJ", extension: ".obj.zip", canBeAssembly: true }
 };
 
 export type PartExport = {

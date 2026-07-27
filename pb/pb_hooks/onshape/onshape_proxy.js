@@ -171,21 +171,17 @@ function handleProxyRequest(e) {
  */
 function cleanupRequestCache() {
     const cutoff = Date.now() - MAXIMUM_CACHE_AGE_MS;
-
-    // we love N+1 queries :D
-
-    const records = $app.findAllRecords("onshape_api_cache").filter(record => {
-        const timestamp = record?.get("timestamp");
-        return typeof timestamp === "number" && timestamp < cutoff;
-    });
-
-    for(const record of records) {
-        if(!record) continue;
-        try {
-            $app.delete(record);
-        } catch(err) {
-            console.warn("Failed to delete expired Onshape API cache record:", err);
-        }
+    
+    const { formatComparisonTime } = /** @type typeof import("../util") */ (require(`${__hooks}/util`));
+    const cutoffStr = formatComparisonTime(new Date(cutoff));
+    
+    try {
+        $app.db()
+            .newQuery(`DELETE FROM ${REQUEST_CACHE_COLLECTION} WHERE timestamp < {:cutoff}`)
+            .bind({ cutoff: cutoffStr })
+            .execute();
+    } catch(err) {
+        console.warn(`Failed to clean up expired Onshape API cache records: ${err}`);
     }
 }
 

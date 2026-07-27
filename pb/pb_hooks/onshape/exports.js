@@ -1,6 +1,8 @@
 // @ts-check
 /// <reference path="../../pb_data/types.d.ts" />
 
+// See https://onshape-public.github.io/docs/api-adv/translation/
+
 const EXPORT_QUEUE_COLLECTION = "export_queue";
 
 /**
@@ -18,7 +20,7 @@ const EXPORT_FORMAT_MAP = {
     dxf: { onshape: "DXF", extension: ".dxf" },
     step: { onshape: "STEP", extension: ".step" },
     gltf: { onshape: "GLTF", extension: ".gltf" },
-    obj: { onshape: "OBJ", extension: ".obj" }
+    obj: { onshape: "OBJ", extension: ".obj.zip" }
 };
 
 /**
@@ -80,6 +82,7 @@ function startPartExport(authRecord, partRecord, type) {
                 resolution: "FINE",
                 unit: "CENTIMETER" // most 3d printing software expects centimeters from experience
             },
+            excludeHiddenEntities: true,
             storeInDocument: false,
             notifyUser: false
         });
@@ -104,6 +107,7 @@ function startPartExport(authRecord, partRecord, type) {
                 resolution: "FINE",
                 unit: "CENTIMETER" // most 3d printing software expects centimeters from experience
             },
+            excludeHiddenEntities: true,
             storeInDocument: false,
             notifyUser: false
         });
@@ -158,12 +162,93 @@ function saveToCard(cardRecord, fileId, fileBytes, type) {
 }
 
 /**
+ * Extract the singular zipped file in an archive and return its bytes.
+ * @param {number[]} zipBytes 
+ * @returns {number[]} the extracted file bytes
+ */
+function unzipSingleFile(zipBytes) {
+    const { fileMode } = /** @type {typeof import("../util")} */ (require(`${__hooks}/util`));
+
+    // temp directory under pb_data
+    const tempBase = $filepath.join(__hooks, "..", "pb_data", "temp");
+    $os.mkdirAll(tempBase, fileMode.rwx);
+
+    // unique work directory idk
+    const uniqueId = $security.randomString(16);
+    const workDir = $filepath.join(tempBase, "unzip_" + uniqueId);
+    $os.mkdirAll(workDir, fileMode.rwx);
+
+    const zipPath = $filepath.join(workDir, "archive.zip");
+    $os.writeFile(zipPath, zipBytes, fileMode.rw);
+
+    try {
+        // try different commands until it works lol
+        var extracted = false;
+
+        // unzip for Linux/macOS
+        try {
+            $os.cmd("unzip", "-o", zipPath, "-d", workDir).output();
+            extracted = true;
+        } catch (_) { /* try next */ }
+
+        // tar for Windows/Linux
+        if(!extracted) try {
+            $os.cmd("tar", "-xf", zipPath, "-C", workDir).output();
+            extracted = true;
+        } catch (_) { /* try next */ }
+
+        // powershell Expand-Archive for Windows
+        if(!extracted) try {
+            $os.cmd("powershell", "-Command",
+                "Expand-Archive -Path '" + zipPath + "' -DestinationPath '" + workDir + "' -Force"
+            ).output();
+            extracted = true;
+        } catch (_) { /* try next */ }
+
+        if(!extracted) {
+            throw new Error("No zip extraction tool available (tried unzip, tar, powershell)");
+        }
+
+        // Find the extracted file (skip the zip archive itself and directories)
+        const entries = $os.readDir(workDir);
+        let extractedFileName = null;
+        for(var i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            const name = entry.name();
+            if(name !== "archive.zip" && !entry.isDir()) {
+                extractedFileName = name;
+                break;
+            }
+        }
+
+        if(!extractedFileName) throw new Error("No file found in zip archive after extraction");
+
+        // read the extracted file
+        var filePath = $filepath.join(workDir, extractedFileName);
+        var result = $os.readFile(filePath);
+
+        // normalize to byte array
+        if(typeof result === "string") result = toBytes(result);
+
+        return result;
+    } finally {
+        // Always clean up the temp directory
+        try {
+            $os.removeAll(workDir);
+        } catch(e) {
+            console.warn(`Failed to clean up temp directory ${workDir}: ${e}`);
+        }
+    }
+}
+
+/**
  * download the result of a completed translation and attach it to the card
  * @param {core.Record} authRecord the user to authenticate as
  * @param {core.Record} exportQueueRecord
+ * @param {any} [statusRes] if we already made a translation status request, avoid duplication
  * @returns {boolean} whether the download was successful
  */
-function downloadExportResult(authRecord, exportQueueRecord) {
+function downloadExportResult(authRecord, exportQueueRecord, statusRes) {
     const { onshapeRequest } = /** @type {typeof import("./onshape_proxy")} */ (require(`${__hooks}/onshape/onshape_proxy`));
 
     const translationId = exportQueueRecord.getString("translation_id");
@@ -180,7 +265,10 @@ function downloadExportResult(authRecord, exportQueueRecord) {
     }
 
     // Get the translation status
-    const statusRes = onshapeRequest(authRecord, "GET", `v16/translations/${translationId}`);
+    if(!statusRes) {
+        statusRes = onshapeRequest(authRecord, "GET", `v16/translations/${translationId}`);
+    }
+
     if(statusRes.statusCode >= 400) {
         exportQueueRecord.set("status", "failed");
         exportQueueRecord.set("error_message", `Failed to get translation status: ${statusRes.statusCode}`);
@@ -226,12 +314,24 @@ function downloadExportResult(authRecord, exportQueueRecord) {
         return false;
     }
 
+    let body = normalizeFileBody(downloadRes.body);
+    
+    // If this isn't an obj (which needs to be zip) and the result has a Content-Type of application/zip,
+    // extract the file and save that instead.
+    // This runtime probably isn't fast enough that we should be using JSZip, but it's cross-platform
+    // and easy.
+    let contentType = downloadRes.headers["Content-Type"] ?? downloadRes.headers["content-type"] ?? "";
+    if(Array.isArray(contentType)) contentType = contentType[0];
+    if(type !== "obj" && contentType.startsWith("application/zip")) {
+        console.log(`Export result is a zip file, extracting the single file inside for ${type} export`);
+        body = unzipSingleFile(body);
+    }
     
     // write the file using the raw bytes from the response
     if(cardId) {
         const cardRecord = $app.findRecordById("cards", cardId);
         if(cardRecord) {
-            saveToCard(cardRecord, fileId, normalizeFileBody(downloadRes.body), type);
+            saveToCard(cardRecord, fileId, body, type);
         }
     }
 
@@ -444,9 +544,6 @@ function queuePartExport(app, authRecord, options) {
     // If this is an export type we can synchronously handle, do that
     if(trySyncExport(authRecord, partRecord, cardRecord, options)) return;
 
-    console.log("Not trying async export");
-    throw new BadRequestError("TODO");
-
     // Create the export queue entry
     const queueCollection = app.findCollectionByNameOrId(EXPORT_QUEUE_COLLECTION);
     const queueRecord = new Record(queueCollection, {
@@ -458,11 +555,6 @@ function queuePartExport(app, authRecord, options) {
         created_by: authRecord.id,
     });
     $app.save(queueRecord);
-
-    // Start the export process asynchronously
-    // Since PocketBase hooks are synchronous, we use a cron-style approach:
-    // The webhook handler will pick up ACTIVE/queued exports on the next cron tick.
-    // However, we immediately try to start the translation in the background.
 
     try {
         startExportProcess(authRecord, queueRecord, partRecord);
@@ -562,6 +654,34 @@ function handleExportWebhook(payload) {
 }
 
 /**
+ * Clean up expired exports. Removes old finished or failed exports; the others _should_ be picked up?
+ * Still, for safety, we remove slightly old other exports too.
+ */
+function cleanupExpiredExports() {
+    const FINISHED_EXPORT_THRESHOLD = 60 * 60 * 24 * 7 * 1000; // 7 days
+    const OTHER_EXPORT_THRESHOLD = 60 * 60 * 24 * 3 * 1000; // 3 days
+
+    const now = Date.now();
+
+    const { formatComparisonTime } = /** @type {typeof import("../util")} */ (require(`${__hooks}/util`));
+    const finishedTs = formatComparisonTime(new Date(now - FINISHED_EXPORT_THRESHOLD));
+    const otherTs = formatComparisonTime(new Date(now - OTHER_EXPORT_THRESHOLD));
+
+    try {
+        $app.db()
+            .newQuery(`DELETE FROM ${EXPORT_QUEUE_COLLECTION} WHERE (status = "completed" OR status = "failed") AND timestamp < {:finishedTs}`)
+            .bind({ finishedTs })
+            .execute();
+        $app.db()
+            .newQuery(`DELETE FROM ${EXPORT_QUEUE_COLLECTION} WHERE (status != "completed" AND status != "failed") AND timestamp < {:otherTs}`)
+            .bind({ otherTs })
+            .execute();
+    } catch(err) {
+        console.warn(`Failed to clean up expired exports: ${err}`);
+    }
+}
+
+/**
  * Resume unfinished exports on startup.
  * Finds all export_queue entries with status "queued" or "translating" and
  * tries to restart or check on them.
@@ -570,16 +690,18 @@ function resumeUnfinishedExports() {
     console.log("Resuming unfinished exports...");
 
     try {
-        const records = $app.findAllRecords(EXPORT_QUEUE_COLLECTION);
+        cleanupExpiredExports();
 
-        console.log(`Found ${records.length} export queue records, checking for unfinished exports...`);
+        const records = $app.findAllRecords(EXPORT_QUEUE_COLLECTION, $dbx.exp(`status = "queued" OR status = "translating"`));
+        if(records.length === 0) return;
+
+        console.log(`Found ${records.length} unfinished export queue records`);
 
         for(const record of records) {
             if(!record) continue;
 
             const status = /** @type {string} */ (record.get("status"));
-
-            if(status === "completed" || status === "failed") continue;
+            if(status === "completed" || status === "failed") continue; // shouldn't happen
 
             const translationId = /** @type {string | undefined} */ (record.get("translation_id"));
             const createdBy = /** @type {string | undefined} */ (record.get("created_by"));
@@ -624,10 +746,10 @@ function resumeUnfinishedExports() {
                     const state = statusRes.body?.requestState;
 
                     if(state === "DONE") {
-                        // Translation completed while we were away, download it
-                        downloadExportResult(authRecord, record);
+                        // Translation completed while we were away; download it
+                        downloadExportResult(authRecord, record, statusRes);
                     } else if(state === "ACTIVE") {
-                        // Still running, keep waiting (webhook will handle it)
+                        // Still running; keep waiting for the webhook
                         console.log(`Export ${record.id} translation ${translationId} still ACTIVE, waiting for webhook`);
                     } else if(state === "FAILED") {
                         record.set("status", "failed");

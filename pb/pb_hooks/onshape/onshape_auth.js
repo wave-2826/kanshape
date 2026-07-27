@@ -308,20 +308,17 @@ function getValidOnshapeToken(userRecord) {
  */
 function cleanupExpiredOnshapeTransactions() {
     const cutoff = Date.now() - OAUTH_TRANSACTION_MAX_AGE_MS;
-    const transactions = $app.findAllRecords(OAUTH_TRANSACTION_COLLECTION);
 
-    // N+1 ftw (on small data) hehe
-    for(const transaction of transactions) {
-        if(!transaction) continue;
+    const { formatComparisonTime } = /** @type typeof import("../util") */ (require(`${__hooks}/util`));
+    const cutoffTime = formatComparisonTime(new Date(cutoff));
 
-        const createdAt = Date.parse(String(transaction.get("created") ?? ""));
-        if(Number.isFinite(createdAt) && createdAt < cutoff) {
-            try {
-                $app.delete(transaction);
-            } catch(err) {
-                console.warn("Failed to delete expired Onshape OAuth transaction:", err);
-            }
-        }
+    try {
+        $app.db()
+            .newQuery(`DELETE FROM ${OAUTH_TRANSACTION_COLLECTION} WHERE created < {:cutoffTime}`)
+            .bind({ cutoffTime })
+            .execute();
+    } catch(err) {
+        console.warn(`Failed to delete expired Onshape OAuth transactions: ${err}`);
     }
 }
 

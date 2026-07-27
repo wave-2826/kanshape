@@ -1,0 +1,2 @@
+# ignore pb_migrations for github repo language
+pb_migrations/*.js linguist-generated

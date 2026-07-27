@@ -8,7 +8,7 @@ routerAdd("POST", "/api/onshape/webhook", (e) => {
     const event = body.event;
     if(!event) return e.json(200, { ok: true });
 
-    console.log(`Webhook received: ${event} | data: ${body}`);
+    console.log(`Webhook received: ${event} | data: ${JSON.stringify(body)}`);
 
     // Lifecycle events, ack immediately
     if(event === "webhook.ping" || event === "webhook.register" || event === "webhook.unregister") {
@@ -20,8 +20,8 @@ routerAdd("POST", "/api/onshape/webhook", (e) => {
     try {
         switch(event) {
             case "onshape.model.translation.complete":
-                const { processTranslationComplete } = require(`${__hooks}/onshape/exports`);
-                processTranslationComplete(body);
+                const { handleExportWebhook } = require(`${__hooks}/onshape/exports`);
+                handleExportWebhook(body);
                 break;
             default:
                 console.warn(`No handler for received webhook event ${event}`);

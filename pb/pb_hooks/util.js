@@ -13,7 +13,15 @@ function parseJSON(bytes) {
  */
 function encodeJSON(data) {
     const str = JSON.stringify(data);
-    return str.split("").map((c) => c.charCodeAt(0));
+    return toBytes(str);
+}
+
+/**
+ * format a time identical to Pocketbase for correct lexiogrpahic comparison
+ * @param {Date} date
+ */
+function formatComparisonTime(date) {
+    return date.toISOString().replace("T", " ").replace("Z", "");
 }
 
 /**
@@ -37,5 +45,6 @@ module.exports = {
     parseJSON,
     encodeJSON,
     parseJSONFile,
+    formatComparisonTime,
     fileMode
 };

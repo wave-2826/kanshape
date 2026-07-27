@@ -30,6 +30,11 @@ export type AppConfig = {
          * The URL of the site's favicon.
          */
         faviconUrl: string;
+        /**
+         * A public URL that this site must be accessible from.
+         * TODO: warning for admins accessing the site from a different URL to make sure they change this
+         */
+        publicUrl: string;
     };
     onshape: {
         /** The Onshape client ID for OAuth */
@@ -47,7 +52,8 @@ const defaultConfig: AppConfig = {
     site: {
         name: "Kanshape",
         logoUrl: null,
-        faviconUrl: "/favicon.svg"
+        faviconUrl: "/favicon.svg",
+        publicUrl: "http://localhost:5173"
     },
     onshape: {
         clientId: "",
@@ -65,6 +71,7 @@ export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
     "site/name": { optional: false, type: "string", name: "Site Name" },
     "site/logoUrl": { optional: true, type: "string", name: "Site Logo URL" },
     "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" },
+    "site/publicUrl": { optional: false, type: "string", name: "Site Public URL" },
     "onshape/clientId": { optional: false, type: "string", name: "Onshape OAuth Client ID" },
     "onshape/clientSecret": { optional: false, type: "string", name: "Onshape OAuth Client Secret" },
     "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain, like https://cad.onshape.com" }

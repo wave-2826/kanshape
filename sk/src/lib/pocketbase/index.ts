@@ -16,7 +16,7 @@ import { Collections, type CollectionRecords, type CollectionResponses, type Rec
 import type { TypedBoardOverviewResponse, TypedBoardsResponse, TypedProjectOverviewResponse, TypedProjectsResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
 import type { TypedCardsResponse } from "$lib/data/cards";
 import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-import type { TypedPartsResponse } from "$lib/data/parts";
+import type { TypedPartCardsResponse, TypedPartsResponse } from "$lib/data/parts";
 /**
  * Collection responses with type overrides.
  * @extends {Record<Collections, any>}
@@ -30,7 +30,7 @@ type TypedCollectionResponses = {
     [Collections.SubprojectOverview]: TypedSubprojectOverviewResponse,
     [Collections.BoardOverview]: TypedBoardOverviewResponse,
     [Collections.Parts]: TypedPartsResponse,
-    [Collections.PartCards]: TypedCardPreviewResponse
+    [Collections.PartCards]: TypedPartCardsResponse
 };
 
 /**
@@ -314,13 +314,18 @@ export async function watchOne<
     recordId: string,
     queryParams = {} as RecordListOptions & { expand?: Expand },
     realtime = browser
-): Promise<Readable<T>> {
+): Promise<Readable<T | null>> {
     const collection = client.collection(collectionName);
-    let result = await collection.getOne<T>(recordId, queryParams);
+    let result;
+    try {
+        result = await collection.getOne<T>(recordId, queryParams);
+    } catch {
+        result = null;
+    }
 
     let unsubRealtime: UnsubscribeFunc | undefined;
     
-    const store = readable<T>(result, (set) => {
+    const store = readable<T | null>(result, (set) => {
         // watch for changes (only if in the browser)
         if(realtime) collection.subscribe<T>(
             recordId,

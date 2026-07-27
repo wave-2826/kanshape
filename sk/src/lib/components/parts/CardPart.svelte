@@ -19,18 +19,18 @@
 
     let modal: CardPartModal | null = $state(null);
 
-    const partData = $derived("id" in part ? part.part_data : part.partData);
-    const partId = $derived("id" in part ? part.part_id : part.partId);
+    const partData = $derived("part_id" in part ? part.part_data : part.partData);
+    const partId = $derived("part_id" in part ? part.part_id : part.id);
 </script>
 
-{#if "id" in part}
+{#if "part_id" in part}
     <CardPartModal {part} bind:this={modal} />
 {/if}
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex - it doesn't -->
 <div
     class="part"
-    class:button={"id" in part}
+    class:button={"part_id" in part}
     onclick={(e) => {
         if(e.target instanceof HTMLElement && e.target.closest("[data-part-preview]")) return;
         modal?.open();
@@ -38,12 +38,12 @@
     onkeydown={(e) => {
         if(e.key === "Enter" || e.key === " ") modal?.open();
     }}
-    role={"id" in part ? "button" : "presentation"}
-    tabindex={"id" in part ? 0 : undefined}
+    role={"part_id" in part ? "button" : "presentation"}
+    tabindex={"part_id" in part ? 0 : undefined}
 >
     <span class="part-type">{part.type === "part" ? "Part" : "Assembly"}</span>
     <div class="preview" data-part-preview>
-        {#if "id" in part}
+        {#if "part_id" in part}
             <!-- holy fetch waterfall -->
             <PartPreviewRenderer {part} edges={false} />
         {:else}
@@ -213,6 +213,7 @@
         grid-area: result;
         --bg-color: var(--bg-primary);
         align-self: start;
+        justify-self: end;
         margin-top: 0.5rem;
 
         font-size: var(--font-small);

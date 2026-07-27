@@ -91,6 +91,7 @@ export function watchOnshapeContext(
     let unsub: (() => void) | undefined;
 
     // We use a normal watch instead of watchOne because the project won't always exist
+    // TODO: yeah don't do that. we can use watchone
     if(documentId) {
         watch(Collections.OnshapeDocuments, {
             expand: "project,subproject",

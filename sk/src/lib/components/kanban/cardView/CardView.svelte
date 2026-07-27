@@ -26,7 +26,7 @@
 
         autofocusTitle = false
     }: {
-        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         card: TypedCardsResponse | TypedCardsCreate,
         subprojects: SubprojectsRecord[],
         disabled?: boolean,
@@ -39,15 +39,15 @@
         autofocusTitle?: boolean
     } = $props();
 
-    const sections = $derived(board.expand.sections ?? []);
+    const sections = $derived(board?.expand.sections ?? []);
 
-    const metadataItems = $derived(getCardMetadataItems(board, {
+    const metadataItems = $derived(board ? getCardMetadataItems(board, {
         board: $state.snapshot(board) as TypedBoardsResponse,
         // svelte-ignore state_snapshot_uncloneable - symbols are ""unclonable"", but passing by reference
         // is okay because they're immutable
         metadata: $state.snapshot(card.metadata as any) // tsc errors without as any ???
-    }, true));
-    const extraItems = $derived(getExtraMetadataItems(metadataItems, card.metadata));
+    }, true) : null);
+    const extraItems = $derived(metadataItems ? getExtraMetadataItems(metadataItems, card.metadata) : null);
 </script>
 
 <header>
@@ -204,7 +204,7 @@
         </h3>
         <CardFieldCategory {fields} bind:card />
     {/each}
-    {#if extraItems.length > 0}
+    {#if extraItems && extraItems.length > 0}
         <h3><FileQuestionMark /> Other</h3>
         <CardFieldCategory fields={extraItems} bind:card />
     {/if}

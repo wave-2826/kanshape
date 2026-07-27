@@ -76,8 +76,8 @@ function saveRequestCache(hash, statusCode, headers, body) {
  * @param {string} method - HTTP method (GET, POST, etc.)
  * @param {string} path - API path (e.g. "v16/parts/d/123/w/456/e/789"). Should be everything AFTER "/api/".
  * @param {Record<string, string>} [extraHeaders] - Additional headers to forward
- * @param {any} [body] - Request body
- * @returns {{ statusCode: number, headers: Record<string, string | string[]>, body: any }}
+ * @param {string} [body] - Request body
+ * @returns {{ statusCode: number, headers: Record<string, string | string[]>, body: any | number[] }}
  */
 function onshapeRequest(authRecord, method, path, extraHeaders, body) {
     /** @type typeof import("../config") */
@@ -105,7 +105,7 @@ function onshapeRequest(authRecord, method, path, extraHeaders, body) {
 
     if(!res) throw new InternalServerError("No response from Onshape");
 
-    return { statusCode: res.statusCode, headers: res.headers, body: res.json };
+    return { statusCode: res.statusCode, headers: res.headers, body: res.json ?? res.body };
 }
 
 /**

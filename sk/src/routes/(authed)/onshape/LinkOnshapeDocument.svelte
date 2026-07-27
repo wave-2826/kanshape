@@ -112,6 +112,10 @@ dl {
 dt {
     font-weight: bold;
 }
+button {
+    text-align: left;
+    word-break: break-word;
+}
 h2 {
     margin-left: 0;
 }

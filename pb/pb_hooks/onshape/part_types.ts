@@ -3,9 +3,13 @@ import { components } from "../../../sk/src/lib/onshape/schema";
 import type { PartModelHeader, AssemblyModelHeader } from "../../../sk/src/lib/components/parts/renderer";
 export type { PartModelHeader, AssemblyModelHeader };
 
+import type { PartHeuristicsResult } from "../../../sk/src/lib/onshape/partHeuristics";
+export type { PartHeuristicsResult };
+
 export type _schemas = components["schemas"];
 
 export type DeepRequired<T> = T extends object ? { [K in keyof T]-?: DeepRequired<T[K]> } : T;
+export type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
 
 export type BTAssemblyDefinitionInfo = _schemas["BTAssemblyDefinitionInfo"];
 export type BTAssemblyInstanceInfo = _schemas["BTAssemblyInstanceInfo"];

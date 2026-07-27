@@ -3,7 +3,7 @@
     import { getOnshapeContext, LinkedProjectType } from "../../../lib/components/nav/onshapeContext.svelte";
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { watch } from "$lib/pocketbase";
+    import { watch, watchOne } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
     import { Plus } from "lucide-svelte";
     import { deasyncify } from "$lib/util";
@@ -11,6 +11,8 @@
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     import { nav } from "$lib/navigation";
     import { derived } from "svelte/store";
+    import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
+    import { untrack } from "svelte";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -35,10 +37,66 @@
             did: onshapeCtx.documentId,
             eid: filterToDocument ? undefined : onshapeCtx.elementId
         }
+    }, 0, 500, {
+        pollOnChange: [Collections.Cards]
     })));
+
+    // to whoever reads this code: i'm deeply, truly remorseful for this heinous mess i'm unfortunate enough
+    // to appear in the blame of, and am gravely reconsidering the choices which have led me here. godspeed.
+
+    // TODO: deduplicate this logic from subproject rendering
+    // perhaps another "unidentified card" (??) component?
+    let openCardId: string | null = $state(null);
+    const openCard = $derived.by(() => {
+        if(!openCardId || untrack(() => !cards || !$cards)) return null;
+        return untrack(() => $cards?.items.find((c) => c.id === openCardId)) ?? null;
+    });
+
+    // This is kind of a mess, but we need information from the open card's board and project, which depends
+    // on the open card, so we need to do a bunch of fetching to gather that information. It's not
+    // the worst, at least.
+    const openCardProject = $derived(openCard ? deasyncify(watchOne(Collections.Projects, openCard.project, {
+        expand: "subprojects"
+    })) : null);
+    const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
+        expand: "sections"
+    })) : null);
+    // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
+    // a separate cached card loading system or something
+    // TODO: Don't fetch all board cards
+    const openCardBoardCards = $derived(openCardBoard ? deasyncify(watch(Collections.CardPreview, {
+        filter: `board = "${$openCardBoard?.id}"`,
+        sort: "position,created"
+    }, 1, 500, {
+        waitForConnection: true,
+        pollOnChange: [Collections.Cards]
+    })) : null);
 </script>
 
-<div class="page">
+<div class="page" data-modal-target>
+    <CardViewPanel
+        board={$openCardBoard ?? undefined}
+        boardCards={$openCardBoardCards?.items ?? []}
+        bind:card={
+            () => $openCardBoard && $openCardBoardCards ? openCardId : null,
+            (id) => {
+                if(!$openCardBoardCards || !$openCardProject) return;
+                if(id && !$cards?.items.find((c) => c.id === id)) {
+                    // this card is from another subproject; open its board
+                    // TODO: open the linked card with a query param or something
+                    const v = $openCardBoardCards.items.find(c => c.id === id);
+                    if(!v) {
+                        console.warn(`Card ${id} not found in board ${$openCardBoard?.id}`);
+                    } else {
+                        nav(`/projects/${$openCardProject.id}/boards/${v?.board}`);
+                    }
+                }
+                openCardId = id;
+            }
+        }
+        subprojects={$openCardProject?.expand.subprojects ?? []}
+    />
+    
     <SelectionBanner selections={$selections ?? []} />
     
     <menu>
@@ -73,7 +131,7 @@
             {:else}
                 {#each $cards.items as card (card.id)}
                     <KanbanListEntry {card} onclick={() => {
-                        // todo
+                        openCardId = card.id;
                     }} showBoard />
                     {#if $parts}
                         <div class="part-children">
@@ -93,20 +151,20 @@
         {#if !$parts}
             <p class="empty">Loading parts...</p>
         {/if}
-    </div>
 
-    {#if linkedProject === null}
-        <p>Loading...</p>
-    {:else if linkedProject.type === LinkedProjectType.Unregistered || linkedProject.type === LinkedProjectType.Unlinked}
-        <div class="link">
-            {#if linkedProject.type === LinkedProjectType.Unlinked}
-                <p>This document is registered but not linked to a particular project. Choose one to automatically select card boards.</p>
-            {:else}
-                <p>This document is not registered. cChoose one to automatically select card boards.</p>
-            {/if}
-            <LinkOnshapeDocument />
-        </div>
-    {/if}
+        {#if linkedProject === null}
+            <p>Loading...</p>
+        {:else if linkedProject.type === LinkedProjectType.Unregistered || linkedProject.type === LinkedProjectType.Unlinked}
+            <div class="link">
+                {#if linkedProject.type === LinkedProjectType.Unlinked}
+                    <p>This document is registered but not linked to a particular project. Choose one to automatically select card boards.</p>
+                {:else}
+                    <p>This document is not registered. cChoose one to automatically select card boards.</p>
+                {/if}
+                <LinkOnshapeDocument />
+            </div>
+        {/if}
+    </div>
 </div>
 
 <style lang="scss">
@@ -120,9 +178,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 0.5rem 1rem 1.5rem 1rem;
-    overflow-y: auto;
-    min-height: 0;
+    padding: 0.5rem 1rem 1rem 1rem;
 }
 .empty {
     font-size: var(--font-small);
@@ -146,6 +202,7 @@ menu {
 
 .cards {
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;

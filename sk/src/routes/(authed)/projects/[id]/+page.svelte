@@ -2,18 +2,16 @@
   import BoardOverviewItems from './BoardOverviewItems.svelte';
 
     import { link } from "$lib/actions";
-    import { AlarmClock, Check, CheckCheck, Clock, Kanban, ListCheck, Settings, Square, SquareKanban, Tag } from "lucide-svelte";
+    import { AlarmClock, CheckCheck, Clock, Kanban, ListCheck, Settings, Tag } from "lucide-svelte";
     import { getProjectContext } from "./context";
-    import type { ProjectLinkedSite, TypedBoardOverviewResponse, TypedProjectOverviewResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
+    import type { ProjectLinkedSite } from "$lib/data/project";
     import ProjectPage from "./ProjectPage.svelte";
     import { deasyncify } from "$lib/util";
     import { watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import type { Readable } from "svelte/store";
     import ActivityEntry from "../../log/ActivityEntry.svelte";
     import { relativeTime } from "$lib/datetime";
     import { metadata } from "$lib/metadata";
-    import type { ListResult } from "pocketbase";
     import BoardButtons from "./boards/[boardId]/(kanban)/BoardButtons.svelte";
 
     const project = $derived(getProjectContext().project);

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { client, save, stripExpand, watchOne, type ExpandResponse } from "$lib/pocketbase";
+    import { client, queryOne, save, stripExpand, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-    import { walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
+    import { walkMetadata, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
     import { deasyncify, debounce, deepEqual } from "$lib/util";
     import CardView from "./CardView.svelte";
     import { readable, type Readable } from "svelte/store";
@@ -19,7 +19,7 @@
         card: cardId = $bindable(),
         subprojects
     }: {
-        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         boardCards: TypedCardPreviewResponse[],
         card: string | null,
         subprojects: SubprojectsRecord[]
@@ -164,9 +164,9 @@
                 walkMetadataValues(metadataItem.type, metadataItem.value, (ty, val) => {
                     if(ty.base === "file") {
                         if(ty.multi) {
-                            metadataFiles.push(...(val as MetadataFile[]).map(f => f.id));
+                            metadataFiles.push(...(val as MetadataFile[]).map(f => String(f.id)));
                         } else if(val !== null) {
-                            metadataFiles.push((val as MetadataFile).id);
+                            metadataFiles.push(String((val as MetadataFile).id));
                         }
                     }
                 });
@@ -201,7 +201,7 @@
     }
     const updateCardFilesDebounced = debounce(updateCardFiles, 100);
 
-    let uploadContext: UploadContext = {
+    let uploadContext: UploadContext = $state({
         queueUpload(name: string, file: File) {
             uploadQueue.push({ name, file });
             updateCardFilesDebounced();
@@ -213,12 +213,50 @@
             if(!card) return "";
             // Files are given random suffixes by pocketbase, so we just find the file
             // in the card's files array. could be a little cleaner, but whatever.
-            const foundFile = card.files.find(f => f.startsWith(file.id)) ?? file.id;
+            const foundFile = card.files.find(f => f.startsWith(String(file.id))) ?? String(file.id);
             const url = new URL(client.files.getURL(card, foundFile));
             url.searchParams.set("download", "1");
             return url.toString();
         }
-    };
+    });
+    $effect(() => {
+        if(!cardId) {
+            uploadContext.partExport = undefined;
+            return;
+        }
+        
+        uploadContext.partExport = {
+            cardId,
+            
+            async getParts() {
+                if(!card) return [];
+
+                // TODO: should have like. client side caching since we already fetch
+                // all of these anyway
+                const partMetadataEntries: Set<string> = new Set();
+                walkMetadata(card, (ty, val) => {
+                    if(ty.base === "onshape_part" && val) {
+                        partMetadataEntries.add(val as string);
+                    }
+                });
+                
+                // this is a terrible solution but i couldn't care less atp, so sorry yall
+                return Promise.all(Array.from(partMetadataEntries).map(async (partId) => {
+                    return await queryOne(Collections.Parts, partId);
+                })).then(parts => parts.filter(p => p !== null));
+            },
+            hasParts() {
+                if(!card) return false;
+                let hasParts = false;
+                walkMetadata(card, (ty, val) => {
+                    if(ty.base === "onshape_part") {
+                        hasParts = true;
+                    }
+                });
+                return hasParts;
+            },
+        };
+    });
     setUploadContext(uploadContext);
 </script>
 

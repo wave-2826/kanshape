@@ -11,6 +11,7 @@ export const Collections = {
 	Mfas: "_mfas",
 	Otps: "_otps",
 	Superusers: "_superusers",
+	ActiveWebhooks: "active_webhooks",
 	ActivityLog: "activity_log",
 	ActivityLogPreview: "activity_log_preview",
 	AssignedCards: "assigned_cards",
@@ -20,6 +21,7 @@ export const Collections = {
 	CardPreview: "card_preview",
 	Cards: "cards",
 	Config: "config",
+	ExportQueue: "export_queue",
 	Files: "files",
 	GroupOverview: "group_overview",
 	Groups: "groups",
@@ -114,6 +116,18 @@ export type SuperusersRecord = {
 	tokenKey: string
 	updated: IsoAutoDateString
 	verified?: boolean
+}
+
+export type ActiveWebhooksRecord<Tevents = unknown> = {
+	client_id?: string
+	company_id?: string
+	created: IsoAutoDateString
+	document_id?: string
+	events: null | Tevents
+	id: string
+	updated: IsoAutoDateString
+	url: string
+	webhook_id: string
 }
 
 export const ActivityLogActionOptions = {
@@ -298,6 +312,20 @@ export type ConfigRecord = {
 	value?: string
 }
 
+export type ExportQueueRecord = {
+	card?: RecordIdString
+	created_by?: RecordIdString
+	error_message?: string
+	file_id?: string
+	id: string
+	part_record?: RecordIdString
+	status: string
+	timestamp: IsoAutoDateString
+	translation_id?: string
+	type: string
+	webhook_id?: string
+}
+
 export type FilesRecord = {
 	file: FileNameString
 	id: string
@@ -388,6 +416,9 @@ export type PartCardsRecord<Tassignment_data = unknown, Tassignment_name_cache =
 	moved_at?: IsoDateString
 	position?: number
 	priority: PartCardsPriorityOptions
+	project?: RecordIdString
+	project_color?: string
+	project_title: string
 	section: RecordIdString
 	section_color?: string
 	section_name?: string
@@ -505,6 +536,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type ActiveWebhooksResponse<Tevents = unknown, Texpand = unknown> = Required<ActiveWebhooksRecord<Tevents>> & BaseSystemFields<Texpand>
 export type ActivityLogResponse<Tchanges = unknown, Texpand = unknown> = Required<ActivityLogRecord<Tchanges>> & BaseSystemFields<Texpand>
 export type ActivityLogPreviewResponse<Tchanges = unknown, Texpand = unknown> = Required<ActivityLogPreviewRecord<Tchanges>> & BaseSystemFields<Texpand>
 export type AssignedCardsResponse<Tpriority_number = unknown, Texpand = unknown> = Required<AssignedCardsRecord<Tpriority_number>> & BaseSystemFields<Texpand>
@@ -514,6 +546,7 @@ export type CardAssignmentCacheResponse<Texpand = unknown> = Required<CardAssign
 export type CardPreviewResponse<Tassignment_data = unknown, Tassignment_name_cache = unknown, Tdescription = unknown, Tsubprojects = unknown, Texpand = unknown> = Required<CardPreviewRecord<Tassignment_data, Tassignment_name_cache, Tdescription, Tsubprojects>> & BaseSystemFields<Texpand>
 export type CardsResponse<Tassignment_data = unknown, Tmetadata = unknown, Texpand = unknown> = Required<CardsRecord<Tassignment_data, Tmetadata>> & BaseSystemFields<Texpand>
 export type ConfigResponse<Texpand = unknown> = Required<ConfigRecord> & BaseSystemFields<Texpand>
+export type ExportQueueResponse<Texpand = unknown> = Required<ExportQueueRecord> & BaseSystemFields<Texpand>
 export type FilesResponse<Texpand = unknown> = Required<FilesRecord> & BaseSystemFields<Texpand>
 export type GroupOverviewResponse<Tcard_count = unknown, Tmember_count = unknown, Texpand = unknown> = Required<GroupOverviewRecord<Tcard_count, Tmember_count>> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
@@ -538,6 +571,7 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	active_webhooks: ActiveWebhooksRecord
 	activity_log: ActivityLogRecord
 	activity_log_preview: ActivityLogPreviewRecord
 	assigned_cards: AssignedCardsRecord
@@ -547,6 +581,7 @@ export type CollectionRecords = {
 	card_preview: CardPreviewRecord
 	cards: CardsRecord
 	config: ConfigRecord
+	export_queue: ExportQueueRecord
 	files: FilesRecord
 	group_overview: GroupOverviewRecord
 	groups: GroupsRecord
@@ -570,6 +605,7 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	active_webhooks: ActiveWebhooksResponse
 	activity_log: ActivityLogResponse
 	activity_log_preview: ActivityLogPreviewResponse
 	assigned_cards: AssignedCardsResponse
@@ -579,6 +615,7 @@ export type CollectionResponses = {
 	card_preview: CardPreviewResponse
 	cards: CardsResponse
 	config: ConfigResponse
+	export_queue: ExportQueueResponse
 	files: FilesResponse
 	group_overview: GroupOverviewResponse
 	groups: GroupsResponse

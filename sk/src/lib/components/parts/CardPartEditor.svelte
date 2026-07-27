@@ -104,8 +104,10 @@
 
     const hasValue = $derived(value !== null && value !== undefined && value !== "");
     let part = $state<TypedPartsResponse | { error: string } | null>(null);
+    let lastValue: string | null | undefined = null;
     $effect(() => {
-        if(hasValue) {
+        if(hasValue && value !== lastValue) {
+            lastValue = value;
             const store = deasyncify(
                 (watchOne(Collections.Parts, value!, {
                     requestKey: null

@@ -70,6 +70,21 @@ routerUse((e) => {
     return e.next();
 });
 
+// temporary api routes
+routerAdd("GET", "/api/test/webhook", (e) => {
+    const { ensureWebhook } = /** @type {typeof import("./webhooks")} */ (require(`${__hooks}/onshape/webhooks`));
+    
+    const auth = e.requestInfo().auth;
+    if(!auth) throw new UnauthorizedError("auth required");
+    const query = e.requestInfo().query;
+    if(!query.document_id) throw new BadRequestError("document_id required");
+
+    console.log(JSON.stringify(ensureWebhook(auth, ["onshape.model.translation.complete"], {
+        documentId: query.document_id
+    })));
+
+    return e.json(200, { ok: true });
+});
 
 cronAdd("cleanup_onshape_oauth_transactions", "*/15 * * * *", () => {
     require(`${__hooks}/onshape/onshape_auth`).cleanupExpiredOnshapeTransactions();

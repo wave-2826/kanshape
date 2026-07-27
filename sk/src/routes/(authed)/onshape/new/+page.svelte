@@ -14,9 +14,6 @@
     import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "lucide-svelte";
     import { untrack } from "svelte";
 
-    // TODO: persist card data when changing board. Requires some changes
-    // to our state management
-
     const onshapeCtx = getOnshapeContext();
 
     /** parse and validate the selection passed through query parameters */
@@ -184,7 +181,7 @@
         }
     });
 </script>
-partRecordId
+
 <div class="page">
     <header>
         <button class="cancel" onclick={() => nav("/onshape")}>
@@ -200,117 +197,123 @@ partRecordId
             {/if}
         </div>
     </header>
-    {#if fullBoard && $fullBoard && project}
-        <NewCardView
-            bind:this={newCardView}
-            board={$fullBoard}
-            subprojects={project.expand.subprojects ?? []}
-            onopen={(card) => {
-                defaultTitle = card.title;
-                return card;
-            }}
-            oncreate={() => nav("/onshape")}
-            buttonsClass={$css("card-buttons")}
-            contentClass={$css("card-content")}
-        >
-            {#snippet header()}
-                <div class="part-header">
-                    {#if board && board.type !== "parts"}
-                        <span class="warning" title="This board is not a parts board. Parts and files will not be automatically linked.">
-                            <TriangleAlert />
-                        </span>
-                    {/if}
-                    {#if partData.state === "no-part"}
-                        <div class="placeholder-part">No selected part</div>
-                    {/if}
-                    {#if partData.state === "failed"}
-                        <div class="placeholder-part">Failed to load part data: {partData.message}</div>
-                    {/if}
-                    {#if partData.state === "loaded"}
-                        <CardPart part={partData} />
-                    {:else if partData.state === "loading"}
-                        <div class="placeholder-part">Loading part data...</div>
-                    {:else if partData.state === "failed"}
-                        <div class="placeholder-part">Failed to load part data: {partData.message}</div>
-                    {:else}
-                        <div class="placeholder-part">No selected part</div>
-                    {/if}
-                </div>
-            {/snippet}
-
-            {#snippet buttons()}
-                <Kanban /> Board
-                <PopoverButton
-                    class={$css("board-select-button")}
-                    contentClass={$css("board-select-popover")}
-                    style="color: {project?.color ?? "inherit"}"
-                >
-                    {#if board}
-                        <span class="board-name">{board.title}</span>
-                    {:else}
-                        <span class="board-name">Select board...</span>
-                    {/if}
-                    <ChevronDown />
-
-                    {#snippet content()}
-                        {#if $projects}
-                            <div class="project-list">
-                                {#each $projects.items.sort((a, b) => {
-                                    // sort linked project first
-                                    if(isLinked(a.id) && !isLinked(b.id)) return -1;
-                                    if(!isLinked(a.id) && isLinked(b.id)) return 1;
-                                    return a.title?.localeCompare(b.title ?? "") ?? 0;
-                                }) as project}
-                                    <div class="project" style="--project-color: {project.color ?? "inherit"}">
-                                        <SquareKanban class={$css("icon")} /> <span class="name">{project.title}</span>
-                                        {#if isLinked(project.id)}
-                                            <Link />
-                                        {/if}
-                                    </div>
-                                    {#each project.expand.boards?.sort((a, b) => {
-                                        // sort parts boards first
-                                        if(a.type === "parts" && b.type !== "parts") return -1;
-                                        if(a.type !== "parts" && b.type === "parts") return 1;
-                                        return a.title?.localeCompare(b.title ?? "") ?? 0;
-                                    }) as board}
-                                        <button
-                                            class="board"
-                                            class:not-parts={board.type !== "parts"}
-                                            class:selected={selectedBoard?.board === board.id}
-                                            onclick={() => {
-                                                selectedBoard = { board: board.id, project: project.id };
-                                            }}
-                                            style="--project-color: {project.color ?? "inherit"}"
-                                        >
-                                            <Kanban class={$css("icon")} /> <span class="name">{board.title}</span>
-                                            {#if board.type === "parts"}
-                                                <span title="This is a parts board"><Factory class={$css("parts-board-icon")} /></span>
-                                            {/if}
-                                        </button>
-                                    {/each}
-                                {/each}
-                            </div>
-                        {:else}
-                            <p>Failed to load projects</p>
-                        {/if}
-                    {/snippet}
-                </PopoverButton>
-
+    
+    <NewCardView
+        bind:this={newCardView}
+        board={$fullBoard ?? undefined}
+        subprojects={project?.expand.subprojects ?? []}
+        onopen={(card) => {
+            defaultTitle = card.title;
+            return card;
+        }}
+        oncreate={() => nav("/onshape")}
+        buttonsClass={$css("card-buttons")}
+        contentClass={$css("card-content")}
+    >
+        {#snippet header()}
+            <div class="part-header">
                 {#if board && board.type !== "parts"}
                     <span class="warning" title="This board is not a parts board. Parts and files will not be automatically linked.">
                         <TriangleAlert />
                     </span>
                 {/if}
-            {/snippet}
-        </NewCardView>
-    {/if}
+                {#if partData.state === "failed"}
+                    <div class="placeholder-part">Failed to load part data: {partData.message}</div>
+                {/if}
+                {#if partData.state === "loaded"}
+                    <CardPart part={partData} />
+                {:else if partData.state === "loading"}
+                    <div class="placeholder-part">Loading part data...</div>
+                {:else if partData.state === "failed"}
+                    <div class="placeholder-part">Failed to load part data: {partData.message}</div>
+                {:else}
+                    <div class="placeholder-part">No selected part</div>
+                {/if}
+            </div>
+        {/snippet}
+
+        {#snippet buttons()}
+            <Kanban />
+            <PopoverButton
+                class={$css("board-select-button")}
+                contentClass={$css("board-select-popover")}
+                style="color: {project?.color ?? "inherit"}"
+            >
+                {#if board}
+                    <span class="board-name">{board.title}</span>
+                {:else}
+                    <span class="board-name">Select board...</span>
+                {/if}
+                <ChevronDown />
+
+                {#snippet content({ close })}
+                    {#if $projects}
+                        <div class="project-list">
+                            {#each $projects.items.sort((a, b) => {
+                                // sort linked project first
+                                if(isLinked(a.id) && !isLinked(b.id)) return -1;
+                                if(!isLinked(a.id) && isLinked(b.id)) return 1;
+                                return a.title?.localeCompare(b.title ?? "") ?? 0;
+                            }) as project}
+                                <div class="project" style="--project-color: {project.color ?? "inherit"}">
+                                    <SquareKanban class={$css("icon")} /> <span class="name">{project.title}</span>
+                                    {#if isLinked(project.id)}
+                                        <Link />
+                                    {/if}
+                                </div>
+                                {#each project.expand.boards?.sort((a, b) => {
+                                    // sort parts boards first
+                                    if(a.type === "parts" && b.type !== "parts") return -1;
+                                    if(a.type !== "parts" && b.type === "parts") return 1;
+                                    return a.title?.localeCompare(b.title ?? "") ?? 0;
+                                }) as board}
+                                    <button
+                                        class="board"
+                                        class:not-parts={board.type !== "parts"}
+                                        class:selected={selectedBoard?.board === board.id}
+                                        onclick={() => {
+                                            selectedBoard = { board: board.id, project: project.id };
+                                            newCardView?.updateCard((c) => {
+                                                c.board = board.id;
+                                                c.section = board.sections?.[0] ?? "";
+                                                c.subprojects = c.subprojects.filter(sp => project.subprojects.includes(sp));
+                                            });
+                                            close();
+                                        }}
+                                        style="--project-color: {project.color ?? "inherit"}"
+                                    >
+                                        <Kanban class={$css("icon")} /> <span class="name">{board.title}</span>
+                                        {#if board.type === "parts"}
+                                            <span title="This is a parts board"><Factory class={$css("parts-board-icon")} /></span>
+                                        {/if}
+                                    </button>
+                                {/each}
+                            {/each}
+                        </div>
+                    {:else}
+                        <p>Failed to load projects</p>
+                    {/if}
+                {/snippet}
+            </PopoverButton>
+
+            {#if board && board.type !== "parts"}
+                <span class="warning" title="This board is not a parts board. Parts and files will not be automatically linked.">
+                    <TriangleAlert />
+                </span>
+            {:else if !board}
+                <span class="warning" title="Select a board before creating the card.">
+                    <TriangleAlert />
+                </span>
+            {/if}
+        {/snippet}
+    </NewCardView>
 </div>
 
 <style lang="scss">
 .page {
     display: flex;
     flex-direction: column;
-    max-height: 100%;
+    height: 100%;
 }
 
 header {

@@ -3,7 +3,8 @@
     import { Box, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
     import { getUploadContext } from './uploadContext';
     import PopoverButton from '$lib/components/PopoverButton.svelte';
-    import { partExportTypes, type PartExportType } from '$lib/data/parts';
+    import { partExportTypes, type PartExport, type PartExportType } from '$lib/data/parts';
+    import { client } from '$lib/pocketbase';
 
     let {
         type, value = $bindable()
@@ -21,12 +22,12 @@
     {#snippet capsule(file: MetadataFile)}
         <div
             class="file-capsule"
-            class:export={file.id === CREATE_SYMBOL}
+            class:export={file.id === CREATE_SYMBOL || file.type === "export" || file.type === "auto_export"}
             title={file.id === CREATE_SYMBOL ? "This file will be generated for a part." : ""}
         >
-            {#if file.id === CREATE_SYMBOL && file.createType === "auto_export"}
+            {#if (file.id === CREATE_SYMBOL && file.createType === "auto_export") || (file.id !== CREATE_SYMBOL && file.type === "auto_export")}
                 <Sparkles class={$css("file-icon")} />
-            {:else if file.id === CREATE_SYMBOL && file.createType === "export"}
+            {:else if (file.id === CREATE_SYMBOL && file.createType === "export") || (file.id !== CREATE_SYMBOL && file.type === "export")}
                 <SquareArrowRightExit class={$css("file-icon")} />
             {:else}
                 <FileIcon class={$css("file-icon")} />
@@ -43,6 +44,10 @@
                         // TODO: Download progress indicator
                         // TODO: Handle errors
                         fetch(url).then(async (res) => {
+                            if(res.status !== 200) {
+                                console.error("Failed to download file", res.status, await res.text());
+                                return;
+                            }
                             const blob = await res.blob();
                             const a = document.createElement("a");
                             a.href = URL.createObjectURL(blob);
@@ -81,9 +86,9 @@
                     if(files && files.length > 0) {
                         for(const file of files) {
                             // The actual name of the file isn't the uploaded name, but we store it
-                            const generatedName = crypto.randomUUID().replace(/-/g, "");
-                            uploadContext.queueUpload(generatedName + "." + file.name.split(".").pop(), file);
-                            value = [...(value as MetadataFile[]), { name: file.name, id: generatedName }];
+                            const id = crypto.randomUUID().replace(/-/g, "");
+                            uploadContext.queueUpload(id + "." + file.name.split(".").pop(), file);
+                            value = [...(value as MetadataFile[]), { name: file.name, id }];
                         }
                     }
                 }} onclick={close} />
@@ -92,9 +97,9 @@
                     const files = (e.target as HTMLInputElement).files;
                     if(files && files.length > 0) {
                         const file = files[0];
-                        const generatedName = crypto.randomUUID().replace(/-/g, "");
-                        uploadContext.queueUpload(generatedName + "." + file.name.split(".").pop(), file);
-                        value = { name: file.name, id: generatedName };
+                        const id = crypto.randomUUID().replace(/-/g, "");
+                        uploadContext.queueUpload(id + "." + file.name.split(".").pop(), file);
+                        value = { name: file.name, id };
                     }
                 }} onclick={close} />
             {/if}
@@ -112,19 +117,46 @@
                         <p>loading parts</p>
                     {:then parts}
                         {#each parts as part}
-                            <span class="part-label"><Box /> {"partData" in part ? part.partData.name : part.part_data?.name}</span>
+                            {@const partName = ("partData" in part ? part.partData.name : part.part_data?.name) ?? part.id}
+                            <span class="part-label"><Box /> {partName}</span>
                             {#each Object.entries(partExportTypes) as [k, exportType]}
                                 <button
                                     class="part-action"
                                     onclick={() => {
-                                        const name = (exportType.name + "." + exportType.extension).replace(/[^a-zA-Z0-9_.-]/g, "_");
-                                        value = [...(value as MetadataFile[]), {
-                                            name,
-                                            id: CREATE_SYMBOL,
-                                            partRecordId: part.id,
-                                            createType: "export",
-                                            exportType: k as PartExportType
-                                        }];
+                                        const name = (partName + exportType.extension).replace(/[^a-zA-Z0-9_.-]/g, "_");
+                                        let newPart: MetadataFile;
+                                        if(uploadContext.partExport?.cardId === null) {
+                                            newPart = {
+                                                name,
+                                                id: CREATE_SYMBOL,
+                                                partRecordId: part.id,
+                                                createType: "export",
+                                                exportType: k as PartExportType
+                                            };
+                                        } else {
+                                            const id = crypto.randomUUID().replace(/-/g, "");
+                                            newPart = {
+                                                name,
+                                                id,
+                                                type: "export",
+                                                partRecordId: part.id
+                                            };
+                                            client.send("/api/parts/export_all", {
+                                                method: "POST",
+                                                body: [{
+                                                    id,
+                                                    partRecordId: part.id,
+                                                    type: k as PartExportType,
+                                                    cardId: uploadContext.partExport?.cardId
+                                                } satisfies PartExport]
+                                            });
+                                        }
+
+                                        if(type.multi) {
+                                            value = [...(value as MetadataFile[]), newPart];
+                                        } else {
+                                            value = newPart;
+                                        }
                                         close();
                                     }}
                                 >
@@ -159,7 +191,7 @@
         border-radius: 0.25rem;
 
         a {
-            color: var(--text-primary);
+            color: inherit;
         }
         .file-icon {
             width: 1em;

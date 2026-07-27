@@ -1,17 +1,14 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { link } from "$lib/actions";
-    import type { ProjectLinkedSite, TypedBoardsResponse, TypedSubprojectOverviewResponse } from "$lib/data/project";
+    import type { ProjectLinkedSite } from "$lib/data/project";
     import { Kanban, Settings } from "lucide-svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
-    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
+    import { watch, watchOne } from "$lib/pocketbase";
     import { deasyncify } from "$lib/util";
-    import type { Readable } from "svelte/store";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
-    import type { ListResult } from "pocketbase";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import KanbanMenu from "$lib/components/kanban/KanbanMenu.svelte";
     import Masonry from "$lib/components/Masonry.svelte";
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";

@@ -27,7 +27,7 @@
         buttons,
         header
     }: {
-        board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         subprojects: SubprojectsRecord[],
         boardCards?: TypedCardPreviewResponse[],
         disabled?: boolean,
@@ -41,7 +41,7 @@
         header?: Snippet
     } = $props();
 
-    const sections = $derived(board.expand.sections ?? []);
+    const sections = $derived(board?.expand.sections ?? []);
 
     async function create() {
         if(cardData.title.length === 0) return;
@@ -170,7 +170,7 @@
     function getDefaultCardData(): TypedCardsCreate {
         return {
             assignment_data: null,
-            board: board.id,
+            board: board?.id ?? "",
             created_by: $authModel?.id ?? "",
             dependencies: [],
             description: "",
@@ -200,8 +200,10 @@
         update() {}
     });
     $effect(() => {
+        if(!board) return;
         if(board.type === "parts") {
             uploadContext.partExport = {
+                cardId: null,
                 async getParts() {
                     let parts: (TypedPartsResponse | CreationPart)[] = [];
                     walkMetadata(cardData, (ty, val) => {
@@ -251,6 +253,7 @@
 <style lang="scss">
 .content {
     overflow-y: auto;
+    flex: 1;
 }
 .buttons {
     display: flex;

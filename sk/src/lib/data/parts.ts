@@ -1,5 +1,15 @@
 import type { PartHeuristicsResult } from "$lib/onshape/partHeuristics";
-import type { PartsResponse } from "$lib/pocketbase/generated-types";
+import type { PartCardsResponse, PartsResponse } from "$lib/pocketbase/generated-types";
+import type { CardAssignmentData } from "./cards";
+import type { NonNullValuesExcept } from "./kanban";
+
+export type TypedPartCardsResponse = NonNullValuesExcept<PartCardsResponse<
+    CardAssignmentData, // assignment_data
+    string[], // assignment_name_cache
+    string, // description (truncated)
+    { id: string, name: string }[], // subprojects
+    {} // expand
+>, "assignment_data" | "assignment_name_cache">;
 
 /**
  * Data for an assembly stored in the part data.  

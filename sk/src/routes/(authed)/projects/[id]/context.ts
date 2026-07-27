@@ -1,9 +1,7 @@
 import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-import type { TypedBoardsResponse } from "$lib/data/project";
-import { watch, watchOne, type ExpandResponse, type PageStore } from "$lib/pocketbase";
+import { watch, watchOne, type PageStore } from "$lib/pocketbase";
 import { Collections, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
 import { createContext } from "svelte";
-import type { Readable } from "svelte/store";
 
 export function watchProject(id: string) {
     return watchOne(Collections.Projects, id, {
@@ -14,7 +12,7 @@ export function watchProject(id: string) {
 export function watchBoard(id: string) {
     return watchOne(Collections.Boards, id, {
         expand: "sections"
-    }) as Promise<Readable<TypedBoardsResponse & ExpandResponse<"boards", "sections">>>;
+    });
 }
 
 export function watchCards(boardId: string): Promise<PageStore<TypedCardPreviewResponse> | null> {

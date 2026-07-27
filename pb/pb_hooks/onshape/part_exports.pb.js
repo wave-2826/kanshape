@@ -8,27 +8,24 @@
 routerAdd("POST", "/api/parts/export_all", (e) => {
     if(!e.auth) throw new UnauthorizedError("Unauthorized");
     const info = e.requestInfo();
+    if(!info.body || typeof info.body !== "object") throw new BadRequestError("Invalid request body");
 
-    console.log("1");
-    const body = /** @type {PartExport[]} */ (info.body);
+    const body = /** @type {PartExport[]} */ (info.body.exports);
     if(!Array.isArray(body)) throw new BadRequestError("Invalid request body");
 
-    console.log("2");
     const { queuePartExport } = /** @type {typeof import("./exports")} */ (require(`${__hooks}/onshape/exports`));
 
     for(const part of body) {
-        console.log("3");
         if(!part.cardId) throw new BadRequestError("Missing cardId");
         if(!part.type) throw new BadRequestError("Missing export type");
         if(!part.partRecordId) throw new BadRequestError("Missing partRecordId");
 
-        console.log(`Would queue export for part ${part.partRecordId} (card ${part.cardId}) of type ${part.type}`);
-        // queuePartExport(e.app, e.auth, {
-        //     type: part.type,
-        //     partRecordId: part.partRecordId,
-        //     cardId: part.cardId,
-        //     fileId: part.id,
-        // });
+        queuePartExport(e.app, e.auth, {
+            type: part.type,
+            partRecordId: part.partRecordId,
+            cardId: part.cardId,
+            fileId: part.id,
+        });
     }
 
     return e.json(200, { ok: true });

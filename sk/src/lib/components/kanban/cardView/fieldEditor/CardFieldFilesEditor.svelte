@@ -5,6 +5,7 @@
     import PopoverButton from '$lib/components/PopoverButton.svelte';
     import { partExportTypes, type PartExport, type PartExportType } from '$lib/data/parts';
     import { client } from '$lib/pocketbase';
+    import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 
     let {
         type, value = $bindable()
@@ -20,12 +21,18 @@
 
 <div class="files">
     {#snippet capsule(file: MetadataFile)}
+        {@const hasFile = uploadContext.hasFile(file)}
         <div
             class="file-capsule"
             class:export={file.id === CREATE_SYMBOL || file.type === "export" || file.type === "auto_export"}
-            title={file.id === CREATE_SYMBOL ? "This file will be generated for a part." : ""}
+            title={
+                file.id === CREATE_SYMBOL ? "This file will be generated for a part." :
+                !hasFile ? "This file doesn't exist on the card yet. It's likely being exported." : ""
+            }
         >
-            {#if (file.id === CREATE_SYMBOL && file.createType === "auto_export") || (file.id !== CREATE_SYMBOL && file.type === "auto_export")}
+            {#if !hasFile}
+                <LoadingSpinner class={$css("file-icon")} />
+            {:else if (file.id === CREATE_SYMBOL && file.createType === "auto_export") || (file.id !== CREATE_SYMBOL && file.type === "auto_export")}
                 <Sparkles class={$css("file-icon")} />
             {:else if (file.id === CREATE_SYMBOL && file.createType === "export") || (file.id !== CREATE_SYMBOL && file.type === "export")}
                 <SquareArrowRightExit class={$css("file-icon")} />
@@ -143,12 +150,14 @@
                                             };
                                             client.send("/api/parts/export_all", {
                                                 method: "POST",
-                                                body: [{
-                                                    id,
-                                                    partRecordId: part.id,
-                                                    type: k as PartExportType,
-                                                    cardId: uploadContext.partExport?.cardId
-                                                } satisfies PartExport]
+                                                body: {
+                                                    exports: [{
+                                                        id,
+                                                        partRecordId: part.id,
+                                                        type: k as PartExportType,
+                                                        cardId: uploadContext.partExport?.cardId
+                                                    } satisfies PartExport]
+                                                }
                                             });
                                         }
 

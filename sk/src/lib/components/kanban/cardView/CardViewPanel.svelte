@@ -217,6 +217,10 @@
             const url = new URL(client.files.getURL(card, foundFile));
             url.searchParams.set("download", "1");
             return url.toString();
+        },
+        hasFile(file) {
+            if(!card) return false;
+            return card.files.some(f => f.startsWith(String(file.id)));
         }
     });
     $effect(() => {
@@ -224,7 +228,7 @@
             uploadContext.partExport = undefined;
             return;
         }
-        
+
         uploadContext.partExport = {
             cardId,
             

@@ -145,16 +145,12 @@ function startPartExport(authRecord, partRecord, type) {
  */
 function saveToCard(cardRecord, fileId, fileBytes, type) {
     try {
-        // i don't know what type this is actually?
-        const existingFiles = /** @type any[] */ (cardRecord.get("files"));
-
         const extension = EXPORT_FORMAT_MAP[type].extension || "";
         const filename = `${fileId}${extension}`;
 
-        if(!existingFiles.includes(filename)) {
-            existingFiles.push($filesystem.fileFromBytes(fileBytes, filename));
-        }
-        cardRecord.set("files", existingFiles);
+        // re-fetch the card record so we have an up-to-date one and don't overwrite any changes
+        cardRecord = $app.findRecordById("cards", cardRecord.id);
+        cardRecord.set("files+", [$filesystem.fileFromBytes(fileBytes, filename)]);
         $app.save(cardRecord);
     } catch(err) {
         console.warn("Failed to attach file to card:", err);
@@ -169,8 +165,6 @@ function saveToCard(cardRecord, fileId, fileBytes, type) {
  */
 function downloadExportResult(authRecord, exportQueueRecord) {
     const { onshapeRequest } = /** @type {typeof import("./onshape_proxy")} */ (require(`${__hooks}/onshape/onshape_proxy`));
-    const { getConfigOption } = /** @type {typeof import("../config")} */ (require(`${__hooks}/config`));
-    const { getValidOnshapeToken } = /** @type {typeof import("./onshape_auth")} */ (require(`${__hooks}/onshape/onshape_auth`));
 
     const translationId = exportQueueRecord.getString("translation_id");
     const partRecordId = exportQueueRecord.getString("part_record");
@@ -219,26 +213,11 @@ function downloadExportResult(authRecord, exportQueueRecord) {
         return false;
     }
 
-    // Download the external data using $http.send directly since we need raw bytes
-    const metadata = getValidOnshapeToken(authRecord);
-    if(!metadata) {
-        exportQueueRecord.set("status", "failed");
-        exportQueueRecord.set("error_message", "User is missing Onshape OAuth metadata");
-        $app.save(exportQueueRecord);
-        return false;
-    }
-
-    const baseOnshapeUrl = getConfigOption("onshape/baseDomain", "https://cad.onshape.com").replace(/\/+$/, "");
     const fid = resultExternalDataIds[0];
-    const downloadRes = /** @type {any} */ ($http.send({
-        url: `${baseOnshapeUrl}/api/v16/documents/d/${did}/externaldata/${fid}`,
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${metadata.access_token}`,
-            "Accept": "application/octet-stream",
-        },
-        timeout: 120,
-    }));
+    
+    const downloadRes = onshapeRequest(authRecord, "GET", `v16/documents/d/${did}/externaldata/${fid}`, {
+        "Accept": "application/octet-stream"
+    });
 
     if(!downloadRes || downloadRes.statusCode >= 400) {
         exportQueueRecord.set("status", "failed");
@@ -249,12 +228,10 @@ function downloadExportResult(authRecord, exportQueueRecord) {
 
     
     // write the file using the raw bytes from the response
-    const fileBytes = downloadRes.raw || downloadRes.body || downloadRes.json;
-    
     if(cardId) {
         const cardRecord = $app.findRecordById("cards", cardId);
         if(cardRecord) {
-            saveToCard(cardRecord, fileId, fileBytes, type);
+            saveToCard(cardRecord, fileId, normalizeFileBody(downloadRes.body), type);
         }
     }
 
@@ -435,13 +412,17 @@ function trySyncExport(authRecord, partRecord, cardRecord, options) {
         params.set("precomputedLevelOfDetail", "fine");
         params.set("outputFaceAppearances", "true");
 
-        const exportRes = onshapeRequest(authRecord, "GET", `${exportPath}?${params.toString()}`);
+        const exportRes = onshapeRequest(authRecord, "GET", `${exportPath}?${params.toString()}`, {
+            "Accept": "model/gltf+json;charset=UTF-8;qs=0.08"
+        });
         if(exportRes.statusCode >= 400) {
             console.warn(`Failed to synchronously export GLTF: ${exportRes.statusCode} - ${JSON.stringify(exportRes.body)}`);
             return false;
         }
 
         saveToCard(cardRecord, fileId, normalizeFileBody(exportRes.body), type);
+
+        return true;
     }
 
     return false;
@@ -462,6 +443,9 @@ function queuePartExport(app, authRecord, options) {
 
     // If this is an export type we can synchronously handle, do that
     if(trySyncExport(authRecord, partRecord, cardRecord, options)) return;
+
+    console.log("Not trying async export");
+    throw new BadRequestError("TODO");
 
     // Create the export queue entry
     const queueCollection = app.findCollectionByNameOrId(EXPORT_QUEUE_COLLECTION);

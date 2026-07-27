@@ -6,10 +6,13 @@ import type { TypedPartsResponse } from "$lib/data/parts";
 import type { CreationPart } from "$lib/components/parts/partData";
 
 // todo: there's probably a better place for this type
+// also todo: this could be cleaned up with a more general context passing information down instead of callbacks
 export type UploadContext = {
     queueUpload(name: string, file: File): void;
     update(): void;
     getFileUrl?(file: MetadataFile): string;
+    /** Whether the card currently has the given file */
+    hasFile(file: MetadataFile): boolean;
 
     /**
      * only set if on a parts board.

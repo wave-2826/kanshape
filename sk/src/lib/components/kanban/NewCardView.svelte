@@ -158,10 +158,12 @@
         // begin exports
         client.send("/api/parts/export_all", {
             method: "POST",
-            body: exports.map(e => ({
-                ...e,
-                cardId: record.id
-            }))
+            body: {
+                exports: exports.map(e => ({
+                    ...e,
+                    cardId: record.id
+                }))
+            }
         });
 
         oncreate();
@@ -197,7 +199,10 @@
             const namedFile = new File([file], name, { type: file.type, lastModified: file.lastModified });
             cardData.files!.push(namedFile);
         },
-        update() {}
+        update() {},
+        hasFile(file: MetadataFile) {
+            return cardData.files?.some(f => f.name.startsWith(String(file.id))) ?? false;
+        }
     });
     $effect(() => {
         if(!board) return;

@@ -20,7 +20,7 @@
     let modal: CardPartModal | null = $state(null);
 
     const partData = $derived("part_id" in part ? part.part_data : part.partData);
-    const partId = $derived("part_id" in part ? part.part_id : part.id);
+    const partId = $derived("part_id" in part ? part.part_id : "");
 </script>
 
 {#if "part_id" in part}
@@ -78,7 +78,7 @@
                 <dl>
                     {#if hasType}
                         <dt>Confidence:</dt>
-                        <dd>{Math.round((data.heuristic.confidence - 0.9) * 1000)}%</dd>
+                        <dd>{Math.round(data.heuristic.confidence * 100)}%</dd>
                         <dt>Size:</dt>
                         <dd>{formatDistance(data.heuristic.size[0])} x {formatDistance(data.heuristic.size[1])}</dd>
                         <dt>{data.heuristic.partType === "plate" ? "Thickness" : "Length"}:</dt>

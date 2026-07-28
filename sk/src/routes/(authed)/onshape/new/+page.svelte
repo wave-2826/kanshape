@@ -5,6 +5,7 @@
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import { getPartData, getSelectionPartData, type CreationPart, type PartSelection } from "$lib/components/parts/partData";
     import PopoverButton from "$lib/components/PopoverButton.svelte";
+    import type { PartExportType } from "$lib/data/parts";
     import { boardTypesConst, CREATE_SYMBOL, type MetadataFile } from "$lib/data/project";
     import { nav } from "$lib/navigation";
     import { generateRecordID, type OnshapeSelection } from "$lib/onshape/client";
@@ -152,8 +153,19 @@
                         }`]];
 
                         // TODO: bad for i18n, though it's not like we do that anyway...
-                        const partFileName = `${partData.partData.name.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+                        let partFileName = partData.partData.name
+                            .replace(/["]/g, "") // replace some characters with nothing
+                            .replace(/[^a-zA-Z0-9_-]/g, "_") // replace invalid filename characters with underscores
+                            .replace(/_+/g, "_"); // replace multiple underscores with a single underscore
+                        if(partFileName.length > 30) partFileName = partFileName.substring(0, 30);
 
+                        const autoExportTypes: PartExportType[] = [];
+                        if(heuristic?.partType === "plate") autoExportTypes.push("dxf");
+                        // todo: this would be nice but will eat through onshape api requests so...
+                        // we should figure that out first
+                        // else if(heuristic?.partType === "unknown") autoExportTypes.push("step");
+
+                        const internalId = partData.internalId;
                         c.metadata = {
                             ...(c.metadata ?? {}),
                             "parts/onshape_part_id": {
@@ -169,13 +181,13 @@
                             },
                             "parts/files": {
                                 type: boardTypesConst.parts.fields.files.type,
-                                value: [{
+                                value: autoExportTypes.map(t => ({
                                     id: CREATE_SYMBOL,
-                                    name: `${partFileName}.dxf`,
+                                    name: `${partFileName}.${t}`,
                                     createType: "auto_export",
-                                    forPart: { internalId: partData.internalId },
-                                    exportType: "dxf"
-                                }] satisfies MetadataFile[]
+                                    forPart: { internalId: internalId },
+                                    exportType: t
+                                })) satisfies MetadataFile[]
                             }
                         };
                     }
@@ -219,9 +231,6 @@
                     <span class="warning" title="This board is not a parts board. Parts and files will not be automatically linked.">
                         <TriangleAlert />
                     </span>
-                {/if}
-                {#if partData.state === "failed"}
-                    <div class="placeholder-part">Failed to load part data: {partData.message}</div>
                 {/if}
                 {#if partData.state === "loaded"}
                     <CardPart part={partData} />

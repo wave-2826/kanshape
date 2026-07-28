@@ -2,706 +2,688 @@
 // import(path : "onshape/std/common.fs", version : "2960.0");
 // import(path : "onshape/std/geometry.fs", version : "2960.0");
 
-// This expanded in scope a bit, so the docs don't fit as well anymore. sorry about that!
-
-/**
-* Robust Principal Axes Determination using Least Median of Squares (LMS)
-*
-* Implements the algorithm from:
-*   Y.-S. Liu and K. Ramani, "Robust principal axes determination for point-based shapes using least median of squares"
-*   doi:10.1016/j.cad.2008.10.012 - See https://pmc.ncbi.nlm.nih.gov/articles/PMC2710849/#S9
-*
-* This algorithm attempts to estimate a geometry's principal axis - which is intuitively the "direction" of a body -
-* by removing outlier geometry and using regular PCA (Principal Component Analysis). PCA finds the directions along
-* which a point cloud varies the most. For a long thin shape, the first PCA axis is usually the shape's dominant
-* "length" direction.
-* 
-* Standard PCA is sensitive to outliers, so this extension follows the paper's aproach by doing the following:
-*  - Extract vertex positions from the selected solid body.
-*    - Currently, this just uses the part's vertices, but perhaps we could sample face points as well.
-*  - Repeatedly choose small random subsets of points.
-*  - Run PCA on each subset and measure how well its primary axis fits the entire point cloud.
-*  - Keep the subset whose axis produces the smallest median error. (Algorithm 2 - LMS)
-*  - Starting from that subset, grow a "major region" by adding nearby (Algorithm 4 - Forward search)
-*    iteratively add the points that are consistent with the current axis..
-*    This grows the "major region" while treating the rest as outliers.
-*  - Run PCA on the resulting major region.
-*  - Place a mate connector at the computed reference frame.
-* 
-* The resulting mate connector's X axis is the robust primary principal axis.
-*/
-
 function(tl_context is Context, queries) {
-    // Tuneable constants
-    const SURFACE_SAMPLES = 100; // points sampled from part faces
-    const LMS_K = 4; // seed subset size (>= p+1 where p=3 for 3D PCA)
-    const MAX_PTS = 150; // subsample cap for performance
-    const M_STEP = 10;
+    const MIN_PLANAR_AREA_FRACTION = 0.03;
+    const ANGLE_ALIGN_COS = 0.9; // tolerance for faces at the end of an axis
+    const CYL_AXIS_PARALLEL_COS = 0.996; // tolerance for grouping collinear cylindrical faces
+    const END_GROUP_T_TOL = 0.01; // faces within this percent of axis span are the "same" end
 
-    // LCG PRNG
-    // Sufficient randomness for RANSAC
-    // Parameters from Numerical Recipes (32-bit LCG).
-    const lcgNext = function(state is number) returns number {
-        return ((1664525 * state + 1013904223) % 4294967296);
-    };
-    const lcgFloat = function(state is number) returns number {
-        // Map [0, 4294967296) → [0, 1)
-        return abs(state) / 4294967296;
+    const PLATE_MIN_COMBINED_AREA_FRAC = 0.55;
+    const PLATE_MAX_THICKNESS_RATIO = 0.4;
+    const PLATE_MIN_SCORE = 0.5;
+
+    const ELONGATION_MIN_RATIO = 1.2;
+    const END_FACE_MIN_CERTAINTY = 0.85;
+    const MIN_CLASSIFICATION_CONFIDENCE = 0.4;
+
+    const FILL_RATIO_SHAFT_MIN = 0.85;
+    const FILL_RATIO_TUBE_MIN = 0.12;
+
+    const SYMMETRY_ANGLE_BINS = 36; // 10 deg bins
+    const SYMMETRY_ORDERS = [2, 3, 4, 5, 6, 8, 10, 12, 16, 24];
+    const SYMMETRY_MIN_SCORE = 0.75;
+
+    // -- generic helpers
+
+    const arbitraryPerpendicular = function(v is Vector) returns Vector {
+        const helper = abs(v[2]) < 0.9 ? vector(0, 0, 1) : vector(1, 0, 0);
+        return normalize(cross(v, helper));
     };
 
-    /** 
-    * PCA via SVD of the covariance matrix
-    * pts: array of dimensionless 3D Vectors (no units)
-    * Returns { origin: Vector, e1: Vector, e2: Vector, e3: Vector }
-    *   e1: direction of maximum variance (first principal axis)
-    *   e2: direction of second-largest variance
-    *   e3: cross(e1, e2), completing a right-handed frame, probably not needed but whatever
-    */
-    const computePCA = function(pts is array) returns map {
+    const concatArrays = function(a is array, b is array) returns array {
+        var out = a;
+        for(var x in b) out = append(out, x);
+        return out;
+    };
+
+    const cross2 = function(o is array, a is array, b is array) returns number {
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    };
+
+    // -- 2D convex hull
+
+    const convexHull2D = function(pts is array) returns array {
+        // We use the monotone chain algorithm.
+        // See https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain#JavaScript
+
+        if(size(pts) <= 3) return pts;
+
+        // sort lexiographically, so x first then y
+        var sorted = sort(pts, function(a, b) {
+            if(abs(a[0] - b[0]) > 1e-9) return a[0] - b[0];
+            return a[1] - b[1];
+        });
+
+        var lower = [];
+        for(var p in sorted) {
+            while(size(lower) >= 2 && cross2(lower[size(lower) - 2], lower[size(lower) - 1], p) <= 0) {
+                lower = subArray(lower, 0, size(lower) - 1);
+            }
+            lower = append(lower, p);
+        }
+
+        var upper = [];
+        for(var i = size(sorted) - 1; i >= 0; i -= 1) {
+            const p = sorted[i];
+            while(size(upper) >= 2 && cross2(upper[size(upper) - 2], upper[size(upper) - 1], p) <= 0) {
+                upper = subArray(upper, 0, size(upper) - 1);
+            }
+            upper = append(upper, p);
+        }
+
+        lower = subArray(lower, 0, size(lower) - 1);
+        upper = subArray(upper, 0, size(upper) - 1);
+        return concatArrays(lower, upper);
+    };
+
+    const polygonArea = function(poly is array) returns number {
+        const n = size(poly);
+        if(n < 3) return 0;
+        var area2 = 0;
+        for(var i = 0; i < n; i += 1) {
+            const p1 = poly[i];
+            const p2 = poly[i + 1 < n ? i + 1 : 0];
+            area2 += p1[0] * p2[1] - p2[0] * p1[1];
+        }
+        return abs(area2) / 2;
+    };
+
+    // -- geometry gathering
+
+    const gatherPlanarFaces = function(context is Context, faces is Query) returns array {
+        var out = [];
+        for(var face in evaluateQuery(context, qGeometry(faces, GeometryType.PLANE))) {
+            const plane = try(evPlane(context, { "face": face }));
+            if(plane == undefined) continue;
+            out = append(out, {
+                "face": face,
+                "origin": plane.origin,
+                "normal": normalize(plane.normal),
+                "area": evArea(context, { "entities": face })
+            });
+        }
+        return out;
+    };
+
+    const gatherCylindricalFaces = function(context is Context, faces is Query) returns array {
+        var out = [];
+        for(var face in evaluateQuery(context, qGeometry(faces, GeometryType.CYLINDER))) {
+            const def = try(evSurfaceDefinition(context, { "face": face }));
+            if(def == undefined || def.coordSystem == undefined) continue;
+            const axisPoint = def.coordSystem.origin;
+            const axisDir = normalize(def.coordSystem.zAxis);
+
+            // To detect if this is an external/convex surface, we sample a point and compare the face normal there.
+            var isExternal = true;
+            const sample = try(evFaceTangentPlanes(context, {
+                "face": face, "parameters": [vector(0.5, 0.5)], "returnUndefinedOutsideFace": true
+            })[0]);
+            if(sample != undefined) {
+                const toSample = sample.origin - axisPoint;
+                const radial = toSample - dot(toSample, axisDir) * axisDir;
+                if(dot(radial, radial) > (1e-9 * meter) ^ 2) {
+                    isExternal = dot(normalize(radial), sample.normal) > 0;
+                }
+            }
+
+            out = append(out, {
+                "face": face, "axisPoint": axisPoint, "axisDir": axisDir,
+                "radius": def.radius, "area": evArea(context, { "entities": face }),
+                "external": isExternal
+            });
+        }
+        return out;
+    };
+
+    /** Project sampled points from a set of coplanar faces into 2D around a center point. */
+    const sampleCrossSection2D = function(context is Context, faceQueries is array, normal is Vector, center is Vector) returns array {
+        const u = arbitraryPerpendicular(normal);
+        const v = cross(normal, u);
+        var pts2d = [];
+        for(var fq in faceQueries) {
+            for(var vtx in evaluateQuery(context, qAdjacent(fq, AdjacencyType.VERTEX))) {
+                const p = try silent(evVertexPoint(context, { "vertex": vtx }));
+                if(p != undefined) pts2d = append(pts2d, [dot(p - center, u) / meter, dot(p - center, v) / meter]);
+            }
+        }
+        return pts2d;
+    };
+
+    /** Get the hull area of a cross-section */
+    const hullCrossSectionArea = function(hull is array) returns ValueWithUnits {
+        if(size(hull) < 3) return 0 * meter ^ 2;
+        return polygonArea(hull) * meter ^ 2;
+    };
+
+    // -- rotational symmetry
+    
+    const PI_VALUE = 180 * degree;
+
+    /** Generate a radial profile based on the convex hull of the projected 2D points. */
+    const radialProfile = function(hull is array, numBins is number) returns array {
+        var bins = [];
+        for(var i = 0; i < numBins; i += 1) bins = append(bins, -1);
+        
+        const hullPointCount = size(hull);
+        if(hullPointCount == 0) return bins;
+
+        // cast a ray for each bin to find where it intersects the hull edges
+        for(var b = 0; b < numBins; b += 1) {
+            var theta = (b + 0.5) / numBins * (2 * PI_VALUE);
+            var dx = cos(theta);
+            var dy = sin(theta);
+
+            var maxRadius = -1;
+
+            // check the ray against every edge of the convex hull
+            for(var i = 0; i < hullPointCount; i += 1) {
+                var p1 = hull[i];
+                var p2 = hull[(i + 1) % hullPointCount]; // Wrap around
+
+                // calculate intersection between the ray R(origin, dir) and segment L(p1, p2)
+                var det = (p2[0] - p1[0]) * dy - (p2[1] - p1[1]) * dx;
+
+                // if det is 0, the ray is parallel
+                if(abs(det) > 1e-9) {
+                    // parameter on L [0, 1]
+                    var u = (p1[1] * dx - p1[0] * dy) / det;
+                    
+                    // if 0 < u < 1, R intersects L
+                    if(u >= -1e-9 && u <= 1.0 + 1e-9) {
+                        // intersection distance from the origin on R
+                        var t = (p1[1] * p2[0] - p1[0] * p2[1]) / det;
+                        if(t > maxRadius) maxRadius = t;
+                    }
+                }
+            }
+            bins[b] = maxRadius;
+        }
+        
+        return bins;
+    };
+
+    /** Score how well the radial profile matches a given symmetry order. */
+    const symmetryScoreForOrder = function(bins is array, order is number) returns number {
+        const numBins = size(bins);
+        const shift = round(numBins / order);
+        if(shift < 1) return 0;
+
+        var sumErr = 0; var sumR = 0; var compared = 0;
+        for(var i = 0; i < numBins; i += 1) {
+            const j = (i + shift) >= numBins ? (i + shift - numBins) : (i + shift);
+            if(bins[i] < 0 || bins[j] < 0) continue;
+            sumErr += abs(bins[i] - bins[j]);
+            sumR += 0.5 * (bins[i] + bins[j]);
+            compared += 1;
+        }
+        if(compared < numBins / 2 || sumR < 1e-9) return 0; // too sparse to trust
+        return max(0, 1 - sumErr / sumR);
+    };
+
+    const rotationalSymmetryScore = function(hull is array) returns map {
+        const bins = radialProfile(hull, SYMMETRY_ANGLE_BINS);
+        var bestOrder = 1; var bestScore = 0;
+        for(var order in SYMMETRY_ORDERS) {
+            const s = symmetryScoreForOrder(bins, order);
+            if(s > bestScore) { bestScore = s; bestOrder = order; }
+        }
+        return { "score": bestScore, "order": bestOrder, "bins": bins };
+    };
+
+    /** Find where the candidate axis line pierces a plane defined by a point and normal. */
+    const axisPlaneIntersection = function(axisOrigin is Vector, axisDir is Vector, planeOrigin is Vector, planeNormal is Vector) returns Vector {
+        const denom = dot(axisDir, planeNormal);
+        if(abs(denom) < 1e-6) return planeOrigin; // shouldn't happen for a genuine end face; fail safe
+        const t = dot(planeOrigin - axisOrigin, planeNormal) / denom;
+        return axisOrigin + t * axisDir;
+    };
+
+    // -- axis candidates
+
+    /**
+     * Group cylindrical faces that share approximately the same axis line.
+     * We do this because spline profiles usually have small fillet cylinders
+     * sitting on the true part axis, which is a good signal.
+     */
+    const buildCylinderClusters = function(cylData is array, requireExternalSeed is boolean) returns array {
+        var clusters = [];
+        var used = [];
+        for(var i = 0; i < size(cylData); i += 1) used = append(used, false);
+
+        for(var i = 0; i < size(cylData); i += 1) {
+            if(used[i]) continue;
+            if(requireExternalSeed && !cylData[i].external) continue;
+            const seed = cylData[i];
+            var totalArea = seed.area; var count = 1;
+            used[i] = true;
+            for(var j = 0; j < size(cylData); j += 1) {
+                if(j == i || used[j]) continue;
+                const c = cylData[j];
+                if(abs(dot(c.axisDir, seed.axisDir)) < CYL_AXIS_PARALLEL_COS) continue;
+                const toC = c.axisPoint - seed.axisPoint;
+                const perp = toC - dot(toC, seed.axisDir) * seed.axisDir;
+                if(sqrt(dot(perp, perp)) > 0.05 * max(seed.radius, c.radius)) continue;
+                totalArea += c.area; count += 1;
+                used[j] = true;
+            }
+            clusters = append(clusters, { "origin": seed.axisPoint, "axis": seed.axisDir, "totalArea": totalArea, "count": count });
+        }
+        return clusters;
+    };
+
+    const dominantCylinderAxis = function(cylData is array) {
+        if(size(cylData) == 0) return undefined;
+
+        // prefer axes anchored on an external surface
+        var clusters = buildCylinderClusters(cylData, true);
+        if(size(clusters) == 0) clusters = buildCylinderClusters(cylData, false); // fallback
+
+        var best = clusters[0];
+        for(var cl in clusters) {
+            // more collinear members beats bigger area
+            // maybe this isn't the best metric, but it seems to work well.
+            if(cl.count > best.count || (cl.count == best.count && cl.totalArea > best.totalArea)) best = cl;
+        }
+        return { "origin": best.origin, "axis": best.axis, "source": "cylinder" };
+    };
+
+    const farthestPointAxis = function(pts is array) returns map {
         const n = size(pts);
-        if(n < 3) throw regenError("PCA requires at least 3 points");
+        if(n < 2) return undefined;
 
-        // Centroid
-        var ox = 0; var oy = 0; var oz = 0;
-        for(var p in pts) { ox += p[0]; oy += p[1]; oz += p[2]; }
-        ox /= n; oy /= n; oz /= n;
-
-        // 3x3 covariance matrix (it's symmetric, so we only compute the upper triangle)
-        var c00 = 0; var c01 = 0; var c02 = 0;
-        /*  c01 */   var c11 = 0; var c12 = 0;
-        /* would be c02, c12 */   var c22 = 0;
+        var farA = pts[0]; var farAd = -1 * meter ^ 2;
         for(var p in pts) {
-            const dx = p[0] - ox;
-            const dy = p[1] - oy;
-            const dz = p[2] - oz;
-            c00 += dx * dx; c01 += dx * dy; c02 += dx * dz;
-            c11 += dy * dy; c12 += dy * dz;
-            c22 += dz * dz;
+            const d = dot(p - pts[0], p - pts[0]);
+            if(d > farAd) { farAd = d; farA = p; }
         }
+        var farB = farA; var farBd = -1 * meter ^ 2;
+        for(var p in pts) {
+            const d = dot(p - farA, p - farA);
+            if(d > farBd) { farBd = d; farB = p; }
+        }
+        if(farBd < (1e-6 * meter) ^ 2) return undefined;
 
-        // SVD: A = (U)(S)transpose(V) (if A is symmetric, U = V, singular values = eigenvalues)
-        // Singular values in S are in descending order.
-        // Column j of U is the eigenvector for S[j].
-        const svd = svd(matrix([[c00, c01, c02], [c01, c11, c12], [c02, c12, c22]]));
-        const U = svd.u;
-        
-        // Extract first two eigenvectors from columns of U
-        const e1 = normalize(vector(U[0][0], U[1][0], U[2][0]));
-        const e2 = normalize(vector(U[0][1], U[1][1], U[2][1]));
-        const e3 = normalize(cross(e1, e2)); // right-handed frame
-
-        return {
-            "origin": vector(ox, oy, oz),
-            "e1": e1, "e2": e2, "e3": e3
-        };
+        return { "origin": 0.5 * (farA + farB), "axis": normalize(farB - farA), "source": "farthestPoint" };
     };
 
-    /**
-    * Returns the perpendicular distance from point p to the line through
-    * the origin o in direction e. e has to be a unit vector.
-    */
-    const axisResidual = function(p is Vector, o is Vector, e is Vector) returns number {
-        const d = p - o;
-        return norm(d - dot(d, e) * e);
+    const inertialAxis = function(massProps is map) returns map {
+        const I = massProps.inertia / (kilogram * meter ^ 2);
+        const U = svd(I).u; // values are decreasing, so the last column is the long axis
+        const axis = normalize(vector(U[0][2], U[1][2], U[2][2]));
+        return { "origin": massProps.centroid, "axis": axis, "source": "inertia" };
     };
 
-    /**
-    * Returns the median of a numeric array
-    */
-    const arrayMedian = function(vals is array) returns number {
-        const sorted = sort(vals, function(a, b) { return a - b; });
-        const n = size(sorted);
-        if(n % 2 == 1) {
-            return sorted[floor(n / 2)];
-        } else {
-            return (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
-        }
-    };
+    // -- plate test
 
-    const addFaceSamples = function(context is Context, face is Query, count is number, pts is array) returns array {
-        const grid = ceil(sqrt(count));
-        if(grid < 1) return pts;
-
-        var uvSamples = [];
-        for(var iu = 0; iu < grid; iu += 1) {
-            for(var iv = 0; iv < grid; iv += 1) {
-                const u = (iu + 0.5) / grid;
-                const v = (iv + 0.5) / grid;
-                uvSamples = append(uvSamples, vector(u, v));
-            }
+    const findPlate = function(planarData is array, totalArea) {
+        var big = [];
+        for(var f in planarData) if(f.area > MIN_PLANAR_AREA_FRACTION * totalArea) big = append(big, f);
+        for(var i = 1; i < size(big); i += 1) {
+            var j = i;
+            const item = big[i];
+            while(j > 0 && big[j - 1].area < item.area) { big[j] = big[j - 1]; j -= 1; }
+            big[j] = item;
         }
 
-        const planes = evFaceTangentPlanes(context, {
-            "face" : face,
-            "parameters": uvSamples,
-            "returnUndefinedOutsideFace": true
-        });
+        var best = undefined;
+        const n = min(size(big), 10);
+        for(var i = 0; i < n; i += 1) {
+            for(var j = i + 1; j < n; j += 1) {
+                const a = big[i]; const b = big[j];
+                if(dot(a.normal, b.normal) > -0.98) continue;
 
-        for(var plane in planes) {
-            if(plane == undefined) continue;
-            // debug(context, plane.origin, DebugColor.MAGENTA);
-            pts = append(pts, plane.origin / meter);
-        }
+                const thickness = abs(dot(b.origin - a.origin, a.normal));
+                if(thickness < 1e-6 * meter) continue;
 
-        return pts;
-    };
-    const collectPointCloud = function(context is Context, body is Query) returns array {
-        var pts = [];
+                const combinedFrac = (a.area + b.area) / totalArea;
+                const charLength = sqrt(max(a.area, b.area));
+                const thicknessRatio = thickness / charLength;
 
-        const verts = evaluateQuery(context, qOwnedByBody(body, EntityType.VERTEX));
+                if(combinedFrac < PLATE_MIN_COMBINED_AREA_FRAC) continue;
+                if(thicknessRatio > PLATE_MAX_THICKNESS_RATIO) continue;
 
-        for(var v in verts) {
-            const point = evVertexPoint(context, { "vertex" : v });
-            pts = append(pts, point / meter);
-            // debug(context, point, DebugColor.CYAN);
-        }
-
-        const faces = evaluateQuery(context, qOwnedByBody(body, EntityType.FACE));
-
-        var faceAreas = [];
-        var totalArea = 0 * meter ^ 2;
-
-        for(var face in faces) {
-            const area = evArea(context, {
-                "entities" : face
-            });
-
-            faceAreas = append(faceAreas, area);
-            totalArea += area;
-        }
-
-        if(totalArea == 0 * meter ^ 2) return pts;
-
-        for(var i = 0; i < size(faces); i += 1) {
-            const face = faces[i];
-            const area = faceAreas[i];
-
-            const nSamples = max(1, round(SURFACE_SAMPLES * area / totalArea));
-
-            pts = addFaceSamples(context, face, nSamples, pts);
-        }
-
-        return pts;
-    };
-
-    const rpa = function(context is Context, body is Query, T is number, lambda is number) returns map {
-        // First, construct the point cloud
-        // For now, this is just the vertices of the shape but we should probably be sampling faces.
-        var allPts = collectPointCloud(context, body);
-
-        // Limit/subsample to MAX_PTS. Take every step-th point.
-        var pts = allPts;
-        const nAll = size(allPts);
-        if(nAll > MAX_PTS) {
-            const step = floor(nAll / MAX_PTS);
-            pts = [];
-            var idx = 0;
-            while(idx < nAll) {
-                pts = append(pts, allPts[idx]);
-                idx += step;
-            }
-        }
-        const n = size(pts);
-
-        // LMS: find outlier-free seed subset (Algorithm 2 in the paper)
-        // For T iterations:
-        // - Sample LMS_K distinct random points
-        // - Compute PCA to find the first axis e1
-        // - Record the median of all of the residuals
-        //  Keep the subset with the smallest median (which is the goal of the LMS phase, equation 5 in the paper)
-
-        var rng = 1; // PRNG seed (any nonzero integer works)
-        var rMin = 1e30;
-        var bestIdxs = [0, 1, 2, 3]; // fallback to the first four points
-        for(var iter = 0; iter < T; iter += 1) {
-            // Sample LMS_K unique indices from [0, n)
-            var subIdxs = [];
-            var used = {}; // index -> true
-            while(size(subIdxs) < LMS_K) {
-                rng = lcgNext(rng);
-                const si = floor(lcgFloat(rng) * n);
-                if(used[si] == undefined) {
-                    used[si] = true;
-                    subIdxs = append(subIdxs, si);
+                const score = combinedFrac * (1 - min(thicknessRatio / PLATE_MAX_THICKNESS_RATIO, 1));
+                if(best == undefined || score > best.score) {
+                    best = { "faceA": a, "faceB": b, "thickness": thickness, "score": score };
                 }
             }
-
-            // PCA of the tiny subset
-            var sub = [];
-            for(var si in subIdxs) sub = append(sub, pts[si]);
-            const pca = computePCA(sub);
-
-            // Median residual over the remaining points (pts - subIdxs)
-            var residuals = [];
-            for(var p in pts) {
-                if(used[p] == undefined) residuals = append(residuals, axisResidual(p, pca.origin, pca.e1));
-            }
-
-            const med = arrayMedian(residuals);
-            if(med < rMin) {
-                rMin = med;
-                bestIdxs = subIdxs;
-            }
         }
-
-        // Forward Search: grow the major region (Algorithm 1 in the paper)
-        // Starting from the LMS seed, iwe teratively add the M_STEP closest
-        // remaining points as long as their residual <= rmax = lambda * rt
-        // (where rt is the max residual inside the seed subset, equation 6 in the paper).
-        // The final Q is the "major region"; the other points are considered outliers.
-
-        // Boolean mask: if inMajor[i] = true, pts[i] is in Q
-        var inMajor = makeArray(n, false);
-        for(var bi in bestIdxs) inMajor[bi] = true;
-
-        // Initial major region Q
-        var Q = [];
-        for(var i = 0; i < n; i += 1) if(inMajor[i]) {
-            Q = append(Q, pts[i]);
-            // debug(context, pts[i] * meter, DebugColor.GREEN);
-        }
-
-        // rmax from the initial seed
-        var pca = computePCA(Q);
-        var rt  = 0.0;
-        for(var p in Q) {
-            const r = axisResidual(p, pca.origin, pca.e1);
-            if(r > rt) rt = r;
-        }
-        const rmax = lambda * rt;
-
-        // Main growth loop
-        var growing = true;
-        while(growing) {
-            // Recompute PCA on current Q (the frame shifts as Q grows)
-            pca = computePCA(Q);
-
-            // Score all non-Q points by residual to current e1 axis
-            var candidates = [];
-            for(var i = 0; i < n; i += 1) {
-                if(!inMajor[i]) {
-                    const r = axisResidual(pts[i], pca.origin, pca.e1);
-                    candidates = append(candidates, { "r" : r, "i" : i });
-                }
-            }
-
-            if(size(candidates) == 0) { growing = false; break; }
-
-            // Sort candidates ascending by residual
-            candidates = sort(candidates, function(a, b) { return a.r - b.r; });
-
-            // If the best remaining point exceeds rmax, we're done
-            if(candidates[0].r > rmax) {
-                growing = false;
-            } else {
-                // Admit up to M_STEP points whose residual <= rmax
-                var admitted = 0;
-                for(var c in candidates) {
-                    if(admitted >= M_STEP) break;
-                    if(c.r > rmax) break;
-                    inMajor[c.i] = true;
-                    Q = append(Q, pts[c.i]);
-                    // debug(context, pts[c.i] * meter, DebugColor.YELLOW);
-                    admitted += 1;
-                }
-                if(admitted == 0) growing = false;
-            }
-        }
-
-        // Finally, compute PCA on the major region
-        pca = computePCA(Q);
-
-        // Create an output mate connector where the x-axis is the principal axis
-        const originPt = pca.origin * meter; // restore length units
-        const cs = coordSystem(originPt, pca.e1, pca.e3);
-        
-        // debug(context, cs);
-        
-        return { "cs": cs };
+        return best;
     };
 
-    /**
-    * A simpler PCT-based frame on the vertices of the part. This is less robust
-    * to outliers but much faster since it doesn't require the RANSAC/LMS iterations.
-    */
-    const pctFrame = function(context is Context, body is Query) returns map {
-        const verts = evaluateQuery(context, qOwnedByBody(body, EntityType.VERTEX));
+    // -- end-face search
 
-        var pts = [];
-        for(var v in verts) {
-            const point = evVertexPoint(context, { "vertex" : v });
-            pts = append(pts, point / meter);
-        }
+    const findEndFaces = function(context is Context, body is Query, axisOrigin is Vector, axisDir is Vector, planarData is array) {
+        const cs = coordSystem(axisOrigin, axisDir, arbitraryPerpendicular(axisDir));
+        const bbox = evBox3d(context, { "topology": body, "cSys": cs, "tight": true });
+        const span = bbox.maxCorner[0] - bbox.minCorner[0];
+        if(span < 1e-6 * meter) return undefined;
 
-        if(size(pts) < 3) {
-            // sample some points from the faces of the part to get a better estimate of the principal axis
-            const faces = evaluateQuery(context, qOwnedByBody(body, EntityType.FACE));
-            for(var face in faces) {
-                pts = addFaceSamples(context, face, SURFACE_SAMPLES, pts);
-            }
-
-            // give up if still not enough points
-            if(size(pts) < 3) return { "cs": coordSystem(vector(0, 0, 0), vector(1, 0, 0), vector(0, 0, 1)) };
-        }
-
-        const pca = computePCA(pts);
-
-        const originPt = pca.origin * meter; // restore length units
-        const cs = coordSystem(originPt, pca.e1, pca.e3);
-
-        // debug(context, cs);
-
-        return { "cs": cs };
-    };
-
-    /**
-    * Yeah, so it turns out this simple inertial frame heuristic is better than the
-    * RPA algorithm in its current state. The algorithm is definitely broken in the
-    * LMS phase, but I haven't been able to track down the issue yet. Hopefully I'll
-    * get to it eventually, but this works for now!
-    */
-
-    const inertialFrame = function(context is Context, body is Query) returns map {
-        const mp = evApproximateMassProperties(context, {
-            "entities": body,
-            "density": 1 * kilogram / meter ^ 3
-        });
-
-        const centroid = mp.centroid / meter;
-
-        const I = mp.inertia / (kilogram * meter ^ 2);
-        const svdResult = svd(I);
-
-        const U = svdResult.u;
-
-        const e1 = normalize(vector(U[0][0], U[1][0], U[2][0]));
-        const e2 = normalize(vector(U[0][1], U[1][1], U[2][1]));
-        const e3 = normalize(cross(e1, e2));
-
-        const cs = coordSystem(centroid * meter, e1, e3);
-
-        return { "cs": cs };
-    };
-
-    // annotation { "Feature Type Name" : "Robust Principal Axes" }
-    // export const robustPrincipalAxes = defineFeature(function(context is Context, id is Id, definition is map)
-    //     precondition {
-    //         annotation {
-    //             "Name": "Bodies",
-    //             "Filter": EntityType.BODY && BodyType.SOLID
-    //         } definition.body is Query;
-
-    //         annotation {
-    //             "Name": "RANSAC Iterations",
-    //             "UIHint": UIHint.REMEMBER_PREVIOUS_VALUE,
-    //             "Description": "Number of random LMS trials. Higher numbers produce a more robust initial seed."
-    //         } isInteger(definition.iterations, { (unitless): [10, 200, 1000] } as IntegerBoundSpec);
-
-    //         annotation {
-    //             "Name": "Residual Band Scale lambda  [1.0 - 2.5]",
-    //             "UIHint": UIHint.REMEMBER_PREVIOUS_VALUE,
-    //             "Description": "Controls how far from the initial seed the major region extends. Smaller numbers make it tighter."
-    //         } isReal(definition.lambda, POSITIVE_REAL_BOUNDS);
-    //     }
-    //     {
-    //         const T = definition.iterations;
-    //         const lambda = max(1.0, min(5.0, definition.lambda));
-
-    //         for(var body in evaluateQuery(context, definition.body)) {
-    //             var res = rpa(context, body, T, lambda);   
-    //             opMateConnector(context, id ~ "_" ~ transientQueriesToStrings([ body ])[0] ~ "principalFrame", {
-    //                 "coordSystem" : res.cs,
-    //                 "owner"       : body
-    //             });
-    //         }
-    //     },
-    //     // default values
-    //     { "iterations" : 50, "lambda" : 2.5 }
-    // );
-
-    // annotation { "Feature Type Name" : "Inertial Principal Axes" }
-    // export const inertialPrincipalAxes = defineFeature(function(context is Context, id is Id, definition is map)
-    //     precondition
-    //     {
-    //         annotation {
-    //             "Name": "Bodies",
-    //             "Filter": EntityType.BODY && BodyType.SOLID
-    //         } definition.body is Query;
-    //     }
-    //     {
-    //         for(var body in evaluateQuery(context, definition.body)) {
-    //             const frame = inertialFrame(context, body);
-        
-    //             opMateConnector(context, id ~ "_" ~ transientQueriesToStrings([body])[0] ~ "inertialFrame", {
-    //                 "coordSystem": frame.cs,
-    //                 "owner" : body
-    //             });
-    //         }
-    //     }
-    // );
-
-    const testAxisType = function(context is Context, body is Query, cs is CoordSystem) {
-        // Transform the body into the inertial frame and calculate its aabb
-        const bbox = evBox3d(context, {
-            "topology": body,
-            "cSys": cs,
-            "tight": true
-        });
-
-        // Find the end faces 
-        const faces = evaluateQuery(context, qOwnedByBody(body, EntityType.FACE));
+        // find the two extreme axial positions among aligned faces.
         var minT = 1e30; var maxT = -1e30;
-        var minFace; var maxFace;
-        for(var face in faces) {
-            const plane = try(evPlane(context, {
-                "face": face
-            }));
-            if(plane == undefined) continue;
-            
-            const alignment = abs(dot(plane.normal, cs.xAxis));
-            if(alignment < 0.9) continue; // skip faces that aren't reasonably aligned with the outlier axis
-
-            const fb = evBox3d(context, {
-                "topology": face
-            });
-            const center = 0.5 * (fb.minCorner + fb.maxCorner);
-            const size = bbox.maxCorner[0] - bbox.minCorner[0];
-            if(size < 1e-6 * meter) continue; // skip degenerate cases
-            const t = dot(center - cs.origin, cs.xAxis) / size;
-
-            if(t < minT) { minT = t; minFace = face; }
-            if(t > maxT) { maxT = t; maxFace = face; }
+        var alignedCount = 0;
+        for(var f in planarData) {
+            if(abs(dot(f.normal, axisDir)) < ANGLE_ALIGN_COS) continue;
+            alignedCount += 1;
+            const t = dot(f.origin - axisOrigin, axisDir) / span;
+            if(t < minT) minT = t;
+            if(t > maxT) maxT = t;
         }
+        if(alignedCount < 2) return undefined;
 
-        if(minFace == undefined || maxFace == undefined) return undefined;
+        // gather every aligned face within tolerance
+        var minGroup = []; var maxGroup = [];
+        for(var f in planarData) {
+            if(abs(dot(f.normal, axisDir)) < ANGLE_ALIGN_COS) continue;
+            const t = dot(f.origin - axisOrigin, axisDir) / span;
+            if(abs(t - minT) < END_GROUP_T_TOL) minGroup = append(minGroup, f);
+            if(abs(t - maxT) < END_GROUP_T_TOL) maxGroup = append(maxGroup, f);
+        }
+        if(size(minGroup) == 0 || size(maxGroup) == 0) return undefined;
+
+        var minArea = 0 * meter ^ 2; var minRep = minGroup[0];
+        for(var f in minGroup) { minArea += f.area; if(f.area > minRep.area) minRep = f; }
+        var maxArea = 0 * meter ^ 2; var maxRep = maxGroup[0];
+        for(var f in maxGroup) { maxArea += f.area; if(f.area > maxRep.area) maxRep = f; }
+
+        var minFaceQueries = []; for(var f in minGroup) minFaceQueries = append(minFaceQueries, f.face);
+        var maxFaceQueries = []; for(var f in maxGroup) maxFaceQueries = append(maxFaceQueries, f.face);
 
         return {
-            "minFace": minFace,
-            "maxFace": maxFace,
+            "minFaceQueries": minFaceQueries, "maxFaceQueries": maxFaceQueries,
+            "minRep": minRep, "maxRep": maxRep,
+            "minFaceArea": minArea, "maxFaceArea": maxArea,
             "certainty": maxT - minT,
-            "bbox": bbox,
-            "cs": cs
+            "cs": cs, "bbox": bbox, "span": span
         };
     };
 
-    const calculateOutlierCs = function(context is Context, bbox is Box3d, cs is CoordSystem) returns CoordSystem {
-        const sx = bbox.maxCorner[0] - bbox.minCorner[0];
-        const sy = bbox.maxCorner[1] - bbox.minCorner[1];
-        const sz = bbox.maxCorner[2] - bbox.minCorner[2];
+    // -- the actual classification, finally
 
-        // Calculate a "outlier axis" to find end faces based on; default to X if no significant outlier is found
-        var outlierAxis = 0; // X
-        if(sy > 1.2 * sx && sy > 1.2 * sz) {
-            outlierAxis = 1; // Y
-        } else if(sz > 1.2 * sx && sz > 1.2 * sy) {
-            outlierAxis = 2; // Z
-        }
+    const classifyBody = function(context is Context, body is Query) returns map {
+        const partID = transientQueriesToStrings([body])[0];
+        const faces = qOwnedByBody(body, EntityType.FACE);
 
-        const yAxis = cross(cs.xAxis, cs.zAxis);
-        const xAxis =
-            outlierAxis == 0 ? cs.xAxis :
-            (outlierAxis == 1 ? yAxis :
-                            cs.zAxis);
-        const zAxis = 
-            outlierAxis == 0 ? yAxis :
-            (outlierAxis == 1 ? cs.zAxis :
-                            cs.xAxis);
-        return coordSystem(cs.origin, xAxis, zAxis);
-    };
+        const planarData = gatherPlanarFaces(context, faces);
+        const cylData = gatherCylindricalFaces(context, faces);
 
-    // The final 
-    const runHeuristics = function(context is Context, body is Query) returns map {
-        const partID = transientQueriesToStrings([ body ]);
-
-        // Try all four of our strategies to attempt to find the principal axis and faces:
-        // 1) Inertial frame
-        // 2) Inertial frame + outlier axis
-        // 3) RPA robust PCA
-        // 4) PCT PCA
-        // This is getting hacky, but it works for every part I've tried!
-
-        const inertialFrame = inertialFrame(context, body);
-        const pctFrame = pctFrame(context, body);
-
-        const inertialFaces = testAxisType(context, body, inertialFrame.cs);
-        const pctFaces = testAxisType(context, body, pctFrame.cs);
-
-        const outlierFrame = inertialFaces != undefined ? calculateOutlierCs(context, inertialFaces.bbox, inertialFrame.cs) : undefined;
-        const outlierFaces = outlierFrame != undefined ? testAxisType(context, body, outlierFrame) : undefined;
-
-        var candidates = [ inertialFaces, outlierFaces, pctFaces ];
-        candidates = filter(candidates, function(c) { return c != undefined; });
-        if(size(candidates) == 0) {
-            // rpa is slow, so we use it as a fallback. unfortunate, but necessary for
-            // reasonable performance.
-            const rpaFrame = rpa(context, body, 50, 2.5);
-            const rpaFaces = testAxisType(context, body, rpaFrame.cs);
-            if(rpaFaces == undefined) {
-                debug(context, "Failed to find end faces for part " ~ partID[0], DebugColor.RED);
-                candidates = [ { 'certainty': 0.0 } ];
-            } else {
-                candidates = [ rpaFaces ];
-            }
-        }
-
-        // Pick the one with the widest end face separation as our best guess for the principal axis
-        var best = candidates[0];
-        for(var c in candidates) {
-            if(c.certainty > best.certainty) best = c;
-        }
-
-        var isShaft = false;
-        var isTube = false;
-        var isPlate = false;
-        var size = [0 * meter, 0 * meter]; // of a tube or shaft
-        var thickness = 0 * meter; // of a plate
-        var topFace = undefined;
-        if(best.certainty > 0.9) {
-            const minFace = best.minFace;
-            const maxFace = best.maxFace;
-            const endFaceAreas = [ evArea(context, { "entities": minFace }), evArea(context, { "entities": maxFace }) ];
-
-            // choose the end face with the largest area as the top face for export
-            var topFaceQuery = maxFace;
-            if(endFaceAreas[0] > endFaceAreas[1]) {
-                topFaceQuery = minFace;
-            }
-
-            var topFaceNormal = try(evPlane(context, { "face": topFaceQuery }).normal);
-            topFace = {
-                'id': transientQueriesToStrings([topFaceQuery])[0],
-                'normal': topFaceNormal != undefined ? [topFaceNormal[0], topFaceNormal[1], topFaceNormal[2]] : undefined
-            };
-
-            // z faces outward, roughly along the principal axis
-            const facePerpendicularCs = coordSystem(evFaceTangentPlane(context, {
-                "face": minFace,
-                "parameter": vector(0.5, 0.5)
-            }));
-
-            const faceDistance = best.certainty * (best.bbox.maxCorner[0] - best.bbox.minCorner[0]);
-            // debug(context, minFace, DebugColor.BLUE);
-            // debug(context, maxFace, DebugColor.RED);
-
-            thickness = faceDistance;
-            size = [best.bbox.maxCorner[1] - best.bbox.minCorner[1], best.bbox.maxCorner[2] - best.bbox.minCorner[2]];
-
-            // We have a few criteria for our heuristic approach.
-
-            // For shafts:
-            // - If the AABB when rotated around the principal axis by 60deg or 45deg is roughly the same size
-            //   as it was before, this is likely a shaft. This is optimized for cylinders and hex shafts/splines,
-            //   of course.
-            // - If the non-principal dimensions are less than 0.75", this is likely a shaft.
-            // - If the end faces are circular, this is likely a shaft.
-            // - If the end face areas aren't identical, this is likely not a shaft.
-            const rotatedCs60 = coordSystem(
-                best.cs.origin,
-                best.cs.xAxis, // maintain direction
-                rotationMatrix3d(best.cs.xAxis, 60 * degree) * best.cs.zAxis
-            );
-            const rotatedCs45 = coordSystem(
-                best.cs.origin,
-                best.cs.xAxis, // maintain direction
-                rotationMatrix3d(best.cs.xAxis, 45 * degree) * best.cs.zAxis
-            );
-            const r60Box = evBox3d(context, {
-                "topology": body,
-                "cSys": rotatedCs60,
-                "tight": true
-            });
-            const r45Box = evBox3d(context, {
-                "topology": body,
-                "cSys": rotatedCs45,
-                "tight": true
-            });
-            const r60Size = hypot(r60Box.maxCorner[1] - r60Box.minCorner[1], r60Box.maxCorner[2] - r60Box.minCorner[2]);
-            const r45Size = hypot(r45Box.maxCorner[1] - r45Box.minCorner[1], r45Box.maxCorner[2] - r45Box.minCorner[2]);
-            const originalSize = hypot(best.bbox.maxCorner[1] - best.bbox.minCorner[1], best.bbox.maxCorner[2] - best.bbox.minCorner[2]);
-            if(originalSize < 1e-6 * meter) {
-                debug(context, "Degenerate part " ~ partID[0] ~ " with zero non-principal size", DebugColor.RED);
-                return undefined;
-            }
-            const dimRatio60 = r60Size / originalSize;
-            const dimRatio45 = r45Size / originalSize;
-            const nonPrincipalDim = max(best.bbox.maxCorner[1] - best.bbox.minCorner[1], best.bbox.maxCorner[2] - best.bbox.minCorner[2]);
-            const endFaceIsCircular = canBeCircle(minFace) || canBeCircle(maxFace);
-            isShaft = abs(dimRatio60 - 1) < 0.05 || abs(dimRatio45 - 1) < 0.05 || (nonPrincipalDim < 0.75 * inch) || endFaceIsCircular;
-            const endFaceAreaRatio = max(endFaceAreas) / min(endFaceAreas);
-            if(endFaceAreaRatio > 1.1) {
-                isShaft = false;
-            }
-
-            // For tubes:
-            // - If the non-princial axes are close to integer inches, this is likely a tube.
-            //   This is optimized for imperial tube sizes, of course.
-            // - If either end face has a smaller area than its bounding box's non-principal area,
-            //   this is likely a tube.
-            const principalDimInches = (best.bbox.maxCorner[0] - best.bbox.minCorner[0]) / inch;
-            const sidesAreStandard = (abs(size[0] / inch - round(size[0] / inch)) < 0.1) && (abs(size[1] / inch - round(size[1] / inch)) < 0.1);
-            const minFaceBbox = evBox3d(context, { "topology": minFace, "tight": true, "cSys": facePerpendicularCs });
-            const maxFaceBbox = evBox3d(context, { "topology": maxFace, "tight": true, "cSys": facePerpendicularCs });
-            const minFaceNonPrincipalArea = (minFaceBbox.maxCorner[0] - minFaceBbox.minCorner[0]) * (minFaceBbox.maxCorner[1] - minFaceBbox.minCorner[1]);
-            const maxFaceNonPrincipalArea = (maxFaceBbox.maxCorner[0] - maxFaceBbox.minCorner[0]) * (maxFaceBbox.maxCorner[1] - maxFaceBbox.minCorner[1]);
-            const smallerAreaThanBbox = (endFaceAreas[0] < 0.5 * minFaceNonPrincipalArea) || (endFaceAreas[1] < 0.5 * maxFaceNonPrincipalArea);
-            
-            isTube = (sidesAreStandard && principalDimInches > 0.5) || (smallerAreaThanBbox && !isShaft);
-
-            // For plates:
-            // - If the principal dimension is much shorter than the other two, this is likely a plate.
-            // - If the distance between the end faces is less than 0.3 inches, this is likely a plate
-            // - If the part is an active sheet metal model, this is a plate.
-            const principalDim = best.bbox.maxCorner[0] - best.bbox.minCorner[0];
-            isPlate = (principalDim < 0.5 * nonPrincipalDim) || (faceDistance < 0.3 * inch) || isSheetMetalModelActive(context, body);
-        }
+        var totalArea = 0 * meter ^ 2;
+        for(var f in planarData) totalArea += f.area;
+        for(var c in cylData) totalArea += c.area;
 
         const aabb = evBox3d(context, { "topology": body, "tight": true });
-        const material = getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL });
-
-        return {
-            'partID': partID[0],
-            'name': getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
-            'material': material != undefined ? {
-                'density': material.density / (kilogram / meter ^ 3),
-                'name': material.name
-            } : undefined,
-            'appearance': getProperty(context, { entity: body, propertyType: PropertyType.APPEARANCE }),
-            'description': getProperty(context, { entity: body, propertyType: PropertyType.DESCRIPTION }),
-            'part_number': getProperty(context, { entity: body, propertyType: PropertyType.PART_NUMBER }),
-            'revision': getProperty(context, { entity: body, propertyType: PropertyType.REVISION }),
-            'heuristic': {
-                'partType': isShaft ? "shaft" : (isPlate ? "plate" : (isTube ? "tube" : "unknown")),
-                'size': [size[0] / meter, size[1] / meter],
-                'thickness': thickness / meter,
-                'confidence': best.certainty,
-                'principalAxis': best.certainty > 0.9 ? [best.cs.xAxis[0], best.cs.xAxis[1], best.cs.xAxis[2]] : undefined,
-                'topFace': topFace != undefined ? topFace : undefined,
-            },
-            'aabb': {
-                'min': [aabb.minCorner[0] / meter, aabb.minCorner[1] / meter, aabb.minCorner[2] / meter],
-                'max': [aabb.maxCorner[0] / meter, aabb.maxCorner[1] / meter, aabb.maxCorner[2] / meter]
-            }
+        const aabbDiag = sqrt(dot(aabb.maxCorner - aabb.minCorner, aabb.maxCorner - aabb.minCorner));
+        const aabbOut = {
+            "min": [aabb.minCorner[0] / meter, aabb.minCorner[1] / meter, aabb.minCorner[2] / meter],
+            "max": [aabb.maxCorner[0] / meter, aabb.maxCorner[1] / meter, aabb.maxCorner[2] / meter]
         };
+
+        const respond = function(heuristic is map) returns map {
+            const material = getProperty(context, { entity: body, propertyType: PropertyType.MATERIAL });
+            return {
+                "partID": partID,
+                "name": getProperty(context, { entity: body, propertyType: PropertyType.NAME }),
+                "material": material != undefined ? {
+                    "density": material.density / (kilogram / meter ^ 3),
+                    "name": material.name
+                } : undefined,
+                "appearance": getProperty(context, { entity: body, propertyType: PropertyType.APPEARANCE }),
+                "description": getProperty(context, { entity: body, propertyType: PropertyType.DESCRIPTION }),
+                "part_number": getProperty(context, { entity: body, propertyType: PropertyType.PART_NUMBER }),
+                "revision": getProperty(context, { entity: body, propertyType: PropertyType.REVISION }),
+                "aabb": aabbOut,
+                "heuristic": heuristic
+            };
+        };
+
+        const unknownResult = function(sizeArr is array, thickness, confidence, axis, topFace, debugInfo is map) returns map {
+            return respond({
+                "partType": "unknown", "size": sizeArr, "thickness": thickness,
+                "confidence": confidence, "principalAxis": axis, "topFace": topFace,
+                "debug": debugInfo
+            });
+        };
+
+        const computeTopFace = function(context is Context, endFaces is map) returns map {
+            const topFaceQuery = endFaces.maxFaceArea >= endFaces.minFaceArea ? endFaces.maxRep.face : endFaces.minRep.face;
+            const topFaceNormal = try(evPlane(context, { "face": topFaceQuery }).normal);
+            return {
+                "id": transientQueriesToStrings([topFaceQuery])[0],
+                "normal": topFaceNormal != undefined ? [topFaceNormal[0], topFaceNormal[1], topFaceNormal[2]] : undefined
+            };
+        };
+
+        if(totalArea == 0 * meter ^ 2) return unknownResult([0, 0], 0, 0, undefined, undefined, { "reason": "zero surface area" });
+
+        // plate tests
+        const sheetMetal = try(isSheetMetalModelActive(context, body)) == true;
+        const plate = findPlate(planarData, totalArea);
+
+        if(plate != undefined && (plate.score > PLATE_MIN_SCORE || sheetMetal)) {
+            const top = plate.faceA.area >= plate.faceB.area ? plate.faceA : plate.faceB;
+            const plateCs = coordSystem(top.origin, arbitraryPerpendicular(top.normal), top.normal);
+            const plateBox = evBox3d(context, { "topology": body, "cSys": plateCs, "tight": true });
+
+            return respond({
+                "partType": "plate",
+                "size": [
+                    (plateBox.maxCorner[0] - plateBox.minCorner[0]) / meter,
+                    (plateBox.maxCorner[1] - plateBox.minCorner[1]) / meter
+                ],
+                "thickness": plate.thickness / meter,
+                "confidence": max(min(plate.score, 1.0), 0.0),
+                "principalAxis": undefined,
+                "topFace": {
+                    "id": transientQueriesToStrings([top.face])[0],
+                    "normal": [top.normal[0], top.normal[1], top.normal[2]]
+                },
+                "debug": { "plateScore": plate.score, "sheetMetal": sheetMetal }
+            });
+        }
+
+        // stock tests (shaft or tube)
+        const massProps = evApproximateMassProperties(context, { "entities": body, "density": 1 * kilogram / meter ^ 3 });
+
+        var axisCandidates = [];
+        const cylAxis = dominantCylinderAxis(cylData);
+        if(cylAxis != undefined) axisCandidates = append(axisCandidates, cylAxis);
+
+        var verts = [];
+        for(var v in evaluateQuery(context, qOwnedByBody(body, EntityType.VERTEX))) {
+            verts = append(verts, evVertexPoint(context, { "vertex": v }));
+        }
+        const fpAxis = farthestPointAxis(verts);
+        if(fpAxis != undefined) axisCandidates = append(axisCandidates, fpAxis);
+
+        axisCandidates = append(axisCandidates, inertialAxis(massProps));
+
+        var best = undefined; var bestSource = undefined; var bestScore = -1;
+        for(var cand in axisCandidates) {
+            const ef = findEndFaces(context, body, cand.origin, cand.axis, planarData);
+            if(ef == undefined) continue;
+            // `certainty` is a fraction of each candidate span, so perpendicular holes can score ~1.0
+            // against its own tiny span. Weighting by how much of the part's overall size that span 
+            // ctually accounts for fixes those being misidentified as primary axes.
+            const spanFrac = aabbDiag > 0 * meter ? min(ef.span / aabbDiag, 1.0) : 0;
+            const score = ef.certainty * spanFrac;
+            if(score > bestScore + 1e-6) { // small bias so float precision doesn't reorder ties
+                best = ef; bestSource = cand.source; bestScore = score;
+            }
+        }
+
+        if(best == undefined || best.certainty < END_FACE_MIN_CERTAINTY) {
+            return unknownResult([0, 0], 0, 0, undefined, undefined, {
+                "reason": "no axis candidate found well-separated end faces",
+                "bestCertainty": best == undefined ? 0 : best.certainty
+            });
+        }
+
+        const topFaceInfo = computeTopFace(context, best);
+
+        const sizeY = best.bbox.maxCorner[1] - best.bbox.minCorner[1];
+        const sizeZ = best.bbox.maxCorner[2] - best.bbox.minCorner[2];
+        const maxNonPrincipal = max(sizeY, sizeZ);
+        const principalAxisOut = [best.cs.xAxis[0], best.cs.xAxis[1], best.cs.xAxis[2]];
+        const elongation = maxNonPrincipal < 1e-9 * meter ? 1e30 : best.span / maxNonPrincipal;
+
+        // end shape similarity, using the areas of each to measure whether both ends are the same profile
+        const endAreaRatio = max(best.minFaceArea, best.maxFaceArea) / min(best.minFaceArea, best.maxFaceArea);
+        const endShapeConfidence = 1 / endAreaRatio;
+
+        // project each end's samples about where the candidate axis pierces that plane
+        const minCenter = axisPlaneIntersection(best.cs.origin, best.cs.xAxis, best.minRep.origin, best.minRep.normal);
+        const maxCenter = axisPlaneIntersection(best.cs.origin, best.cs.xAxis, best.maxRep.origin, best.maxRep.normal);
+        const minPts2d = sampleCrossSection2D(context, best.minFaceQueries, best.minRep.normal, minCenter);
+        const maxPts2d = sampleCrossSection2D(context, best.maxFaceQueries, best.maxRep.normal, maxCenter);
+        const minHull = convexHull2D(minPts2d);
+        const maxHull = convexHull2D(maxPts2d);
+
+        // debug: draw all the sampled points
+        // for(var point2d in minPts2d) {
+        //     // transform back to the plane defined by minCenter and best.minRep.normal
+        //     const u = arbitraryPerpendicular(best.minRep.normal);
+        //     const v = cross(best.minRep.normal, u);
+        //     addDebugPoint(context, minCenter + (point2d[0] * u + point2d[1] * v) * meter, DebugColor.CYAN);
+        // }
+        // for(var point2d in maxPts2d) {
+        //     // transform back to the plane defined by maxCenter and best.maxRep.normal
+        //     const u = arbitraryPerpendicular(best.maxRep.normal);
+        //     const v = cross(best.maxRep.normal, u);
+        //     addDebugPoint(context, maxCenter + (point2d[0] * u + point2d[1] * v) * meter, DebugColor.MAGENTA);
+        // }
+
+        // Differentiate shafts and tubes with rotational symmetry
+        const minSym = rotationalSymmetryScore(minHull);
+        const maxSym = rotationalSymmetryScore(maxHull);
+        const symmetryScore = min(minSym.score, maxSym.score);
+        const symmetryOrder = minSym.score <= maxSym.score ? minSym.order : maxSym.order;
+
+        // debug: draw radial profiles
+        // for(var i = 0; i < size(minSym.bins); i += 1) {
+        //     const r = minSym.bins[i];
+        //     if(r < 0) continue;
+        //     const theta = (i + 0.5) / size(minSym.bins) * 2 * PI_VALUE;
+        //     const u = arbitraryPerpendicular(best.minRep.normal);
+        //     const v = cross(best.minRep.normal, u);
+        //     addDebugLine(context, minCenter, minCenter + (r * cos(theta) * u + r * sin(theta) * v) * meter, DebugColor.BLUE);
+        // }
+        // for(var i = 0; i < size(maxSym.bins); i += 1) {
+        //     const r = maxSym.bins[i];
+        //     if(r < 0) continue;
+        //     const theta = (i + 0.5) / size(maxSym.bins) * 2 * PI_VALUE;
+        //     const u = arbitraryPerpendicular(best.maxRep.normal);
+        //     const v = cross(best.maxRep.normal, u);
+        //     addDebugLine(context, maxCenter, maxCenter + (r * cos(theta) * u + r * sin(theta) * v) * meter, DebugColor.RED);
+        // }
+
+        // if something is very asymmetrical, it's unlikely to be anything
+        if(symmetryScore < SYMMETRY_MIN_SCORE) {
+            return unknownResult([sizeY / meter, sizeZ / meter], best.span / meter, best.certainty * 0.3, undefined, topFaceInfo, {
+                "reason": "cross-section not rotationally symmetric about the candidate axis",
+                "symmetryScore": symmetryScore, "symmetryOrder": symmetryOrder, "axisSource": bestSource
+            });
+        }
+
+        // our second test is based on fill ratio, so the ratio between the object's
+        // cross section and convex hull. hollow shapes (lower fill area) are considered tubes.
+        const minHullArea = hullCrossSectionArea(minHull);
+        const maxHullArea = hullCrossSectionArea(maxHull);
+        const crossSectionArea = min(minHullArea, maxHullArea);
+        const impliedFilledVolume = crossSectionArea * best.span;
+        const fillRatio = impliedFilledVolume > 0 * meter ^ 3 ? massProps.volume / impliedFilledVolume : 0;
+
+        // round stock (if our axis is from cylindrical faces) doesn't have a length requirement if
+        // unfilled; otherwise, this could be a gear or something
+        // not a perfect metric, but it allows us to catch a few more cases.
+        const elongationOk = (bestSource == "cylinder" && fillRatio < FILL_RATIO_SHAFT_MIN) || (elongation >= ELONGATION_MIN_RATIO);
+        if(!elongationOk) {
+            return unknownResult([sizeY / meter, sizeZ / meter], best.span / meter, best.certainty * 0.3, undefined, topFaceInfo, {
+                "reason": "not elongated enough to be stock", "elongation": elongation, "axisSource": bestSource
+            });
+        }
+
+        var partType = "unknown";
+        var confidence = 0;
+        if(fillRatio >= FILL_RATIO_SHAFT_MIN) {
+            partType = "shaft";
+            confidence = best.certainty * endShapeConfidence * symmetryScore * min(fillRatio, 1.0);
+        } else if(fillRatio >= FILL_RATIO_TUBE_MIN) {
+            // cylinder stock is always a shaft; maybe this isn't a perfect
+            // metric, but it seems to work well in practice
+            partType = bestSource == "cylinder" ? "shaft" : "tube";
+            const bandCenter = 0.5 * (FILL_RATIO_SHAFT_MIN + FILL_RATIO_TUBE_MIN);
+            const bandHalfWidth = 1.0 * (FILL_RATIO_SHAFT_MIN - FILL_RATIO_TUBE_MIN);
+            confidence = best.certainty * endShapeConfidence * symmetryScore * (1 - abs(fillRatio - bandCenter) / bandHalfWidth);
+        }
+
+        if(partType == "unknown" || confidence < MIN_CLASSIFICATION_CONFIDENCE) {
+            return unknownResult([sizeY / meter, sizeZ / meter], best.span / meter, max(confidence, 0), principalAxisOut, topFaceInfo, {
+                "reason": confidence < MIN_CLASSIFICATION_CONFIDENCE ? "classification uncertain" : "fill ratio too low",
+                "axisSource": bestSource, "elongation": elongation, "certainty": best.certainty,
+                "fillRatio": fillRatio, "endAreaRatio": endAreaRatio,
+                "symmetryScore": symmetryScore, "symmetryOrder": symmetryOrder,
+                "minFaceAreaRaw": best.minFaceArea / meter ^ 2, "maxFaceAreaRaw": best.maxFaceArea / meter ^ 2,
+                "minHullArea": minHullArea / meter ^ 2, "maxHullArea": maxHullArea / meter ^ 2
+            });
+        }
+
+        return respond({
+            "partType": partType,
+            "size": [sizeY / meter, sizeZ / meter],
+            "thickness": best.span / meter,
+            "confidence": min(confidence, 1.0),
+            "principalAxis": principalAxisOut,
+            "topFace": topFaceInfo,
+            "debug": {
+                "axisSource": bestSource, "elongation": elongation, "certainty": best.certainty,
+                "fillRatio": fillRatio, "endAreaRatio": endAreaRatio,
+                "symmetryScore": symmetryScore, "symmetryOrder": symmetryOrder,
+                "minFaceAreaRaw": best.minFaceArea / meter ^ 2, "maxFaceAreaRaw": best.maxFaceArea / meter ^ 2,
+                "minHullArea": minHullArea / meter ^ 2, "maxHullArea": maxHullArea / meter ^ 2
+            }
+        });
     };
 
-    // // Debugging feature to visualize
-    // annotation { "Feature Type Name" : "Debug Principal Axes" }
-    // export const debugPrincipalAxes = defineFeature(function(context is Context, id is Id, definition is map)
-    //     precondition {
-    //         annotation {
-    //             "Name": "Body",
-    //             "Filter": EntityType.BODY && BodyType.SOLID
-    //         } definition.body is Query;
-    //     }
-    //     {
-    //         const body = evaluateQuery(context, definition.body)[0];
-    //         println(runHeuristics(context, body));
-    //     }
-    // );
-
     const results = evaluateQuery(tl_context, qOwnerBody(qTransient('{{selectionID}}')));
-    if(size(results) == 0) return { 'error': 'No body selected' };
+    if(size(results) == 0) return { "error": "No body selected" };
     const body = results[0];
-    if(size(qBodyType(body, BodyType.SOLID)) == 0) return { 'error': 'Selected body is not a solid' };
-    return runHeuristics(tl_context, body);
+    if(size(qBodyType(body, BodyType.SOLID)) == 0) return { "error": "Selected body is not a solid" };
+    return classifyBody(tl_context, body);
 }
+
+/**
+Debugging feature to visualize:
+
+annotation { "Feature Type Name" : "Debug Heuristics 3" }
+export const debugPrincipalAxes = defineFeature(function(context is Context, id is Id, definition is map)
+    precondition {
+        annotation {
+            "Name": "Body",
+            "Filter": EntityType.BODY && BodyType.SOLID
+        } definition.body is Query;
+    }
+    {
+        const results = evaluateQuery(context, definition.body);
+        if(size(results) == 0) return { "error": "No body selected" };
+        
+        for(var body in results) {
+            if(size(qBodyType(body, BodyType.SOLID)) == 0) return { "error": "Selected body is not a solid" };
+            const result = classifyBody(context, body);
+            debug(context, result.heuristic.partType);
+            debug(context, result);
+            
+            const centroid = evApproximateCentroid(context, { "entities": body });
+            if(result.heuristic.principalAxis != undefined) {
+                addDebugArrow(context, centroid, centroid + vector(result.heuristic.principalAxis) * meter * 0.15, .25 * centimeter, DebugColor.RED);
+            }
+            if(result.heuristic.topFace != undefined) {
+                // highlight the top face
+                const top_face_query = qTransient(result.heuristic.topFace.id);
+                debug(context, top_face_query, DebugColor.GREEN);
+                const face_centroid = evApproximateCentroid(context, { "entities": top_face_query });
+                addDebugArrow(context, face_centroid, face_centroid + vector(result.heuristic.topFace.normal) * meter * 0.05, .25 * centimeter, DebugColor.GREEN);
+            }
+        }
+    }
+);
+*/

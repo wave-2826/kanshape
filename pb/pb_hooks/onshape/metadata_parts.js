@@ -17,6 +17,8 @@ function walkMetadata(metadata, leafType, callback) {
      * @param {CardMetadata[string]["type"]} type 
      */
     function walk(value, type) {
+        if(!type) return;
+        
         if(type.base === "list") {
             if(!Array.isArray(value)) return;
             for(let i = 0; i < value.length; i++) {

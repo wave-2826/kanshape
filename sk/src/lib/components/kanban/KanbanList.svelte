@@ -45,6 +45,7 @@
         bind:card={openCardId}
         {subprojects}
         {board}
+        projectId={project.id}
     />
 
     {#if cards !== null && $cards !== null}

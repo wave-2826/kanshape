@@ -17,12 +17,14 @@
         board,
         boardCards,
         card: cardId = $bindable(),
-        subprojects
+        subprojects,
+        projectId
     }: {
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         boardCards: TypedCardPreviewResponse[],
         card: string | null,
-        subprojects: SubprojectsRecord[]
+        subprojects: SubprojectsRecord[],
+        projectId: string
     } = $props();
 
     /**
@@ -108,6 +110,7 @@
             return () => unsub();
         } else {
             serverCard = null;
+            console.log("null");
         }
     });
     
@@ -301,7 +304,7 @@
             {subprojects}
         />
         <hr />
-        <CardViewFooter card={_card} />
+        <CardViewFooter card={_card} {projectId} />
     {:else}
         <p>Error displaying card: unknown preview</p>
     {/if}

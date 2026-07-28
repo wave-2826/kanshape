@@ -101,6 +101,7 @@
                         }
                     }
                     subprojects={$project.expand.subprojects ?? []}
+                    projectId={$project?.id ?? ""}
                 />
             {/if}
     

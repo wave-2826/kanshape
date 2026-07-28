@@ -14,8 +14,8 @@
 
 <div class="properties">
     {#each fields as field}
-        <div class="property" title={field.description}>
-            <span class="prop-label">
+        <div class="property">
+            <span class="prop-label" title={field.description}>
                 {field.name}
                 {#if field.allowsClearing && card.metadata && card.metadata[field.id] !== undefined}
                     <button class="clear" onclick={() => {

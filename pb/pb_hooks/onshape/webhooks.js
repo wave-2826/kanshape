@@ -89,6 +89,9 @@ function findWebhookFor(webhookURL, events, options) {
  * this assumes that onshape will never clean up non-transient webhooks,
  * which i think is true?
  *
+ * Each webhook gets a random secret embedded in the URL as ?secret=...
+ * so we can verify incoming requests actually came from Onshape.
+ *
  * @param {core.Record} authRecord user to authenticate as
  * @param {OnshapeWebhookEvent[]} events event types to subscribe to
  * @param {WebhookOptions} [options] additional webhook options
@@ -108,9 +111,10 @@ function ensureWebhook(authRecord, events, options) {
         throw new InternalServerError(`site/publicUrl config option must be a public URL for webhook-based exports, but is ${baseUrl}`);
     }
 
-    const webhookUrl = `${baseUrl.replace(/\/+$/, "")}/api/onshape/webhook`;
-    const existingRecord = findWebhookFor(webhookUrl, events, options);
+    const baseWebhookPath = `${baseUrl.replace(/\/+$/, "")}/api/onshape/webhook`;
+    const existingRecord = findWebhookFor(baseWebhookPath, events, options);
 
+    // Reuse existing webhook if events match
     if(existingRecord) {
         const { parseJSON } = /** @type {typeof import("../util")} */ (require(`${__hooks}/util`));
         /** @type OnshapeWebhookEvent[] */
@@ -123,9 +127,9 @@ function ensureWebhook(authRecord, events, options) {
         }
 
         // something changed, so delete the old webhook from Onshape and DB
-        // i don't know if this is actually valid because it may be tied to the
+        // i don't know if this is actually always valid because it may be tied to the
         // original auth?
-        console.log(`Webhook config changed for ${webhookUrl}, recreating...`);
+        console.log(`Webhook config changed for ${baseWebhookPath}, deleting old webhook ${existingWebhookId} and creating new one`);
         if(existingWebhookId) {
             try {
                 onshapeRequest(authRecord, "DELETE", `v16/webhooks/${existingWebhookId}`);
@@ -139,6 +143,11 @@ function ensureWebhook(authRecord, events, options) {
             // oh well
         }
     }
+
+    // Generate a random secret and embed it in the URL so we can verify
+    // incoming requests actually came from Onshape.
+    const secret = $security.randomString(48);
+    const webhookUrl = `${baseWebhookPath}?secret=${secret}`;
 
     // create a new persistent webhook and save it
     /** @type {any} */
@@ -167,8 +176,9 @@ function ensureWebhook(authRecord, events, options) {
     const collection = $app.findCollectionByNameOrId(ACTIVE_WEBHOOKS_COLLECTION);
     const record = new Record(collection, {
         webhook_id: webhookId,
+        secret,
         events: JSON.stringify(events.slice().sort()),
-        url: webhookUrl,
+        url: baseWebhookPath,
         client_id: options?.clientId ?? null,
         document_id: options?.documentId ?? null,
         company_id: options?.companyId ?? null
@@ -177,6 +187,56 @@ function ensureWebhook(authRecord, events, options) {
 
     console.log(`Created persistent webhook ${webhookId} for ${webhookUrl} with event(s) ${events.join(", ")}`);
     return { webhookId, isNew: true };
+}
+
+/**
+ * verify that an incoming webhook request is legitimate.
+ * checks the ?secret= query param and webhookId in the payload against the database.
+ * @param {core.RequestEvent} e
+ * @returns {{ payload: any, webhookId: string } | null} null if verification fails
+ */
+function verifyWebhook(e) {
+    const body = e.requestInfo().body;
+    if(!body || typeof body !== "object") {
+        console.warn("Invalid webhook body");
+        return null;
+    }
+
+    const webhookId = body.webhookId;
+    if(!webhookId) {
+        console.warn("Missing webhookId in payload");
+        return null;
+    }
+
+    // Verify the webhook exists in our DB
+    let record;
+    try {
+        record = $app.findFirstRecordByData(ACTIVE_WEBHOOKS_COLLECTION, "webhook_id", webhookId);
+    } catch {
+        console.warn(`Unknown webhookId ${webhookId}`);
+        return null;
+    }
+    if(!record) {
+        console.warn(`Unknown webhookId ${webhookId}`);
+        return null;
+    }
+
+    // Verify the secret matches
+    const storedSecret = record.getString("secret");
+    let submittedSecret = "";
+    try {
+        const query = e.request?.url?.query();
+        if(query) {
+            submittedSecret = query.get("secret") || "";
+        }
+    } catch { /* fall through */ }
+
+    if(!storedSecret || submittedSecret !== storedSecret) {
+        console.warn(`Webhook: invalid secret for webhookId ${webhookId}`);
+        return null;
+    }
+
+    return { payload: body, webhookId };
 }
 
 /**
@@ -207,4 +267,5 @@ module.exports = {
     ACTIVE_WEBHOOKS_COLLECTION,
     ensureWebhook,
     deleteWebhook,
+    verifyWebhook
 };

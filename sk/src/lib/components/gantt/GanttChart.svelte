@@ -68,6 +68,7 @@
         boardCards={$cards?.items ?? []}
         bind:card={openCardId}
         {subprojects}
+        projectId={project.id}
     />
 
     <Gantt {categories} onclickitem={(id) => openCardId = id}>

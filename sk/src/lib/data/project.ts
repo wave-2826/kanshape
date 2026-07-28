@@ -80,6 +80,11 @@ export type CardMetadataFieldType<Dynamic extends boolean = true> = {
     create: "onshape_part";
 };
 
+/**
+ * A part an export being created is for. Either an existing part record or another part being
+ * created (in which case internal id references its internalId)
+ */
+export type CreationExportPartTarget = { record: string } | { internalId: string };
 export type MetadataFile = {
     id: string;
     /** Original name of the file */
@@ -93,7 +98,11 @@ export type MetadataFile = {
     id: typeof CREATE_SYMBOL,
     name: string;
     createType: "export" | "auto_export";
-    partRecordId: string;
+    /**
+     * The part this export being created is for. Either an existing part record or another part being
+     * created (in which case internal id references its internalId)
+     */
+    forPart: CreationExportPartTarget;
     exportType: PartExportType;
 };
 export type MetadataValue = string | number | boolean | MetadataValue[] | MetadataFile | CreationPart | null;
@@ -186,6 +195,8 @@ export function walkMetadataValues(
     value: MetadataValue,
     callback: (type: CardMetadataFieldType<false>, value: MetadataValue) => void
 ) {
+    if(!type) return;
+    
     callback(type, value);
 
     switch(type.base) {
@@ -225,8 +236,10 @@ export async function transformMetadata(
     value: MetadataValue,
     callback: (node: MetadataNode) => MetadataNode | Promise<MetadataNode>
 ): Promise<MetadataNode> {
+    if(!type) return { type, value };
+    
     ({ type, value } = await callback({ type, value }));
-
+    
     switch(type.base) {
         case "list":
             if(Array.isArray(value)) {
@@ -297,7 +310,7 @@ export const boardTypesConst = {
             },
             "steps": {
                 name: "Machining steps",
-                description: "The machine the part is to be manufactured on",
+                description: "The machining steps required to manufature this part",
                 type: { base: "list", field: {
                     base: "tuple",
                     fields: [

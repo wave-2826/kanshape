@@ -489,8 +489,9 @@ function trySyncExport(authRecord, partRecord, cardRecord, options) {
             const exportRes = onshapeRequest(authRecord, "POST", exportPath, undefined, JSON.stringify(exportBody));
 
             if(exportRes.statusCode === 200) {
-                console.log(`DXF exportinternal succeeded, got ${typeof exportRes.body === "string" ? exportRes.body.length : "?"} bytes`);
-                saveToCard(cardRecord, fileId, normalizeFileBody(exportRes.body), type);
+                const body = normalizeFileBody(exportRes.body);
+                console.log(`DXF exportinternal succeeded, got ${body.length} bytes`);
+                saveToCard(cardRecord, fileId, body, type);
                 return true;
             } else {
                 console.warn(`exportinternal failed: ${exportRes.statusCode} - ${JSON.stringify(exportRes.body)}`);
@@ -535,11 +536,21 @@ function trySyncExport(authRecord, partRecord, cardRecord, options) {
  * @param {ExportOptions} options
  */
 function queuePartExport(app, authRecord, options) {
-    const partRecord = app.findRecordById("parts", options.partRecordId);
-    if(!partRecord) throw new NotFoundError(`Part record not found: ${options.partRecordId}`);
+    let partRecord;
+    try {
+        partRecord = app.findRecordById("parts", options.partRecordId);
+        if(!partRecord) throw new NotFoundError(`Part record not found: ${options.partRecordId}`);
+    } catch(e) {
+        throw new NotFoundError(`Part record not found: ${options.partRecordId}`);
+    }
 
-    const cardRecord = app.findRecordById("cards", options.cardId);
-    if(!cardRecord) throw new NotFoundError(`Card record not found: ${options.cardId}`);
+    let cardRecord;
+    try {
+        cardRecord = app.findRecordById("cards", options.cardId);
+        if(!cardRecord) throw new NotFoundError(`Card record not found: ${options.cardId}`);
+    } catch(e) {
+        throw new NotFoundError(`Card record not found: ${options.cardId}`);
+    }
 
     // If this is an export type we can synchronously handle, do that
     if(trySyncExport(authRecord, partRecord, cardRecord, options)) return;

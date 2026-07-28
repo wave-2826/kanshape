@@ -8,6 +8,9 @@ routerAdd("POST", "/api/onshape/webhook", (e) => {
     const event = body.event;
     if(!event) return e.json(200, { ok: true });
 
+    const { verifyWebhook } = /** @type {typeof import("./webhooks")} */ (require(`${__hooks}/onshape/webhooks`));
+    if(!verifyWebhook(e)) return;
+
     console.log(`Webhook received: ${event} | data: ${JSON.stringify(body)}`);
 
     // Lifecycle events, ack immediately

@@ -1,11 +1,12 @@
 <script lang="ts">
     import type { TypedCardsResponse } from "$lib/data/cards";
-    import { deleteRecord, queryOne } from "$lib/pocketbase";
+    import { deleteRecord } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { Trash } from "lucide-svelte";
+    import { ExternalLink, Trash } from "lucide-svelte";
     import { getUsername } from "./nameCache";
+    import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
 
-    const { card }: { card: TypedCardsResponse } = $props();
+    const { card, projectId }: { card: TypedCardsResponse, projectId: string } = $props();
 
     function deleteCard() {
         const id = card.id;
@@ -14,26 +15,43 @@
     }
 
     const creationUsername = $derived(card?.created_by ? getUsername(card.created_by) : null);
+
+    const onshapeContext = getOnshapeContext();
 </script>
 
 <footer>
-    <div class="metadata">
-        <span>
-            Created by
-            {#if creationUsername === null}
-                Unknown User
-            {:else}
-                {#await creationUsername}
-                    Loading user...
-                {:then name}
-                    {name ?? "Unknown User"}
-                {/await}
+    {#if onshapeContext.onOnshape}
+        <button onclick={() => {
+            // open card in kanshape board view
+            const boardId = card.board;
+            const cardId = card.id;
+            // TODO: card query param to actually.. open the specific card
+            const url = `/projects/${projectId}/boards/${boardId}`;
+            window.open(window.location.origin + url, "_blank");
+        }}>
+            <ExternalLink /> Open in new tab
+        </button>
+    {:else}
+        <div class="metadata">
+            <span>
+                Created by
+                {#if creationUsername === null}
+                    Unknown User
+                {:else}
+                    {#await creationUsername}
+                        Loading user...
+                    {:then name}
+                        {name ?? "Unknown User"}
+                    {/await}
+                {/if}
+                on {new Date(card.created).toLocaleString()}
+            </span>
+            <span>Last updated {new Date(card.updated).toLocaleString()}</span>
+            {#if card.moved_at}
+                <span>Moved sections at {new Date(card.moved_at).toLocaleString()}</span>
             {/if}
-            on {new Date(card.created).toLocaleString()}
-        </span>
-        <span>Last updated {new Date(card.updated).toLocaleString()}</span>
-        <span>Moved sections at {new Date(card.moved_at).toLocaleString()}</span>
-    </div>
+        </div>
+    {/if}
     
     <button onclick={deleteCard} class="delete"><Trash /> Delete Card</button>
 </footer>

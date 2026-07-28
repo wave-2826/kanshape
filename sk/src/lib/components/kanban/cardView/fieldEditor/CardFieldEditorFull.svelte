@@ -19,11 +19,11 @@
         value: defaultMetadataFieldValue(field.type)
     });
     const valueTypeIsValid = $derived(
-        metadataItem.type.base === CREATE_SYMBOL || checkMetadataValue(field.type, metadataItem.value)
+        metadataItem.type && (metadataItem.type.base === CREATE_SYMBOL || checkMetadataValue(field.type, metadataItem.value))
     );
     // If the value isn't valid for the field type, we use the stored type instead
     const usedType = $derived(
-        valueTypeIsValid && metadataItem.type.base !== CREATE_SYMBOL ? field.type : metadataItem.type
+        (valueTypeIsValid && metadataItem.type.base !== CREATE_SYMBOL) || !metadataItem.type ? field.type : metadataItem.type
     );
 
     const uploadContext = getUploadContext();

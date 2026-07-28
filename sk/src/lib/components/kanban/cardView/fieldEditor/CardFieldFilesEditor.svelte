@@ -27,10 +27,11 @@
             class:export={file.id === CREATE_SYMBOL || file.type === "export" || file.type === "auto_export"}
             title={
                 file.id === CREATE_SYMBOL ? "This file will be generated for a part." :
-                !hasFile ? "This file doesn't exist on the card yet. It's likely being exported." : ""
+                !hasFile ? "This file doesn't exist on the card yet. It's likely being exported." :
+                file.type === "auto_export" ? "This export was automatically created based on the detected part." : ""
             }
         >
-            {#if !hasFile}
+            {#if file.id !== CREATE_SYMBOL && !hasFile}
                 <LoadingSpinner class={$css("file-icon")} />
             {:else if (file.id === CREATE_SYMBOL && file.createType === "auto_export") || (file.id !== CREATE_SYMBOL && file.type === "auto_export")}
                 <Sparkles class={$css("file-icon")} />
@@ -40,6 +41,7 @@
                 <FileIcon class={$css("file-icon")} />
             {/if}
             {#if getFileUrl}
+                <!-- TODO: allow renaming uploaded files -->
                 <a
                     href={getFileUrl(file as MetadataFile)}
                     target="_blank"
@@ -98,7 +100,8 @@
                             value = [...(value as MetadataFile[]), { name: file.name, id }];
                         }
                     }
-                }} onclick={close} />
+                    close?.();
+                }} />
             {:else}
                 <input type="file" onchange={async (e) => {
                     const files = (e.target as HTMLInputElement).files;
@@ -108,13 +111,14 @@
                         uploadContext.queueUpload(id + "." + file.name.split(".").pop(), file);
                         value = { name: file.name, id };
                     }
-                }} onclick={close} />
+                    close?.();
+                }} />
             {/if}
         {/snippet}
 
         {#if uploadContext.partExport !== undefined && uploadContext.partExport.hasParts()}
             <PopoverButton contentClass={$css("add-part-export-content")}>
-                <Plus /> Add {type.multi ? "file(s)" : "file"}
+                <Plus /> Add {type.multi ? "files" : "file"} or exports
                 {#snippet content({ close })}
                     <label class="button">
                         <Upload /> Upload...
@@ -124,61 +128,69 @@
                         <p>loading parts</p>
                     {:then parts}
                         {#each parts as part}
-                            {@const partName = ("partData" in part ? part.partData.name : part.part_data?.name) ?? part.id}
+                            {@const partName = ("partData" in part ? part.partData.name : part.part_data?.name) ?? "Unknown part"}
                             <span class="part-label"><Box /> {partName}</span>
-                            {#each Object.entries(partExportTypes) as [k, exportType]}
-                                <button
-                                    class="part-action"
-                                    onclick={() => {
-                                        const name = (partName + exportType.extension).replace(/[^a-zA-Z0-9_.-]/g, "_");
-                                        let newPart: MetadataFile;
-                                        if(uploadContext.partExport?.cardId === null) {
-                                            newPart = {
-                                                name,
-                                                id: CREATE_SYMBOL,
-                                                partRecordId: part.id,
-                                                createType: "export",
-                                                exportType: k as PartExportType
-                                            };
-                                        } else {
-                                            const id = crypto.randomUUID().replace(/-/g, "");
-                                            newPart = {
-                                                name,
-                                                id,
-                                                type: "export",
-                                                partRecordId: part.id
-                                            };
-                                            client.send("/api/parts/export_all", {
-                                                method: "POST",
-                                                body: {
-                                                    exports: [{
-                                                        id,
-                                                        partRecordId: part.id,
-                                                        type: k as PartExportType,
-                                                        cardId: uploadContext.partExport?.cardId
-                                                    } satisfies PartExport]
+                            <div class="part-actions">
+                                {#each Object.entries(partExportTypes) as [k, exportType]}
+                                    <button
+                                        class="part-action"
+                                        onclick={() => {
+                                            const name = (partName + exportType.extension).replace(/[^a-zA-Z0-9_.-]/g, "_");
+                                            let newPart: MetadataFile;
+                                            if(uploadContext.partExport?.cardId === null) {
+                                                newPart = {
+                                                    name,
+                                                    id: CREATE_SYMBOL,
+                                                    createType: "export",
+                                                    forPart: "internalId" in part ? { internalId: part.internalId } : { record: part.id },
+                                                    exportType: k as PartExportType
+                                                };
+                                            } else {
+                                                const id = crypto.randomUUID().replace(/-/g, "");
+                                                if(!("id" in part)) {
+                                                    console.error("Part doesn't have an id", part);
+                                                    return;
                                                 }
-                                            });
-                                        }
 
-                                        if(type.multi) {
-                                            value = [...(value as MetadataFile[]), newPart];
-                                        } else {
-                                            value = newPart;
-                                        }
-                                        close();
-                                    }}
-                                >
-                                    <SquareArrowRightExit /> Add {exportType.name} export
-                                </button>
-                            {/each}
+                                                newPart = {
+                                                    name,
+                                                    id,
+                                                    type: "export",
+                                                    partRecordId: part.id
+                                                };
+                                                client.send("/api/parts/export_all", {
+                                                    method: "POST",
+                                                    body: {
+                                                        exports: [{
+                                                            id,
+                                                            partRecordId: part.id,
+                                                            type: k as PartExportType,
+                                                            cardId: uploadContext.partExport?.cardId
+                                                        } satisfies PartExport]
+                                                    }
+                                                });
+                                            }
+    
+                                            if(type.multi) {
+                                                value = [...(value as MetadataFile[]), newPart];
+                                            } else {
+                                                value = newPart;
+                                            }
+                                            close();
+                                        }}
+                                        title="Add a {exportType.name} export for this part"
+                                    >
+                                        <SquareArrowRightExit /> {exportType.name}
+                                    </button>
+                                {/each}
+                            </div>
                         {/each}
                     {/await}
                 {/snippet}
             </PopoverButton>
         {:else}
             <label class="button">
-                <Plus /> Add {type.multi ? "file(s)" : "file"}
+                <Plus /> Add {type.multi ? "files" : "file"}
                 {@render uploadInput()}
             </label>
         {/if}
@@ -232,6 +244,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    max-height: 25rem;
+    overflow-y: auto;
 
     font-size: var(--font-small);
 
@@ -245,6 +259,8 @@
     }
 
     .part-label {
+        flex-shrink: 0;
+
         color: var(--text-secondary);
         margin-top: 0.5rem;
 
@@ -257,8 +273,11 @@
         align-items: center;
         gap: 0.5rem;
     }
-    .part-action {
-        margin-left: 0.5rem;
+    .part-actions {
+        margin-left: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
     }
 }
 </style>

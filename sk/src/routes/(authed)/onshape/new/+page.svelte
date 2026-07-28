@@ -69,7 +69,7 @@
                         return;
                     }
                     partData = {
-                        id: generateRecordID(),
+                        internalId: generateRecordID(),
                         state: "loaded",
                         type: "assembly",
                         sel,
@@ -131,6 +131,9 @@
                     // don't overwrite title if user started changing it
                     if(c.title === defaultTitle) c.title = `Create ${partData.partData.name}`;
 
+                    c.board = board.id;
+                    c.section = board.sections?.[0] ?? "";
+
                     // TODO: This should be much more configurable
                     if(board.type === "parts") {
                         let creationSteps = [
@@ -169,8 +172,8 @@
                                 value: [{
                                     id: CREATE_SYMBOL,
                                     name: `${partFileName}.dxf`,
-                                    partRecordId: partData.id,
                                     createType: "auto_export",
+                                    forPart: { internalId: partData.internalId },
                                     exportType: "dxf"
                                 }] satisfies MetadataFile[]
                             }

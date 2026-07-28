@@ -16,8 +16,8 @@ export type PartSelection = {
 
 /** Data for creating a new part when making a card */
 export type CreationPart = {
-    /** ID of the part that will be created */
-    id: string;
+    // ID not sent to server used for associating parts -> exports. just a random string.
+    internalId: string;
     type: "part" | "assembly",
     sel: PartSelection,
     partData: PartHeuristicsResult | AssemblyData,
@@ -96,7 +96,7 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
             const partData = await getPartData(ctx.client, partSelection);
             if(!partData) return null;
             return {
-                id: generateRecordID(),
+                internalId: generateRecordID(),
                 type: "assembly",
                 sel: partSelection,
                 partData
@@ -137,7 +137,7 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
         }
 
         return {
-            id: generateRecordID(),
+            internalId: generateRecordID(),
             type: selection.type,
             sel: selection,
             partData,
@@ -165,7 +165,7 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
         partSelection.partId = heuristics.partID ?? partSelection.partId;
 
         return {
-            id: generateRecordID(),
+            internalId: generateRecordID(),
             type: "part",
             sel: partSelection,
             partData: heuristics

@@ -5,13 +5,14 @@
     import { Collections, type PartsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import CardView from "./cardView/CardView.svelte";
-    import { CREATE_SYMBOL, transformMetadata, walkMetadata, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
+    import { CREATE_SYMBOL, transformMetadata, walkMetadata, type CreationExportPartTarget, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { Snippet } from "svelte";
     import { setUploadContext, type UploadContext } from "./cardView/fieldEditor/uploadContext";
     import type { PartExport, TypedPartsResponse } from "$lib/data/parts";
     import type { CreationPart } from "../parts/partData";
     import { queryExistingParts, generatePartPreview, updatePartRecord } from "../parts/CardPartEditor.svelte";
+    import { generateRecordID } from "$lib/onshape/client";
 
     const {
         board,
@@ -45,9 +46,10 @@
 
     async function create() {
         if(cardData.title.length === 0) return;
+        if(!board) return;
 
         // exports can be slow, so we run them after card creation
-        let exports: PartExport[] = [];
+        let exports: (Omit<PartExport, "partRecordId"> & { forPart: CreationExportPartTarget })[] = [];
         // parts are created after the card since they require the card id and we'd prefer not to make two requests
         let parts: { part: CreationPart, existingOrNewId: PartsResponse[] | string }[] = [];
 
@@ -59,8 +61,8 @@
                     switch(file.createType) {
                         case "auto_export":
                         case "export":
-                            const id = crypto.randomUUID();
-                            exports.push({ type: file.exportType, partRecordId: file.partRecordId, id });
+                            const id = crypto.randomUUID().replace(/-/g, "");
+                            exports.push({ type: file.exportType, forPart: file.forPart, id });
                             return {
                                 id,
                                 name: file.name,
@@ -95,7 +97,7 @@
                         }
                         
 
-                        const newId = existing && existing.length > 0 ? existing[0].id : part.id;
+                        const newId = existing && existing.length > 0 ? existing[0].id : generateRecordID();
                         parts.push({ part, existingOrNewId: existing && existing.length > 0 ? existing : newId })
 
                         return {
@@ -120,7 +122,7 @@
         const indexFile = (file: MetadataValue) => {
             const f = file as MetadataFile;
             if(typeof f.id !== "string") return;
-            metadataFiles.add(f.name);
+            metadataFiles.add(f.id);
         };
         walkMetadata(cardData, (ty, val) => {
             if(ty.base === "file") {
@@ -155,15 +157,33 @@
             generatePartPreview(partRecord.id);
         }
 
+        // map exports to actual part records
+        exports = exports.map(e => {
+            const forPart = e.forPart;
+            if("record" in forPart) {
+                return {
+                    ...e,
+                    partRecordId: forPart.record
+                };
+            } else if("internalId" in forPart) {
+                const part = parts.find(p => p.part.internalId === forPart.internalId);
+                if(!part) throw new Error("No part found for export with internalId: " + forPart.internalId);
+                
+                const partRecordId = typeof part.existingOrNewId === "string" ? part.existingOrNewId : part.existingOrNewId[0].id;
+                return {
+                    ...e,
+                    partRecordId,
+                    cardId: record.id
+                };
+            } else {
+                throw new Error("Unknown forPart type");
+            }
+        }) satisfies PartExport[];
+
         // begin exports
         client.send("/api/parts/export_all", {
             method: "POST",
-            body: {
-                exports: exports.map(e => ({
-                    ...e,
-                    cardId: record.id
-                }))
-            }
+            body: { exports }
         });
 
         oncreate();
@@ -218,7 +238,7 @@
                         }
                     });
                     // deduplicate by id
-                    return [...new Map(parts.map(p => [p.id, p])).values()];
+                    return [...new Map(parts.map(p => ["id" in p ? p.id : null, p])).values()];
                 },
                 hasParts() {
                     let hasParts = false;
@@ -252,7 +272,7 @@
 </div>
 <div class={["buttons", buttonsClass]}>
     {@render buttons?.()}
-    <button type="submit" disabled={cardData.title.length === 0} onclick={create}><Plus /> Create</button>
+    <button type="submit" disabled={cardData.title.length === 0 || !board} onclick={create}><Plus /> Create</button>
 </div>
 
 <style lang="scss">

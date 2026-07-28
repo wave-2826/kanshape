@@ -95,6 +95,7 @@
             }
         }
         subprojects={$openCardProject?.expand.subprojects ?? []}
+        projectId={$openCardProject?.id ?? ""}
     />
     
     <SelectionBanner selections={$selections ?? []} />

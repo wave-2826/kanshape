@@ -297,24 +297,26 @@
                 <div class="part-wrapepr">
                     <CardPart {part} />
                     {#if status === "existing"}
-                        <div class="placeholder existing">
+                        <div class="placeholder extra-info">
                             <span>This part has already been added. Refresh its inforamtion?</span>
-                            <button onclick={async () => {
-                                if(!part || "error" in part) return;
-                                const sel: PartSelection = {
-                                    type: part.type,
-                                    documentId: part.document_id,
-                                    elementId: part.element_id,
-                                    configuration: part.configuration,
-                                    wvm: part.wvm,
-                                    wvmId: part.wvm_id,
-                                    partId: part.part_id
-                                };
-                                status = "loading";
-                                let existing = await queryExistingParts(sel);
-                                await refreshPart(sel, existing);
-                            }}><RefreshCw /> Refresh</button>
-                            <button onclick={() => status = "display"}>Close</button>
+                            <div class="buttons">
+                                <button onclick={async () => {
+                                    if(!part || "error" in part) return;
+                                    const sel: PartSelection = {
+                                        type: part.type,
+                                        documentId: part.document_id,
+                                        elementId: part.element_id,
+                                        configuration: part.configuration,
+                                        wvm: part.wvm,
+                                        wvmId: part.wvm_id,
+                                        partId: part.part_id
+                                    };
+                                    status = "loading";
+                                    let existing = await queryExistingParts(sel);
+                                    await refreshPart(sel, existing);
+                                }}><RefreshCw /> Refresh</button>
+                                <button onclick={() => status = "display"}>Close</button>
+                            </div>
                         </div>
                     {/if}
                 </div>
@@ -352,18 +354,24 @@
     flex-direction: column;
     gap: 0.25rem;
     width: 100%;
+    container-type: inline-size;
 }
 .placeholder {
     background-color: var(--bg-secondary);
     border-radius: 4px;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 
-    &.existing {
+    &.extra-info {
         margin-left: 0.5rem;
     }
+    .buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
     span {
         flex: 1;
     }
@@ -372,6 +380,14 @@
         padding: 0.25rem 0.5rem;
     }
 }
+
+@container (max-width: 340px) {
+    .placeholder.extra-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 .add {
     gap: 0.5rem;
 }

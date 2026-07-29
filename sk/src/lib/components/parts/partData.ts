@@ -1,6 +1,6 @@
-import type { AssemblyData } from "$lib/data/parts";
+import type { AssemblyData, PartData } from "$lib/data/parts";
 import { generateRecordID, type OnshapeClient, type OnshapeSelection } from "$lib/onshape/client";
-import { getPartHeuristics, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
+import { getPartHeuristics } from "$lib/onshape/partHeuristics";
 import type { components } from "$lib/onshape/schema";
 import type { OnshapeContext } from "../nav/onshapeContext.svelte";
 
@@ -20,7 +20,7 @@ export type CreationPart = {
     internalId: string;
     type: "part" | "assembly",
     sel: PartSelection,
-    partData: PartHeuristicsResult | AssemblyData,
+    partData: PartData | AssemblyData,
     assemblyData?: BTAssemblyDefinitionInfo
 };
 
@@ -180,7 +180,7 @@ export async function getSelectionCreationData(ctx: OnshapeContext, sel: Onshape
 /** Gets part data from a part selection (not client messaging) */
 export async function getPartData(
     client: OnshapeClient, sel: PartSelection, linkDocumentId?: string
-): Promise<PartHeuristicsResult | AssemblyData | null> {
+): Promise<PartData | AssemblyData | null> {
     if(sel.type === "part" && sel.partId) {
         const heuristics = await getPartHeuristics(
             client,

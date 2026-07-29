@@ -190,6 +190,16 @@
 
         await refreshPart(sel, existing);
     }
+
+    function setPart(v: TypedPartsResponse) {
+        part = v;
+        if(value !== v.id) value = v.id;
+
+        save(Collections.Parts, {
+            ...part,
+            preview_model: undefined
+        });
+    }
 </script>
 
 <!-- holy conditional tree -->
@@ -211,7 +221,7 @@
                 <div class="placeholder">Error loading part: {part.error}</div>
             {:else}
                 <div class="part-wrapepr">
-                    <CardPart {part} />
+                    <CardPart bind:part={() => part!, setPart} />
                     {#if status === "existing"}
                         <div class="placeholder extra-info">
                             <span>This part has already been added. Refresh its inforamtion?</span>

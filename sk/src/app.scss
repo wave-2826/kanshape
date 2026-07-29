@@ -115,7 +115,7 @@ button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.un
 
 .multi-button {
     --bg-color: var(--bg-primary);
-    --bg-selection: var(--bg-secondary);
+    --selection-color: var(--bg-secondary);
 
     display: flex;
     flex-direction: row;
@@ -133,7 +133,7 @@ button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.un
         }
 
         &.active {
-            --bg-color: var(--bg-selection);
+            --bg-color: var(--selection-color);
         }
     }
 }

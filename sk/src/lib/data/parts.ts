@@ -20,7 +20,17 @@ export type AssemblyData = {
     part_number: string;
 };
 
-export type TypedPartsResponse = PartsResponse<PartHeuristicsResult | AssemblyData>;
+/**
+ * Data for a part stored in the part data.
+ * Simply contains the result of part heuristics and an optional type override.
+ */
+export type PartData = PartHeuristicsResult & {
+    override?: {
+        partType: PartHeuristicsResult["heuristic"]["partType"]
+    }
+};
+
+export type TypedPartsResponse = PartsResponse<PartData | AssemblyData>;
 
 export type PartExportType = "step" | "dxf" | "gltf" | "obj";
 export const partExportTypes: {

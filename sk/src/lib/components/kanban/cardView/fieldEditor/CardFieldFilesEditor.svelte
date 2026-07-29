@@ -22,6 +22,7 @@
 <div class="files">
     {#snippet capsule(file: MetadataFile)}
         {@const hasFile = uploadContext.hasFile(file)}
+        <!-- TODO: file previews for images and models -->
         <div
             class="file-capsule"
             class:export={file.id === CREATE_SYMBOL || file.type === "export" || file.type === "auto_export"}

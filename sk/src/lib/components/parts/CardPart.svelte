@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { TypedPartsResponse } from "$lib/data/parts";
-    import { appearanceToHex, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
-    import { Box, Boxes, Sparkles } from "lucide-svelte";
+    import type { PartData, TypedPartsResponse } from "$lib/data/parts";
+    import { appearanceToHex } from "$lib/onshape/partHeuristics";
+    import { Box, Boxes, Cuboid, Cylinder, Diamond, Sparkles, X } from "lucide-svelte";
     import PopoverButton from "../PopoverButton.svelte";
     import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";
@@ -11,7 +11,7 @@
     import type { CreationPart } from "./partData";
     import { formatDistance } from "$lib/util";
 
-    const { part }: {
+    let { part = $bindable() }: {
         part: TypedPartsResponse | CreationPart;
     } = $props();
 
@@ -21,6 +21,26 @@
 
     const partData = $derived("part_id" in part ? part.part_data : part.partData);
     const partId = $derived("part_id" in part ? part.part_id : "");
+
+    function setOverride(override: PartData["override"]) {
+        if("part_id" in part && part.part_data) {
+            part = {
+                ...part,
+                part_data: {
+                    ...part.part_data,
+                    override
+                }
+            };
+        } else if("partData" in part && part.partData) {
+            part = {
+                ...part,
+                partData: {
+                    ...part.partData,
+                    override
+                }
+            };
+        }
+    }
 </script>
 
 {#if "part_id" in part}
@@ -60,8 +80,17 @@
         {partData?.part_number ?? ""}
     </span>
     {#if part.type === "part"}
-        {@const data = partData as PartHeuristicsResult}
-        {@const hasType = data.heuristic.partType !== "unknown"}
+        {@const data = partData as PartData}
+        {@const partType = data.override?.partType ?? data.heuristic.partType}
+        {@const hasType = partType !== "unknown"}
+
+        {#snippet typeIcon(ty: PartData["heuristic"]["partType"])}
+            {#if ty === "plate"}<Diamond />
+            {:else if ty === "shaft"}<Cylinder />
+            {:else if ty === "tube"}<Cuboid />
+            {:else}<Box />{/if}
+        {/snippet}
+
         <PopoverButton
             class={[$css("heuristic-button"), hasType ? $css("autodetected") : ""]}
             contentClass={$css("heuristic-result")}
@@ -69,13 +98,41 @@
             {#snippet content()}
                 <p>
                     {#if hasType}
-                        Detected this part as a
+                        {data.override ? "Set as a" : "Detected this part as a"}
                         <span class="length">{formatDistance(data.heuristic.thickness)}</span>
-                        <span class="part-type">{data.heuristic.partType}</span>.
+                        <span class="part-type">{partType}</span>.
                     {:else}
-                        No part type could be detected.
+                        {data.override ? "No part type set." : "No part type could be detected."}
                     {/if}
                 </p>
+                <div class="actions">
+                    <div class="horizontal">
+                        <button class="unset" class:active={data.override?.partType === "unknown"} onclick={() => {
+                            setOverride({ partType: "unknown" });
+                        }} title="Set to no part configured">
+                            <X />
+                        </button>
+                        <button class:active={!data.override} onclick={() => {
+                            setOverride(undefined);
+                        }} title="Use detected part ({data.heuristic.partType})">
+                            <Sparkles />
+                            Detected ({data.heuristic.partType})
+                        </button>
+                    </div>
+                    <div class="multi-button">
+                        {#snippet option(type: PartData["heuristic"]["partType"])}
+                            <button
+                                class:active={data.override?.partType === type}
+                                onclick={() => setOverride({ partType: type })}
+                                title="Set this part as a {type} (overrides detection)
+Doesn't make a huge difference right now! Just visual."
+                            >{@render typeIcon(type)} {type.charAt(0).toUpperCase() + type.slice(1)}</button>
+                        {/snippet}
+                        {@render option("plate")}
+                        {@render option("shaft")}
+                        {@render option("tube")}
+                    </div>
+                </div>
                 <dl>
                     {#if hasType}
                         <dt>Confidence:</dt>
@@ -125,17 +182,10 @@
                     </dd>
                 </dl>
             {/snippet}
-            {#if layoutParams.isMobile}
-                {#if hasType}
-                    <Sparkles />
-                    {data.heuristic.partType.charAt(0).toUpperCase() + data.heuristic.partType.slice(1)}
-                {:else}
-                    Unknown
-                {/if}
-            {:else}
-                {#if hasType}<Sparkles /> Detected {data.heuristic.partType}
-                {:else}No part detected{/if}
-            {/if}
+
+            {#if data.override}{@render typeIcon(partType)} {partType.charAt(0).toUpperCase() + partType.slice(1)}
+            {:else if hasType}<Sparkles /> {layoutParams.isMobile ? partType.charAt(0).toUpperCase() + partType.slice(1) : `Detected ${partType}`}
+            {:else}No part detected{/if}
         </PopoverButton>
     {/if}
     <span class="part-id">{partId}</span>
@@ -273,6 +323,28 @@
                 border-radius: 4px;
                 background-color: currentColor;
             }
+        }
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        .horizontal {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        .unset {
+            flex: 0;
+            padding: 0.25rem;
+        }
+        button.active {
+            --bg-color: var(--bg-selection);
+        }
+        .multi-button {
+            --bg-color: var(--bg-secondary);
+            --selection-color: var(--bg-selection);
         }
     }
 }

@@ -51,7 +51,7 @@ cases where the expected type doesn't match the value type by displaying a reset
 {:else if type.base === "onshape_part"}
     <CardPartEditor bind:value={get, set<string>} {cardId} />
 {:else if type.base === CREATE_SYMBOL && type.create === "onshape_part"}
-    <CardPart part={value as CreationPart} />
+    <CardPart bind:part={value as CreationPart} />
 {:else if type.base === "user" || type.base === "group"}
     <div class="select">
         <CachedCollectionSelector

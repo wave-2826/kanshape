@@ -33,7 +33,15 @@
             ...card.metadata,
             [field.id]: {
                 type: usedType,
-                value: newValue
+                // reuse the old object if possible to maintain reactivity
+                value: (
+                    metadataItem.value && typeof metadataItem.value === "object" &&
+                    newValue && typeof newValue === "object" &&
+                    !Array.isArray(metadataItem.value) && !Array.isArray(newValue)
+                ) ? Object.assign(
+                    metadataItem.value,
+                    newValue
+                ) : newValue
             }
         };
         uploadContext.update();

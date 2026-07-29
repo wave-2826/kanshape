@@ -19,7 +19,7 @@
     import type { PartExportType } from "$lib/data/parts";
     import { boardTypesConst, CREATE_SYMBOL, type MetadataFile } from "$lib/data/project";
     import { nav } from "$lib/navigation";
-    import { watch, watchOne } from "$lib/pocketbase";
+    import { save, watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify, formatDistance } from "$lib/util";
     import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "lucide-svelte";
@@ -245,7 +245,10 @@
                     </span>
                 {/if}
                 {#if partData.state === "loaded"}
-                    <CardPart part={partData} />
+                    <CardPart bind:part={() => partData.state === "loaded" ? partData : null as never, p => {
+                        if(partData.state !== "loaded") throw new Error("Part data is not loaded");
+                        partData = { ...p, state: "loaded" };
+                    }} />
                 {:else if partData.state === "loading"}
                     <div class="placeholder-part">Loading part data...</div>
                 {:else if partData.state === "failed"}

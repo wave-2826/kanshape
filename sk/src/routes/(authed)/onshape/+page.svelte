@@ -3,7 +3,7 @@
     import { getOnshapeContext, LinkedProjectType } from "../../../lib/components/nav/onshapeContext.svelte";
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
+    import { save, watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
     import { Plus } from "lucide-svelte";
     import { deasyncify, deepEqual } from "$lib/util";
@@ -150,7 +150,10 @@
                             {#each $parts.items.filter(
                                 p => p.current_card === card.id || p.past_revision_cards.includes(card.id)
                             ) as part (part.id)}
-                                <CardPart {part} />
+                                <CardPart bind:part={() => part, p => {
+                                    $parts.items = $parts.items.map(existing => existing.id === p.id ? p : existing);
+                                    save(Collections.Parts, { ...p, preview_model: undefined });
+                                }} />
                             {/each}
                         </div>
                     {/if}

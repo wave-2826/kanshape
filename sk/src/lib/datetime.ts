@@ -75,10 +75,10 @@ export function relativeTime(date: Date): string {
 export function formatCloseDate(date: Date): string {
     const now = new Date();
     const diff = date.getTime() - now.getTime();
-    const dayDiff = Math.round(diff / (1000 * 60 * 60 * 24));
+    const dayDiff = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-    if(dayDiff === 0) return "Today";
-    if(dayDiff === 1) return "Tomorrow";
+    if(dayDiff === 0) return "today";
+    if(dayDiff === 1) return "tomorrow";
     if(dayDiff > 1 && dayDiff < 7) {
         return `on ${date.toLocaleDateString(undefined, { weekday: 'long' })}`;
     }

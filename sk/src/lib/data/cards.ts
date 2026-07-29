@@ -1,4 +1,5 @@
-import type { CardsPriorityOptions, CardsResponse, Create } from "$lib/pocketbase/generated-types";
+import type { CardsPriorityOptions, CardsResponse, Create, UsersResponse } from "$lib/pocketbase/generated-types";
+import type { TypedCardPreviewResponse } from "./kanban";
 import type { CardMetadataFieldType, MetadataValue } from "./project";
 
 export type TypedCardsResponse<Expand = {}> = CardsResponse<CardAssignmentData, CardMetadata, Expand>;
@@ -38,6 +39,18 @@ export type CardAssignmentData = {
 } | AnyoneOnAssignmentData | {
     type: "looking_for_assignment"
 } | null;
+
+export function assignedToSelf(card: TypedCardPreviewResponse, auth: UsersResponse | null) {
+    const assignment = card.assignment_data as CardAssignmentData;
+    if(!assignment) return false;
+    // if(assignment.type === "looking_for_assignment") return true;
+    if(assignment.type === "anyone_on" && assignment.on_date === new Date().toISOString().split("T")[0]) return true;
+
+    if(!auth) return false;
+    if(assignment.type === "users" && assignment.ids.includes(auth.id)) return true;
+    if(assignment.type === "groups" && assignment.ids.some(id => auth.groups.includes(id))) return true;
+    return false;
+}
 
 export type CardMetadata = {
     [id: string]: {

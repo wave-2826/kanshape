@@ -1,9 +1,10 @@
 <script lang="ts">
     import { Clock, Flag, Tag, TextInitial, Users } from "lucide-svelte";
-    import { getPriorityColor, type CardAssignmentData } from "../../data/cards";
+    import { assignedToSelf, getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import { authModel } from "$lib/pocketbase/auth";
 
     const {
         card,
@@ -16,7 +17,7 @@
     const assignment = $derived(card.assignment_data as CardAssignmentData);
 </script>
 
-<button class="card" {onclick} class:critical={card.priority === "critical"}>
+<button class="card" class:assigned={assignedToSelf(card, $authModel)} {onclick} class:critical={card.priority === "critical"}>
     <div class="header">
         <h3 class:untitled={!card.title.trim()}>{card.title.trim() ? card.title : "Untitled"}</h3>
         {#each card.subprojects as subproject}
@@ -83,7 +84,11 @@
     padding: 0.4rem 0.5rem;
     font-size: var(--font-tiny);
 
+    &.assigned {
+        border-top: 1px solid var(--accent);
+    }
     &.critical {
+        // overwrites assignment border
         border-top: 1px solid var(--error);
     }
 }
@@ -145,6 +150,13 @@
 .assignment {
     &.looking-for-assignment {
         color: var(--error);
+    }
+    .assigned & {
+        background-color: var(--bg-selection);
+        padding: 3px 5px;
+        margin-left: -3px;
+        border-radius: 4px;
+        font-weight: bold;
     }
 }
 </style>

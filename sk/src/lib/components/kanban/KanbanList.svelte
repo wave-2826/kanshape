@@ -6,6 +6,7 @@
     import Masonry from "../Masonry.svelte";
     import { sortListCards, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
+    import { createOpenCardState } from "./cardView/state.svelte";
 
     const {
         project,
@@ -28,8 +29,8 @@
     });
     const subprojects = $derived(project.expand.subprojects ?? []);
 
-    let listCards = $state<PageItemType<typeof cards>[]>([]);
-    let openCardId = $state<string | null>(null);
+    let listCards = $state<PageItemType<typeof cards>[] | undefined>(undefined);
+    let openCardId = createOpenCardState();
 
     $effect(() => {
         if($cards === null) return;
@@ -42,7 +43,7 @@
 
     <CardViewPanel
         boardCards={listCards}
-        bind:card={openCardId}
+        bind:card={openCardId.cardId}
         {subprojects}
         {board}
         projectId={project.id}
@@ -50,10 +51,10 @@
 
     {#if cards !== null && $cards !== null}
         <div class="content">
-            {#if listCards.length > 0}
+            {#if listCards?.length ?? 0 > 0}
                 <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards}>
                     {#each listCards as card (card.id)}
-                        <KanbanListEntry {card} onclick={() => openCardId = card.id} />
+                        <KanbanListEntry {card} onclick={() => openCardId.cardId = card.id} />
                     {/each}
                 </Masonry>
             {:else}

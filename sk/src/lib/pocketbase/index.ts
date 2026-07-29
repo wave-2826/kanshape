@@ -17,6 +17,7 @@ import type { TypedBoardOverviewResponse, TypedBoardsResponse, TypedProjectOverv
 import type { TypedCardsResponse } from "$lib/data/cards";
 import type { TypedCardPreviewResponse } from "$lib/data/kanban";
 import type { TypedPartCardsResponse, TypedPartsResponse } from "$lib/data/parts";
+import { debounce } from "$lib/util";
 /**
  * Collection responses with type overrides.
  * @extends {Record<Collections, any>}
@@ -455,13 +456,16 @@ export async function watch<
                 queryParams
             ).then((unsub) => unsubRealtime.push(unsub)); // remember for later
             
+            // TODO: I hate hate hate this solution. implement something better serverside using the
+            // realtime api?
+            const refreshList = debounce((coll: string) => {
+                console.info(`Change detected in collection ${coll} - refreshing list for ${collectionName}`);
+                setPage(result.page);
+            }, 100);
             for(const coll of pollOnChange) {
                 client.collection(coll).subscribe(
                     "*",
-                    () => {
-                        console.info(`Change detected in collection ${coll} - refreshing list for ${collectionName}`);
-                        setPage(result.page);
-                    },
+                    () => refreshList(coll),
                     queryParams
                 ).then((unsub) => {
                     // Add to unsubRealtime so that we can unsubscribe from all on cleanup

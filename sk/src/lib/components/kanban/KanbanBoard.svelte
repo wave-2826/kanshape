@@ -6,6 +6,7 @@
     import KanbanMenu from "./KanbanMenu.svelte";
     import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
+    import { createOpenCardState } from "./cardView/state.svelte";
 
     const {
         project,
@@ -28,14 +29,15 @@
     });
     const subprojects = $derived(project.expand.subprojects ?? []);
 
-    let boardCards = $state<TypedCardPreviewResponse[]>([]);
+    let boardCards = $state<TypedCardPreviewResponse[] | undefined>(undefined);
     let draggedCardId = $state<string | null>(null);
     let hoveredSectionId = $state<string | null>(null);
     let activeDropZone = $state<{ sectionId: string; cardId: string | "last"; } | null>(null);
 
-    let openCardId: string | null = $state(null);
+    let openCardId = createOpenCardState();
 
     function cardsForSection(sectionId: string) {
+        if(!boardCards) return [];
         return sortCards(boardCards.filter((card) => card.section === sectionId));
     }
 
@@ -105,6 +107,8 @@
     }
 
     async function onSectionDrop(sectionId: string, event: DragEvent) {
+        if(!boardCards) return;
+
         const dropZone = activeDropZone;
         
         event.preventDefault();
@@ -127,7 +131,7 @@
     <CardViewPanel
         {board}
         {boardCards}
-        bind:card={openCardId}
+        bind:card={openCardId.cardId}
         {subprojects}
         projectId={project.id}
     />
@@ -170,7 +174,7 @@
                                             class="drop-zone top"
                                             class:topmost={i === 0}
                                         ></div>
-                                        <KanbanCard {card} onclick={() => openCardId = card.id} />
+                                        <KanbanCard {card} onclick={() => openCardId.cardId = card.id} />
                                         {#if i === cards.length - 1}
                                             <div
                                                 class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}

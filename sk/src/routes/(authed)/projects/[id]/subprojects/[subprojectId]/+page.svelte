@@ -5,7 +5,7 @@
     import { Kanban, Settings } from "lucide-svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
-    import { watch, watchOne } from "$lib/pocketbase";
+    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import { deasyncify } from "$lib/util";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
@@ -15,6 +15,7 @@
     import { untrack } from "svelte";
     import { nav } from "$lib/navigation";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
+    import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
     
     const subprojectId = $derived(page.params.subprojectId);
     
@@ -40,10 +41,17 @@
         null
     );
 
-    let openCardId: string | null = $state(null);
-    const openCard = $derived.by(() => {
-        if(!openCardId || untrack(() => !cards)) return null;
-        return untrack(() => $cards?.items.find((c) => c.id === openCardId)) ?? null;
+    let openCardId = createOpenCardState();
+    let openCard = $state<ExpandResponse<"card_preview", ""> | null>(null);
+    $effect.pre(() => {
+        if(!openCardId.cardId || !cards || !$cards) {
+            openCard = null;
+            return;
+        }
+        const cardItem = $cards?.items.find((c) => c.id === openCardId.cardId);
+        if(cardItem && untrack(() => cardItem.id !== openCard?.id)) {
+            openCard = cardItem;
+        }
     });
 
     // This is kind of a mess, but we need information from the open card's board, which depends
@@ -83,8 +91,9 @@
                 board={$openCardBoard || undefined}
                 boardCards={$openCardBoardCards?.items}
                 bind:card={
-                    () => openCardId,
+                    () => $openCardBoardCards ? openCardId.cardId : null,
                     (id) => {
+                        openCardId.cardId = id;
                         if(!$openCardBoard || !$openCardBoardCards) return;
                         if(id && !$cards?.items.find((c) => c.id === id)) {
                             // this card is from another subproject; open its board
@@ -96,7 +105,6 @@
                                 nav(`/projects/${$project.id}/boards/${v?.board}`);
                             }
                         }
-                        openCardId = id;
                     }
                 }
                 subprojects={$project.expand.subprojects ?? []}
@@ -127,7 +135,7 @@
                                         <KanbanListEntry
                                             showBoard boardColor={$project.color}
                                             card={card}
-                                            onclick={() => openCardId = card.id}
+                                            onclick={() => openCardId.cardId = card.id}
                                         />
                                     {/each}
                                 </Masonry>

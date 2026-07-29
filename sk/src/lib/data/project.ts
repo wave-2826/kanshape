@@ -452,11 +452,16 @@ export function getCardMetadataItems(
             sections.push({
                 icon: Palette as unknown as Component, // sure...
                 title: "Board Fields",
-                fields: customFieldEntries.map(([id, field]) => ({
-                    ...field,
-                    id: `user/${id}`,
-                    type: materializeMetadataType(field.type, ctx)
-                }))
+                fields: customFieldEntries.map(([id, field]) => {
+                    const materializedType = materializeMetadataType(field.type, ctx);
+                    return {
+                        ...field,
+                        id: `user/${id}`,
+                        type: materializedType,
+                        // a little hacky, maybe, but not the worst
+                        allowsClearing: materializedType.base === "onshape_part"
+                    };
+                })
             });
         }
     }

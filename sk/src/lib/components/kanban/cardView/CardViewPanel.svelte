@@ -12,7 +12,7 @@
     import type { TypedCardsResponse } from "$lib/data/cards";
     import { setUploadContext, type CardSelectState, type UploadContext } from "./fieldEditor/uploadContext";
     import { untrack } from "svelte";
-    
+
     let {
         board,
         boardCards,
@@ -21,6 +21,10 @@
         projectId
     }: {
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
+        /**
+         * The cards on the board. Should be undefined if not loaded yet, as this is used to determine
+         * if the selected card no longer exists.
+         */
         boardCards?: TypedCardPreviewResponse[],
         card: string | null,
         subprojects: SubprojectsRecord[],
@@ -132,8 +136,9 @@
 
     const preview = $derived(boardCards?.find(c => c.id === cardId));
     // unselect this card if it's not in the board cards
-    $effect(() => {
-        if(boardCards && !preview) {
+    $effect.pre(() => {
+        if(boardCards && cardId && !preview) {
+            console.log(`card ${cardId} not found in ${boardCards.length} board cards; assuming deletion`, boardCards);
             cardId = null;
         }
     });

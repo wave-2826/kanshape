@@ -82,7 +82,7 @@
 <div class="layout" class:isMobile={isMobile}>
     <header class="container">
         {#if onOnshape}
-            {#if page.route.id?.startsWith("/(authed)/onshape")}
+            {#if !onshapeContext.location?.startsWith("right-panel") || page.route.id?.startsWith("/(authed)/onshape")}
                 <button onclick={() => window.open(window.location.origin, "_blank")} title="Open in new tab">
                     <ExternalLink />
                 </button>

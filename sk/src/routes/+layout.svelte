@@ -14,7 +14,8 @@
     // typically we use nav() in this application manually, but this catches navigation from other
     // sources like anchors.
     beforeNavigate((navCtx) => {
-        const { to, willUnload, cancel } = navCtx;
+        const { to, willUnload, cancel, type } = navCtx;
+        if(type === "popstate") return; // no need to manually handle if it's a browser history change
 
         if(to && !willUnload && shouldHandleNav()) {
             cancel();

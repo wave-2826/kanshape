@@ -7,6 +7,7 @@
     import { getPriorityColor } from "$lib/data/cards";
     import type { CardsPriorityOptions } from "$lib/pocketbase/generated-types";
     import { layoutCardsToGantt } from "./layout";
+    import { createOpenCardState } from "../kanban/cardView/state.svelte";
 
     const {
         project,
@@ -59,19 +60,19 @@
         return Array.from(categoryMap.values());
     });
     
-    let openCardId = $state<string | null>(null);
+    let openCardId = createOpenCardState();
 </script>
 
 <div class="page" data-modal-target>
     <CardViewPanel
         {board}
         boardCards={$cards?.items}
-        bind:card={openCardId}
+        bind:card={openCardId.cardId}
         {subprojects}
         projectId={project.id}
     />
 
-    <Gantt {categories} onclickitem={(id) => openCardId = id}>
+    <Gantt {categories} onclickitem={(id) => openCardId.cardId = id}>
         {#snippet cornerHeader()}
             <select bind:value={groupBy}>
                 <option value="subproject">Group by subproject</option>

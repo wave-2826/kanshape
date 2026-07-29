@@ -3,16 +3,17 @@
     import { getOnshapeContext, LinkedProjectType } from "../../../lib/components/nav/onshapeContext.svelte";
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { watch, watchOne } from "$lib/pocketbase";
+    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
     import { Plus } from "lucide-svelte";
-    import { deasyncify } from "$lib/util";
+    import { deasyncify, deepEqual } from "$lib/util";
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     import { nav } from "$lib/navigation";
     import { derived } from "svelte/store";
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
     import { untrack } from "svelte";
+    import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -46,10 +47,17 @@
 
     // TODO: deduplicate this logic from subproject rendering
     // perhaps another "unidentified card" (??) component?
-    let openCardId: string | null = $state(null);
-    const openCard = $derived.by(() => {
-        if(!openCardId || untrack(() => !cards || !$cards)) return null;
-        return untrack(() => $cards?.items.find((c) => c.id === openCardId)) ?? null;
+    let openCardId = createOpenCardState();
+    let openCard = $state<ExpandResponse<"part_cards", ""> | null>(null);
+    $effect.pre(() => {
+        if(!openCardId.cardId || !cards || !$cards) {
+            openCard = null;
+            return;
+        }
+        const cardItem = $cards?.items.find((c) => c.id === openCardId.cardId);
+        if(cardItem && untrack(() => cardItem.id !== openCard?.id)) {
+            openCard = cardItem;
+        }
     });
 
     // This is kind of a mess, but we need information from the open card's board and project, which depends
@@ -78,7 +86,7 @@
         board={$openCardBoard ?? undefined}
         boardCards={$openCardBoardCards?.items}
         bind:card={
-            () => $openCardBoard && $openCardBoardCards ? openCardId : null,
+            () => $openCardBoard && $openCardBoardCards ? openCardId.cardId : null,
             (id) => {
                 if(!$openCardBoardCards || !$openCardProject) return;
                 if(id && !$cards?.items.find((c) => c.id === id)) {
@@ -91,7 +99,7 @@
                         nav(`/projects/${$openCardProject.id}/boards/${v?.board}`);
                     }
                 }
-                openCardId = id;
+                openCardId.cardId = id;
             }
         }
         subprojects={$openCardProject?.expand.subprojects ?? []}
@@ -134,7 +142,7 @@
             {:else}
                 {#each $cards.items as card (card.id)}
                     <KanbanListEntry {card} onclick={() => {
-                        openCardId = card.id;
+                        openCardId.cardId = card.id;
                     }} showBoard />
                     {#if $parts}
                         <div class="part-children">

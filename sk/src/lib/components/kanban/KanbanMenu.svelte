@@ -12,7 +12,7 @@
     }: {
         project: ExpandResponse<"projects", "subprojects">,
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
-        cards: TypedCardPreviewResponse[]
+        cards?: TypedCardPreviewResponse[]
     } = $props();
 
     let newCardModal: NewCardModal | null = $state(null);
@@ -46,7 +46,7 @@
     <input type="text" placeholder="Search cards..." disabled />
 </menu>
 
-{#if board && sections}
+{#if board && sections && cards}
     <NewCardModal
         bind:this={newCardModal}
         subprojects={project.expand.subprojects ?? []}

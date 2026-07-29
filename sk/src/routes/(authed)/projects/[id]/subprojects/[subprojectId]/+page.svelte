@@ -93,18 +93,21 @@
                 bind:card={
                     () => $openCardBoardCards ? openCardId.cardId : null,
                     (id) => {
-                        openCardId.cardId = id;
-                        if(!$openCardBoard || !$openCardBoardCards) return;
+                        if(!$openCardBoard || !$openCardBoardCards) {
+                            openCardId.cardId = id;
+                            return;
+                        }
                         if(id && !$cards?.items.find((c) => c.id === id)) {
                             // this card is from another subproject; open its board
-                            // TODO: open the linked card with a query param or something
                             const v = $openCardBoardCards.items.find(c => c.id === id);
                             if(!v) {
                                 console.warn(`Card ${id} not found in board ${$openCardBoard.id}`);
                             } else {
-                                nav(`/projects/${$project.id}/boards/${v?.board}`);
+                                nav(`/projects/${$project.id}/boards/${v?.board}?card=${id}`);
                             }
+                            return;
                         }
+                        openCardId.cardId = id;
                     }
                 }
                 subprojects={$project.expand.subprojects ?? []}
@@ -131,7 +134,6 @@
                             {#if $cards.items.length > 0}
                                 <Masonry colWidth="minmax(min(20rem, 100%), 1fr)"items={$cards.items}>
                                     {#each $cards.items as card (card.id)}
-                                        <!-- TODO: a way to open any card in its board -->
                                         <KanbanListEntry
                                             showBoard boardColor={$project.color}
                                             card={card}

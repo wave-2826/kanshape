@@ -175,7 +175,6 @@
 
 <button class="activity" onclick={async () => {
     // best effort to open relevant card or project page
-    // TODO: a way, in general, to open cards. probably hold the open card in a query parameter
     if(entry.entity_type === "project" && entry.entity_id) {
         nav(`/projects/${entry.entity_id}`);
     } else if(entry.entity_type === "subproject" && entry.entity_id) {
@@ -186,7 +185,7 @@
         // this is unfortunate. I'm not a fan but also don't want to include extra info in every entry..
         const card = await queryOne(Collections.Cards, entry.entity_id).catch(() => null);
         if(card) {
-            nav(`/projects/${entry.project_id}/boards/${card.board}`);
+            nav(`/projects/${entry.project_id}/boards/${card.board}?card=${entry.entity_id}`);
         } else {
             nav(`/projects/${entry.project_id}`);
         }

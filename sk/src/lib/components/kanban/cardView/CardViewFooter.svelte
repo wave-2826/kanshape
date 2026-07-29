@@ -25,8 +25,7 @@
             // open card in kanshape board view
             const boardId = card.board;
             const cardId = card.id;
-            // TODO: card query param to actually.. open the specific card
-            const url = `/projects/${projectId}/boards/${boardId}`;
+            const url = `/projects/${projectId}/boards/${boardId}?card=${cardId}`;
             window.open(window.location.origin + url, "_blank");
         }}>
             <ExternalLink /> Open in new tab

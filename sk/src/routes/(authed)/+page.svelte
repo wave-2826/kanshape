@@ -73,9 +73,7 @@
             <Masonry colWidth="minmax(min(25em, 100%), 1fr)" gridGap="0.5rem" padding="0.5rem" items={$myTasks.items}>
                 {#each $myTasks.items as task}
                     <button class="card" onclick={() => {
-                        // TODO: open card panel inline on this page instead of navigating
-                        // TODO: at least highlight/open the selected card with a query parameter or something
-                        nav(`/projects/${task.project_id}/boards/${task.board_id}`);
+                        nav(`/projects/${task.project_id}/boards/${task.board_id}?card=${task.id}`);
                     }} class:critical={task.priority === "critical"}>
                         <span class="path">
                             <Folder class={$css("icon")} />

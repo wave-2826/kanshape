@@ -88,16 +88,17 @@
         bind:card={
             () => $openCardBoard && $openCardBoardCards ? openCardId.cardId : null,
             (id) => {
-                if(!$openCardBoardCards || !$openCardProject) return;
                 if(id && !$cards?.items.find((c) => c.id === id)) {
-                    // this card is from another subproject; open its board
-                    // TODO: open the linked card with a query param or something
+                    if(!$openCardBoardCards || !$openCardProject) return;
+                    
+                    // this card is from another subproject; open its board in a new tab
                     const v = $openCardBoardCards.items.find(c => c.id === id);
                     if(!v) {
                         console.warn(`Card ${id} not found in board ${$openCardBoard?.id}`);
                     } else {
-                        nav(`/projects/${$openCardProject.id}/boards/${v?.board}`);
+                        window.open(`/projects/${$openCardProject.id}/boards/${v?.board}?card=${id}`, "_blank");
                     }
+                    return;
                 }
                 openCardId.cardId = id;
             }

@@ -1,25 +1,37 @@
+<script lang="ts" module>
+    import { generateRecordID, type OnshapeSelection } from "$lib/onshape/client";
+
+    /**
+     * Intermediate selection state for crating a new card on this page; can either be a client messaging
+     * selection (e.g. from the live messaging updates onshape sends when the user clicks a part), "assembly"
+     * (indicating the current assembly will be added), or null.
+     */
+    export type OnshapeNewCardSelectionState = OnshapeSelection | "assembly" | null;
+</script>
+
 <script lang="ts">
     import { page } from "$app/state";
     import NewCardView from "$lib/components/kanban/NewCardView.svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
     import CardPart from "$lib/components/parts/CardPart.svelte";
-    import { getPartData, getSelectionPartData, type CreationPart, type PartSelection } from "$lib/components/parts/partData";
+    import { getPartData, getSelectionCreationData, type CreationPart, type PartSelection } from "$lib/components/parts/partData";
     import PopoverButton from "$lib/components/PopoverButton.svelte";
     import type { PartExportType } from "$lib/data/parts";
     import { boardTypesConst, CREATE_SYMBOL, type MetadataFile } from "$lib/data/project";
     import { nav } from "$lib/navigation";
-    import { generateRecordID, type OnshapeSelection } from "$lib/onshape/client";
     import { watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify, formatDistance } from "$lib/util";
     import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "lucide-svelte";
     import { untrack } from "svelte";
+    import PartSelectButton from "./PartSelectButton.svelte";
 
     const onshapeCtx = getOnshapeContext();
 
     /** parse and validate the selection passed through query parameters */
-    function parseSelection(part: string | null): OnshapeSelection | null {
+    function parseSelection(part: string | null): OnshapeNewCardSelectionState {
         if(!part) return null;
+        if(part === "assembly") return "assembly";
         try {
             const parsed = JSON.parse(part) as OnshapeSelection;
             if(!["BODY", "ENTITY", "OCCURRENCE"].includes(parsed.selectionType)) throw new Error(`Invalid selection type: ${parsed.selectionType}`);
@@ -33,8 +45,7 @@
             return null;
         }
     }
-    const part = $derived(parseSelection(page.url.searchParams.get("part")));
-    const assembly = $derived(page.url.searchParams.has("assembly"));
+    let part = $state(parseSelection(page.url.searchParams.get("selection")));
 
     let partData = $state<(
         (CreationPart & { state: "loaded"}) |
@@ -42,20 +53,21 @@
         { state: "loading" | "no-part" }
     )>({ state: "no-part" });
     $effect(() => {
-        if(part) (async () => {
+        (async () => {
             partData = { state: "loading" };
             try {
-                if(part) {
-                    const data = await getSelectionPartData(onshapeCtx, part);
+                if(part && part !== "assembly") {
+                    const data = await getSelectionCreationData(onshapeCtx, part);
                     if(!data) {
                         partData = { state: "failed", message: "Failed to load part data" };
                         return;
                     }
                     partData = { ...data, state: "loaded" };
                     return;
-                }
-
-                if(assembly && onshapeCtx.client && onshapeCtx.documentId && onshapeCtx.wvm && onshapeCtx.wvmId && onshapeCtx.elementId) {
+                } else if(part === "assembly") {
+                    if(!onshapeCtx.client || !onshapeCtx.documentId || !onshapeCtx.wvm || !onshapeCtx.wvmId || !onshapeCtx.elementId) {
+                        throw new Error("Missing Onshape context for assembly selection");
+                    }
                     const sel: PartSelection = {
                         documentId: onshapeCtx.documentId,
                         wvm: onshapeCtx.wvm,
@@ -205,10 +217,10 @@
         </button>
         
         <div class="part">
-            {#if part}
-                Creating part card
-            {:else if assembly}
+            {#if part === "assembly"}
                 Creating assembly card
+            {:else if part}
+                Creating part card
             {/if}
         </div>
     </header>
@@ -238,8 +250,11 @@
                     <div class="placeholder-part">Loading part data...</div>
                 {:else if partData.state === "failed"}
                     <div class="placeholder-part">Failed to load part data: {partData.message}</div>
-                {:else}
-                    <div class="placeholder-part">No selected part</div>
+                {:else if !(board && board.type !== "parts")}
+                    <div class="placeholder-part">
+                        No selected part
+                        <PartSelectButton bind:part={part} />
+                    </div>
                 {/if}
             </div>
         {/snippet}
@@ -419,9 +434,13 @@ header {
     margin-bottom: 1rem;
 
     .placeholder-part {
-        padding: 0.5rem 0.75rem;
+        width: 100%;
+        padding: 0.5rem;
         border-radius: 4px;
-        background-color: var(--bg-secondary);
+        background-color: var(--bg-primary);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 

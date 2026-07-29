@@ -130,17 +130,17 @@
     });
 </script>
 
-<!-- {fileUrl} -->
 <div class="part-preview-renderer">
     {#if part.preview_model}
         <canvas bind:this={canvas}></canvas>
+        {#if loading}
+            <p class="loading">Loading model...</p>
+        {/if}
     {:else}
-        <p class="loading" title="Model is currently being generated or failed to generate.">Generating model</p>
-    {/if}
-    {#if loading}
-        <p class="loading">Loading model...</p>
+        <p class="loading" title="Model is currently being generated or failed to generate.">Generating model...</p>
     {/if}
 </div>
+
 <style lang="scss">
 .part-preview-renderer {
     position: relative;

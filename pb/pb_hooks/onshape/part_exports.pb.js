@@ -20,6 +20,8 @@ routerAdd("POST", "/api/parts/export_all", (e) => {
         if(!part.type) throw new BadRequestError("Missing export type");
         if(!part.partRecordId) throw new BadRequestError("Missing partRecordId");
 
+        console.log(`Queueing export for part ${part.partRecordId} (cardId: ${part.cardId}, type: ${part.type})`);
+
         queuePartExport(e.app, e.auth, {
             type: part.type,
             partRecordId: part.partRecordId,

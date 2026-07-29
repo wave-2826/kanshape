@@ -12,6 +12,8 @@ const EXPORT_QUEUE_COLLECTION = "export_queue";
  * @typedef {import("../../../sk/src/lib/data/parts").PartExportType} ExportType
  */
 
+// TODO: save failed exports to the card? difficult bc we probably would need to modify metadata
+
 /**
  * map our export types to Onshape format names and file formats
  * @type {Record<ExportType, { onshape: string, extension: string }>}
@@ -71,6 +73,13 @@ function startPartExport(authRecord, partRecord, type) {
     const wvmPrefix = wvm === "v" ? "v" : wvm === "m" ? "m" : "w";
     let translationBody, translationPath;
 
+    // somewhat arbitrary; maybe could be configured but it's fine for now
+    const qualityParameters = {
+        angularTolerance: 0.05,
+        distanceTolerance: 0.01,
+        maximumChordLength: 10.0
+    };
+
     if(isPartStudio && hasExplicitEndpoint) {
         // case 1: /partstudios/d/{did}/{wv}/{wvid}/e/{eid}/export/{gltf,obj,step}
         translationBody = /** @type DeepPartial<_schemas["BTBGltfExportParams"] | _schemas["BTBStepExportParams"] | _schemas["BTBObjExportParams"]> */({
@@ -80,7 +89,8 @@ function startPartExport(authRecord, partRecord, type) {
             },
             meshParams: {
                 resolution: "FINE",
-                unit: "CENTIMETER" // most 3d printing software expects centimeters from experience
+                unit: "CENTIMETER", // most 3d printing software expects centimeters from experience
+                ...qualityParameters
             },
             excludeHiddenEntities: true,
             storeInDocument: false,
@@ -94,7 +104,10 @@ function startPartExport(authRecord, partRecord, type) {
             storeInDocument: false,
             flattenAssemblies: true,
             flatten: true,
-            configuration: configuration || undefined
+            configuration: configuration || undefined,
+            ...qualityParameters,
+            resolution: "fine",
+            unit: "CENTIMETER"
         });
         translationPath = `v16/partstudios/d/${did}/${wvmPrefix}/${wvmId}/e/${eid}/translations`;
     } else if(!isPartStudio && hasExplicitEndpoint) {
@@ -105,21 +118,33 @@ function startPartExport(authRecord, partRecord, type) {
             },
             meshParams: {
                 resolution: "FINE",
-                unit: "CENTIMETER" // most 3d printing software expects centimeters from experience
+                unit: "CENTIMETER", // most 3d printing software expects centimeters from experience
+                ...qualityParameters,
             },
+            grouping: true,
             excludeHiddenEntities: true,
             storeInDocument: false,
-            notifyUser: false
+            notifyUser: false,
+            triggerAutoDownload: true
         });
         translationPath = `v16/assemblies/d/${did}/${wvmPrefix}/${wvmId}/e/${eid}/export/${type.toLowerCase()}`;
     } else {
+        // assemblies can't export dxfs (doesn't really make sense)
+        if(type === "dxf") throw new BadRequestError("DXF export is only supported for part studios");
+
         // case 4: /assemblies/d/{did}/{wv}/{wvid}/e/{eid}/translations
         translationBody = /** @type Partial<_schemas["BTTranslateFormatParams"]> */ ({
             formatName,
             storeInDocument: false,
             flattenAssemblies: true,
             flatten: true,
-            configuration: configuration || undefined
+            configuration: configuration || undefined,
+            notifyUser: false,
+            useGltfCompression: false,
+            useGlbCompression: false,
+            ...qualityParameters,
+            resolution: "fine",
+            unit: "CENTIMETER"
         });
         translationPath = `v16/assemblies/d/${did}/${wvmPrefix}/${wvmId}/e/${eid}/translations`;
     }
@@ -279,7 +304,9 @@ function downloadExportResult(authRecord, exportQueueRecord, statusRes) {
     const state = statusRes.body?.requestState;
     if(state !== "DONE") {
         exportQueueRecord.set("status", "failed");
-        exportQueueRecord.set("error_message", `Translation ended with state: ${state}`);
+        let msg = `Translation ended with state ${state}`;
+        if(state === "FAILED") msg += `: ${statusRes.body?.failureReason}`;
+        exportQueueRecord.set("error_message", msg);
         $app.save(exportQueueRecord);
         return false;
     }
@@ -573,6 +600,7 @@ function queuePartExport(app, authRecord, options) {
         queueRecord.set("status", "failed");
         queueRecord.set("error_message", String(err));
         $app.save(queueRecord);
+        throw new InternalServerError(`Failed to start export process: ${err}`);
     }
 }
 

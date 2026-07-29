@@ -1,8 +1,9 @@
-import { writable, type Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 import type { AppConfig } from "../config";
 import createClient from "openapi-fetch";
 import { ONSHAPE_CUSTOM_BODY_SYMBOL, onshapeApiFetch } from "./requests";
 import type { paths } from "./schema";
+import type { PartSelection } from "$lib/components/parts/partData";
 
 type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE" | "OCCURRENCE" | "ROLLBACKBAR" | "MATE_CONNECTOR";
 type OnshapeEntityType = "EDGE" | "FACE" | "VERTEX" | "DEGENERATE_EDGE" | "UNKNOWN";
@@ -116,6 +117,8 @@ type OnshapeToClientMessage = {
     selections: OnshapeSelection[];
 } | ItemSelectedMessage;
 
+export type OnshapeLocation = "right-panel-part-studio" | "right-panel-assembly" | "tab" | null;
+
 export class OnshapeClient {
     private boundHandleMessage: (event: MessageEvent) => void;
     private baseDomain: string;
@@ -128,7 +131,14 @@ export class OnshapeClient {
 
     private messageHandlers: { [message: string]: Set<(message: OnshapeToClientMessage) => void> } = {};
 
-    constructor(private config: AppConfig, private docId: string, private wvmId: string, private elementId: string) {
+    constructor(
+        private config: AppConfig,
+        private readonly docId: string,
+        private readonly wvm: "w" | "v" | "m",
+        private readonly wvmId: string,
+        private readonly elementId: string,
+        private readonly location: OnshapeLocation
+    ) {
         this.baseDomain = this.config.onshape.baseDomain;
         this.boundHandleMessage = this.handleMessage.bind(this);
         window.addEventListener("message", this.boundHandleMessage);
@@ -290,6 +300,15 @@ export class OnshapeClient {
     }
 
     /**
+     * Wait for a user selection. This only works in the context of a right-panel extension!
+     */
+    public async waitForClientSelection(): Promise<OnshapeSelection[]> {
+        if(get(this.selections).length > 0) return get(this.selections);
+        const response = await this.waitForMessage("SELECTION", 60_000 * 5);
+        return response.selections;
+    }
+
+    /**
      * Open the select item dialogue for a selection. This only works in the context of a tab extension!
      */
     public async openSelectItemDialog(options: {
@@ -312,6 +331,92 @@ export class OnshapeClient {
         return response;
     }
 
+    // TODO: all the alerts in here should be error popups in the UI instead of alert()
+    async getPartSelection(): Promise<PartSelection | null> {
+        if(this.location === "right-panel-part-studio" || this.location === "right-panel-assembly") {
+            const selections = await this.requestSelection("Select a part to create a card for.", ["BODY"]);
+            return selections && selections.length > 0 ? {
+                wvm: this.wvm ?? "w",
+                type: "part",
+                wvmId: this.wvmId ?? "",
+                documentId: this.docId ?? "",
+                elementId: this.elementId ?? "",
+                partId: selections[0].selectionId,
+                configuration: "default"
+            } : null;
+        } else if(this.location === "tab") {
+            const selection = await this.openSelectItemDialog({
+                dialogTitle: "Select a part to create a card for.",
+                selectParts: true,
+                selectAssemblies: true
+            });
+            if(!selection) return null;
+            console.log("Onshape selection:", selection);
+
+            // sanity checks
+            if(selection.isSurface) {
+                alert("Please select a part, not a surface.");
+                return null;
+            }
+            // meshes are okay
+            if(selection.isFlattenedBody) {
+                alert("Please select a part, not a flattened body.");
+                return null;
+            }
+            if(selection.isComposite) {
+                // probably fine. uh, maybe
+            }
+            if((selection.elementType !== "partstudio" || !selection.elementId) && selection.elementType !== "assembly") {
+                alert("Please select a part from a part studio or assembly.");
+                return null;
+            }
+            if(selection.itemType !== "part" && selection.itemType !== "assembly") {
+                alert("Please select a part or assembly, not a part studio.");
+                return null;
+            }
+
+            let documentId = selection.documentId;
+            if(!documentId) {
+                alert("No document found for selected part.");
+                return null;
+            }
+
+            let elementId = selection.elementId;
+            if(!elementId) {
+                alert("No part studio or assembly found for selected item.");
+                return null;
+            }
+
+            let partId = selection.idTag;
+            if(selection.itemType === "part" && !partId) {
+                alert("No part found for selected part (???).");
+                return null;
+            }
+
+            let workspaceId = selection.workspaceId;
+            let versionId = selection.versionId;
+            if(!workspaceId && !versionId) {
+                alert("No workspace or version found for selected part.");
+                return null;
+            }
+
+            let wvm: "w" | "v" | "m" = "w";
+            let wvmId = workspaceId || versionId;
+            if(wvmId === versionId) wvm = "v";
+
+            return {
+                type: selection.elementType === "partstudio" ? "part" : "assembly",
+                wvm,
+                wvmId,
+                documentId,
+                elementId,
+                partId,
+                configuration: selection.elementConfiguration || "default"
+            };
+        }
+        return null;
+    }
+
     public dispose() {
         window.removeEventListener("message", this.boundHandleMessage);
         if(this.keepAliveInterval) clearInterval(this.keepAliveInterval);
@@ -332,14 +437,13 @@ export class OnshapeClient {
                     this.selections.set(data.selections);
                     break;
                 default:
-                    if(this.messageHandlers[data.messageName]) {
-                        for(const handler of this.messageHandlers[data.messageName]) {
-                            handler(data);
-                        }
-                        break;
-                    }
                     console.info("Received unhandled message from Onshape:", data);
                     break;
+            }
+            if(this.messageHandlers[data.messageName]) {
+                for(const handler of this.messageHandlers[data.messageName]) {
+                    handler(data);
+                }
             }
         } else {
             console.warn("Received message with unexpected format:", event.data);

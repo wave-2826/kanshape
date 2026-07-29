@@ -93,10 +93,15 @@ function removePartReference(app, partId, cardId) {
  */
 function checkPartDeletion(app, partId) {
     const part = app.findRecordById("parts", partId);
-    if(!part) return;
+    if(!part) {
+        console.warn(`Part ${partId} not found when checking for deletion.`);
+        return;
+    }
 
     const currentCard = part.get("current_card");
     const oldCards = part.get("past_revision_cards");
+
+    console.log(`Checking deletion for card ${part.getString("part_id")}; current card: ${typeof currentCard} ${JSON.stringify(currentCard)}, past cards: ${typeof oldCards} ${JSON.stringify(oldCards)}`)
     
     if(!currentCard && (!oldCards || oldCards.length === 0)) {
         // No references left, delete the part

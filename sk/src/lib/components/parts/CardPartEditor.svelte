@@ -103,21 +103,23 @@
     } = $props();
 
     const hasValue = $derived(value !== null && value !== undefined && value !== "");
-    let part = $state<TypedPartsResponse | { error: string } | null>(null);
+    let part = $state<TypedPartsResponse | null>(null);
     let lastValue: string | null | undefined = null;
     $effect(() => {
         if(hasValue && value !== lastValue) {
+            status = "loading";
             lastValue = value;
             const store = deasyncify(
                 (watchOne(Collections.Parts, value!, {
                     requestKey: null
-                }) as Promise<Readable<TypedPartsResponse | { error: string } | null>>)
+                }) as Promise<Readable<TypedPartsResponse | null>>)
                 .catch((e) => {
                     console.error(e);
-                    return readable({ error: `Failed to get part with ID ${value}.` });
+                    return readable(null);
                 })
             );
             const unsub = store.subscribe((v) => {
+                status = "display";
                 part = v;
             });
             return () => unsub();
@@ -127,92 +129,6 @@
     let status = $state<"display" | "loading" | "existing" | "error">("display");
 
     const onshapeCtx = getOnshapeContext();
-    
-    // TODO: all the alerts in here should be error popups in the UI instead of alert()
-    async function getPartSelection(): Promise<PartSelection | null> {
-        if(onshapeCtx.location === "right-panel-part-studio" || onshapeCtx.location === "right-panel-assembly") {
-            const selections = await onshapeCtx.client?.requestSelection("Select a part to create a card for.", ["BODY"]);
-            return selections && selections.length > 0 ? {
-                wvm: onshapeCtx.wvm ?? "w",
-                type: "part",
-                wvmId: onshapeCtx.wvmId ?? "",
-                documentId: onshapeCtx.documentId ?? "",
-                elementId: onshapeCtx.elementId ?? "",
-                partId: selections[0].selectionId,
-                configuration: "default"
-            } : null;
-        } else if(onshapeCtx.location === "tab") {
-            const selection = await onshapeCtx.client?.openSelectItemDialog({
-                dialogTitle: "Select a part to create a card for.",
-                selectParts: true,
-                selectAssemblies: true
-            });
-            if(!selection) return null;
-            console.log("Onshape selection:", selection);
-
-            // sanity checks
-            if(selection.isSurface) {
-                alert("Please select a part, not a surface.");
-                return null;
-            }
-            // meshes are okay
-            if(selection.isFlattenedBody) {
-                alert("Please select a part, not a flattened body.");
-                return null;
-            }
-            if(selection.isComposite) {
-                // probably fine. uh, maybe
-            }
-            if((selection.elementType !== "partstudio" || !selection.elementId) && selection.elementType !== "assembly") {
-                alert("Please select a part from a part studio or assembly.");
-                return null;
-            }
-            if(selection.itemType !== "part" && selection.itemType !== "assembly") {
-                alert("Please select a part or assembly, not a part studio.");
-                return null;
-            }
-
-            let documentId = selection.documentId;
-            if(!documentId) {
-                alert("No document found for selected part.");
-                return null;
-            }
-
-            let elementId = selection.elementId;
-            if(!elementId) {
-                alert("No part studio or assembly found for selected item.");
-                return null;
-            }
-
-            let partId = selection.idTag;
-            if(selection.itemType === "part" && !partId) {
-                alert("No part found for selected part (???).");
-                return null;
-            }
-
-            let workspaceId = selection.workspaceId;
-            let versionId = selection.versionId;
-            if(!workspaceId && !versionId) {
-                alert("No workspace or version found for selected part.");
-                return null;
-            }
-
-            let wvm: "w" | "v" | "m" = "w";
-            let wvmId = workspaceId || versionId;
-            if(wvmId === versionId) wvm = "v";
-
-            return {
-                type: selection.elementType === "partstudio" ? "part" : "assembly",
-                wvm,
-                wvmId,
-                documentId,
-                elementId,
-                partId,
-                configuration: selection.elementConfiguration || "default"
-            };
-        }
-        return null;
-    }
 
     async function refreshPart(sel: PartSelection, existing: PartsResponse[] | null) {
         if(!onshapeCtx.client) return;
@@ -252,7 +168,7 @@
         if(status !== "display") return;
         if(!onshapeCtx.client) return;
 
-        const sel = await getPartSelection();
+        const sel = await onshapeCtx.client.getPartSelection();
         if(!sel) return;
 
         status = "loading";
@@ -322,7 +238,7 @@
                 </div>
             {/if}
         {:else}
-            <div class="placeholder">Loading part...</div>
+            <div class="placeholder">Invalid part</div>
         {/if}
     {:else}
         {#if onshapeCtx.onOnshape}

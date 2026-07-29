@@ -1,7 +1,7 @@
 import { page } from "$app/state";
 import type { AppConfig } from "$lib/config";
 import { nav } from "$lib/navigation";
-import { OnshapeClient } from "$lib/onshape/client";
+import { OnshapeClient, type OnshapeLocation } from "$lib/onshape/client";
 import { watch, type ExpandResponse } from "$lib/pocketbase";
 import { Collections } from "$lib/pocketbase/generated-types";
 import { createContext, untrack } from "svelte";
@@ -18,6 +18,8 @@ export enum LinkedProjectType {
 }
 
 export type OnshapeContext = {
+    // there's a lot of duplicated state between the client and here, which isn't
+    // ideal, but oh well.
     linkedProject: {
         type: LinkedProjectType.Project | LinkedProjectType.Subproject | LinkedProjectType.Unlinked;
     } & ExpandResponse<"onshape_documents", "project,subproject"> | {
@@ -28,7 +30,7 @@ export type OnshapeContext = {
     wvmId?: string;
     elementId?: string;
     client: OnshapeClient | null;
-    location: "right-panel-part-studio" | "right-panel-assembly" | "tab" | null;
+    location: OnshapeLocation;
     onOnshape: boolean;
 };
 
@@ -83,8 +85,10 @@ export function watchOnshapeContext(
         if(onshapeContext.wvm === "w" && wvmId && elementId) onshapeContext.client = new OnshapeClient(
             config,
             documentId,
+            onshapeContext.wvm,
             wvmId || "",
-            elementId || ""
+            elementId || "",
+            onshapeContext.location
         );
     });
 

@@ -13,7 +13,7 @@
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
     import { onMount } from "svelte";
-    import { ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
+    import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
     import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/nav/NavProfile.svelte";
@@ -82,9 +82,16 @@
 <div class="layout" class:isMobile={isMobile}>
     <header class="container">
         {#if onOnshape}
-            <button onclick={() => window.open(window.location.origin, "_blank")}>
-                <ExternalLink />
-            </button>
+            {#if page.route.id?.startsWith("/(authed)/onshape")}
+                <button onclick={() => window.open(window.location.origin, "_blank")} title="Open in new tab">
+                    <ExternalLink />
+                </button>
+            {:else}
+                <!-- if not on an onshape page, show a button to return -->
+                <button onclick={() => nav("/onshape")} title="Return to Onshape panel page">
+                    <CornerDownLeft />
+                </button>
+            {/if}
         {:else}
             <button onclick={() => navOpen = !navOpen}>
                 {#if navOpen}

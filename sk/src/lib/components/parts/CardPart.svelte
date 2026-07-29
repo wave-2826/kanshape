@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { TypedPartsResponse } from "$lib/data/parts";
     import { appearanceToHex, type PartHeuristicsResult } from "$lib/onshape/partHeuristics";
-    import { Box, Sparkles } from "lucide-svelte";
+    import { Box, Boxes, Sparkles } from "lucide-svelte";
     import PopoverButton from "../PopoverButton.svelte";
     import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";
@@ -48,7 +48,8 @@
             <PartPreviewRenderer {part} edges={false} />
         {:else}
             <div class="placeholder" title="Preview will generate after creation">
-                <Box class={$css("placeholder-icon")} />
+                {#if part.type === "assembly"}<Boxes class={$css("placeholder-icon")} />
+                {:else}<Box class={$css("placeholder-icon")} />{/if}
             </div>
         {/if}
     </div>

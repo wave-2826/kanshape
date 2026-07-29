@@ -76,7 +76,7 @@
 <div class="page" data-modal-target>
     <CardViewPanel
         board={$openCardBoard ?? undefined}
-        boardCards={$openCardBoardCards?.items ?? []}
+        boardCards={$openCardBoardCards?.items}
         bind:card={
             () => $openCardBoard && $openCardBoardCards ? openCardId : null,
             (id) => {
@@ -103,9 +103,11 @@
     <menu>
         <button class="add" onclick={() => {
             if($selections && $selections.length > 0) {
-                nav(`/onshape/new?part=${JSON.stringify($selections[0])}`)
-            } else if(onshapeCtx.location === "right-panel-assembly") {
-                nav(`/onshape/new?assembly=true`);
+                nav(`/onshape/new?selection=${encodeURIComponent(JSON.stringify($selections[0]))}`)
+            // We could automatically add the assembly if in an assembly, but we have a separate
+            // assembly button 
+            // } else if(onshapeCtx.location === "right-panel-assembly") {
+            //     nav(`/onshape/new?selection=assembly`);
             } else {
                 nav(`/onshape/new`);
             }

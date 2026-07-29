@@ -1,6 +1,6 @@
 <script lang="ts">
     import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/project';
-    import { Box, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
+    import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
     import { getUploadContext } from './uploadContext';
     import PopoverButton from '$lib/components/PopoverButton.svelte';
     import { partExportTypes, type PartExport, type PartExportType } from '$lib/data/parts';
@@ -129,9 +129,13 @@
                     {:then parts}
                         {#each parts as part}
                             {@const partName = ("partData" in part ? part.partData.name : part.part_data?.name) ?? "Unknown part"}
-                            <span class="part-label"><Box /> {partName}</span>
+                            <span class="part-label">
+                                {#if part.type === "assembly"}<Boxes />
+                                {:else}<Box />{/if}
+                                {partName}
+                            </span>
                             <div class="part-actions">
-                                {#each Object.entries(partExportTypes) as [k, exportType]}
+                                {#each Object.entries(partExportTypes).filter(([_k, t]) => t.canBeAssembly || part.type !== "assembly") as [k, exportType]}
                                     <button
                                         class="part-action"
                                         onclick={() => {

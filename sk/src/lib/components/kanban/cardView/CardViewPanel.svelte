@@ -21,7 +21,7 @@
         projectId
     }: {
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
-        boardCards: TypedCardPreviewResponse[],
+        boardCards?: TypedCardPreviewResponse[],
         card: string | null,
         subprojects: SubprojectsRecord[],
         projectId: string
@@ -81,7 +81,7 @@
                         return;
                     }
     
-                    const selected = boardCards.find(c => c.id === cardId);
+                    const selected = boardCards?.find(c => c.id === cardId);
                     // card should still be correct right now
                     if(selected && card) {
                         selectingCard!.callback(selected, card);
@@ -110,7 +110,6 @@
             return () => unsub();
         } else {
             serverCard = null;
-            console.log("null");
         }
     });
     
@@ -131,7 +130,13 @@
         card = applyDiff(diff, untrack(() => $state.snapshot(card)));
     });
 
-    const preview = $derived(boardCards.find(c => c.id === cardId));
+    const preview = $derived(boardCards?.find(c => c.id === cardId));
+    // unselect this card if it's not in the board cards
+    $effect(() => {
+        if(boardCards && !preview) {
+            cardId = null;
+        }
+    });
 
     function performSave() {
         if(!card) return;

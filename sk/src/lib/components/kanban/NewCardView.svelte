@@ -47,6 +47,16 @@
     async function create() {
         if(cardData.title.length === 0) return;
         if(!board) return;
+        if(!cardData.section) return;
+
+        // update the card position to be 1000 before the first card (lowest existing position) in the section
+        const sectionCards = boardCards?.filter(c => c.section === cardData.section);
+        if(sectionCards && sectionCards.length > 0) {
+            const lowestPosition = Math.min(...sectionCards.map(c => c.position));
+            cardData.position = lowestPosition - 1000;
+        } else {
+            cardData.position = 0;
+        }
 
         // exports can be slow, so we run them after card creation
         let exports: (Omit<PartExport, "partRecordId"> & { forPart: CreationExportPartTarget })[] = [];
@@ -181,7 +191,7 @@
         }) satisfies PartExport[];
 
         // begin exports
-        client.send("/api/parts/export_all", {
+        if(exports.length > 0) client.send("/api/parts/export_all", {
             method: "POST",
             body: { exports }
         });
@@ -213,6 +223,16 @@
     export function updateCard(cb: (data: TypedCardsCreate) => void) {
         cb(cardData);
     }
+
+    // populate data once board loads
+    $effect(() => {
+        if(sections && sections.length > 0 && !sections.find(s => s.id === cardData.section)) {
+            cardData.section = sections[0].id;
+        }
+        if(board && !cardData.board) {
+            cardData.board = board.id;
+        }
+    });
 
     let uploadContext: UploadContext = $state({
         queueUpload(name: string, file: File) {
@@ -272,7 +292,9 @@
 </div>
 <div class={["buttons", buttonsClass]}>
     {@render buttons?.()}
-    <button type="submit" disabled={cardData.title.length === 0 || !board} onclick={create}><Plus /> Create</button>
+    <button type="submit" disabled={
+        cardData.title.length === 0 || !board || !cardData.section
+    } onclick={create}><Plus /> Create</button>
 </div>
 
 <style lang="scss">

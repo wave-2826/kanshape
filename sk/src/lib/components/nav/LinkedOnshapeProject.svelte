@@ -32,9 +32,9 @@
                         <p>
                             This document, "<span class="name">
                                 {linkedProject.title}
-                            </span>", is linked to the project <a class="name" href={`/projects/${linkedProject.project}`}>
+                            </span>", is linked to the project <a class="name" href={`/projects/${linkedProject.project}`} target="_blank">
                                 {linkedProject.expand.project?.title ?? "Unknown Project"}
-                            </a> {#if linkedProject.expand.subproject} and subproject <a class="name" href={`/projects/${linkedProject.project}/subprojects/${linkedProject.expand.subproject?.id}`}>
+                            </a> {#if linkedProject.expand.subproject} and subproject <a class="name" href={`/projects/${linkedProject.project}/subprojects/${linkedProject.expand.subproject?.id}`} target="_blank">
                                 {linkedProject.expand.subproject?.name ?? "Unknown Subproject"}
                             </a>{/if}.
                         </p>

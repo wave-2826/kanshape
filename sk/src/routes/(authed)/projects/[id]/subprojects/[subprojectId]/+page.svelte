@@ -79,31 +79,29 @@
         {/snippet}
         
         <div class="shell" data-modal-target>
-            {#if $openCardBoard}
-                <CardViewPanel
-                    board={$openCardBoard}
-                    boardCards={$openCardBoardCards ? $openCardBoardCards.items : []}
-                    bind:card={
-                        () => openCardId,
-                        (id) => {
-                            if(!$openCardBoardCards) return;
-                            if(id && !$cards?.items.find((c) => c.id === id)) {
-                                // this card is from another subproject; open its board
-                                // TODO: open the linked card with a query param or something
-                                const v = $openCardBoardCards.items.find(c => c.id === id);
-                                if(!v) {
-                                    console.warn(`Card ${id} not found in board ${$openCardBoard.id}`);
-                                } else {
-                                    nav(`/projects/${$project.id}/boards/${v?.board}`);
-                                }
+            <CardViewPanel
+                board={$openCardBoard || undefined}
+                boardCards={$openCardBoardCards?.items}
+                bind:card={
+                    () => openCardId,
+                    (id) => {
+                        if(!$openCardBoard || !$openCardBoardCards) return;
+                        if(id && !$cards?.items.find((c) => c.id === id)) {
+                            // this card is from another subproject; open its board
+                            // TODO: open the linked card with a query param or something
+                            const v = $openCardBoardCards.items.find(c => c.id === id);
+                            if(!v) {
+                                console.warn(`Card ${id} not found in board ${$openCardBoard.id}`);
+                            } else {
+                                nav(`/projects/${$project.id}/boards/${v?.board}`);
                             }
-                            openCardId = id;
                         }
+                        openCardId = id;
                     }
-                    subprojects={$project.expand.subprojects ?? []}
-                    projectId={$project?.id ?? ""}
-                />
-            {/if}
+                }
+                subprojects={$project.expand.subprojects ?? []}
+                projectId={$project?.id ?? ""}
+            />
     
             <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">
                 {#if subprojectOverview && $subprojectOverview}

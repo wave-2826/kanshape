@@ -25,7 +25,7 @@ export type CreationPart = {
 };
 
 type BTAssemblyDefinitionInfo = components["schemas"]["BTAssemblyDefinitionInfo"];
-function getSelectionFromAssemblyPath(ctx: OnshapeContext, assembly: BTAssemblyDefinitionInfo, path: string[]): PartSelection | null {
+function getSelectionFromAssemblyPath(assembly: BTAssemblyDefinitionInfo, path: string[]): PartSelection | null {
     if(path.length === 0) throw new Error("Path must have at least one item");
     const targetId = path[path.length - 1];
     
@@ -67,7 +67,7 @@ function getSelectionFromAssemblyPath(ctx: OnshapeContext, assembly: BTAssemblyD
 }
 
 /** Gets part data from a client messaging selection */
-export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSelection): Promise<CreationPart | null> {
+export async function getSelectionCreationData(ctx: OnshapeContext, sel: OnshapeSelection): Promise<CreationPart | null> {
     if(!ctx.client || !ctx.documentId || !ctx.wvm || !ctx.wvmId || !ctx.elementId) {
         throw new Error("Onshape context is not fully initialized");
     }
@@ -121,7 +121,11 @@ export async function getSelectionPartData(ctx: OnshapeContext, sel: OnshapeSele
             throw new Error(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}`);
         }
 
-        const selection = getSelectionFromAssemblyPath(ctx, assemblyData, sel.occurrencePath!);
+        if(!sel.occurrencePath) {
+            throw new Error("Expected occurrence path on assembly selection");
+        }
+        
+        const selection = getSelectionFromAssemblyPath(assemblyData, sel.occurrencePath);
         if(!selection) {
             throw new Error("Failed to find selection in assembly metadata");
         }

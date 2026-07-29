@@ -34,7 +34,7 @@
         </p>
         {#if onshapeCtx.location === "right-panel-assembly"}
             <button onclick={() => {
-                nav("/onshape/new?assembly=true")
+                nav("/onshape/new?selection=assembly")
             }}>Create assembly card</button>
         {/if}
     {/if}

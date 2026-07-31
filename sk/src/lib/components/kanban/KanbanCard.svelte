@@ -86,6 +86,7 @@
 
     &.assigned {
         border-top: 1px solid var(--accent);
+        --bg-color: color-mix(in srgb, var(--accent) 3%, var(--bg-secondary) 90%);
     }
     &.critical {
         // overwrites assignment border

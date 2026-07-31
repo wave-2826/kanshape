@@ -1,6 +1,6 @@
 <script lang="ts">
-import "../../app.scss";
-import { onMount } from "svelte";
+    import "../../app.scss";
+    import { onMount } from "svelte";
     import { client } from "$lib/pocketbase";
     import { page } from "$app/state";
     import type { AuthProviderInfo } from "pocketbase";
@@ -14,7 +14,7 @@ import { onMount } from "svelte";
 
     onMount(async () => {
         // If already logged in, redirect to home
-        if($authModel !== null) {
+        if($authModel !== null && client.authStore.isValid) {
             const followPath = page.url.searchParams.get("r") || "/";
             nav(decodeURIComponent(followPath));
             return;

@@ -1,5 +1,5 @@
 <script module lang="ts">
-    import { createContext, untrack } from "svelte";
+    import { createContext } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
     export type LayoutParams = {
         isMobile: boolean;
@@ -15,7 +15,6 @@
     import { onMount } from "svelte";
     import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
-    import { setConfig } from "$lib/config";
     import NavProfile from "$lib/components/nav/NavProfile.svelte";
     import { dev } from "$app/environment";
     import { fade, slide } from "svelte/transition";
@@ -23,11 +22,11 @@
     import { nav } from "$lib/navigation";
     import LinkedOnshapeProject from "$lib/components/nav/LinkedOnshapeProject.svelte";
     import { addOnshapeContext, watchOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
+    import { getConfig } from "$lib/config";
+    import { client } from "$lib/pocketbase";
 
-    const { data, children } = $props();
-    const config = $derived(data.config ?? {});
-    // svelte-ignore state_referenced_locally
-    setConfig(config);
+    const { children } = $props();
+    const config = getConfig();
 
     $effect(() => {
         if(page.error) $metadata.title = `Error: ${page.error.message}`;
@@ -36,7 +35,7 @@
     // Client-side redirect to /login if not authenticated
     onMount(() => {
         const followPath = page.url.pathname;
-        if($authModel === null) nav("/login?r=" + encodeURIComponent(followPath));
+        if($authModel === null || !client.authStore.isValid) nav("/login?r=" + encodeURIComponent(followPath));
     });
 
     const isMobile = $derived(new MediaQuery("screen and (max-width: 640px)").current);
@@ -73,11 +72,6 @@
     const forceNavOpen = $derived(page.url.pathname === "/" && !isMobile);
     let showNav = $derived(!onOnshape && (navOpen || forceNavOpen));
 </script>
-
-<svelte:head>
-    <link rel="icon" href="{config.site.faviconUrl}" />
-    <title>{$metadata.title} - {config.site.name}</title>
-</svelte:head>
 
 <div class="layout" class:isMobile={isMobile}>
     <header class="container">

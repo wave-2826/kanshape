@@ -37,7 +37,7 @@
     function getFaviconUrl(url: string): string | null {
         try {
             const urlObj = new URL(url);
-            return `https://www.google.com/s2/favicons?domain=${urlObj.host}&sz=16`;
+            return `https://www.google.com/s2/favicons?domain=${urlObj.host}&sz=32`;
         } catch(e) {
             return null;
         }

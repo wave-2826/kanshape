@@ -1,15 +1,14 @@
 <script lang="ts">
     import { debounce } from "$lib/util";
-    import { matchFilter, parseFilterString, stringifyFilterNode } from "./filter";
+    import { stringifyFilterNode } from "./filter";
     import type { FilterState, FilterViewState } from "./KanbanMenu.svelte";
+    import { applyQuickQuery, setFilterQuery, updateMatcher } from "./KanbanMenu.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
     import InlineCollectionSelector from "$lib/pocketbase/selector/InlineCollectionSelector.svelte";
-    import InlineSelector from "$lib/components/InlineSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { Clock, Flag, Kanban, Tag, Users } from "lucide-svelte";
     import { getPriorityColor } from "$lib/data/cards";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import { authModel } from "$lib/pocketbase/auth";
     import { getGroupName } from "../nameCache";
 
@@ -22,7 +21,7 @@
         filterState: FilterState,
         project: ExpandResponse<"projects", "subprojects,boards">,
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
-        hiddenViewCategories?: (keyof FilterViewState)[]
+        hiddenViewCategories?: readonly (keyof FilterViewState)[]
     } = $props();
 
     const priorityOptions = [
@@ -66,69 +65,8 @@
         return sameSet(userIds, targetUserIds) && sameSet(groupIds, targetGroupIds);
     });
 
-    function composeQuery(): string {
-        const clauses: string[] = [];
-
-        if(quick.priorities.length > 0) {
-            const orClause = quick.priorities.map((p) => `priority = "${p}"`).join(" or ");
-            clauses.push(quick.priorities.length > 1 ? `(${orClause})` : orClause);
-        }
-
-        if(quick.due) {
-            const option = dueOptions.find((o) => o.value === quick.due);
-            if(option) clauses.push(option.query);
-        }
-
-        // or together users and groups
-        const assignmentClauses = [
-            ...quick.users.map((u) => `any assignment has "${u.name}"`),
-            ...quick.groups.map((g) => `any assignment has "${g.name}"`)
-        ];
-        if(assignmentClauses.length > 0) {
-            clauses.push(assignmentClauses.length > 1 ? `(${assignmentClauses.join(" or ")})` : assignmentClauses[0]);
-        }
-
-        if(quick.subprojects.length > 0) {
-            const orClause = quick.subprojects.map((s) => `any subprojects has "${s.name}"`).join(" or ");
-            clauses.push(quick.subprojects.length > 1 ? `(${orClause})` : orClause);
-        }
-
-        if(quick.boards.length > 0) {
-            const orClause = quick.boards.map((b) => `board = "${b.name}"`).join(" or ");
-            clauses.push(quick.boards.length > 1 ? `(${orClause})` : orClause);
-        }
-
-        if(quick.sections.length > 0) {
-            const orClause = quick.sections.map((s) => `section = "${s.name}"`).join(" or ");
-            clauses.push(quick.sections.length > 1 ? `(${orClause})` : orClause);
-        }
-
-        return clauses.join(" and ");
-    }
-
-    function updateMatcher() {
-        filterState.match = filterState.filter ? () => {
-            let cache = new Map<string, boolean>();
-            return (card: TypedCardPreviewResponse): boolean => {
-                if(cache.has(card.id)) return cache.get(card.id)!;
-                const result = filterState.filter ? matchFilter(filterState.filter, card, {
-                    subprojects
-                }) : true;
-                console.log("matching card", card.title, "with filter", result);
-                cache.set(card.id, result);
-                return result;
-            };
-        } : undefined;
-    }
-
     function applyQuery() {
-        let query = composeQuery();
-        if(/^\(([^\(\)]*)\)$/.test(query)) {
-            query = query.substring(1, query.length - 1);
-        }
-        filterState.filterString = query;
-        filterState.filter = query ? parseFilterString(query).node ?? undefined : undefined;
-        updateMatcher();
+        applyQuickQuery(filterState, subprojects);
     }
 
     function togglePriority(value: string) {
@@ -143,8 +81,36 @@
         applyQuery();
     }
 
+    function toggleSubproject(id: string) {
+        filterState.quick.subprojects = filterState.quick.subprojects.some((s) => s.id === id)
+            ? filterState.quick.subprojects.filter((s) => s.id !== id)
+            : [...filterState.quick.subprojects, { id, name: subprojects.find((s) => s.id === id)?.name ?? "Unknown subproject" }];
+        applyQuery();
+    }
+
+    function toggleBoard(id: string) {
+        filterState.quick.boards = filterState.quick.boards.some((b) => b.id === id)
+            ? filterState.quick.boards.filter((b) => b.id !== id)
+            : [...filterState.quick.boards, { id, name: boards.find((b) => b.id === id)?.title ?? "Unknown board" }];
+        applyQuery();
+    }
+
+    function toggleSection(id: string) {
+        filterState.quick.sections = filterState.quick.sections.some((s) => s.id === id)
+            ? filterState.quick.sections.filter((s) => s.id !== id)
+            : [...filterState.quick.sections, { id, name: sections.find((s) => s.id === id)?.title ?? "Unknown section" }];
+        applyQuery();
+    }
+
     // filter to cards assigned to the current user
     async function assignedToMe() {
+        if(assignedToMeActive) {
+            filterState.quick.users = [];
+            filterState.quick.groups = [];
+            applyQuery();
+            return;
+        }
+
         const auth = $authModel;
         if(!auth) return;
 
@@ -167,18 +133,17 @@
         filterState.quick.subprojects = [];
         filterState.quick.boards = [];
         filterState.quick.sections = [];
-        filterState.filterString = "";
-        filterState.filter = undefined;
-        updateMatcher();
+        filterState.quick.search = "";
+        setFilterQuery(filterState, "");
+        updateMatcher(filterState);
     }
 
     // editing the raw query input directly clears other state
 
     function updateQuery(e: InputEvent) {
         const target = e.target as HTMLInputElement;
-        filterState.filterString = target.value;
-        filterState.filter = target.value ? parseFilterString(target.value).node ?? undefined : undefined;
-        updateMatcher();
+        setFilterQuery(filterState, target.value);
+        updateMatcher(filterState);
 
         filterState.quick.priorities = [];
         filterState.quick.due = "";
@@ -187,6 +152,7 @@
         filterState.quick.subprojects = [];
         filterState.quick.boards = [];
         filterState.quick.sections = [];
+        filterState.quick.search = "";
     }
     const updateQueryDebounced = debounce(updateQuery, 200);
 </script>
@@ -244,54 +210,55 @@
         />
     </div>
 
-    {#if subprojects.length > 0}
+    {#if !hiddenViewCategories.includes("subprojects") && subprojects.length > 0}
         <div class="group">
             <span class="group-label"><Tag /> Subprojects</span>
-            <InlineSelector
-                values={selectedSubprojects}
-                data={subprojects.map((s) => ({ id: s.id, name: s.name ?? "Unknown subproject" }))}
-                onchange={(ids) => {
-                    filterState.quick.subprojects = subprojects
-                        .filter((s) => ids.includes(s.id))
-                        .map((s) => ({ id: s.id, name: s.name ?? "Unknown subproject" }));
-                    applyQuery();
-                }}
-                itemName="subprojects"
-            />
+            <div class="chips">
+                {#each subprojects as subproject}
+                    <button
+                        type="button"
+                        class:selected={selectedSubprojects.some((s) => s.id === subproject.id)}
+                        onclick={() => toggleSubproject(subproject.id)}
+                    >
+                        {subproject.name ?? "Unknown subproject"}
+                    </button>
+                {/each}
+            </div>
         </div>
     {/if}
 
     {#if !hiddenViewCategories.includes("board") && boards.length > 0}
         <div class="group">
             <span class="group-label"><Kanban /> Board</span>
-            <InlineSelector
-                values={selectedBoards}
-                data={boards.map((b) => ({ id: b.id, name: b.title ?? "Unknown board" }))}
-                onchange={(ids) => {
-                    filterState.quick.boards = boards
-                        .filter((b) => ids.includes(b.id))
-                        .map((b) => ({ id: b.id, name: b.title ?? "Unknown board" }));
-                    applyQuery();
-                }}
-                itemName="boards"
-            />
+            <div class="chips">
+                {#each boards as b}
+                    <button
+                        type="button"
+                        class:selected={selectedBoards.some((x) => x.id === b.id)}
+                        onclick={() => toggleBoard(b.id)}
+                    >
+                        {b.title ?? "Unknown board"}
+                    </button>
+                {/each}
+            </div>
         </div>
     {/if}
 
     {#if !hiddenViewCategories.includes("section") && sections.length > 0}
         <div class="group">
             <span class="group-label"><Kanban /> Section</span>
-            <InlineSelector
-                values={selectedSections}
-                data={sections.map((s) => ({ id: s.id, name: s.title ?? "Unknown section" }))}
-                onchange={(ids) => {
-                    filterState.quick.sections = sections
-                        .filter((s) => ids.includes(s.id))
-                        .map((s) => ({ id: s.id, name: s.title ?? "Unknown section" }));
-                    applyQuery();
-                }}
-                itemName="sections"
-            />
+            <div class="chips">
+                {#each sections as section}
+                    <button
+                        type="button"
+                        class:selected={selectedSections.some((s) => s.id === section.id)}
+                        onclick={() => toggleSection(section.id)}
+                        style="color: {section.color ?? "inherit"}"
+                    >
+                        {section.title ?? "Unknown section"}
+                    </button>
+                {/each}
+            </div>
         </div>
     {/if}
 

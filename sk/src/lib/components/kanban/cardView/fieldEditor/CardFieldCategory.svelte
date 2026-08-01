@@ -28,7 +28,7 @@
                 {/if}
             </span>
             <div class="prop-value">
-                <CardFieldEditorFull {field} bind:card={card} />
+                <CardFieldEditorFull {field} bind:card />
             </div>
         </div>
     {/each}

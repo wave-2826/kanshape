@@ -7,7 +7,7 @@
     import { sortListCards, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { createOpenCardState } from "./cardView/state.svelte";
-    import { defaultFilterState } from "./menu/KanbanMenu.svelte";
+    import { createFilterState } from "./menu/KanbanMenu.svelte";
 
     const {
         project,
@@ -33,7 +33,8 @@
     let listCards = $state<PageItemType<typeof cards>[] | undefined>(undefined);
     let openCardId = createOpenCardState();
 
-    let filterState = $state(defaultFilterState);
+    const hiddenViewCategories = ["board"] as const;
+    let filterState = $state(createFilterState(hiddenViewCategories));
     const filter = $derived(filterState.match?.());
 
     $effect(() => {
@@ -44,7 +45,7 @@
 
 <div class="kanban-list" data-modal-target>
     <!-- TODO: edit sort fields here? -->
-    <KanbanMenu {project} {board} cards={listCards} bind:filterState={filterState} hiddenViewCategories={["board"]} />
+    <KanbanMenu {project} {board} cards={listCards} bind:filterState {hiddenViewCategories} />
 
     <CardViewPanel
         boardCards={listCards}
@@ -57,7 +58,7 @@
     {#if cards !== null && $cards !== null}
         <div class="content">
             {#if listCards?.length ?? 0 > 0}
-                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards}>
+                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards} key={JSON.stringify(filterState.view)}>
                     {#each listCards as card (card.id)}
                         <KanbanListEntry
                             {card}

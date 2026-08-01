@@ -256,7 +256,7 @@
                 {:else if !(board && board.type !== "parts")}
                     <div class="placeholder-part">
                         No selected part
-                        <PartSelectButton bind:part={part} />
+                        <PartSelectButton bind:part />
                     </div>
                 {/if}
             </div>

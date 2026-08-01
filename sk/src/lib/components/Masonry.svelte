@@ -49,7 +49,8 @@ const {
     gridGap = '0.5em',
     padding = '0px',
     colWidth = 'minmax(min(20em, 100%), 1fr)',
-    items = []
+    items = [],
+    key
 }: {
     children: Snippet,
     stretchFirst?: boolean,
@@ -57,7 +58,9 @@ const {
     padding?: string,
     colWidth?: string,
     /** pass in data if it's dynamically updated */
-    items?: any[]
+    items?: any[],
+    /** an additional key for rerendering */
+    key?: any
 } = $props();
 
 let grids: {
@@ -127,6 +130,7 @@ let width = $derived.by(() => size ? size[0].inlineSize : 0);
 $effect(() => {
     void masonryElement;
     void items;
+    void key;
     void width;
     if(masonryElement && items && width) { 
         untrack(() => calcGrid([masonryElement!]))

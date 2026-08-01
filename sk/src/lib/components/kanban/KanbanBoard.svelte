@@ -3,7 +3,7 @@
     import KanbanCard from "./KanbanCard.svelte";
     import { Plus } from "lucide-svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
-    import KanbanMenu, { defaultFilterState } from "./menu/KanbanMenu.svelte";
+    import KanbanMenu, { createFilterState } from "./menu/KanbanMenu.svelte";
     import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { createOpenCardState } from "./cardView/state.svelte";
@@ -36,7 +36,8 @@
 
     let openCardId = createOpenCardState();
 
-    const filterState = $state(defaultFilterState);
+    const hiddenViewCategories = ["board", "section"] as const;
+    let filterState = $state(createFilterState(hiddenViewCategories));
     const filter = $derived(filterState.match?.());
 
     function cardsForSection(sectionId: string) {
@@ -129,7 +130,7 @@
 </script>
 
 <div class="kanban" data-modal-target>
-    <KanbanMenu {project} {board} cards={boardCards} bind:this={kanbanMenu} {filterState} hiddenViewCategories={["board", "section"]} />
+    <KanbanMenu {project} {board} cards={boardCards} bind:this={kanbanMenu} bind:filterState {hiddenViewCategories} />
 
     <CardViewPanel
         {board}

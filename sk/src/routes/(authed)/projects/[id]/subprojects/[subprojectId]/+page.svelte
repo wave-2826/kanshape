@@ -9,7 +9,7 @@
     import { deasyncify } from "$lib/util";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
-    import KanbanMenu, { defaultFilterState } from "$lib/components/kanban/menu/KanbanMenu.svelte";
+    import KanbanMenu, { createFilterState } from "$lib/components/kanban/menu/KanbanMenu.svelte";
     import Masonry from "$lib/components/Masonry.svelte";
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
     import { untrack } from "svelte";
@@ -55,7 +55,8 @@
         }
     });
 
-    let filterState = $state(defaultFilterState);
+    const hiddenViewCategories = ["subprojects"] as const;
+    let filterState = $state(createFilterState(hiddenViewCategories));
     const filter = $derived(filterState.match?.());
 
     const cards = $derived(subprojectCards && $subprojectCards ?
@@ -137,10 +138,10 @@
                 <h2><Kanban /> Cards ({$subprojectOverview?.card_count ?? 0})</h2>
                 {#if subprojectCards}
                     {#if cards && $subprojectCards !== null}
-                        <KanbanMenu project={$project} {cards} bind:filterState={filterState} />
+                        <KanbanMenu project={$project} {cards} bind:filterState {hiddenViewCategories} />
                         <div class="card-list">
                             {#if cards.length > 0}
-                                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={cards}>
+                                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={cards} key={JSON.stringify(filterState.view)}>
                                     {#each cards as card (card.id)}
                                         <KanbanListEntry
                                             showBoard boardColor={$project.color}

@@ -1,5 +1,7 @@
 <script lang="ts" module>
-    import { type FilterNode } from "./filter";
+    import { type FilterNode, matchFilter, parseFilterString } from "./filter";
+    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
+    import { browser } from "$app/environment";
 
     export type FilterViewState = {
         description: boolean,
@@ -11,6 +13,46 @@
         section: boolean
     };
 
+    const defaultView: FilterViewState = {
+        description: true,
+        board: true,
+        due: true,
+        assignment: true,
+        priority: true,
+        subprojects: true,
+        section: true
+    };
+
+    const VIEW_STORAGE_PREFIX = "kanban_filter_view";
+
+    /**
+     * different views (e.g. board vs list) hide different categories, so we keep a separate saved
+     * view per set of hidden categories.
+     */
+    function viewStorageKey(hiddenCategories: readonly (keyof FilterViewState)[]): string {
+        const suffix = [...hiddenCategories].sort().join(",");
+        return suffix ? `${VIEW_STORAGE_PREFIX}:${suffix}` : VIEW_STORAGE_PREFIX;
+    }
+
+    export function loadFilterView(hiddenCategories: readonly (keyof FilterViewState)[] = []): FilterViewState {
+        if(!browser) return { ...defaultView };
+        try {
+            const raw = localStorage.getItem(viewStorageKey(hiddenCategories));
+            if(!raw) return { ...defaultView };
+            return { ...defaultView, ...JSON.parse(raw) };
+        } catch {
+            return { ...defaultView };
+        }
+    }
+    export function saveFilterView(view: FilterViewState, hiddenCategories: readonly (keyof FilterViewState)[] = []) {
+        if(!browser) return;
+        try {
+            localStorage.setItem(viewStorageKey(hiddenCategories), JSON.stringify(view));
+        } catch {
+            // oh well
+        }
+    }
+
     export type FilterQuickState = {
         priorities: string[],
         due: string,
@@ -18,7 +60,8 @@
         groups: { id: string, name: string }[],
         subprojects: { id: string, name: string }[],
         boards: { id: string, name: string }[],
-        sections: { id: string, name: string }[]
+        sections: { id: string, name: string }[],
+        search: string
     };
 
     export type FilterState = {
@@ -33,38 +76,116 @@
         match?: () => (card: TypedCardPreviewResponse) => boolean
     };
 
-    export const defaultFilterState: FilterState = {
-        filter: undefined,
-        match: undefined,
-        view: {
-            description: true,
-            board: true,
-            due: true,
-            assignment: true,
-            priority: true,
-            subprojects: true,
-            section: true
-        },
-        quick: {
-            priorities: [],
-            due: "",
-            users: [],
-            groups: [],
-            subprojects: [],
-            boards: [],
-            sections: []
+    export function createFilterState(hiddenCategories: readonly (keyof FilterViewState)[] = []): FilterState {
+        return {
+            filter: undefined,
+            match: undefined,
+            view: loadFilterView(hiddenCategories),
+            quick: {
+                priorities: [],
+                due: "",
+                users: [],
+                groups: [],
+                subprojects: [],
+                boards: [],
+                sections: [],
+                search: ""
+            }
+        };
+    }
+
+    /** parse a query and store it (plus the string) on the filter state */
+    export function setFilterQuery(filterState: FilterState, query: string): FilterNode | undefined {
+        filterState.filterString = query;
+        filterState.filter = query ? parseFilterString(query).node ?? undefined : undefined;
+        return filterState.filter;
+    }
+
+    /**
+     * rebuild filterState.match from the current filter. The matcher is a
+     * function that _creates_ a per-card matcher for things like caching.
+     */
+    export function updateMatcher(filterState: FilterState) {
+        filterState.match = filterState.filter ? () => {
+            const cache = new Map<string, boolean>();
+            return (card: TypedCardPreviewResponse): boolean => {
+                if(cache.has(card.id)) return cache.get(card.id)!;
+                const result = filterState.filter ? matchFilter(filterState.filter, card) : true;
+                cache.set(card.id, result);
+                return result;
+            };
+        } : undefined;
+    }
+
+    /** compose the quick-filter state into a single query string. */
+    export function composeQuickQuery(quick: FilterQuickState): string {
+        const clauses: string[] = [];
+
+        if(quick.priorities.length > 0) {
+            const orClause = quick.priorities.map((p) => `priority = "${p}"`).join(" or ");
+            clauses.push(quick.priorities.length > 1 ? `(${orClause})` : orClause);
         }
-    };
+
+        if(quick.due) {
+            const dueQueries: Record<string, string> = {
+                overdue: `due < today`,
+                today: `due >= today and due < today+1`,
+                week: `due > today and due < today+7`,
+                month: `due >= today and due < today+30`
+            };
+            if(dueQueries[quick.due]) clauses.push(dueQueries[quick.due]);
+        }
+
+        // or together users and groups
+        const assignmentClauses = [
+            ...quick.users.map((u) => `any assignment has "${u.name}"`),
+            ...quick.groups.map((g) => `any assignment has "${g.name}"`)
+        ];
+        if(assignmentClauses.length > 0) {
+            clauses.push(assignmentClauses.length > 1 ? `(${assignmentClauses.join(" or ")})` : assignmentClauses[0]);
+        }
+
+        if(quick.subprojects.length > 0) {
+            const orClause = quick.subprojects.map((s) => `any subprojects has "${s.name}"`).join(" or ");
+            clauses.push(quick.subprojects.length > 1 ? `(${orClause})` : orClause);
+        }
+
+        if(quick.boards.length > 0) {
+            const orClause = quick.boards.map((b) => `board = "${b.name}"`).join(" or ");
+            clauses.push(quick.boards.length > 1 ? `(${orClause})` : orClause);
+        }
+
+        if(quick.sections.length > 0) {
+            const orClause = quick.sections.map((s) => `section = "${s.name}"`).join(" or ");
+            clauses.push(quick.sections.length > 1 ? `(${orClause})` : orClause);
+        }
+
+        if(quick.search.trim()) {
+            const term = quick.search.trim();
+            clauses.push(`(title ~ "${term}" or description ~ "${term}")`);
+        }
+
+        return clauses.join(" and ");
+    }
+
+    export function applyQuickQuery(filterState: FilterState, subprojects: { id: string, name?: string }[] = []) {
+        let query = composeQuickQuery(filterState.quick);
+        if(/^\(([^\(\)]*)\)$/.test(query)) {
+            query = query.substring(1, query.length - 1);
+        }
+        setFilterQuery(filterState, query);
+        updateMatcher(filterState);
+    }
 </script>
 
 <script lang="ts">
     import { Clock, Flag, Funnel, Kanban, RotateCcw, SquarePlus, Tag, TextInitial, Users, View } from "lucide-svelte";
     import NewCardModal from "../NewCardModal.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
-    import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import PopoverButton from "../../PopoverButton.svelte";
     import FilterMenu from "./FilterMenu.svelte";
+    import { debounce } from "$lib/util";
 
     const viewLabels: Record<keyof FilterViewState, string> = {
         description: "Description",
@@ -91,21 +212,34 @@
          * Categories to hide from the view menu. e.g. the kanban board view doesn't show sections anyway, so
          * we can hide that option from the view menu.
          */
-        hiddenViewCategories?: (keyof FilterViewState)[]
+        hiddenViewCategories?: readonly (keyof FilterViewState)[]
     } = $props();
 
     let newCardModal: NewCardModal | null = $state(null);
 
     const sections = $derived(board?.expand.sections ?? []);
+    const subprojects = $derived(project.expand.subprojects ?? []);
 
     export function openNewCardModal(defaultSectionId?: string) {
         newCardModal?.open(defaultSectionId);
     }
 
+    function onSearchInput(e: Event) {
+        const target = e.target as HTMLInputElement;
+        filterState.quick.search = target.value;
+        applyQuickQuery(filterState, subprojects);
+    }
+    const onSearchDebounced = debounce(onSearchInput, 100, true);
+
     const hiddenViewItems = $derived(Object.values(filterState.view).filter(v => !v).length);
     // svelte doesn't like these inline for some reason
     const viewButtonClass = $derived(hiddenViewItems > 0 ? "selected" : "");
     const filterButtonClass = $derived(filterState.filter !== undefined ? "selected" : "");
+
+    // Persist the active view whenever it changes, keyed by this view's hidden categories.
+    $effect(() => {
+        saveFilterView(filterState.view, hiddenViewCategories);
+    });
 </script>
 
 <menu>
@@ -120,7 +254,7 @@
             <span class="indicator">+</span>
         {/if}
         {#snippet content()}
-            <FilterMenu bind:filterState={filterState} {project} {board} {hiddenViewCategories} />
+            <FilterMenu bind:filterState {project} {board} {hiddenViewCategories} />
         {/snippet}
     </PopoverButton>
     <PopoverButton class={viewButtonClass}>
@@ -155,7 +289,12 @@
             </div>
         {/snippet}
     </PopoverButton>
-    <input type="text" placeholder="Search cards..." disabled />
+    <input
+        type="text"
+        placeholder="Search cards..."
+        value={filterState.quick.search}
+        oninput={onSearchDebounced}
+    />
 </menu>
 
 {#if board && sections && cards}

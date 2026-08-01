@@ -444,10 +444,6 @@ export function stringifyFilterNode(node: FilterNode): string {
     return stringify(node);
 }
 
-type FilterContext = {
-    subprojects?: { id: string; name?: string }[];
-};
-
 const dateFields = new Set(["due_by", "due", "created", "updated", "moved_at"]);
 
 function daysSinceEpoch(input: unknown): number | null {
@@ -510,7 +506,7 @@ function evaluateValue(node: ValueNode): string | number | boolean {
     }
 }
 
-function getFieldValue(field: string, card: TypedCardPreviewResponse, context: FilterContext): unknown {
+function getFieldValue(field: string, card: TypedCardPreviewResponse): unknown {
     switch(field) {
         case "title": return card.title;
         case "description": return card.description;
@@ -536,7 +532,7 @@ function getFieldValue(field: string, card: TypedCardPreviewResponse, context: F
         case "assignees":
         case "assignment": return card.assignment_name_cache ?? [];
         case "subproject":
-        case "subprojects": return (context.subprojects ?? card.subprojects).map(s => s.name);
+        case "subprojects": return card.subprojects.map(s => s.name);
         default: return undefined;
     }
 }
@@ -561,8 +557,8 @@ function compare(fieldValue: unknown, value: string | number | boolean, operatio
         return compareNumbers(fieldNum, valueNum, operation);
     }
 
-    const fieldStr = toString(fieldValue);
-    const valueStr = toString(value);
+    const fieldStr = toString(fieldValue).toLocaleLowerCase();
+    const valueStr = toString(value).toLocaleLowerCase();
     switch(operation) {
         case FilterType.Equals: return fieldStr === valueStr;
         case FilterType.Contains: return fieldStr.includes(valueStr);
@@ -574,8 +570,8 @@ function compare(fieldValue: unknown, value: string | number | boolean, operatio
     }
 }
 
-function matchComparison(node: Extract<FilterNode, { type: FilterNodeType.Filter }>, card: TypedCardPreviewResponse, context: FilterContext): boolean {
-    const fieldValue = getFieldValue(node.field, card, context);
+function matchComparison(node: Extract<FilterNode, { type: FilterNodeType.Filter }>, card: TypedCardPreviewResponse): boolean {
+    const fieldValue = getFieldValue(node.field, card);
     if(fieldValue === undefined) return false;
     const value = evaluateValue(node.value);
     if(Array.isArray(fieldValue)) {
@@ -585,18 +581,18 @@ function matchComparison(node: Extract<FilterNode, { type: FilterNodeType.Filter
     return compare(fieldValue, value, node.operation, node.field);
 }
 
-function matchFilterNode(node: FilterNode, card: TypedCardPreviewResponse, context: FilterContext): boolean {
+function matchFilterNode(node: FilterNode, card: TypedCardPreviewResponse): boolean {
     switch(node.type) {
-        case FilterNodeType.Not: return !matchFilterNode(node.node, card, context);
-        case FilterNodeType.And: return node.nodes.every(n => matchFilterNode(n, card, context));
-        case FilterNodeType.Or: return node.nodes.some(n => matchFilterNode(n, card, context));
-        case FilterNodeType.Xor: return node.nodes.filter(n => matchFilterNode(n, card, context)).length === 1;
-        case FilterNodeType.Filter: return matchComparison(node, card, context);
+        case FilterNodeType.Not: return !matchFilterNode(node.node, card);
+        case FilterNodeType.And: return node.nodes.every(n => matchFilterNode(n, card));
+        case FilterNodeType.Or: return node.nodes.some(n => matchFilterNode(n, card));
+        case FilterNodeType.Xor: return node.nodes.filter(n => matchFilterNode(n, card)).length === 1;
+        case FilterNodeType.Filter: return matchComparison(node, card);
     }
 }
 
-export function matchFilter(filter: FilterNode, card: TypedCardPreviewResponse, context: FilterContext = {}): boolean {
-    return matchFilterNode(filter, card, context);
+export function matchFilter(filter: FilterNode, card: TypedCardPreviewResponse): boolean {
+    return matchFilterNode(filter, card);
 }
 
 export const testing = {

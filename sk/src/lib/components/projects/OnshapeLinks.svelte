@@ -33,8 +33,7 @@
     {#each $links.items as link}
         <span class:full-preview={fullPreview} class="link-badge" class:button={!fullPreview}>
             <a href={`${config.onshape.baseDomain}/documents/${link.id}`} target="_blank" rel="noopener noreferrer">
-                <!-- TODO: we can store this ourselves -->
-                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                <img src="/onshape.png" alt="Onshape" width="16" height="16" />
                 {link.title ? link.title : link.id}
             </a>
             {#if fullPreview}

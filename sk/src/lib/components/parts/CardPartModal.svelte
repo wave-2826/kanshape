@@ -43,8 +43,7 @@
                     open(`${config.onshape.baseDomain}/documents/${part.document_id}/${part.wvm}/${part.wvm_id}/e/${part.element_id}`, "_blank");
                 }
             }}>
-                <!-- TODO: we can store this ourselves -->
-                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                <img src="/onshape.png" alt="Onshape" width="16" height="16" />
                 {#if canOpenInTab}
                     Open tab <ArrowRight class={$css("icon")} />
                 {:else}

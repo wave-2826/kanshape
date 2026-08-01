@@ -12,8 +12,7 @@
 {#if linkedProject && linkedProject.type !== LinkedProjectType.Unregistered && documentId}
     <div class="onshape-header">
         <PopoverButton class={$css("linked-project")}>
-            <!-- TODO: we can store this ourselves -->
-            <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+            <img src="/onshape.png" alt="Onshape" width="16" height="16" />
             
             {#if linkedProject.type === LinkedProjectType.Unlinked}
                 <Unlink class={$css("icon")} /> Unlinked

@@ -255,8 +255,7 @@
             {#if cardId}
                 <button class="add" onclick={addPart}>
                     + Add part
-                    <!-- TODO: we can store this ourselves -->
-                    <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                    <img src="/onshape.png" alt="Onshape" width="16" height="16" />
                 </button>
             {:else}
                 <!-- TODO: there are some possible interfaces that could work for this, but right now

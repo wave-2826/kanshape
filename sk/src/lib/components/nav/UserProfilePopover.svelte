@@ -52,8 +52,7 @@
 
         {#if $fullModel && !$fullModel.onshape_auth_expiry}
             <button onclick={() => onshapeOAuth()}>
-                <!-- TODO: we can store this ourselves -->
-                <img src="https://www.google.com/s2/favicons?domain=onshape.com&sz=32" alt="Onshape" width="16" height="16" />
+                <img src="/onshape.png" alt="Onshape" width="16" height="16" />
                 Auth with Onshape
             </button>
         {/if}

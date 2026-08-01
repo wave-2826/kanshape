@@ -78,10 +78,12 @@
 	{#if isOpen}
 		<Portal target="body">
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<ul
 				class="dropdown inline-dropdown"
 				use:anchor={{ element: selectorInput, placement: "vauto-end", offset: 0 }}
 				transition:fly={{ y: -10, duration: 100 }}
+				onclick={(e) => e.stopPropagation()}
 				onmousedown={(e) => e.stopPropagation()}
 			>
 				{#if children}

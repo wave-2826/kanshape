@@ -9,13 +9,14 @@
     import { deasyncify } from "$lib/util";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
-    import KanbanMenu from "$lib/components/kanban/KanbanMenu.svelte";
+    import KanbanMenu, { defaultFilterState } from "$lib/components/kanban/menu/KanbanMenu.svelte";
     import Masonry from "$lib/components/Masonry.svelte";
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
     import { untrack } from "svelte";
     import { nav } from "$lib/navigation";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
+    import { sortListCards } from "$lib/data/kanban";
     
     const subprojectId = $derived(page.params.subprojectId);
     
@@ -30,7 +31,7 @@
         null
     );
 
-    const cards = $derived(subproject ?
+    const subprojectCards = $derived(subproject ?
         deasyncify(watch(Collections.CardPreview, {
             filter: `subprojects ~ "${subproject.id}"`,
             sort: "position,created"
@@ -44,15 +45,22 @@
     let openCardId = createOpenCardState();
     let openCard = $state<ExpandResponse<"card_preview", ""> | null>(null);
     $effect.pre(() => {
-        if(!openCardId.cardId || !cards || !$cards) {
+        if(!openCardId.cardId || !subprojectCards || !$subprojectCards) {
             openCard = null;
             return;
         }
-        const cardItem = $cards?.items.find((c) => c.id === openCardId.cardId);
+        const cardItem = $subprojectCards?.items.find((c) => c.id === openCardId.cardId);
         if(cardItem && untrack(() => cardItem.id !== openCard?.id)) {
             openCard = cardItem;
         }
     });
+
+    let filterState = $state(defaultFilterState);
+    const filter = $derived(filterState.match?.());
+
+    const cards = $derived(subprojectCards && $subprojectCards ?
+        sortListCards($subprojectCards.items, undefined, filter) : null
+    );
 
     // This is kind of a mess, but we need information from the open card's board, which depends
     // on the open card, so we need to do a bunch of fetching to gather that information. It's not
@@ -97,7 +105,7 @@
                             openCardId.cardId = id;
                             return;
                         }
-                        if(id && !$cards?.items.find((c) => c.id === id)) {
+                        if(id && !cards?.find((c) => c.id === id)) {
                             // this card is from another subproject; open its board
                             const v = $openCardBoardCards.items.find(c => c.id === id);
                             if(!v) {
@@ -127,17 +135,19 @@
                 {/if}
 
                 <h2><Kanban /> Cards ({$subprojectOverview?.card_count ?? 0})</h2>
-                {#if cards}
-                    {#if $cards !== null}
-                        <KanbanMenu project={$project} cards={$cards.items} />
+                {#if subprojectCards}
+                    {#if cards && $subprojectCards !== null}
+                        <KanbanMenu project={$project} {cards} bind:filterState={filterState} />
                         <div class="card-list">
-                            {#if $cards.items.length > 0}
-                                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)"items={$cards.items}>
-                                    {#each $cards.items as card (card.id)}
+                            {#if cards.length > 0}
+                                <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={cards}>
+                                    {#each cards as card (card.id)}
                                         <KanbanListEntry
                                             showBoard boardColor={$project.color}
                                             card={card}
                                             onclick={() => openCardId.cardId = card.id}
+                                            view={filterState.view}
+                                            inactive={filter && !filter(card)}
                                         />
                                     {/each}
                                 </Masonry>

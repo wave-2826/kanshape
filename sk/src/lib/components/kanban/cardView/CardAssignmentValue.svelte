@@ -6,7 +6,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { authModel } from "$lib/pocketbase/auth";
     import { Flag } from "lucide-svelte";
-    import { getGroupName, getUsername } from "./nameCache";
+    import { getGroupName, getUsername } from "../nameCache";
 
     let {
         assignmentData = $bindable()

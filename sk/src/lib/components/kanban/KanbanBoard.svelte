@@ -3,7 +3,7 @@
     import KanbanCard from "./KanbanCard.svelte";
     import { Plus } from "lucide-svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
-    import KanbanMenu from "./KanbanMenu.svelte";
+    import KanbanMenu, { defaultFilterState } from "./menu/KanbanMenu.svelte";
     import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { createOpenCardState } from "./cardView/state.svelte";
@@ -13,7 +13,7 @@
         board,
         cards
     }: {
-        project: ExpandResponse<"projects", "subprojects">,
+        project: ExpandResponse<"projects", "subprojects,boards">,
         board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
@@ -36,14 +36,17 @@
 
     let openCardId = createOpenCardState();
 
+    const filterState = $state(defaultFilterState);
+    const filter = $derived(filterState.match?.());
+
     function cardsForSection(sectionId: string) {
         if(!boardCards) return [];
-        return sortCards(boardCards.filter((card) => card.section === sectionId));
+        return boardCards.filter((card) => card.section === sectionId);
     }
 
     $effect(() => {
         if($cards === null || draggedCardId !== null) return;
-        boardCards = sortCards($cards.items);
+        boardCards = sortCards($cards.items, filter);
     });
 
     function onDragStart(card: TypedCardPreviewResponse, event: DragEvent) {
@@ -126,7 +129,7 @@
 </script>
 
 <div class="kanban" data-modal-target>
-    <KanbanMenu {project} {board} cards={boardCards} bind:this={kanbanMenu} />
+    <KanbanMenu {project} {board} cards={boardCards} bind:this={kanbanMenu} {filterState} hiddenViewCategories={["board", "section"]} />
 
     <CardViewPanel
         {board}
@@ -174,7 +177,12 @@
                                             class="drop-zone top"
                                             class:topmost={i === 0}
                                         ></div>
-                                        <KanbanCard {card} onclick={() => openCardId.cardId = card.id} />
+                                        <KanbanCard
+                                            {card}
+                                            onclick={() => openCardId.cardId = card.id}
+                                            view={filterState.view}
+                                            inactive={filter && !filter(card)}
+                                        />
                                         {#if i === cards.length - 1}
                                             <div
                                                 class:zone-active={activeDropZone?.sectionId === section.id && activeDropZone.cardId === "last"}
@@ -243,7 +251,7 @@ section {
     .section-content {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.5rem;
         transition: border-color 0.1s ease;
         
         padding: 0.25rem;
@@ -294,6 +302,7 @@ section {
     flex-direction: column;
     gap: var(--list-gap);
     flex: 1;
+    padding-top: 1px;
     overflow-y: auto;
     overflow-x: hidden;
 

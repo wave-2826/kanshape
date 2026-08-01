@@ -1,19 +1,20 @@
 <script lang="ts">
     import { type ExpandResponse, type PageItemType, type PageStore } from "$lib/pocketbase";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
-    import KanbanMenu from "./KanbanMenu.svelte";
+    import KanbanMenu from "./menu/KanbanMenu.svelte";
     import KanbanListEntry from "./KanbanListEntry.svelte";
     import Masonry from "../Masonry.svelte";
     import { sortListCards, type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { createOpenCardState } from "./cardView/state.svelte";
+    import { defaultFilterState } from "./menu/KanbanMenu.svelte";
 
     const {
         project,
         board,
         cards
     }: {
-        project: ExpandResponse<"projects", "subprojects">,
+        project: ExpandResponse<"projects", "subprojects,boards">,
         board: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         cards: PageStore<TypedCardPreviewResponse> | null;
     } = $props();
@@ -32,14 +33,18 @@
     let listCards = $state<PageItemType<typeof cards>[] | undefined>(undefined);
     let openCardId = createOpenCardState();
 
+    let filterState = $state(defaultFilterState);
+    const filter = $derived(filterState.match?.());
+
     $effect(() => {
         if($cards === null) return;
-        listCards = sortListCards($cards.items, sections);
+        listCards = sortListCards($cards.items, sections, filter);
     });
 </script>
 
 <div class="kanban-list" data-modal-target>
-    <KanbanMenu {project} {board} cards={listCards} />
+    <!-- TODO: edit sort fields here? -->
+    <KanbanMenu {project} {board} cards={listCards} bind:filterState={filterState} hiddenViewCategories={["board"]} />
 
     <CardViewPanel
         boardCards={listCards}
@@ -54,7 +59,12 @@
             {#if listCards?.length ?? 0 > 0}
                 <Masonry colWidth="minmax(min(20rem, 100%), 1fr)" items={listCards}>
                     {#each listCards as card (card.id)}
-                        <KanbanListEntry {card} onclick={() => openCardId.cardId = card.id} />
+                        <KanbanListEntry
+                            {card}
+                            onclick={() => openCardId.cardId = card.id}
+                            view={filterState.view}
+                            inactive={filter && !filter(card)}
+                        />
                     {/each}
                 </Masonry>
             {:else}

@@ -13,8 +13,20 @@ export type TypedCardPreviewResponse = NonNullValuesExcept<CardPreviewResponse<
     {} // expand
 >, "assignment_data" | "assignment_name_cache">;
 
-export function sortCards<CardType extends TypedCardPreviewResponse>(list: CardType[]): CardType[] {
+/**
+ * Sort cards by position, with an optional active filter for putting
+ * filtered cards at the top.
+ */
+export function sortCards<CardType extends TypedCardPreviewResponse>(
+    list: CardType[],
+    active?: (card: CardType) => boolean
+): CardType[] {
     return [...list].sort((left, right) => {
+        const leftActive = active?.(left) ?? false;
+        const rightActive = active?.(right) ?? false;
+        if(leftActive && !rightActive) return -1;
+        if(!leftActive && rightActive) return 1;
+
         const positionDelta = (left.position ?? Number.MAX_SAFE_INTEGER) - (right.position ?? Number.MAX_SAFE_INTEGER);
         if(positionDelta !== 0) return positionDelta;
         return left.created.localeCompare(right.created);
@@ -33,25 +45,37 @@ function priorityInteger(priority: CardsPriorityOptions): number {
 
 /**
  * Sort cards for the list view. This is different from normal sort; the categories we sort by, in order, are:
+ * - active (if passed; used for showing filtered cards at the top)
  * - priority (highest to lowest)
  * - section (first to last)
  * - due date (earliest to latest)
  * - position (lowest to highest)
  */
-export function sortListCards<CardType extends TypedCardPreviewResponse>(list: CardType[], sections: SectionsRecord[]): CardType[] {
-    const sectionOrder = sections.reduce((acc, section, index) => {
+export function sortListCards<CardType extends TypedCardPreviewResponse>(
+    list: CardType[],
+    sections?: SectionsRecord[],
+    active?: (card: CardType) => boolean
+): CardType[] {
+    const sectionOrder = sections ? sections.reduce((acc, section, index) => {
         acc[section.id] = index;
         return acc;
-    }, {} as Record<string, number>);
+    }, {} as Record<string, number>) : null;
 
     return [...list].sort((left, right) => {
+        const leftActive = active?.(left) ?? false;
+        const rightActive = active?.(right) ?? false;
+        if(leftActive && !rightActive) return -1;
+        if(!leftActive && rightActive) return 1;
+
         const priorityDelta = priorityInteger(right.priority) - priorityInteger(left.priority);
         if(priorityDelta !== 0) return priorityDelta;
 
-        const leftSectionOrder = sectionOrder[left.section] ?? Number.MAX_SAFE_INTEGER;
-        const rightSectionOrder = sectionOrder[right.section] ?? Number.MAX_SAFE_INTEGER;
-        const sectionDelta = leftSectionOrder - rightSectionOrder;
-        if(sectionDelta !== 0) return sectionDelta;
+        if(sectionOrder) {
+            const leftSectionOrder = sectionOrder[left.section] ?? Number.MAX_SAFE_INTEGER;
+            const rightSectionOrder = sectionOrder[right.section] ?? Number.MAX_SAFE_INTEGER;
+            const sectionDelta = leftSectionOrder - rightSectionOrder;
+            if(sectionDelta !== 0) return sectionDelta;
+        }
 
         const leftDue = left.due_by ? new Date(left.due_by).getTime() : Number.MAX_SAFE_INTEGER;
         const rightDue = right.due_by ? new Date(right.due_by).getTime() : Number.MAX_SAFE_INTEGER;

@@ -5,44 +5,62 @@
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import { authModel } from "$lib/pocketbase/auth";
+    import type { FilterViewState } from "./menu/KanbanMenu.svelte";
     
     const {
         card,
         onclick,
         showBoard = false,
-        boardColor = "var(--text-tertiary)"
+        boardColor = "var(--text-tertiary)",
+        view,
+        inactive = false
     }: {
-        card: TypedCardPreviewResponse;
-        onclick: () => void;
-        showBoard?: boolean;
-        boardColor?: string;
+        card: TypedCardPreviewResponse,
+        onclick: () => void,
+        showBoard?: boolean,
+        boardColor?: string,
+        view?: FilterViewState,
+        /** Display as inactive for when filtering/searching */
+        inactive?: boolean
     } = $props();
 
     const assignment = $derived(card.assignment_data as CardAssignmentData | null);
 </script>
 
-<button class="card" class:assigned={assignedToSelf(card, $authModel)} {onclick} class:critical={card.priority === "critical"}>
+<button
+    class="card"
+    class:assigned={assignedToSelf(card, $authModel)}
+    class:critical={card.priority === "critical"}
+    class:inactive
+    {onclick}
+>
     <div class="main">
         <h3 class:untitled={!card.title.trim()}>{card.title.trim() ? card.title : "Untitled"}</h3>
-        {#if showBoard && card.board_name}
+        {#if (!view || view.board) && showBoard && card.board_name}
             <span class="meta-pill" style="color: {boardColor}"><Kanban /><span>{card.board_name}</span></span>
         {/if}
 
-        {#each card.subprojects as subproject}
-            <span class="meta-pill subproject">
-                <Tag />
-                <span>{subproject.name}</span>
+        {#if !view || view.subprojects}
+            {#each card.subprojects as subproject}
+                <span class="meta-pill subproject">
+                    <Tag />
+                    <span>{subproject.name}</span>
+                </span>
+            {/each}
+        {/if}
+        
+        {#if !view || view.section}
+            <span class="meta-pill section" style="color: {card.section_color ?? 'var(--text-primary)'}">
+                <Kanban />
+                <span>{card.section_name ?? card.section}</span>
             </span>
-        {/each}
+        {/if}
 
-        <span class="meta-pill section" style="color: {card.section_color ?? 'var(--text-primary)'}">
-            <Kanban />
-            <span>{card.section_name ?? card.section}</span>
-        </span>
+        {#if !view || view.priority}
+            <span class="meta-pill" style="color: {getPriorityColor(card.priority)}"><Flag />{card.priority}</span>
+        {/if}
 
-        <span class="meta-pill" style="color: {getPriorityColor(card.priority)}"><Flag />{card.priority}</span>
-
-        {#if card.due_by}
+        {#if (!view || view.due) && card.due_by}
             <span class="meta-pill" style="{new Date(card.due_by) < new Date() ? 'color: var(--error)' : ""}" title={`Due ${
                 new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(card.due_by))
             }`}>
@@ -51,7 +69,7 @@
             </span>
         {/if}
 
-        {#if assignment}
+        {#if (!view || view.assignment) && assignment}
             <span class="meta-pill assignment" class:looking-for-assignment={assignment.type === "looking_for_assignment"}>
                 <Users />
                 <span>
@@ -75,7 +93,7 @@
         {/if}
     </div>
 
-    {#if card.description}
+    {#if (!view || view.description) && card.description}
         <div class="description"><TextInitial /><span>{card.description}</span></div>
     {/if}
 </button>
@@ -90,16 +108,22 @@
     overflow: hidden;
     text-align: left;
 
+    transition: opacity 0.1s ease;
+
     --bg-color: var(--bg-secondary);
     padding: 0.25rem 0.7rem;
     font-size: var(--font-tiny);
 
     &.assigned {
         border-left: 1px solid var(--accent);
+        --bg-color: color-mix(in srgb, var(--accent) 3%, var(--bg-secondary) 90%);
     }
     &.critical {
         // overwrites assignment border
         border-left: 1px solid var(--error);
+    }
+    &.inactive {
+        opacity: 0.25;
     }
 }
 

@@ -3,7 +3,7 @@
     import { deleteRecord } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { ExternalLink, Trash } from "lucide-svelte";
-    import { getUsername } from "./nameCache";
+    import { getUsername } from "../nameCache";
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
 
     const { card, projectId }: { card: TypedCardsResponse, projectId: string } = $props();

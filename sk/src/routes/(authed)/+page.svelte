@@ -298,9 +298,11 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            word-break: break-word;
 
             .icon {
                 color: var(--text-secondary);
+                vertical-align: middle;
             }
         }
     }

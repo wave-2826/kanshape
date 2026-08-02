@@ -7,6 +7,7 @@
     import { deasyncify } from "$lib/util";
     import { LogOut } from "lucide-svelte";
     import type { Readable } from "svelte/store";
+    import ThemeSelector from "./ThemeSelector.svelte";
 
     type EnrichedUser = ExpandRecord<"users", "groups"> & {
         onshape_auth_expiry?: string;
@@ -63,6 +64,8 @@
         }}>
             <LogOut /> Sign out
         </button>
+
+        <ThemeSelector />
     </div>
 {/if}
 

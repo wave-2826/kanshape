@@ -357,7 +357,7 @@ button {
     .label {
         padding: 0 0.35em;
         font-size: var(--font-tiny);
-        color: #fff;
+        color: var(--text-primary);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

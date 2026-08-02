@@ -3,7 +3,7 @@
     scrollbar-color: var(--border) transparent;
 }
 
-:root {
+@mixin dark-theme {
     --bg-site: #101113;
     --bg-primary: #18191e;
     --bg-secondary: #24262c;
@@ -13,17 +13,49 @@
     --text-tertiary: #6e7a8c;
     --border: #434d5a;
 
-    --font-large: 1.4rem;
-    --font-medium: 1rem;
-    --font-text: 0.9rem;
-    --font-small: 0.85rem;
-    --font-tiny: 0.7rem;
-
     --accent: #4a9eff;
     --error: #ff6e64;
     --success: #00b894;
     --warning-medium: #ffb473;
     --warning-high: #ff8661;
+}
+@mixin light-theme {
+    --bg-site: #eceef1;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f6f8;
+    --bg-selection: #d6e4f5;
+    --text-primary: #1c1f26;
+    --text-secondary: #333a46;
+    --text-tertiary: #626e82;
+    --border: #c3cbd6;
+
+    --accent: #1a73e8;
+    --error: #d93025;
+    --success: #188038;
+    --warning-medium: #b06000;
+    --warning-high: #c5221f;
+}
+
+:root {
+    @include dark-theme;
+
+    --font-large: 1.4rem;
+    --font-medium: 1rem;
+    --font-text: 0.9rem;
+    --font-small: 0.85rem;
+    --font-tiny: 0.7rem;
+}
+
+// Light theme, applied via `data-theme="light"` on <html>.
+// The dark theme above is the default (and matches `prefers-color-scheme: dark`).
+html[data-theme="light"] {
+    @include light-theme;
+}
+
+@media (prefers-color-scheme: light) {
+    html:not([data-theme="dark"]) {
+        @include light-theme;
+    }
 }
 
 html {

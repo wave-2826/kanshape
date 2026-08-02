@@ -4,7 +4,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!-- Improve webkit scrollbars by forcing dark defaults -->
-        <meta name="color-scheme" content="dark" />
+        <meta name="color-scheme" content="dark light" />
+        <script>
+            // Apply the persisted theme before hydration to avoid flashing
+            (function () {
+                try {
+                    var theme = localStorage.getItem("theme");
+                    if(theme === "light" || theme === "dark") document.documentElement.setAttribute("data-theme", theme);
+                } catch (e) {}
+            })();
+        </script>
         %sveltekit.head%
     </head>
 

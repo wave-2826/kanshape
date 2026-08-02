@@ -2,7 +2,7 @@
     import { debounce } from "$lib/util";
     import { stringifyFilterNode } from "./filter";
     import type { FilterState, FilterViewState } from "./KanbanMenu.svelte";
-    import { applyQuickQuery, setFilterQuery, updateMatcher } from "./KanbanMenu.svelte";
+    import { applyQuickQuery, clearFilterState, setFilterQuery, updateMatcher } from "./KanbanMenu.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
     import InlineCollectionSelector from "$lib/pocketbase/selector/InlineCollectionSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
@@ -123,19 +123,6 @@
         filterState.quick.users = users;
         filterState.quick.groups = groups;
         applyQuery();
-    }
-
-    function clearAll() {
-        filterState.quick.priorities = [];
-        filterState.quick.due = "";
-        filterState.quick.users = [];
-        filterState.quick.groups = [];
-        filterState.quick.subprojects = [];
-        filterState.quick.boards = [];
-        filterState.quick.sections = [];
-        filterState.quick.search = "";
-        setFilterQuery(filterState, "");
-        updateMatcher(filterState);
     }
 
     // editing the raw query input directly clears other state
@@ -271,7 +258,9 @@
             value={filterState.filterString ?? (filterState.filter ? stringifyFilterNode(filterState.filter) : "")}
             oninput={updateQueryDebounced}
         />
-        <button type="button" class="clear" onclick={clearAll} disabled={!filterState.filterString && selectedPriorities.length === 0 && !dueFilter && selectedUsers.length === 0 && selectedGroups.length === 0 && selectedSubprojects.length === 0 && selectedBoards.length === 0 && selectedSections.length === 0}>
+        <button type="button" class="clear" onclick={() => {
+            clearFilterState(filterState);
+        }} disabled={!filterState.filterString && selectedPriorities.length === 0 && !dueFilter && selectedUsers.length === 0 && selectedGroups.length === 0 && selectedSubprojects.length === 0 && selectedBoards.length === 0 && selectedSections.length === 0}>
             Clear
         </button>
     </div>

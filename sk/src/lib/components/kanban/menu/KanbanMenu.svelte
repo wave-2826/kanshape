@@ -176,10 +176,23 @@
         setFilterQuery(filterState, query);
         updateMatcher(filterState);
     }
+
+    export function clearFilterState(filterState: FilterState) {
+        filterState.quick.priorities = [];
+        filterState.quick.due = "";
+        filterState.quick.users = [];
+        filterState.quick.groups = [];
+        filterState.quick.subprojects = [];
+        filterState.quick.boards = [];
+        filterState.quick.sections = [];
+        filterState.quick.search = "";
+        setFilterQuery(filterState, "");
+        updateMatcher(filterState);
+    }
 </script>
 
 <script lang="ts">
-    import { Clock, Flag, Funnel, Kanban, RotateCcw, SquarePlus, Tag, TextInitial, Users, View } from "lucide-svelte";
+    import { Clock, Flag, Funnel, Kanban, RotateCcw, SquarePlus, Tag, TextInitial, Users, View, X } from "lucide-svelte";
     import NewCardModal from "../NewCardModal.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
     import type { TypedBoardsResponse } from "$lib/data/project";
@@ -251,7 +264,23 @@
     <PopoverButton class={filterButtonClass}>
         <Funnel /> Filter
         {#if filterState.filter}
-            <span class="indicator">+</span>
+            <!-- we can't nest interactive elements, so we use div[role=button]. i don't think this is 
+             technically the correct solution for accessibility, but i'm not certain. -->
+            <span
+                class="indicator"
+                role="button"
+                tabindex="0"
+                onclick={(e) => {
+                    e.stopPropagation();
+                    clearFilterState(filterState);
+                }}
+                onkeydown={(e) => {
+                    if(e.key === "Enter" || e.key === " ") {
+                        e.stopPropagation();
+                        clearFilterState(filterState);
+                    }
+                }}
+            ><X /></span>
         {/if}
         {#snippet content()}
             <FilterMenu bind:filterState {project} {board} {hiddenViewCategories} />
@@ -264,12 +293,6 @@
         {/if}
         {#snippet content()}
             <div class="view-items">
-                <button
-                    onclick={() => {
-                        filterState.view = Object.fromEntries(Object.keys(filterState.view).map((key) => [key, true])) as FilterViewState;
-                    }}
-                    disabled={hiddenViewItems === 0}
-                ><RotateCcw class={$css("reset-icon")} /> Reset</button>
                 {#each (Object.entries(viewLabels) as [keyof FilterViewState, string][]) as [key, label]}
                     {#if !hiddenViewCategories.includes(key as keyof FilterViewState)}
                         <label>
@@ -286,6 +309,12 @@
                         </label>
                     {/if}
                 {/each}
+                <button
+                    onclick={() => {
+                        filterState.view = Object.fromEntries(Object.keys(filterState.view).map((key) => [key, true])) as FilterViewState;
+                    }}
+                    disabled={hiddenViewItems === 0}
+                ><RotateCcw class={$css("reset-icon")} /> Reset</button>
             </div>
         {/snippet}
     </PopoverButton>
@@ -347,6 +376,13 @@ menu {
 .indicator {
     font-size: var(--font-small);
     color: var(--accent);
-    margin: 0 0.25em;
+    padding: 0.25rem;
+    margin: -0.25rem;
+}
+.indicator[role=button] {
+    transition: color 0.2s ease;
+    &:hover {
+        color: color-mix(in srgb, var(--accent), var(--text-primary) 50%);
+    }
 }
 </style>

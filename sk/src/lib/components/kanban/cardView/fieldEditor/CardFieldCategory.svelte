@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { CardMetadataSection } from "$lib/data/project";
     import CardFieldEditorFull from "./CardFieldEditorFull.svelte";
     import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
     import { Trash } from "lucide-svelte";
+    import type { CardMetadataSection } from "$lib/data/metadata";
 
     let {
         fields, card = $bindable()

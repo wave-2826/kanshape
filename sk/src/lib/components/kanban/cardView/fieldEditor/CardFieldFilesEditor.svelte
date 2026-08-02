@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/project';
-    import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
     import { getUploadContext } from './uploadContext';
     import PopoverButton from '$lib/components/PopoverButton.svelte';
     import { partExportTypes, type PartExport, type PartExportType } from '$lib/data/parts';
     import { client } from '$lib/pocketbase';
     import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+    import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/metadata';
+    import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
 
     let {
         type, value = $bindable()
     }: {
-        type: CardMetadataFieldType<false> & { base: "file" },
+        type: CardMetadataFieldType & { base: "file" },
         value: MetadataFile | MetadataFile[] | null
     } = $props();
 

@@ -122,7 +122,7 @@ export type OnshapeLocation = "right-panel-part-studio" | "right-panel-assembly"
 export class OnshapeClient {
     private boundHandleMessage: (event: MessageEvent) => void;
     private baseDomain: string;
-    private keepAliveInterval: number | null = null;
+    private keepAliveInterval: ReturnType<typeof setTimeout> | null = null;
 
     /** The transient entity IDs selected. */
     public selections: Writable<OnshapeSelection[]> = writable([]);

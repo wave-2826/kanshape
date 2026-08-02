@@ -8,10 +8,11 @@
     import InlineSelector from "$lib/components/InlineSelector.svelte";
     import { localToZoned, tomorrowDate, zonedToLocal } from "$lib/datetime";
     import CardDependencySelector from "./CardDependencySelector.svelte";
-    import { getCardMetadataItems, getExtraMetadataItems, type TypedBoardsResponse } from "$lib/data/project";
+    import { type TypedBoardsResponse } from "$lib/data/project";
     import type { ExpandResponse } from "$lib/pocketbase";
     import CardFieldCategory from "./fieldEditor/CardFieldCategory.svelte";
     import type { CardSelectState } from "./fieldEditor/uploadContext";
+    import { getCardMetadataItems, getExtraMetadataItems } from "$lib/data/metadata";
 
     let {
         board,
@@ -41,12 +42,7 @@
 
     const sections = $derived(board?.expand.sections ?? []);
 
-    const metadataItems = $derived(board ? getCardMetadataItems(board, {
-        board: $state.snapshot(board) as TypedBoardsResponse,
-        // svelte-ignore state_snapshot_uncloneable - symbols are ""unclonable"", but passing by reference
-        // is okay because they're immutable
-        metadata: $state.snapshot(card.metadata as any) // tsc errors without as any ???
-    }, true) : null);
+    const metadataItems = $derived(board ? getCardMetadataItems(board) : null);
     const extraItems = $derived(metadataItems ? getExtraMetadataItems(metadataItems, card.metadata) : null);
 </script>
 

@@ -5,7 +5,6 @@
     import { Collections, type PartsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import { Plus } from "lucide-svelte";
     import CardView from "./cardView/CardView.svelte";
-    import { CREATE_SYMBOL, transformMetadata, walkMetadata, type CreationExportPartTarget, type MetadataFile, type MetadataValue, type TypedBoardsResponse } from "$lib/data/project";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { Snippet } from "svelte";
     import { setUploadContext, type UploadContext } from "./cardView/fieldEditor/uploadContext";
@@ -13,6 +12,8 @@
     import type { CreationPart } from "../parts/partData";
     import { queryExistingParts, generatePartPreview, updatePartRecord } from "../parts/CardPartEditor.svelte";
     import { generateRecordID } from "$lib/onshape/client";
+    import type { TypedBoardsResponse } from "$lib/data/project";
+    import { CREATE_SYMBOL, transformMetadata, walkMetadata, type CreationExportPartTarget, type MetadataFile, type MetadataValue } from "$lib/data/metadata";
 
     const {
         board,

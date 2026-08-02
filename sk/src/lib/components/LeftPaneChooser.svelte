@@ -1,10 +1,10 @@
-<script lang="ts">
+<script lang="ts" generics="K">
     import { GripHorizontal, Plus, Trash2 } from "lucide-svelte";
     import type { Snippet } from "svelte";
 
-    let selected: number | null = $state(null);
+    let selected: K | null = $state(null);
 
-    type OptionData = { name: string; tooltip?: string; color?: string };
+    type OptionData = { key: K, name: string; tooltip?: string; color?: string };
 
     const {
         options,
@@ -18,7 +18,7 @@
     }: {
         options: OptionData[],
         ordered?: boolean,
-        pane: Snippet<[number]>,
+        pane: Snippet<[K]>,
         oncreate?: () => void,
         ondelete?: (option: number) => void,
         onreorder?: (from: number, to: number) => void,
@@ -109,7 +109,7 @@
                 const selArr = options.map((_, i) => i);
                 const selItem = selArr.splice(from, 1)[0];
                 selArr.splice(to, 0, selItem);
-                selected = selArr.indexOf(selected);
+                selected = options[selArr.indexOf(selItem)]?.key ?? null;
             }
         }
 
@@ -132,18 +132,18 @@
 })}
     <li
         data-index={i} class={`list-item button ${classname}`} {style}
-        class:selected={selected === i} class:dragging={dragState !== null}
+        class:selected={selected === option.key} class:dragging={dragState !== null}
     >
         {#if ordered}
             <button
-                onclick={() => selected = i}
+                onclick={() => selected = option.key}
                 class="unstyled action drag"
                 onpointerdown={(ev) => startDrag(ev as PointerEvent, i)}
                 aria-label="Reorder"
             ><GripHorizontal /></button>
         {/if}
         <button
-            onclick={() => selected = i}
+            onclick={() => selected = option.key}
             class="unstyled label"
             style={option.color ? `color: ${option.color}` : undefined}
             title={option.tooltip}
@@ -153,8 +153,7 @@
         {#if ondelete}
             <button onclick={() => {
                 ondelete(i);
-                if(selected === i) selected = null;
-                else if(selected !== null && selected > i) selected = selected - 1;
+                if(selected === option.key) selected = null;
             }} class="unstyled action delete"><Trash2 /></button>
         {/if}
     </li>
@@ -191,7 +190,7 @@
                 <li>
                     <button onclick={() => {
                         oncreate();
-                        selected = options.length - 1;
+                        selected = options[options.length - 1]?.key ?? null;
                     }} class="label"><Plus />Create new</button>
                 </li>
             {/if}

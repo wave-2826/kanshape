@@ -9,7 +9,7 @@
     const { date }: { date: Date } = $props();
 
     let timeString = $derived(relativeTime(date));
-    let interval: number;
+    let interval: ReturnType<typeof setTimeout>;
 
     function update() {
         timeString = relativeTime(date);

@@ -2,15 +2,15 @@
 
 <script lang="ts">
     import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
-    import { type CardMetadataField, checkMetadataValue, CREATE_SYMBOL, defaultMetadataFieldValue } from "$lib/data/project";
     import { TriangleAlert } from "lucide-svelte";
     import CardFieldEditor from "./CardFieldEditor.svelte";
     import { getUploadContext } from "./uploadContext";
+    import { checkMetadataValue, CREATE_SYMBOL, defaultMetadataFieldValue, type CardMetadataField } from "$lib/data/metadata";
     
     let {
         field, card = $bindable()
     }: {
-        field: CardMetadataField<false> & { id: string },
+        field: CardMetadataField & { id: string },
         card: TypedCardsResponse | TypedCardsCreate
     } = $props();
 

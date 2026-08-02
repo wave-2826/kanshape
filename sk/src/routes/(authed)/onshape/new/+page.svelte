@@ -17,7 +17,7 @@
     import { getPartData, getSelectionCreationData, type CreationPart, type PartSelection } from "$lib/components/parts/partData";
     import PopoverButton from "$lib/components/PopoverButton.svelte";
     import type { PartExportType } from "$lib/data/parts";
-    import { boardTypesConst, CREATE_SYMBOL, type MetadataFile } from "$lib/data/project";
+    import { boardTypesConst } from "$lib/data/project";
     import { nav } from "$lib/navigation";
     import { save, watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
@@ -25,6 +25,7 @@
     import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "lucide-svelte";
     import { untrack } from "svelte";
     import PartSelectButton from "./PartSelectButton.svelte";
+    import { CREATE_SYMBOL, type MetadataFile } from "$lib/data/metadata";
 
     const onshapeCtx = getOnshapeContext();
 

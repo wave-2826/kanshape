@@ -4,8 +4,6 @@ cases where the expected type doesn't match the value type by displaying a reset
 -->
 <script lang="ts">
     import { autoSize } from "$lib/actions";
-    import type { CardMetadata } from "$lib/data/cards";
-    import { CREATE_SYMBOL, defaultMetadataFieldValue, type CardMetadataFieldType, type MetadataFile, type MetadataValue } from "$lib/data/project";
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
     import CardFieldEditor from "./CardFieldEditor.svelte";
@@ -14,12 +12,13 @@ cases where the expected type doesn't match the value type by displaying a reset
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import type { CreationPart } from "$lib/components/parts/partData";
     import CardFieldFilesEditor from "./CardFieldFilesEditor.svelte";
+    import { CREATE_SYMBOL, type CardMetadata, type CardMetadataFieldType, type MetadataFile, type MetadataValue, defaultMetadataFieldValue } from "$lib/data/metadata";
 
     let {
         type, value = $bindable(),
         cardId
     }: {
-        type: CardMetadataFieldType<false>,
+        type: CardMetadataFieldType,
         value: CardMetadata[string]["value"],
         cardId?: string
     } = $props();
@@ -36,7 +35,9 @@ cases where the expected type doesn't match the value type by displaying a reset
     }
 </script>
 
-{#if type.base === "text"}
+{#if type.base === "empty"}
+    <span class="empty">No value</span>
+{:else if type.base === "text"}
     <input type="text" bind:value={get, set<string>} />
 {:else if type.base === "longtext"}
     <textarea bind:value={get, set<string>} placeholder="Enter description..." use:autoSize={value}></textarea>
@@ -138,70 +139,75 @@ cases where the expected type doesn't match the value type by displaying a reset
 {/if}
 
 <style lang="scss">
-    input, textarea {
+.empty {
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+input, textarea {
+    flex: 1;
+    padding: 0.25rem 0.5rem;
+    min-width: 0;
+}
+
+.select {
+    display: contents;
+    > :global(*) {
         flex: 1;
-        padding: 0.25rem 0.5rem;
         min-width: 0;
     }
+}
 
-    .select {
-        display: contents;
-        > :global(*) {
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+
+    .list-item {
+        display: flex;
+        gap: 0.25rem;
+        
+        > :global(:first-child) {
             flex: 1;
             min-width: 0;
         }
-    }
-
-    .list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        flex: 1;
-        min-width: 0;
-
-        .list-item {
-            display: flex;
-            gap: 0.25rem;
-            
-            > :global(:first-child) {
-                flex: 1;
-                min-width: 0;
-            }
-            .remove {
-                padding: 0.25rem;
-            }
-        }
-
-        .add-item {
-            align-self: flex-end;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
+        .remove {
+            padding: 0.25rem;
         }
     }
 
-    .tuple {
-        display: flex;
+    .add-item {
+        align-self: flex-end;
         gap: 0.25rem;
-        flex: 1;
-        min-width: 0;
+        padding: 0.25rem 0.5rem;
     }
+}
 
-    .custom-select {
-        display: flex;
-        min-width: min-content;
+.tuple {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.custom-select {
+    display: flex;
+    min-width: min-content;
+    flex: 0;
+
+    &.is-other select {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        width: 5rem;
+    }
+    &.is-other input[type="text"] {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
         flex: 0;
-
-        &.is-other select {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            width: 5rem;
-        }
-        &.is-other input[type="text"] {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            flex: 0;
-            width: 10rem;
-            border-left: 1px solid var(--border);
-        }
+        width: 10rem;
+        border-left: 1px solid var(--border);
     }
+}
 </style>

@@ -1,9 +1,9 @@
 import { createContext } from "svelte";
 import { type TypedCardsResponse } from "../../../../data/cards";
 import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-import type { MetadataFile } from "$lib/data/project";
 import type { TypedPartsResponse } from "$lib/data/parts";
 import type { CreationPart } from "$lib/components/parts/partData";
+import type { MetadataFile } from "$lib/data/metadata";
 
 // todo: there's probably a better place for this type
 // also todo: this could be cleaned up with a more general context passing information down instead of callbacks

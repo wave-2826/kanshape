@@ -1,5 +1,5 @@
 import { loadConfig } from "$lib/config";
-import type { LayoutLoad } from "../(authed)/$types";
+import type { PageLoad } from "./$types";
 
 // turn off SSR - we're JAMstack here
 export const ssr = false;
@@ -8,7 +8,7 @@ export const prerender = false;
 // trailing slashes make relative paths much easier
 export const trailingSlash = "always";
 
-export const load: LayoutLoad = async ({ fetch }) => {
+export const load: PageLoad = async ({ fetch }) => {
     return {
         config: await loadConfig(fetch)
     };

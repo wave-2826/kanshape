@@ -16,7 +16,11 @@
 </script>
 
 <LeftPaneChooser
-    options={linkedSites?.map(s => ({ name: s.name ?? "", tooltip: s.url })) ?? []}
+    options={linkedSites?.map((s, i) => ({
+        name: s.name ?? "",
+        tooltip: s.url,
+        key: i
+    })) ?? []}
     oncreate={() => {
         if(!linkedSites) linkedSites = [];
         linkedSites.push({ name: `New site`, url: "" })

@@ -2,7 +2,7 @@
     import { client, queryOne, save, stripExpand, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import { Collections, type FileNameString, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import ModalPanel from "$lib/components/ModalPanel.svelte";
-    import { walkMetadata, walkMetadataValues, type MetadataFile, type TypedBoardsResponse } from "$lib/data/project";
+    import { type TypedBoardsResponse } from "$lib/data/project";
     import { deasyncify, debounce, deepEqual } from "$lib/util";
     import CardView from "./CardView.svelte";
     import { readable, type Readable } from "svelte/store";
@@ -12,6 +12,7 @@
     import type { TypedCardsResponse } from "$lib/data/cards";
     import { setUploadContext, type CardSelectState, type UploadContext } from "./fieldEditor/uploadContext";
     import { untrack } from "svelte";
+    import { walkMetadata, walkMetadataValues, type MetadataFile } from "$lib/data/metadata";
 
     let {
         board,

@@ -56,7 +56,11 @@
 
 <h2>Boards</h2>
 <LeftPaneChooser
-    options={boards.map(b => ({ name: b.title ?? "", tooltip: b.description }))}
+    options={boards.map((b, i) => ({
+        name: b.title ?? "",
+        tooltip: b.description,
+        key: i
+    }))}
     oncreate={() => boards.push({
         title: `Board ${boards.length + 1}`,
         type: "blank",
@@ -82,7 +86,11 @@
 
 <h2>Subprojects</h2>
 <LeftPaneChooser
-    options={subprojects.map(sp => ({ name: sp.name ?? "", tooltip: sp.description }))}
+    options={subprojects.map((sp, i) => ({
+        name: sp.name ?? "",
+        tooltip: sp.description,
+        key: i
+    }))}
     oncreate={() => subprojects.push({
         name: `Subproject ${subprojects.length + 1}`,
         part_id_offset: (subprojects.length + 1) * 1000

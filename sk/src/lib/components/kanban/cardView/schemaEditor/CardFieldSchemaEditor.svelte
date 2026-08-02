@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { CardMetadataFieldType } from "$lib/data/project";
+    import type { CardMetadataFieldType } from "$lib/data/metadata";
     import { Plus, X } from "lucide-svelte";
     import CardFieldSchemaEditor from "./CardFieldSchemaEditor.svelte";
 
     let {
         type = $bindable()
     }: {
-        type: CardMetadataFieldType<false>
+        type: CardMetadataFieldType
     } = $props();
 </script>
 
@@ -14,7 +14,7 @@
     <select bind:value={
         () => type.base,
         (v) => {
-            type = { base: v } as CardMetadataFieldType<false>;
+            type = { base: v } as CardMetadataFieldType;
             if(type.base === "user" || type.base === "group" || type.base === "file") {
                 type.multi = false;
             } else if(type.base === "list") {
@@ -30,6 +30,7 @@
             }
         }
     }>
+        <option value="empty">Empty</option>
         <option value="text">Text</option>
         <option value="longtext">Long Text</option>
         <option value="number">Number</option>

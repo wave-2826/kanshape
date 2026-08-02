@@ -1,6 +1,6 @@
 import type { CardsPriorityOptions, CardsResponse, Create, UsersResponse } from "$lib/pocketbase/generated-types";
 import type { TypedCardPreviewResponse } from "./kanban";
-import type { CardMetadataFieldType, MetadataValue } from "./project";
+import type { CardMetadata } from "./metadata";
 
 export type TypedCardsResponse<Expand = {}> = CardsResponse<CardAssignmentData, CardMetadata, Expand>;
 export type TypedCardsCreate = Required<
@@ -40,6 +40,9 @@ export type CardAssignmentData = {
     type: "looking_for_assignment"
 } | null;
 
+/**
+ * check if the given card is assigned to this current user.
+ */
 export function assignedToSelf(card: TypedCardPreviewResponse, auth: UsersResponse | null) {
     const assignment = card.assignment_data as CardAssignmentData;
     if(!assignment) return false;
@@ -51,12 +54,3 @@ export function assignedToSelf(card: TypedCardPreviewResponse, auth: UsersRespon
     if(assignment.type === "groups" && assignment.ids.some(id => auth.groups.includes(id))) return true;
     return false;
 }
-
-export type CardMetadata = {
-    [id: string]: {
-        /** The value of the metadata field */
-        value: MetadataValue;
-        /** The metadata type is stored on the field to stay valid after schema changes */
-        type: CardMetadataFieldType<false>;
-    }
-};

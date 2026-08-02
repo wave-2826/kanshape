@@ -135,7 +135,12 @@
 
     <h2>Sections</h2>
     <LeftPaneChooser
-        options={board.sections?.map(s => ({ name: s.title ?? "", tooltip: s.description, color: s.color })) ?? []}
+        options={board.sections?.map((s, i) => ({
+            name: s.title ?? "",
+            tooltip: s.description,
+            color: s.color,
+            key: i
+        })) ?? []}
         oncreate={() => {
             if(!board.sections) board.sections = [];
             board.sections.push({ title: `Section ${board.sections.length + 1}`, description: "", color: undefined, is_completed: false });

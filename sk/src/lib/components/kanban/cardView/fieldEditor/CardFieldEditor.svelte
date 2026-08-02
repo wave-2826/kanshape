@@ -144,10 +144,15 @@ cases where the expected type doesn't match the value type by displaying a reset
     color: var(--text-secondary);
 }
 
-input, textarea {
+input:not([type="checkbox"]), textarea {
     flex: 1;
     padding: 0.25rem 0.5rem;
     min-width: 0;
+}
+input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin: 0 0.25rem;
 }
 
 .select {
@@ -187,6 +192,7 @@ input, textarea {
 
 .tuple {
     display: flex;
+    align-items: center;
     gap: 0.25rem;
     flex: 1;
     min-width: 0;

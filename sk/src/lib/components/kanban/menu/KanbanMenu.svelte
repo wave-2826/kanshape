@@ -192,7 +192,7 @@
 </script>
 
 <script lang="ts">
-    import { Clock, Flag, Funnel, Kanban, RotateCcw, SquarePlus, Tag, TextInitial, Users, View, X } from "lucide-svelte";
+    import { Clock, Flag, Funnel, Kanban, RotateCcw, SquarePlus, Tag, TextInitial, Users, View, X } from "@lucide/svelte";
     import NewCardModal from "../NewCardModal.svelte";
     import type { ExpandResponse } from "$lib/pocketbase";
     import type { TypedBoardsResponse } from "$lib/data/project";

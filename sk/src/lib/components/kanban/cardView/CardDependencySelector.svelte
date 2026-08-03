@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
-    import { Trash } from "lucide-svelte";
+    import { Trash } from "@lucide/svelte";
     import KanbanListEntry from "../KanbanListEntry.svelte";
     import type { TypedCardsResponse } from "$lib/data/cards";
 

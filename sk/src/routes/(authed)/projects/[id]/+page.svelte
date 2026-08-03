@@ -2,7 +2,7 @@
   import BoardOverviewItems from './BoardOverviewItems.svelte';
 
     import { link } from "$lib/actions";
-    import { AlarmClock, CheckCheck, Clock, Kanban, ListCheck, Settings, Tag } from "lucide-svelte";
+    import { AlarmClock, CheckCheck, Clock, Kanban, ListCheck, Settings, Tag } from "@lucide/svelte";
     import { getProjectContext } from "./context";
     import type { ProjectLinkedSite } from "$lib/data/project";
     import ProjectPage from "./ProjectPage.svelte";

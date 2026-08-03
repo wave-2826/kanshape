@@ -4,7 +4,7 @@
     import { nav } from "$lib/navigation";
     import { type ExpandResponse } from "$lib/pocketbase";
     import { grow } from "$lib/transitions";
-    import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "lucide-svelte";
+    import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "@lucide/svelte";
     import { untrack } from "svelte";
     
     // svelte-ignore non_reactive_update ???

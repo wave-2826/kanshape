@@ -42,7 +42,7 @@
   },
   "type": "module",
   "dependencies": {
-    "lucide-svelte": "^1.0.1",
+    "@lucide/svelte": "^1.28.0",
     "openapi-fetch": "^0.17.0",
     "pocketbase": "^0.26.9",
     "three": "^0.185.1"

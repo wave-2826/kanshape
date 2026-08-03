@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Loader } from "lucide-svelte";
+    import { Loader } from "@lucide/svelte";
 
     const { class: _class }: { class?: string } = $props();
 </script>

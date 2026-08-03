@@ -2,7 +2,7 @@
     import { metadata } from "$lib/metadata";
     import { batch, save } from "$lib/pocketbase";
     import { Collections, type Create } from "$lib/pocketbase/generated-types";
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import { getTemplateSections, type ProjectLinkedSite } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
     import type { BoardCreationData } from "$lib/components/projects/BoardSettings.svelte";

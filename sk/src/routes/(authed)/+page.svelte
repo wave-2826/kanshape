@@ -7,7 +7,7 @@
     import { watch } from "$lib/pocketbase";
     import { Collections, type AssignedCardsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-    import { AlarmClock, ChevronDown, ChevronUp, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "lucide-svelte";
+    import { AlarmClock, ChevronDown, ChevronUp, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "@lucide/svelte";
     import type { ListResult } from "pocketbase";
     import { writable, type Readable } from "svelte/store";
     import ActivityEntry from "./log/ActivityEntry.svelte";

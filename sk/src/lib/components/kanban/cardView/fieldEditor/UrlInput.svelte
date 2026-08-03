@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ExternalLink, Pencil, Save, X } from "lucide-svelte";
+    import { ExternalLink, Pencil, Save, X } from "@lucide/svelte";
 
     let {
         value = $bindable()

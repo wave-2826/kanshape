@@ -2,7 +2,7 @@
     import ModalPanel from "$lib/components/ModalPanel.svelte";
     import { deleteRecord, type ExpandResponse, type PageStore } from "$lib/pocketbase";
     import Paginator from "$lib/pocketbase/Paginator.svelte";
-    import { Pencil, Trash } from "lucide-svelte";
+    import { Pencil, Trash } from "@lucide/svelte";
     import UsersEditView from "./UsersEditView.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { authModel } from "$lib/pocketbase/auth";

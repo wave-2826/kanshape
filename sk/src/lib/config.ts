@@ -63,14 +63,14 @@ const defaultConfig: AppConfig = {
 };
 export type ConfigValueType = {
     optional: boolean;
-    type: "string" | "number" | "boolean";
+    type: "string" | "number" | "boolean" | "file" | "oauth-provider";
     name?: string;
 };
 export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
-    "auth/autoOAuth": { optional: true, type: "string", name: "Automatically authenticate with OAuth provider" },
+    "auth/autoOAuth": { optional: true, type: "oauth-provider", name: "Automatically authenticate with OAuth provider" },
     "site/name": { optional: false, type: "string", name: "Site Name" },
-    "site/logoUrl": { optional: true, type: "string", name: "Site Logo URL" },
-    "site/faviconUrl": { optional: false, type: "string", name: "Site Favicon URL" },
+    "site/logoUrl": { optional: true, type: "file", name: "Site Logo" },
+    "site/faviconUrl": { optional: true, type: "file", name: "Site Favicon" },
     "site/publicUrl": { optional: false, type: "string", name: "Site Public URL" },
     "onshape/clientId": { optional: false, type: "string", name: "Onshape OAuth Client ID" },
     "onshape/clientSecret": { optional: false, type: "string", name: "Onshape OAuth Client Secret" },
@@ -113,7 +113,7 @@ export async function loadConfig(fetch: typeof window.fetch = window.fetch): Pro
 
     configPathIDs = new Map();
 
-    let result = defaultConfig;
+    let result = structuredClone(defaultConfig);
     for(const { key, value, id } of pairs) {
         const path = key as ConfigPath;
         configPathIDs.set(path, id);
@@ -130,11 +130,18 @@ export async function updateConfig<K extends ConfigPath>(
 ): Promise<void> {
     if(!configPathIDs) loadConfig(fetch);
 
+    const config = configCache ??= structuredClone(defaultConfig);
+    setPath(config, path.split("/"), value);
+
     const id = configPathIDs!.get(path);
     await save(Collections.Config, { id, key: path, value: value ?? undefined }, {
         create: id === undefined,
         fetch
     });
+}
+
+export function getDefaultConfigValue<K extends ConfigPath>(path: K): LeafPathType<AppConfig, K> {
+    return getPath(defaultConfig, path.split("/"));
 }
 
 /** Helper function to set a value at a specific path in an object. */
@@ -145,5 +152,15 @@ function setPath(obj: any, path: string[], value: any) {
         const key = path.shift()!;
         if(!obj[key]) obj[key] = {};
         setPath(obj[key], path, value);
+    }
+}
+/** Helper function to get a value at a specific path in an object. */
+function getPath(obj: any, path: string[]): any {
+    if(path.length === 1) {
+        return obj[path[0]];
+    } else {
+        const key = path.shift()!;
+        if(!obj[key]) return undefined;
+        return getPath(obj[key], path);
     }
 }

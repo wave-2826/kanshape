@@ -1,7 +1,7 @@
 <script lang="ts" generics="Item extends { id: string; name: string }">
     // I hate the code duplication here, but oh well...
 
-	import { Check, ChevronDown } from "lucide-svelte";
+	import { Check, ChevronDown } from "@lucide/svelte";
 	import { fly } from "svelte/transition";
 	import type { Snippet } from "svelte";
 	import Portal from "./Portal.svelte";

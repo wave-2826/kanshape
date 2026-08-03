@@ -4,7 +4,7 @@
     import { type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { type ExpandResponse } from "$lib/pocketbase";
-    import { X } from "lucide-svelte";
+    import { X } from "@lucide/svelte";
     import NewCardView from "./NewCardView.svelte";
 
     let {

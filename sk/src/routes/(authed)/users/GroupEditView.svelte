@@ -3,7 +3,7 @@
     import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
     import { Collections, type GroupOverviewRecord, type UsersRecord } from "$lib/pocketbase/generated-types";
     import { debounce } from "$lib/util";
-    import { Trash } from "lucide-svelte";
+    import { Trash } from "@lucide/svelte";
     import { untrack } from "svelte";
     import { authModel } from "$lib/pocketbase/auth";
 

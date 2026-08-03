@@ -22,8 +22,8 @@
         }
     });
 
-    const config = $derived(data.config ?? {});
     // svelte-ignore state_referenced_locally
+    const config = $state(data.config ?? {});
     setConfig(config);
 </script>
 

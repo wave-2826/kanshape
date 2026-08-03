@@ -3,7 +3,7 @@
     import { client, save, type ExpandResponse } from "$lib/pocketbase";
     import { authModel } from "$lib/pocketbase/auth";
     import { Collections, type PartsResponse, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import CardView from "./cardView/CardView.svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { Snippet } from "svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { CardMetadataFieldType } from "$lib/data/metadata";
-    import { Plus, X } from "lucide-svelte";
+    import { Plus, X } from "@lucide/svelte";
     import CardFieldSchemaEditor from "./CardFieldSchemaEditor.svelte";
 
     let {
@@ -114,7 +114,7 @@
                     }}><X /></button>
                     <input type="text" bind:value={option.value} oninput={(e) => {
                         if(type.base !== "select") return;
-                        type.options[i].value = (e.target as HTMLInputElement).value;
+                        type.options[i].value = e.currentTarget.value;
                     }} />
                 </div>
             {/each}

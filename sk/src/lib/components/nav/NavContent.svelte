@@ -2,7 +2,7 @@
     import { page } from "$app/state";
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { AlarmClock, FolderKanban, Medal, Plus, Settings, Users } from "lucide-svelte";
+    import { AlarmClock, FolderKanban, Medal, Plus, Settings, Users } from "@lucide/svelte";
     import { link } from "$lib/actions";
     import NavProject from "./NavProject.svelte";
     import { authModel } from "$lib/pocketbase/auth";

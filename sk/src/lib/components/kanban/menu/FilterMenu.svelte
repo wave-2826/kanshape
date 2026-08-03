@@ -7,7 +7,7 @@
     import InlineCollectionSelector from "$lib/pocketbase/selector/InlineCollectionSelector.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import type { TypedBoardsResponse } from "$lib/data/project";
-    import { Clock, Flag, Kanban, Tag, Users } from "lucide-svelte";
+    import { Clock, Flag, Kanban, Tag, Users } from "@lucide/svelte";
     import { getPriorityColor } from "$lib/data/cards";
     import { authModel } from "$lib/pocketbase/auth";
     import { getGroupName } from "../nameCache";

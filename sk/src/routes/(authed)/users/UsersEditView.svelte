@@ -2,7 +2,7 @@
     import { queryOne, save } from "$lib/pocketbase";
     import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
     import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
-    import { Info, Trash } from "lucide-svelte";
+    import { Info, Trash } from "@lucide/svelte";
     import { authModel } from "$lib/pocketbase/auth";
 
     const { user, ondelete }: {

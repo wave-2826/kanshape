@@ -247,6 +247,9 @@ export function contrastStyle(node: HTMLElement, styleText: string) {
     };
 }
 
-export function autofocus(node: HTMLElement, enabled: boolean) {
-    if(enabled) node.focus();
+export function autofocus(node: HTMLElement, enabled: boolean = true) {
+    // I'm not sure if this is the right way to do this, but...
+    requestAnimationFrame(() => {
+        if(enabled) node.focus();
+    });
 }

@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import type { TypedCardsCreate, TypedCardsResponse } from "$lib/data/cards";
-    import { TriangleAlert } from "lucide-svelte";
+    import { TriangleAlert } from "@lucide/svelte";
     import CardFieldEditor from "./CardFieldEditor.svelte";
     import { getUploadContext } from "./uploadContext";
     import { checkMetadataValue, CREATE_SYMBOL, defaultMetadataFieldValue, type CardMetadataField } from "$lib/data/metadata";

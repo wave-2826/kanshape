@@ -7,7 +7,7 @@ cases where the expected type doesn't match the value type by displaying a reset
     import CachedCollectionSelector from "$lib/pocketbase/selector/CachedCollectionSelector.svelte";
     import UrlInput from "./UrlInput.svelte";
     import CardFieldEditor from "./CardFieldEditor.svelte";
-    import { Plus, X } from "lucide-svelte";
+    import { Plus, X } from "@lucide/svelte";
     import CardPartEditor from "../../../parts/CardPartEditor.svelte";
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import type { CreationPart } from "$lib/components/parts/partData";

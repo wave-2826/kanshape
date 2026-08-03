@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { X } from "lucide-svelte";
+    import { X } from "@lucide/svelte";
     import type { Snippet } from "svelte";
     import { MediaQuery } from "svelte/reactivity";
     import { fade, fly } from "svelte/transition";

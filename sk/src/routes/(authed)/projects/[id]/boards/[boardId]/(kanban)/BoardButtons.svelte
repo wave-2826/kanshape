@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from "$app/state";
     import { link } from "$lib/actions";
-    import { ChartNoAxesGantt, Kanban, List } from "lucide-svelte";
+    import { ChartNoAxesGantt, Kanban, List } from "@lucide/svelte";
 
     const {
         projectId,

@@ -3,7 +3,7 @@
     import { authModel } from "$lib/pocketbase/auth";
     import { Collections } from "$lib/pocketbase/generated-types";
     import Paginator from "$lib/pocketbase/Paginator.svelte";
-    import { Trash } from "lucide-svelte";
+    import { Trash } from "@lucide/svelte";
     import ActivityEntry from "./ActivityEntry.svelte";
 
     const changes = $derived(await watch(Collections.ActivityLogPreview, {

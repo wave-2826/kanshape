@@ -5,7 +5,7 @@
 
 import type { Component } from "svelte";
 import { boardTypes, type TypedBoardsResponse } from "./project";
-import { Palette } from "lucide-svelte";
+import { Palette } from "@lucide/svelte";
 import type { PartExportType } from "./parts";
 import type { CreationPart } from "$lib/components/parts/partData";
 import type { TypedCardsCreate, TypedCardsResponse } from "./cards";
@@ -359,7 +359,7 @@ export function getCardMetadataItems(board: TypedBoardsResponse): CardMetadataSe
     const customFieldEntries = Object.entries(customFields);
     if (customFieldEntries.length > 0) {
         sections.push({
-            icon: Palette as unknown as Component, // sure...
+            icon: Palette,
             title: "Board Fields",
             fields: customFieldEntries.map(([id, field]) => {
                 return {

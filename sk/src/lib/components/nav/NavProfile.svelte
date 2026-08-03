@@ -1,6 +1,6 @@
 <script lang="ts">
     import { authModel } from "$lib/pocketbase/auth";
-    import { User } from "lucide-svelte";
+    import { User } from "@lucide/svelte";
     import { client } from "$lib/pocketbase";
     import PopoverButton from "../PopoverButton.svelte";
     import UserProfilePopover from "./UserProfilePopover.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
     import BoardButtons from './BoardButtons.svelte';
-    import { Settings } from "lucide-svelte";
+    import { Settings } from "@lucide/svelte";
     import type { Snippet } from "svelte";
     import { getProjectContext } from "../../../context";
     import type { ProjectLinkedSite } from "$lib/data/project";

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Tag } from "lucide-svelte";
+    import { Tag } from "@lucide/svelte";
     import { onMount, tick, type Snippet } from "svelte";
 
 	export type GanttItem = {

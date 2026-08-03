@@ -1,5 +1,5 @@
 <script lang="ts" generics="K">
-    import { GripHorizontal, Plus, Trash2 } from "lucide-svelte";
+    import { GripHorizontal, Plus, Trash2 } from "@lucide/svelte";
     import type { Snippet } from "svelte";
 
     let selected: K | null = $state(null);

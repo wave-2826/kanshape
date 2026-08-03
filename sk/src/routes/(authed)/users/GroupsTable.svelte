@@ -3,7 +3,7 @@
     import { deleteRecord, save, type PageStore } from "$lib/pocketbase";
     import { Collections, type GroupOverviewRecord } from "$lib/pocketbase/generated-types";
     import Paginator from "$lib/pocketbase/Paginator.svelte";
-    import { Pencil, Plus, Trash } from "lucide-svelte";
+    import { Pencil, Plus, Trash } from "@lucide/svelte";
     import GroupEditView from "./GroupEditView.svelte";
     import { authModel } from "$lib/pocketbase/auth";
 

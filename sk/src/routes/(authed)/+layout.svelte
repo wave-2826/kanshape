@@ -13,7 +13,7 @@
     import { page } from "$app/state";
     import { metadata } from "$lib/metadata";
     import { onMount } from "svelte";
-    import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from 'lucide-svelte';
+    import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from '@lucide/svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
     import NavProfile from "$lib/components/nav/NavProfile.svelte";
     import { dev } from "$app/environment";

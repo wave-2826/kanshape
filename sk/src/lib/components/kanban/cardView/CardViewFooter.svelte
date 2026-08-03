@@ -2,7 +2,7 @@
     import type { TypedCardsResponse } from "$lib/data/cards";
     import { deleteRecord } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { ExternalLink, Trash } from "lucide-svelte";
+    import { ExternalLink, Trash } from "@lucide/svelte";
     import { getUsername } from "../nameCache";
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
 

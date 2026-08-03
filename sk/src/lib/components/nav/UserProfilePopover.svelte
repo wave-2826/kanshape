@@ -5,7 +5,7 @@
     import { authModel, logout } from "$lib/pocketbase/auth";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-    import { LogOut } from "lucide-svelte";
+    import { LogOut } from "@lucide/svelte";
     import type { Readable } from "svelte/store";
     import ThemeSelector from "./ThemeSelector.svelte";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { relativeTime } from "$lib/datetime";
-    import { Check, CheckCheck, Clock, ListCheck } from "lucide-svelte";
+    import { Check, CheckCheck, Clock, ListCheck } from "@lucide/svelte";
 
     const {
         cardCount,

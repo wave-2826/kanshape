@@ -2,7 +2,7 @@
     import { getOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import { nav } from "$lib/navigation";
     import type { OnshapeSelection } from "$lib/onshape/client";
-    import { LoaderCircle } from "lucide-svelte";
+    import { LoaderCircle } from "@lucide/svelte";
 
     const {
         selections

@@ -2,7 +2,7 @@
     import { autofocus, autoSize } from "$lib/actions";
     import { getPriorityColor, priorities, type CardAssignmentData, type TypedCardsCreate, type TypedCardsResponse } from "$lib/data/cards";
     import type { SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "lucide-svelte";
+    import { Calendar, ChartColumnBig, Clock, FileQuestionMark, Flag, Kanban, ListTree, SquareKanban, Timer, Trash, Users } from "@lucide/svelte";
     import CardAssignmentValue from "./CardAssignmentValue.svelte";
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import InlineSelector from "$lib/components/InlineSelector.svelte";

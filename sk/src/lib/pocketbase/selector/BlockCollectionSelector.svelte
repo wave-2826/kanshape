@@ -5,7 +5,7 @@
 <script lang="ts" generics="Collection extends Collections">
     import { batch, client, save } from "$lib/pocketbase";
     import { debounce } from "$lib/util";
-    import { X } from "lucide-svelte";
+    import { X } from "@lucide/svelte";
     import { fly } from "svelte/transition";
     import type { CollectionRecords, Collections } from "../generated-types";
 

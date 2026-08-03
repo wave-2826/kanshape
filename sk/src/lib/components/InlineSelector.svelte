@@ -1,5 +1,5 @@
 <script lang="ts" generics="Item extends { id: string; name: string }">
-	import { Check, ChevronDown, X } from "lucide-svelte";
+	import { Check, ChevronDown, X } from "@lucide/svelte";
 	import { fly } from "svelte/transition";
 	import type { Snippet } from "svelte";
     import Portal from "./Portal.svelte";

@@ -5,7 +5,7 @@
     import { client } from '$lib/pocketbase';
     import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
     import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/metadata';
-    import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from 'lucide-svelte';
+    import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from '@lucide/svelte';
 
     let {
         type, value = $bindable()
@@ -92,7 +92,7 @@
         {#snippet uploadInput(close?: () => void)}
             {#if type.multi}
                 <input type="file" multiple onchange={async (e) => {
-                    const files = (e.target as HTMLInputElement).files;
+                    const files = e.currentTarget.files;
                     if(files && files.length > 0) {
                         for(const file of files) {
                             // The actual name of the file isn't the uploaded name, but we store it
@@ -105,7 +105,7 @@
                 }} />
             {:else}
                 <input type="file" onchange={async (e) => {
-                    const files = (e.target as HTMLInputElement).files;
+                    const files = e.currentTarget.files;
                     if(files && files.length > 0) {
                         const file = files[0];
                         const id = crypto.randomUUID().replace(/-/g, "");

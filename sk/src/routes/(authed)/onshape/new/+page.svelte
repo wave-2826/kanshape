@@ -22,7 +22,7 @@
     import { save, watch, watchOne } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify, formatDistance } from "$lib/util";
-    import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "lucide-svelte";
+    import { ArrowLeft, ChevronDown, Factory, Kanban, Link, SquareKanban, TriangleAlert } from "@lucide/svelte";
     import { untrack } from "svelte";
     import PartSelectButton from "./PartSelectButton.svelte";
     import { CREATE_SYMBOL, type MetadataFile } from "$lib/data/metadata";

@@ -1,7 +1,7 @@
 import type { Component } from "svelte";
 import type { BoardOverviewResponse, BoardsResponse, ProjectOverviewResponse, ProjectsResponse, SubprojectOverviewResponse } from "../pocketbase/generated-types";
 import type { CardMetadataField } from "./metadata";
-import { CodeXml, Factory } from "lucide-svelte";
+import { CodeXml, Factory } from "@lucide/svelte";
 import type { NonNullValuesExcept } from "./kanban";
 
 // TODO: Our database schema isn't very scalable. We should use back-relations instead of
@@ -59,7 +59,7 @@ export const boardTypesConst = {
         description: "A blank board with no special features"
     },
     "parts": {
-        icon: Factory as unknown as Component, // sure...
+        icon: Factory,
         name: "Parts board",
         description: "A board for manufacturing part tasks. Boards of this type are defaulted to when adding parts from Onshape and associate part IDs with all cards.",
         fields: {
@@ -101,7 +101,7 @@ export const boardTypesConst = {
         }
     },
     "software": {
-        icon: CodeXml as unknown as Component, // sure...
+        icon: CodeXml,
         name: "Software board",
         description: "A board for software development tasks. Tasks can be linked to pull requests, issues, and commits from Git platforms like Github.",
         fields: {

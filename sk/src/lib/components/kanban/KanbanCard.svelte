@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Clock, Flag, Tag, TextInitial, Users } from "lucide-svelte";
+    import { Clock, Flag, Tag, TextInitial, Users } from "@lucide/svelte";
     import { assignedToSelf, getPriorityColor, type CardAssignmentData } from "../../data/cards";
     import RelativeTime from "../RelativeTime.svelte";
     import { formatCloseDate, localDateFromDateOnly } from "$lib/datetime";

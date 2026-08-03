@@ -5,7 +5,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import { save, watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import { deasyncify, deepEqual } from "$lib/util";
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";

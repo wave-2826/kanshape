@@ -22,12 +22,12 @@
 
         try {
             // Get OIDC providers from PocketBase
-            const res = await client.send("/api/collections/users/auth-methods", {});
-            providers = (res?.authProviders ?? []).filter((p: AuthProviderInfo) => p.name !== "password");
+            const list = await client.collection("users").listAuthMethods();
+            providers = list.oauth2.providers;
 
             // If autologin is enabled, redirect to the provider immediately
             if(data.config.auth.autoOAuth !== null) {
-                const autoProvider = providers.find(p => p.displayName === data.config.auth.autoOAuth);
+                const autoProvider = providers.find(p => p.name === data.config.auth.autoOAuth);
                 if(autoProvider) providerLogin(autoProvider, client.collection("users"));
                 else error = `Auto-login provider "${data.config.auth.autoOAuth}" not found`;
             }

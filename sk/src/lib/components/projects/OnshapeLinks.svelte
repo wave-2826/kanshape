@@ -2,7 +2,7 @@
     import { getConfig } from "$lib/config";
     import { deleteRecord, watch, type PageStore } from "$lib/pocketbase";
     import { Collections, type OnshapeDocumentsResponse, type ProjectsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { X } from "lucide-svelte";
+    import { X } from "@lucide/svelte";
 
     const {
         linkedTo,

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { nav } from '$lib/navigation';
-    import { ArrowLeft, Save, Trash } from 'lucide-svelte';
+    import { ArrowLeft, Save, Trash } from '@lucide/svelte';
     import type { Snippet } from 'svelte';
 
     const {

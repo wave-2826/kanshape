@@ -1,7 +1,7 @@
 <script lang="ts">
     import { query, save } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { SquareKanban, Tag } from "lucide-svelte";
+    import { SquareKanban, Tag } from "@lucide/svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
 
     const { allowUnlinked = false }: {

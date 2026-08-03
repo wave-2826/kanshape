@@ -91,7 +91,7 @@
     import { deasyncify } from "$lib/util";
     import { readable, type Readable } from "svelte/store";
     import CardPart from "./CardPart.svelte";
-    import { RefreshCw } from "lucide-svelte";
+    import { RefreshCw } from "@lucide/svelte";
     import { getPartData, type PartSelection } from "./partData";
 
     let {

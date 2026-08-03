@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { PartData, TypedPartsResponse } from "$lib/data/parts";
     import { appearanceToHex } from "$lib/onshape/partHeuristics";
-    import { Box, Boxes, Cuboid, Cylinder, Diamond, Sparkles, X } from "lucide-svelte";
+    import { Box, Boxes, Cuboid, Cylinder, Diamond, Sparkles, X } from "@lucide/svelte";
     import PopoverButton from "../PopoverButton.svelte";
     import CardPartModal from "./CardPartModal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";

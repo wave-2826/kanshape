@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ArrowRight, ExternalLink, X } from "lucide-svelte";
+    import { ArrowRight, ExternalLink, X } from "@lucide/svelte";
     import Modal from "../Modal.svelte";
     import Portal from "../Portal.svelte";
     import PartPreviewRenderer from "./PartPreviewRenderer.svelte";

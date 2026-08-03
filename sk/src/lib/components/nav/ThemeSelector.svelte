@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Moon, Sun, SunMoon } from "lucide-svelte";
+    import { Moon, Sun, SunMoon } from "@lucide/svelte";
 
     const STORAGE_KEY = "theme";
     type Theme = "system" | "light" | "dark";

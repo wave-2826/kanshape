@@ -1,5 +1,5 @@
 <script>
-    import { ChevronDown, Link, Unlink } from "lucide-svelte";
+    import { ChevronDown, Link, Unlink } from "@lucide/svelte";
     import PopoverButton from "../PopoverButton.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deleteRecord } from "$lib/pocketbase";

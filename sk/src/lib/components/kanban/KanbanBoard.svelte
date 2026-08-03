@@ -1,7 +1,7 @@
 <script lang="ts">
     import { type ExpandResponse, type PageStore } from "$lib/pocketbase";
     import KanbanCard from "./KanbanCard.svelte";
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import CardViewPanel from "./cardView/CardViewPanel.svelte";
     import KanbanMenu, { createFilterState } from "./menu/KanbanMenu.svelte";
     import { sortCards, moveCard, type TypedCardPreviewResponse } from "$lib/data/kanban";

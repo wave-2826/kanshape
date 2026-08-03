@@ -2,7 +2,7 @@
     import { page } from "$app/state";
     import { link } from "$lib/actions";
     import type { ProjectLinkedSite } from "$lib/data/project";
-    import { Kanban, Settings } from "lucide-svelte";
+    import { Kanban, Settings } from "@lucide/svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
     import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";

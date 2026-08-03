@@ -1,7 +1,13 @@
 <script lang="ts">
-import { updateConfig, configTypes, getConfig } from "$lib/config";
+import { updateConfig, configTypes, getConfig, getDefaultConfigValue } from "$lib/config";
 import type { AppConfig, ConfigPath, ConfigValueType } from "$lib/config";
 import { metadata } from "$lib/metadata";
+    import { watch, type ExpandResponse } from "$lib/pocketbase";
+    import { Collections } from "$lib/pocketbase/generated-types";
+    import { deasyncify } from "$lib/util";
+import FileInput from "./FileInput.svelte";
+import FileManager from "./FileManager.svelte";
+import OAuthProviderDropdown from "./OAuthProviderDropdown.svelte";
 
 $effect(() => {
     $metadata.title = "Application settings";
@@ -31,9 +37,18 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
     }
     saving = false;
 }
+
+let files = $state<ExpandResponse<"files", "">[] | null>(null);
+const filesWatch = deasyncify(watch(Collections.Files));
+$effect(() => {
+    files = $filesWatch?.items ?? null;
+});
 </script>
 
 <div class="layout">
+    <h1 title="Files for site configuration. Doesn't display card files.">Site files</h1>
+    <FileManager bind:files />
+
     <div class="header">
         <h1>Settings</h1>
         {#if saving}<span class="saving">Saving...</span>{/if}
@@ -56,22 +71,38 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
                                         id={item.path} 
                                         type="text" 
                                         bind:value={(config as any)[category][item.key]}
-                                        onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).value)}
+                                        onchange={(e) => handleSave(item.path, e.currentTarget.value)}
                                     />
                                 {:else if item.type.type === 'boolean'}
                                     <input 
                                         id={item.path} 
                                         type="checkbox" 
                                         bind:checked={(config as any)[category][item.key]}
-                                        onchange={(e) => handleSave(item.path, (e.target as HTMLInputElement).checked)}
+                                        onchange={(e) => handleSave(item.path, e.currentTarget.checked)}
                                     />
                                 {:else if item.type.type === 'number'}
                                     <input 
                                         id={item.path} 
                                         type="number" 
                                         bind:value={(config as any)[category][item.key]}
-                                        onchange={(e) => handleSave(item.path, Number((e.target as HTMLInputElement).value))}
+                                        onchange={(e) => handleSave(item.path, Number(e.currentTarget.value))}
                                     />
+                                {:else if item.type.type === 'oauth-provider'}
+                                    <OAuthProviderDropdown
+                                        id={item.path}
+                                        bind:value={(config as any)[category][item.key]}
+                                        onchange={(e) => handleSave(item.path, e.currentTarget.value)}
+                                    />
+                                {:else if item.type.type === 'file'}
+                                    <FileInput
+                                        files={files}
+                                        id={item.path}
+                                        bind:value={(config as any)[category][item.key]}
+                                        defaultValue={getDefaultConfigValue(item.path) ?? undefined}
+                                        onchange={(e) => handleSave(item.path, e.currentTarget.value)}
+                                    />
+                                {:else}
+                                    <p>Unknown type {item.type.type}</p>
                                 {/if}
                             </div>
                         {/each}
@@ -84,7 +115,7 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
 
         <div>
             <hr />
-            <p>Other settings can be found in the <a href="/_/">PocketBase admin dashboard.</a></p>
+            <p>Other settings, such as authentication methods, can be found in the <a href="/_/#/collections?collection=users" target="_blank">PocketBase admin dashboard</a>.</p>
         </div>
     </div>
 </div>
@@ -97,11 +128,14 @@ async function handleSave(path: ConfigPath, value: string | boolean | number) {
     overflow: auto;
 }
 
+h1 {
+    margin-bottom: 0.5rem;
+}
 .header {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-top: 1rem;
 }
 .saving {
     color: var(--text-secondary);

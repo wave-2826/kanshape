@@ -1,6 +1,6 @@
 services:
   pb:
-    image: alpine:latest
+    image: node:22-alpine
     depends_on:
       sk:
         condition: service_completed_successfully

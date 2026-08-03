@@ -120,6 +120,8 @@ export function watchOnshapeContext(
                 }
             });
         });
+    } else {
+        alert("No document ID provided");
     }
 
     return () => unsub?.();

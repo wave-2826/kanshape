@@ -23,7 +23,7 @@ The scope extends a bit beyond Kanban:
 - [x] Onshape document-level kanban view and linking
 - [x] Documentation/other site linking
   - [ ] And embedded previews
-- [ ] View filtering and search
+- [x] View filtering and search
 - [x] Manufacturing metadata and sub-tasks for production
 - [x] Card file uploads for artefacts like drawings, CAM files, etc.
 - [x] Onshape part detection and linking
@@ -41,3 +41,15 @@ The scope extends a bit beyond Kanban:
 ![A card preview in front of a demo board](images/card.png)
 ![The users and groups preview page](images/users.png)
 <img src="images/mobile.png" alt="An alternative list view in a mobile preview" width="30%" />
+
+## Install
+### Requirements
+- Node.js 16+
+- Docker
+
+### Install with docker compose
+```
+git clone https://github.com/wave-2826/kanshape
+cd kanshape
+docker compose up -d
+```

@@ -168,7 +168,7 @@
         {/if}
 
         {#if linkedProject === null}
-            <p>Loading...</p>
+            <p>Loading linked project...</p>
         {:else if linkedProject.type === LinkedProjectType.Unregistered || linkedProject.type === LinkedProjectType.Unlinked}
             <div class="link">
                 {#if linkedProject.type === LinkedProjectType.Unlinked}

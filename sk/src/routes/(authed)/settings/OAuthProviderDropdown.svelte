@@ -28,3 +28,9 @@
         <option value="">Error loading auth methods.</option>
     {/await}
 </select>
+
+<style lang="scss">
+select {
+    margin: 0 0.5rem;
+}
+</style>

@@ -64,7 +64,7 @@ $effect(() => {
                     <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
                     <div class="fields">
                         {#each items as item}
-                            <div class="field">
+                            <div class="field" title={item.type.description}>
                                 <label for={item.path}>{item.type.name || item.key} <span class="required">{item.type.optional ? '' : '*'}</span></label>
                                 {#if item.type.type === 'string'}
                                     <input 

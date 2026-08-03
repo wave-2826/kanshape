@@ -63,6 +63,7 @@ export async function providerLogin(
             emailVisibility: false
         },
     });
+    if(!authResponse.token || !authResponse.record) return;
 
     // update user "record" if "meta" has info it doesn't have
     const { meta, record } = authResponse;

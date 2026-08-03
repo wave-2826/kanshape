@@ -16,6 +16,10 @@ export type AppConfig = {
          * automatically authenticate with when the site loads)
          */
         autoOAuth: string | null;
+        /**
+         * A comma-separated list of OAuth group names to give admin access to, if using OAuth.
+         */
+        oAuthAdminGroups: string | null;
     };
     site: {
         /**
@@ -47,7 +51,8 @@ export type AppConfig = {
 };
 const defaultConfig: AppConfig = {
     auth: {
-        autoOAuth: null
+        autoOAuth: null,
+        oAuthAdminGroups: "admin"
     },
     site: {
         name: "Kanshape",
@@ -64,17 +69,19 @@ const defaultConfig: AppConfig = {
 export type ConfigValueType = {
     optional: boolean;
     type: "string" | "number" | "boolean" | "file" | "oauth-provider";
-    name?: string;
+    name: string;
+    description?: string;
 };
 export const configTypes: { [K in ConfigPath]: ConfigValueType } = {
     "auth/autoOAuth": { optional: true, type: "oauth-provider", name: "Automatically authenticate with OAuth provider" },
+    "auth/oAuthAdminGroups": { optional: true, type: "string", name: "OAuth Admin Groups", description: "If using OAuth, this is a comma-separated list of OAuth group names to give admin access to. Users may need to sign back in to see changes, and users already granted admin won't have it revoked!" },
     "site/name": { optional: false, type: "string", name: "Site Name" },
     "site/logoUrl": { optional: true, type: "file", name: "Site Logo" },
-    "site/faviconUrl": { optional: true, type: "file", name: "Site Favicon" },
-    "site/publicUrl": { optional: false, type: "string", name: "Site Public URL" },
+    "site/faviconUrl": { optional: false, type: "file", name: "Site Favicon" },
+    "site/publicUrl": { optional: false, type: "string", name: "Site Public URL", description: "A public URL that this site must be accessible from." },
     "onshape/clientId": { optional: false, type: "string", name: "Onshape OAuth Client ID" },
     "onshape/clientSecret": { optional: false, type: "string", name: "Onshape OAuth Client Secret" },
-    "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain, like https://cad.onshape.com" }
+    "onshape/baseDomain": { optional: false, type: "string", name: "Onshape Base Domain", description: "Like https://cad.onshape.com." }
 } as const;
 
 

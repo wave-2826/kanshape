@@ -115,15 +115,19 @@ migrate((app) => {
 
     for(const assignmentId of assignmentIds) {
       const record = new Record(collection);
-      record.set("card", card.id);
-      if(assignmentType === "users") {
-        record.set("user", assignmentId);
-        record.set("group", null);
-      } else if(assignmentType === "groups") {
-        record.set("user", null);
-        record.set("group", assignmentId);
+      try {
+        record.set("card", card.id);
+        if(assignmentType === "users") {
+          record.set("user", assignmentId);
+          record.set("group", null);
+        } else if(assignmentType === "groups") {
+          record.set("user", null);
+          record.set("group", assignmentId);
+        }
+        app.save(record);
+      } catch(e) {
+        console.warn(`Failed to create card assignment cache record for card ${card.id} and ${assignmentType.slice(0, -1)} ${assignmentId}: ${e}`);
       }
-      app.save(record);
     }
   }
 }, (app) => {

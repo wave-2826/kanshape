@@ -146,12 +146,14 @@ URLSearchParams.prototype.toString = function () {
  */
 function URL(input) {
     var match = String(input).match(
-        /^([a-zA-Z][a-zA-Z0-9+.-]*:)?\/\/([^\/?#]*)([^?#]*)(\?[^#]*)?(#.*)?$/
+        /^(?:([a-zA-Z][a-zA-Z0-9+.-]*):)?(?:\/\/([^\/?#]*))?([^?#]*)(\?[^#]*)?(#.*)?$/
     );
 
     if(!match) {
         throw new Error("Invalid URL " + input);
     }
+
+    console.log("protocol: " + match[1]);
 
     this.protocol = match[1] || "";
     this.host = match[2] || "";
@@ -206,14 +208,10 @@ Object.defineProperty(URL.prototype, "search", {
 /** @type {string} */
 Object.defineProperty(URL.prototype, "href", {
     get: function () {
-        return (
-            this.protocol +
-            "//" +
-            this.host +
-            this._pathname +
-            this._search +
-            this.hash
-        );
+        var out = "";
+        if(this.protocol) out += this.protocol + "://";
+        if(this.host) out += this.host;
+        return out + this._pathname + this._search + this.hash;
     }
 });
 

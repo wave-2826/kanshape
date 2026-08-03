@@ -24,6 +24,7 @@
     import { addOnshapeContext, watchOnshapeContext } from "$lib/components/nav/onshapeContext.svelte";
     import { getConfig } from "$lib/config";
     import { client } from "$lib/pocketbase";
+    import { goto } from "$app/navigation";
 
     const { children } = $props();
     const config = getConfig();
@@ -71,6 +72,15 @@
 
     const forceNavOpen = $derived(page.url.pathname === "/" && !isMobile);
     let showNav = $derived(!onOnshape && (navOpen || forceNavOpen));
+
+    if(page.url.searchParams.has("oauth_error")) {
+        // TODO: this should really be a notification popup thingy
+        alert(`OAuth error ${page.url.searchParams.get("oauth_error")}: ${page.url.searchParams.get("oauth_error_description")}`);
+        const url = new URL(page.url.toString());
+        url.searchParams.delete("oauth_error");
+        url.searchParams.delete("oauth_error_description");
+        goto(url);
+    }
 </script>
 
 <div class="layout" class:isMobile={isMobile}>

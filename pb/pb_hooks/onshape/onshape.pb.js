@@ -17,11 +17,16 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
 
     if(!e.request) throw new BadRequestError("Missing request information");
 
+    const error = query.get("error");
+
     const code = query.get("code");
-    if(!code) {    
+    if(!code && !error) {    
         const authRecord = /** @type core.Record */ (e.requestInfo().auth);
         // for jake :)
-        if(!authRecord) e.json(418, { error: "I'm a teapot", message: "authentication required to start Onshape OAuth flow" });
+        if(!authRecord) {
+            e.json(418, { error: "I'm a teapot", message: "authentication required to start Onshape OAuth flow" });
+            return;
+        }
 
         const callbackUrl = getCallbackUrl(e.request, e.requestInfo());
         const transaction = createOnshapeTransaction(authRecord, query.get("returnTo") ?? "/", callbackUrl);
@@ -31,9 +36,22 @@ routerAdd("GET", "/api/onshape/oauth", (e) => {
     const state = query.get("state");
     if(!state) throw new BadRequestError("Missing state query parameter");
 
-
     const transactionData = loadOnshapeTransaction(state);
     // Ideally, we would match the transaction user and auth record, but we don't have auth here
+
+    if(error) {
+        // onshape returned an oauth error; redirect back but maintain error and error_description
+        const { URL } = /** @type typeof import("../url") */ (require(`${__hooks}/url`));
+        let returnUrl = new URL(transactionData.returnTo);
+        returnUrl.searchParams.set("oauth_error", error);
+        returnUrl.searchParams.set("oauth_error_description", query.get("error_description") ?? "");
+        try {
+            $app.delete(transactionData.transaction);
+        } catch(err) {
+            console.warn("Failed to delete consumed Onshape OAuth transaction:", err);
+        }
+        return e.redirect(302, returnUrl.href);
+    }
 
     const tokenJson = exchangeAuthorizationCode(code, transactionData.redirectUri);
     const userRecord = $app.findRecordById("users", transactionData.userId);

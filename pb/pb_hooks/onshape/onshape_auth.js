@@ -135,7 +135,7 @@ function getOnshapeMetadata(userRecord) {
     /** @type typeof import("../util") */
     const { parseJSON } = require(`${__hooks}/util`);
     const oauthData = userRecord.get("onshape_oauth");
-    if(!oauthData) return null;
+    if(!oauthData || oauthData.length === 0) return null;
 
     try {
         const metadata = parseJSON(oauthData);

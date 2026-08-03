@@ -9,7 +9,7 @@
     the user has prefers-reduced-motion enabled.
 -->
 
-<Loader class={`${$css("spinner")} ${_class}`} />
+<Loader class={[$css("spinner"), _class]} />
 
 <style lang="scss">
     @keyframes spin {

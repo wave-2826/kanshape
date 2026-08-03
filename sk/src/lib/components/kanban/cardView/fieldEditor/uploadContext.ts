@@ -37,6 +37,5 @@ export const [getUploadContext, setUploadContext] = createContext<UploadContext>
 
 export type CardSelectState = {
     message: string;
-    callback: (selected: TypedCardPreviewResponse, self: TypedCardsResponse) => void;
-    originalSelection: string;
+    callback: (selected: TypedCardPreviewResponse) => void;
 };

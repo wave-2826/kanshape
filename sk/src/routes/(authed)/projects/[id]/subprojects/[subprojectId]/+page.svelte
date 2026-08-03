@@ -4,18 +4,17 @@
     import { Kanban, Settings } from "@lucide/svelte";
     import { getProjectContext } from "../../context";
     import ProjectPage from "../../ProjectPage.svelte";
-    import { watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
+    import { watch, watchOne } from "$lib/pocketbase";
     import { deasyncify } from "$lib/util";
     import { Collections } from "$lib/pocketbase/generated-types";
     import BoardOverviewItems from "../../BoardOverviewItems.svelte";
     import KanbanMenu, { createFilterState } from "$lib/components/kanban/menu/KanbanMenu.svelte";
     import Masonry from "$lib/components/Masonry.svelte";
-    import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
-    import { untrack } from "svelte";
     import { nav } from "$lib/navigation";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
     import { sortListCards } from "$lib/data/kanban";
+    import BoardCardViewPanel from "$lib/components/kanban/cardView/BoardCardViewPanel.svelte";
     
     const subprojectId = $derived(page.params.subprojectId);
     
@@ -42,17 +41,6 @@
     );
 
     let openCardId = createOpenCardState();
-    let openCard = $state<ExpandResponse<"card_preview", ""> | null>(null);
-    $effect.pre(() => {
-        if(!openCardId.cardId || !subprojectCards || !$subprojectCards) {
-            openCard = null;
-            return;
-        }
-        const cardItem = $subprojectCards?.items.find((c) => c.id === openCardId.cardId);
-        if(cardItem && untrack(() => cardItem.id !== openCard?.id)) {
-            openCard = cardItem;
-        }
-    });
 
     const hiddenViewCategories = ["subprojects"] as const;
     let filterState = $state(createFilterState(hiddenViewCategories));
@@ -61,23 +49,6 @@
     const cards = $derived(subprojectCards && $subprojectCards ?
         sortListCards($subprojectCards.items, undefined, filter) : null
     );
-
-    // This is kind of a mess, but we need information from the open card's board, which depends
-    // on the open card, so we need to do a bunch of fetching to gather that information. It's not
-    // the worst, at least.
-    const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
-        expand: "sections"
-    })) : null);
-    // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
-    // a separate cached card loading system or something
-    // TODO: Don't fetch all board cards
-    const openCardBoardCards = $derived(openCardBoard && $openCardBoard ? deasyncify(watch(Collections.CardPreview, {
-        filter: `board = "${$openCardBoard.id}"`,
-        sort: "position,created"
-    }, 1, 500, {
-        waitForConnection: true,
-        pollOnChange: [Collections.Cards]
-    })) : null);
 </script>
 
 {#if project && $project !== null && subproject !== null}
@@ -95,31 +66,10 @@
         {/snippet}
         
         <div class="shell" data-modal-target>
-            <CardViewPanel
-                board={$openCardBoard || undefined}
-                boardCards={$openCardBoardCards?.items}
-                bind:card={
-                    () => $openCardBoardCards ? openCardId.cardId : null,
-                    (id) => {
-                        if(!$openCardBoard || !$openCardBoardCards) {
-                            openCardId.cardId = id;
-                            return;
-                        }
-                        if(id && !cards?.find((c) => c.id === id)) {
-                            // this card is from another subproject; open its board
-                            const v = $openCardBoardCards.items.find(c => c.id === id);
-                            if(!v) {
-                                console.warn(`Card ${id} not found in board ${$openCardBoard.id}`);
-                            } else {
-                                nav(`/projects/${$project.id}/boards/${v?.board}?card=${id}`);
-                            }
-                            return;
-                        }
-                        openCardId.cardId = id;
-                    }
-                }
-                subprojects={$project.expand.subprojects ?? []}
-                projectId={$project?.id ?? ""}
+            <BoardCardViewPanel
+                openCardId={openCardId}
+                cards={$subprojectCards?.items ?? []}
+                project={$project}
             />
     
             <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">

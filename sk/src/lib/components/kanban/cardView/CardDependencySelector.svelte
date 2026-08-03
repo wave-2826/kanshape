@@ -2,24 +2,27 @@
     import type { TypedCardPreviewResponse } from "$lib/data/kanban";
     import { Trash } from "@lucide/svelte";
     import KanbanListEntry from "../KanbanListEntry.svelte";
+    import type { CardSelectState } from "./fieldEditor/uploadContext";
     import type { TypedCardsResponse } from "$lib/data/cards";
 
     let {
         dependencies = $bindable(),
-        boardCards,
+        cards,
+        card = $bindable(),
         onopendependency,
         onselectcard
     }: {
         dependencies: string[],
-        boardCards: TypedCardPreviewResponse[],
+        cards: TypedCardPreviewResponse[],
+        card: TypedCardsResponse,
         onopendependency?: (id: string) => void,
-        onselectcard?: (message: string, cb: (selected: TypedCardPreviewResponse, self: TypedCardsResponse) => void) => void
+        onselectcard?: (state: CardSelectState) => void
     } = $props();
 </script>
 
 <div class="dependencies">
     {#each dependencies as depId (depId)}
-        {@const card = boardCards.find((c) => c.id === depId)}
+        {@const card = cards.find((c) => c.id === depId)}
         {#if card !== undefined}
             <div class="dependency">
                 <button class="remove-dependency" onclick={() => {
@@ -29,16 +32,21 @@
                     onopendependency?.(card.id);
                 }} />
             </div>
+        {:else}
+            <div class="dependency">Unknown dependency card</div>
         {/if}
     {/each}
     
     {#if onselectcard}
         <button class="add" onclick={() => {
-            onselectcard?.("Select a card to add as a dependency", (selected, self) => {
-                console.log("Selected", selected.title, "to add to", self.title);
-                if(selected.id === self.id) return;
-                if(dependencies.includes(selected.id)) return;
-                self.dependencies = [...self.dependencies, selected.id];
+            onselectcard?.({
+                message: "Select a card to add as a dependency", 
+                callback: (selected) => {
+                    console.log("Selected", selected.title, "to add to", card.title);
+                    if(selected.id === card.id) return;
+                    if(dependencies.includes(selected.id)) return;
+                    card.dependencies = [...card.dependencies, selected.id];
+                }
             });
         }}>+ Add dependency</button>
     {/if}

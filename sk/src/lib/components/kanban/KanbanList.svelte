@@ -48,8 +48,8 @@
     <KanbanMenu {project} {board} cards={listCards} bind:filterState {hiddenViewCategories} />
 
     <CardViewPanel
-        boardCards={listCards}
-        bind:card={openCardId.cardId}
+        cards={listCards}
+        card={openCardId}
         {subprojects}
         {board}
         projectId={project.id}

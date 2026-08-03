@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
+    import { type SubprojectsRecord } from "$lib/pocketbase/generated-types";
     import Modal from "../Modal.svelte";
     import { type TypedCardPreviewResponse } from "$lib/data/kanban";
     import type { TypedBoardsResponse } from "$lib/data/project";

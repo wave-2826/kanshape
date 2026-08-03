@@ -13,21 +13,24 @@
     import { setUploadContext, type CardSelectState, type UploadContext } from "./fieldEditor/uploadContext";
     import { untrack } from "svelte";
     import { walkMetadata, walkMetadataValues, type MetadataFile } from "$lib/data/metadata";
+    import type { OpenCardState } from "./state.svelte";
 
     let {
         board,
-        boardCards,
-        card: cardId = $bindable(),
+        cards,
+        card: selected,
         subprojects,
         projectId
     }: {
         board?: TypedBoardsResponse & ExpandResponse<"boards", "sections">,
         /**
-         * The cards on the board. Should be undefined if not loaded yet, as this is used to determine
-         * if the selected card no longer exists.
+         * The cards in the open view that could be selected.
+         * Should be undefined if not loaded yet, as this is used to determine if the selected card no
+         * longer exists. Also used for finding selected dependencies; this doesn't need to be the cards
+         * in the selected card's board.
          */
-        boardCards?: TypedCardPreviewResponse[],
-        card: string | null,
+        cards?: TypedCardPreviewResponse[],
+        card: OpenCardState | null,
         subprojects: SubprojectsRecord[],
         projectId: string
     } = $props();
@@ -73,36 +76,18 @@
 
     let selectingCard = $state<CardSelectState | null>(null);
 
+    let dependencies = $state<TypedCardPreviewResponse[] | null>(null);
+
     // the card on the server currently. doesn't include any local changes.
     let serverCard = $state<TypedCardsResponse | null>(null);
     $effect(() => {
-        if(untrack(() => selectingCard !== null)) {
-            untrack(() => {
-                if(cardId) {
-                    if(card?.id !== selectingCard?.originalSelection) {
-                        console.warn("Card changed while selecting a dependency; cancelling selection");
-                        selectingCard = null;
-                        cardId = null;
-                        return;
-                    }
-    
-                    const selected = boardCards?.find(c => c.id === cardId);
-                    // card should still be correct right now
-                    if(selected && card) {
-                        selectingCard!.callback(selected, card);
-                    }
-                    cardId = selectingCard!.originalSelection;
-                    selectingCard = null;
-                } else {
-                    selectingCard = null;
-                }
-            });
-        }
-
-        if(cardId) {
+        if(selected?.cardId) {
             const store = deasyncify(
-                (watchOne(Collections.Cards, cardId, {
-                    requestKey: null
+                (watchOne(Collections.Cards, selected.cardId, {
+                    requestKey: null,
+                    // pocketbase is crazy !! this is awesome
+                    // no idea how this syntax works actually but taken from here w/ trial-and-error: https://github.com/pocketbase/pocketbase/discussions/3244
+                    expand: "dependencies.card_preview(dependencies)"
                 }) as Promise<Readable<TypedCardsResponse | null>>)
                 .catch((e) => {
                     console.error(e);
@@ -111,10 +96,12 @@
             );
             const unsub = store.subscribe((v) => {
                 serverCard = v;
+                dependencies = (v?.expand as { "dependencies": TypedCardPreviewResponse[] })?.["dependencies"] ?? [];
             });
             return () => unsub();
         } else {
             serverCard = null;
+            dependencies = [];
         }
     });
     
@@ -135,12 +122,12 @@
         card = applyDiff(diff, untrack(() => $state.snapshot(card)));
     });
 
-    const preview = $derived(boardCards?.find(c => c.id === cardId));
+    const preview = $derived(cards?.find(c => c.id === selected?.cardId));
     // unselect this card if it's not in the board cards
     $effect.pre(() => {
-        if(boardCards && cardId && !preview) {
-            console.log(`card ${cardId} not found in ${boardCards.length} board cards; assuming deletion`, boardCards);
-            cardId = null;
+        if(cards && selected?.cardId && !preview) {
+            console.log(`card ${selected} not found in ${cards.length} board cards; assuming deletion`, cards);
+            selected.cardId = null;
         }
     });
 
@@ -238,13 +225,13 @@
         }
     });
     $effect(() => {
-        if(!cardId) {
+        if(!selected) {
             uploadContext.partExport = undefined;
             return;
         }
 
         uploadContext.partExport = {
-            cardId,
+            cardId: selected.cardId,
             
             async getParts() {
                 if(!card) return [];
@@ -289,7 +276,7 @@
     </div>
 {/if}
 
-<ModalPanel open={cardId !== null} onclose={() => cardId = null} collapse={selectingCard !== null}>
+<ModalPanel open={selected?.cardId != null} onclose={() => selected!.cardId = null} collapse={selectingCard !== null}>
     {#if preview}
         {@const _card = card ?? previewPlaceholder(preview)}
         <CardView
@@ -306,12 +293,20 @@
                 }
             }
             allowSelectingDependencies={true}
-            onopendependency={(id) => cardId = id}
+            onopendependency={(id) => selected!.cardId = id}
             onselectdependency={(state) => {
-                if(!card) return;
+                if(!card || !selected) return;
                 selectingCard = state;
+                selected.addListenerForSelection((cardId) => {
+                    const newSelection = cards?.find(c => c.id === cardId);
+                    // card should still be correct right now
+                    if(newSelection && card) {
+                        selectingCard!.callback(newSelection);
+                    }
+                    selectingCard = null;
+                });
             }}
-            {boardCards}
+            dependencies={dependencies ?? undefined}
             {subprojects}
         />
         <hr />

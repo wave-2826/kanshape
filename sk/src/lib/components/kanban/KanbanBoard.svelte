@@ -134,8 +134,8 @@
 
     <CardViewPanel
         {board}
-        {boardCards}
-        bind:card={openCardId.cardId}
+        cards={boardCards}
+        card={openCardId}
         {subprojects}
         projectId={project.id}
     />

@@ -283,7 +283,6 @@
     <CardView
         {board}
         {subprojects}
-        {boardCards}
         {disabled}
         bind:card={cardData}
         autofocusTitle

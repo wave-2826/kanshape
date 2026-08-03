@@ -20,7 +20,7 @@
         subprojects,
         disabled = false,
 
-        boardCards,
+        dependencies,
         onopendependency,
         onselectdependency,
         allowSelectingDependencies,
@@ -32,7 +32,7 @@
         subprojects: SubprojectsRecord[],
         disabled?: boolean,
 
-        boardCards?: TypedCardPreviewResponse[],
+        dependencies?: TypedCardPreviewResponse[],
         onopendependency?: (id: string | null) => void,
         onselectdependency?: (state: CardSelectState) => void,
         allowSelectingDependencies: boolean,
@@ -171,18 +171,16 @@
         <div class="property dependencies">
             <span class="prop-label"><ListTree /> Dependencies</span>
             <div class="prop-value">
-                {#if boardCards && "id" in card}
+                {#if dependencies && "id" in card}
                     <CardDependencySelector
                         bind:dependencies={card.dependencies}
-                        {boardCards}
+                        cards={dependencies}
+                        bind:card
                         onopendependency={onopendependency}
-                        onselectcard={allowSelectingDependencies ? async (message, callback) => {
+                        onselectcard={allowSelectingDependencies ? async (state) => {
                             if(!onopendependency) return;
                             if(!("id" in card)) return;
-                            onselectdependency?.({
-                                message, callback,
-                                originalSelection: card.id
-                            });
+                            onselectdependency?.(state);
                         } : undefined}
                     />
                 {:else}

@@ -66,8 +66,8 @@
 <div class="page" data-modal-target>
     <CardViewPanel
         {board}
-        boardCards={$cards?.items}
-        bind:card={openCardId.cardId}
+        cards={$cards?.items}
+        card={openCardId}
         {subprojects}
         projectId={project.id}
     />

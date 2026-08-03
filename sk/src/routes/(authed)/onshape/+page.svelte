@@ -14,6 +14,7 @@
     import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
     import { untrack } from "svelte";
     import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
+    import BoardCardViewPanel from "$lib/components/kanban/cardView/BoardCardViewPanel.svelte";
     
     $effect(() => {
         $metadata.title = "Onshape Side Panel";
@@ -42,70 +43,18 @@
         pollOnChange: [Collections.Cards]
     })));
 
-    // to whoever reads this code: i'm deeply, truly remorseful for this heinous mess i'm unfortunate enough
-    // to appear in the blame of, and am gravely reconsidering the choices which have led me here. godspeed.
-
-    // TODO: deduplicate this logic from subproject rendering
-    // perhaps another "unidentified card" (??) component?
     let openCardId = createOpenCardState();
-    let openCard = $state<ExpandResponse<"part_cards", ""> | null>(null);
-    $effect.pre(() => {
-        if(!openCardId.cardId || !cards || !$cards) {
-            openCard = null;
-            return;
-        }
-        const cardItem = $cards?.items.find((c) => c.id === openCardId.cardId);
-        if(cardItem && untrack(() => cardItem.id !== openCard?.id)) {
-            openCard = cardItem;
-        }
-    });
-
-    // This is kind of a mess, but we need information from the open card's board and project, which depends
-    // on the open card, so we need to do a bunch of fetching to gather that information. It's not
-    // the worst, at least.
+    let openCard = $derived(openCardId.cardId && cards && $cards ?
+        $cards.items.find((c) => c.id === openCardId.cardId) ?? null :
+        null
+    );
     const openCardProject = $derived(openCard ? deasyncify(watchOne(Collections.Projects, openCard.project, {
         expand: "subprojects"
-    })) : null);
-    const openCardBoard = $derived(openCard ? deasyncify(watchOne(Collections.Boards, openCard.board, {
-        expand: "sections"
-    })) : null);
-    // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
-    // a separate cached card loading system or something
-    // TODO: Don't fetch all board cards
-    const openCardBoardCards = $derived(openCardBoard && $openCardBoard ? deasyncify(watch(Collections.CardPreview, {
-        filter: `board = "${$openCardBoard.id}"`,
-        sort: "position,created"
-    }, 1, 500, {
-        waitForConnection: true,
-        pollOnChange: [Collections.Cards]
     })) : null);
 </script>
 
 <div class="page" data-modal-target>
-    <CardViewPanel
-        board={$openCardBoard ?? undefined}
-        boardCards={$openCardBoardCards?.items}
-        bind:card={
-            () => $openCardBoard && $openCardBoardCards ? openCardId.cardId : null,
-            (id) => {
-                if(id && !$cards?.items.find((c) => c.id === id)) {
-                    if(!$openCardBoardCards || !$openCardProject) return;
-                    
-                    // this card is from another subproject; open its board in a new tab
-                    const v = $openCardBoardCards.items.find(c => c.id === id);
-                    if(!v) {
-                        console.warn(`Card ${id} not found in board ${$openCardBoard?.id}`);
-                    } else {
-                        window.open(`/projects/${$openCardProject.id}/boards/${v?.board}?card=${id}`, "_blank");
-                    }
-                    return;
-                }
-                openCardId.cardId = id;
-            }
-        }
-        subprojects={$openCardProject?.expand.subprojects ?? []}
-        projectId={$openCardProject?.id ?? ""}
-    />
+    <BoardCardViewPanel {openCardId} cards={$cards?.items ?? []} project={$openCardProject} />
     
     <SelectionBanner selections={$selections ?? []} />
     

@@ -72,8 +72,8 @@
     // It would be ideal to fetch only the open card's dependencies here, but that would benefit from
     // a separate cached card loading system or something
     // TODO: Don't fetch all board cards
-    const openCardBoardCards = $derived(openCardBoard ? deasyncify(watch(Collections.CardPreview, {
-        filter: `board = "${$openCardBoard?.id}"`,
+    const openCardBoardCards = $derived(openCardBoard && $openCardBoard ? deasyncify(watch(Collections.CardPreview, {
+        filter: `board = "${$openCardBoard.id}"`,
         sort: "position,created"
     }, 1, 500, {
         waitForConnection: true,

@@ -211,7 +211,6 @@ input[type="checkbox"] {
     &.is-other input[type="text"] {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
-        flex: 0;
         width: 10rem;
         border-left: 1px solid var(--border);
     }

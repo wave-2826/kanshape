@@ -1,6 +1,5 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { link } from "$lib/actions";
     import type { ProjectLinkedSite } from "$lib/data/project";
     import { Kanban, Settings } from "@lucide/svelte";
     import { getProjectContext } from "../../context";
@@ -89,10 +88,10 @@
         onshapeLinks={subproject}
     >
         {#snippet navItems()}
-            <button use:link={`/projects/${$project.id}/subprojects/${subproject.id}/settings`}>
+            <a class="button" href={`/projects/${$project.id}/subprojects/${subproject.id}/settings`}>
                 <Settings />
                 Settings
-            </button>
+            </a>
         {/snippet}
         
         <div class="shell" data-modal-target>

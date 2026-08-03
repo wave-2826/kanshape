@@ -152,7 +152,7 @@ button:hover:not(:disabled):not(.unstyled), .button:hover:not(:disabled):not(.un
     display: flex;
     flex-direction: row;
 
-    > button {
+    > button, > .button {
         border-radius: 0;
 
         &:first-child {
@@ -186,7 +186,7 @@ a {
     text-decoration: none;
     transition: color 0.1s ease;
 
-    &:hover {
+    &:hover:not(.button) {
         color: color-mix(in srgb, var(--accent) 80%, var(--text-primary));
     }
 }

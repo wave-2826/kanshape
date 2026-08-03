@@ -4,7 +4,6 @@
     import type { Snippet } from "svelte";
     import { getProjectContext } from "../../../context";
     import type { ProjectLinkedSite } from "$lib/data/project";
-    import { link } from "$lib/actions";
     import ProjectPage from "../../../ProjectPage.svelte";
     import { getBoardContext } from "../../../context";
     import { metadata } from "$lib/metadata";
@@ -34,10 +33,10 @@
                 <BoardButtons projectId={$project.id} boardId={$board.id} />
             </div>
 
-            <button use:link={`/projects/${$project.id}/boards/${$board.id}/settings`}>
+            <a class="button" href={`/projects/${$project.id}/boards/${$board.id}/settings`}>
                 <Settings />
                 Settings
-            </button>
+            </a>
         {/snippet}
         {@render children()}
     </ProjectPage>

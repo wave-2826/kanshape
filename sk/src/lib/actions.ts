@@ -23,49 +23,6 @@ export function autoSize(node: HTMLTextAreaElement, _value: any = undefined, max
     };
 }
 
-export function openWithLinkBehavior(href: string, event: MouseEvent) {
-    event.preventDefault();
-    
-    if(event.metaKey || event.ctrlKey || event.button === 1) {
-        window.open(href, "_blank");
-        return;
-    }
-
-    nav(href);
-}
-
-export function link(node: HTMLElement, href: string) {
-    function onClick(event: MouseEvent) {
-        openWithLinkBehavior(href, event);
-        event.stopPropagation();
-    }
-    function onKeyPress(event: KeyboardEvent) {
-        if(event.key === "Enter" || event.key === " ") {
-            openWithLinkBehavior(href, event as any);
-        }
-    }
-
-    node.addEventListener("click", onClick);
-    if(!(node instanceof HTMLButtonElement)) {
-        // accessibility
-        node.setAttribute("role", "link");
-        node.setAttribute("tabindex", "0");
-        node.addEventListener("keypress", onKeyPress);
-    }
-
-    return {
-        update(newHref: string) {
-            href = newHref;
-        },
-        destroy() {
-            node.removeEventListener("click", onClick);
-            if(!(node instanceof HTMLButtonElement)) {
-                node.removeEventListener("keypress", onKeyPress);
-            }
-        }
-    };
-}
-
 type AnchorSide = "top" | "bottom" | "left" | "right" | "vauto" | "hauto";
 type AnchorPlacement = "start" | "center" | "end" | "inner";
 export function anchor(

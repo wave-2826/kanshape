@@ -1,7 +1,5 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { link, openWithLinkBehavior } from "$lib/actions";
-    import { nav } from "$lib/navigation";
     import { type ExpandResponse } from "$lib/pocketbase";
     import { grow } from "$lib/transitions";
     import { ChevronDown, ChevronUp, Kanban, Settings, SquareKanban, Tag } from "@lucide/svelte";
@@ -37,16 +35,19 @@
 </script>
 
 <div class="button project-button" class:selected={treeSelected} style="color: {project.color ?? 'var(--bg-secondary)'}" aria-expanded={!collapsed}>
-    <button
+    <a
+        href={`/projects/${project.id}`}
         onclick={(e) => {
-            if(selfSelected) toggleCollapsed();
-            else openWithLinkBehavior(`/projects/${project.id}`, e);
+            if(selfSelected) {
+                toggleCollapsed();
+                e.preventDefault();
+            }
         }}
-        class="unstyled text-button"
+        class="unstyled button text-button"
     >
         <SquareKanban />
         <span>{project.title}</span>
-    </button>
+    </a>
     <button class="unstyled" onclick={toggleCollapsed} aria-label={collapsed ? "Expand subprojects" : "Collapse subprojects"}>
         {#if collapsed === CollapsedState.Expanded}
             <ChevronUp />
@@ -65,27 +66,27 @@
         {#each project.boards as boardId}
             {@const board = project.expand.boards?.find(b => b.id === boardId)}
             {#if board}
-                <button
-                    use:link={`/projects/${project.id}/boards/${boardId}`}
+                <a
+                    href={`/projects/${project.id}/boards/${boardId}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/boards/[boardId]") && page.params.boardId === boardId}
-                    class="text-button"
+                    class="button text-button"
                 >
                     <Kanban />
                     <span>{board.title}</span>
-                </button>
+                </a>
             {/if}
         {/each}
         {#each project.subprojects as subprojectId}
             {@const subproject = subprojects.find(sp => sp.id === subprojectId)}
             {#if subproject}
-                <button
-                    use:link={`/projects/${project.id}/subprojects/${subproject.id}`}
+                <a
+                    href={`/projects/${project.id}/subprojects/${subproject.id}`}
                     class:selected={page.route.id?.startsWith("/(authed)/projects/[id]/subprojects/[subprojectId]") && page.params.subprojectId === subproject.id}
-                    class="text-button"
+                    class="button text-button"
                 >
                     <Tag />
                     <span>{subproject.name}</span>
-                </button>
+            </a>
             {/if}
         {/each}
     </div>

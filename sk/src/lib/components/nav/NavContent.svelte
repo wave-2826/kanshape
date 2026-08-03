@@ -3,7 +3,6 @@
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { AlarmClock, FolderKanban, Medal, Plus, Settings, Users } from "@lucide/svelte";
-    import { link } from "$lib/actions";
     import NavProject from "./NavProject.svelte";
     import { authModel } from "$lib/pocketbase/auth";
     import { fly } from "svelte/transition";
@@ -16,14 +15,14 @@
     });
 </script>
 
-<button use:link={"/"} class:selected={page.route.id === "/(authed)"}>
+<a class="button" href={"/"} class:selected={page.route.id === "/(authed)"}>
     <FolderKanban />
     Overview
-</button>
-<button use:link={"/leaderboard"} class:selected={page.route.id === "/(authed)/leaderboard"}>
+</a>
+<a class="button" href={"/leaderboard"} class:selected={page.route.id === "/(authed)/leaderboard"}>
     <Medal />
     Leaderboard
-</button>
+</a>
 
 <h2>Projects</h2>
 
@@ -36,10 +35,10 @@
             <p>No projects found.</p>
         {/if}
     </div>
-    <button use:link={"/projects/new"} class:selected={page.route.id === "/(authed)/projects/new"}>
+    <a class="button" href={"/projects/new"} class:selected={page.route.id === "/(authed)/projects/new"}>
         <Plus />
         New project
-    </button>
+    </a>
 {:else}
     <p>Failed to load projects.</p>
 {/if}
@@ -47,28 +46,28 @@
 <div style="flex-grow: 1;"></div>
 
 {#if page.route.id === "/(authed)/log"}
-    <button use:link={"/log"} class:selected={page.route.id === "/(authed)/log"} transition:fly={{ y: 5, duration: 100 }}>
+    <a class="button" href={"/log"} class:selected={page.route.id === "/(authed)/log"} transition:fly={{ y: 5, duration: 100 }}>
         <AlarmClock />
         Activity Log
-    </button>
+    </a>
 {/if}
-<button use:link={"/users"} class:selected={page.route.id === "/(authed)/users"}>
+<a class="button" href={"/users"} class:selected={page.route.id === "/(authed)/users"}>
     <Users />
     Users and Groups
-</button>
+</a>
 {#if $authModel?.is_admin}
-    <button use:link={"/settings"} class:selected={page.route.id === "/(authed)/settings"}>
+    <a class="button" href={"/settings"} class:selected={page.route.id === "/(authed)/settings"}>
         <Settings />
         Application Settings
-    </button>
+    </a>
 {/if}
 
 <style lang="scss">
-button {
+.button {
     --bg-color: transparent;
-}
-button.selected {
-    --bg-color: var(--bg-secondary);
+    &.selected {
+        --bg-color: var(--bg-secondary);
+    }
 }
 h2 {
     margin-top: 1rem;

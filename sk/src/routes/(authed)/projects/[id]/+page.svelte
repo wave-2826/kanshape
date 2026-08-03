@@ -1,7 +1,5 @@
 <script lang="ts">
-  import BoardOverviewItems from './BoardOverviewItems.svelte';
-
-    import { link } from "$lib/actions";
+    import BoardOverviewItems from './BoardOverviewItems.svelte';
     import { AlarmClock, CheckCheck, Clock, Kanban, ListCheck, Settings, Tag } from "@lucide/svelte";
     import { getProjectContext } from "./context";
     import type { ProjectLinkedSite } from "$lib/data/project";
@@ -56,10 +54,10 @@
 {#if project && $project !== null}
     <ProjectPage project={$project} linkedSites={$project.linked_sites as ProjectLinkedSite[]} onshapeLinks={$project}>
         {#snippet navItems()}
-            <button use:link={`/projects/${$project.id}/settings`}>
+            <a class="button" href={`/projects/${$project.id}/settings`}>
                 <Settings />
                 Settings
-            </button>
+            </a>
         {/snippet}
         
         <div class="content" style="--project-color: {$project.color || 'var(--accent)'}">
@@ -79,8 +77,15 @@
                 {#if $boards.items.length > 0}
                     <div class="list board-list">
                         {#each $boards.items as board}
-                            <div class="button board" use:link={`/projects/${$project.id}/boards/${board.id}`}>
+                            <div class="button board">
                                 <h3>{board.title}</h3>
+                                <a
+                                    // html forbids us from nesting interactive elements, so we use a silly
+                                    // overlay. apparently this is a normal approach??
+                                    class="click-overlay"
+                                    href={`/projects/${$project.id}/boards/${board.id}`}
+                                    aria-label={`Go to board ${board.title}`}
+                                ></a>
                                 <div class="nav">
                                     <BoardButtons projectId={$project.id} boardId={board.id} buttonClass={$css("nav-button")} />
                                 </div>
@@ -114,7 +119,7 @@
                 {#if $subprojects.items.length > 0}
                     <div class="horizontal-list">
                         {#each $subprojects.items as subproject}
-                            <button class="subproject" use:link={`/projects/${$project.id}/subprojects/${subproject.id}`}>
+                            <a class="button subproject" href={`/projects/${$project.id}/subprojects/${subproject.id}`}>
                                 <h3>{subproject.name}</h3>
                                 <p><ListCheck /> {subproject.card_count} cards</p>
                                 <p class:finished={subproject.finished_card_count > 0}><CheckCheck /> {subproject.finished_card_count} done</p>
@@ -123,7 +128,7 @@
                                 {:else if subproject.next_due !== null}
                                     <p class="due"><Clock /> Next due {relativeTime(new Date(subproject.next_due))}</p>
                                 {/if}
-                            </button>
+                            </a>
                         {/each}
                     </div>
                 {:else}
@@ -169,6 +174,7 @@
 .board, .subproject {
     --bg-color: var(--bg-primary);
     padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+    position: relative;
 
     p {
         display: flex;
@@ -190,6 +196,10 @@
         width: 1em;
         height: 1em;
     }
+}
+.click-overlay {
+    position: absolute;
+    inset: 0;
 }
 .board {
     display: grid;

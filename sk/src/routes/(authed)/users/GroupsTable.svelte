@@ -28,10 +28,6 @@
             }
         }
 
-        // if(confirm(`Are you sure you want to delete the group "${group.name}"? This action cannot be undone.`)) {
-        //     groups.delete(group.id).catch(e => console.error("Failed to delete group:", e));
-        // }
-
         try {
             await deleteRecord(Collections.Groups, group.id);
             if(showingGroup === group.id) showingGroup = null;

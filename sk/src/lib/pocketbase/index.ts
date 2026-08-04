@@ -6,6 +6,7 @@ import type {
     RecordFullListOptions,
     RecordListOptions,
     RecordModel,
+    RecordSubscription,
     UnsubscribeFunc,
 } from "pocketbase";
 import { readable, type Readable, type Subscriber } from "svelte/store";
@@ -384,18 +385,18 @@ export async function watch<
         /** Workaround for pocketbase weirdness; TODO: try to make this work without this hack */
         waitForConnection = false,
         /**
-         * A set of collections to also watch and re-poll the main list on change of. This is an
-         * unfortunate workaround for the fact that pocketbase doesn't (and kind of can't) trigger
-         * realtime events when a view table changes its results, especially in the case of arbitrary
-         * queries that reference other tables.  
-         * This has nearly zero overhead if the collection is already subscribed to, but will
-         * unnecessarily changed records otherwise.
+         * A collections to also watch and update records on the change of. This is an
+         * unfortunate workaround for the fact that pocketbase doesn't trigger realtime events when a
+         * view table changes its results, especially in the case of arbitrary queries that reference
+         * other tables. This has nearly zero overhead if the collection is already subscribed to,
+         * but will unnecessarily changed records otherwise.  
+         * The view and parent should have the same id column for associated records.
          */
-        pollOnChange = []
+        viewParent
     }: {
         realtime?: boolean,
         waitForConnection?: boolean,
-        pollOnChange?: Collections[]
+        viewParent?: Collections
     } = {}
 ): Promise<PageStore<T>> {
     const collection = client.collection(collectionName);
@@ -458,14 +459,31 @@ export async function watch<
             
             // TODO: I hate hate hate this solution. implement something better serverside using the
             // realtime api?
-            const refreshList = debounce((coll: string) => {
-                console.info(`Change detected in collection ${coll} - refreshing list for ${collectionName}`);
-                setPage(result.page);
-            }, 100);
-            for(const coll of pollOnChange) {
-                client.collection(coll).subscribe(
+            if(viewParent) {
+                client.collection(viewParent).subscribe(
                     "*",
-                    () => refreshList(coll),
+                    (change) => {
+                        switch(change.action) {
+                            case "update":
+                            case "create":
+                                // fetch the changed record in the main collection
+                                collection.getOne<T>(change.record.id, queryParams).then((record) => {
+                                    const index = result.items.findIndex((r) => r.id === record.id);
+                                    if(index >= 0) {
+                                        result.items[index] = record;
+                                        set(result);
+                                    } else {
+                                        result.items = [...result.items, record];
+                                        set(result);
+                                    }
+                                });
+                                break;
+                            case "delete":
+                                result.items = result.items.filter((item) => item.id !== change.record.id);
+                                set(result);
+                                break;
+                        }
+                    },
                     queryParams
                 ).then((unsub) => {
                     // Add to unsubRealtime so that we can unsubscribe from all on cleanup

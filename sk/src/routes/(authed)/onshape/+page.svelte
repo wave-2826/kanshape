@@ -40,7 +40,7 @@
             eid: filterToDocument ? undefined : onshapeCtx.elementId
         }
     }, 0, 500, {
-        pollOnChange: [Collections.Cards]
+        viewParent: Collections.Cards
     })));
 
     let openCardId = createOpenCardState();

@@ -21,7 +21,7 @@ export function watchCards(boardId: string): Promise<PageStore<TypedCardPreviewR
         sort: "position,created"
     }, 1, 500, {
         waitForConnection: true,
-        pollOnChange: [Collections.Cards]
+        viewParent: Collections.Cards
     }).catch((err) => {
         console.error("Failed to load cards:", err);
         return null;

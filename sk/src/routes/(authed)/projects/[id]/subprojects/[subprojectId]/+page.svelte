@@ -35,7 +35,7 @@
             sort: "position,created"
         }, 1, 500, {
             waitForConnection: true,
-            pollOnChange: [Collections.Cards]
+            viewParent: Collections.Cards
         })) :
         null
     );

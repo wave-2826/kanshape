@@ -9,7 +9,7 @@
     const changes = $derived(await watch(Collections.ActivityLogPreview, {
         sort: "-date"
     }, 0, 50, {
-        pollOnChange: [Collections.ActivityLog]
+        viewParent: Collections.ActivityLog
     }));
 </script>
 

@@ -1,15 +1,30 @@
 <script lang="ts">
     import { watch } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
+    import { get } from "svelte/store";
     import GroupsTable from "./GroupsTable.svelte";
     import UsersTable from "./UsersTable.svelte";
 
     const groups = watch(Collections.GroupOverview, {}, 0, 100, {
-        pollOnChange: [Collections.Groups, Collections.Users]
+        viewParent: Collections.Groups
     });
     const users = watch(Collections.Users, {
         expand: "groups"
     }, 0, 100);
+
+    // refresh groups on users change
+    users.then(u => {
+        groups.then(g => {
+            let first = true;
+            u.subscribe(() => {
+                if(first) { // don't run immediately on subscribe
+                    first = false;
+                    return;
+                }
+                g.setPage(get(g).page);
+            });
+        });
+    });
 </script>
 
 <div class="page-container">

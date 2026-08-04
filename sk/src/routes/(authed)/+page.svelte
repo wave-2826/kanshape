@@ -53,13 +53,13 @@
 
     const projects = $derived(deasyncify(watch(Collections.ProjectOverview, {}, 0, 0, {
         // technically cards too but that's expensive
-        pollOnChange: [Collections.Projects, Collections.Boards, Collections.Subprojects]
+        viewParent: Collections.Projects
     })));
 
     const changes = $derived(deasyncify(watch(Collections.ActivityLogPreview, {
         sort: "-date"
     }, 0, 10, {
-        pollOnChange: [Collections.ActivityLog]
+        viewParent: Collections.ActivityLog
     })));
 </script>
 

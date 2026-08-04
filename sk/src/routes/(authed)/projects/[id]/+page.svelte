@@ -24,7 +24,7 @@
             filter: `project_id = "${$project.id}"`,
             sort: "title"
         }, 0, 100, {
-            pollOnChange: [Collections.Boards]
+            viewParent: Collections.Boards
         })) :
         null
     );
@@ -34,7 +34,7 @@
             filter: `project_id = "${$project.id}"`,
             sort: "name"
         }, 0, 100, {
-            pollOnChange: [Collections.Subprojects]
+            viewParent: Collections.Subprojects
         })) :
         null
     );
@@ -43,7 +43,7 @@
         filter: `project_id = "${$project.id}"`,
         sort: "-date"
     }, 0, 10, {
-        pollOnChange: [Collections.ActivityLog]
+        viewParent: Collections.ActivityLog
     })) : null);
 
     $effect(() => {

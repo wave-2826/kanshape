@@ -1,30 +1,15 @@
 <script lang="ts">
-    import { queryOne, save } from "$lib/pocketbase";
+    import { queryOne, save, type ExpandResponse } from "$lib/pocketbase";
     import BlockCollectionSelector from "$lib/pocketbase/selector/BlockCollectionSelector.svelte";
-    import { Collections, type UsersResponse } from "$lib/pocketbase/generated-types";
+    import { Collections } from "$lib/pocketbase/generated-types";
     import { Info, Trash } from "@lucide/svelte";
     import { authModel } from "$lib/pocketbase/auth";
 
     const { user, ondelete }: {
-        user: UsersResponse,
+        user: ExpandResponse<"users", "groups">,
         ondelete: () => void
     } = $props();
-
-    function queryFullUser() {
-        return queryOne(Collections.Users, user.id, {
-            expand: "groups"
-        });
-    }
-    type Resolve<T> = T extends Promise<infer U> ? U : T;
     
-    let fullUser: Resolve<ReturnType<typeof queryFullUser>> | null = $state(null);
-    // Should only run when user.id changes
-    $effect(() => {
-        (async () => {
-            fullUser = await queryFullUser();
-        })();
-    });
-
     const dateFormatter = new Intl.DateTimeFormat(undefined, {
         dateStyle: "medium",
         timeStyle: "short"
@@ -73,15 +58,13 @@
 
         <h3>Groups ({user.groups.length})</h3>
         <BlockCollectionSelector
-            values={fullUser?.expand.groups?.map(g => ({ id: g.id, name: g.name ?? "Unnamed group" })) ?? []}
+            values={user.expand.groups?.map(g => ({ id: g.id, name: g.name ?? "Unnamed group" })) ?? []}
             searchField="name"
             onchange={async (ids) => {
                 await save(Collections.Users, {
                     id: user.id,
                     groups: ids
                 }, { create: false }).catch(e => console.error("Failed to save user group changes:", e));
-
-                fullUser = await queryFullUser();
             }}
             collection={Collections.Groups}
             readonly={!$authModel?.is_admin}

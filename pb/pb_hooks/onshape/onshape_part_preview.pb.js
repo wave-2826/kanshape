@@ -108,5 +108,3 @@ routerAdd("POST", "/api/parts/generate_preview", (e) => {
     
     return e.json(200, { message: "Part preview generated successfully", result });
 });
-
-// TODO: GC unreferenced parts?

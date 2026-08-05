@@ -76,7 +76,7 @@
     bottom: 0;
     margin: 1rem 0 1rem 1rem;
     border-radius: 4px 0 0 4px;
-    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow: -4px 0 var(--shadow);
 
     display: flex;
     flex-direction: column;
@@ -117,7 +117,7 @@
         border-radius: 4px 4px 0 0;
         border: 1px solid var(--border);
         border-bottom: none;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 -4px var(--shadow);
     }
     .collapse .panel {
         translate: 0 calc(100% - 1rem);

@@ -204,6 +204,86 @@ export function contrastStyle(node: HTMLElement, styleText: string) {
     };
 }
 
+
+/**
+ * native text-wrap: balance doesn't shrink-wrap the element.
+ * This manually inserts line breaks to better fit balanced text.
+ */
+export function balanceText(element: HTMLElement) {
+    const text = element.textContent ?? "";
+    if(!text.trim()) return;
+
+    const ctx = document.createElement("canvas").getContext("2d");
+    if(!ctx) return;
+    const style = getComputedStyle(element);
+    ctx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    const measure = (str: string) => ctx.measureText(str).width;
+
+    const maxWidth = element.clientWidth;
+    const words = text.split(/\s+/);
+    const fullWidth = measure(text);
+    if(fullWidth <= maxWidth) return; // Already fits on a single line
+
+    // Minimal number of lines needed
+    let lines = 1;
+    let current = "";
+    for(const word of words) {
+        const candidate = current ? `${current} ${word}` : word;
+        if(measure(candidate) > maxWidth) {
+            lines++;
+            current = word;
+        } else {
+            current = candidate;
+        }
+    }
+    if(lines <= 1) return;
+
+    // Balance the words across `lines` lines by minimising the widest line
+    const n = words.length;
+    const lineWidth = (i: number, j: number) => measure(words.slice(i, j + 1).join(" "));
+
+    const INF = Infinity;
+    const dp: number[][] = Array.from({ length: lines + 1 }, () => Array(n).fill(INF));
+    const split: number[][] = Array.from({ length: lines + 1 }, () => Array(n).fill(-1));
+
+    for(let i = 0; i < n; i++) {
+        const width = lineWidth(0, i);
+        if(width <= maxWidth) dp[1][i] = width;
+    }
+
+    for(let k = 2; k <= lines; k++) {
+        for(let i = k - 1; i < n; i++) {
+            for(let j = k - 2; j < i; j++) {
+                const width = lineWidth(j + 1, i);
+                if(width > maxWidth) continue;
+                const candidate = Math.max(dp[k - 1][j], width);
+                if(candidate < dp[k][i]) {
+                    dp[k][i] = candidate;
+                    split[k][i] = j;
+                }
+            }
+        }
+    }
+
+    const result: string[] = [];
+    let k = lines;
+    let i = n - 1;
+    while(k > 0) {
+        const j = split[k][i];
+        result.unshift(words.slice(j + 1, i + 1).join(" "));
+        i = j;
+        k--;
+    }
+
+    element.innerHTML = "";
+    for(const line of result) {
+        const span = document.createElement("span");
+        span.textContent = line;
+        element.appendChild(span);
+        element.appendChild(document.createElement("br"));
+    }
+}
+
 export function autofocus(node: HTMLElement, enabled: boolean = true) {
     // I'm not sure if this is the right way to do this, but...
     requestAnimationFrame(() => {

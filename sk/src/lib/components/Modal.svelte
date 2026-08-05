@@ -74,7 +74,7 @@
     border-radius: 4px;
     border: 1px solid var(--border);
     color: var(--text-primary);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px var(--shadow);
     padding: 1rem 1.5rem;
 }
 </style>

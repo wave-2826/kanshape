@@ -3,8 +3,9 @@
 <script lang="ts">
     import { beforeNavigate } from "$app/navigation";
     import { setConfig } from "$lib/config";
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { nav, shouldHandleNav } from "$lib/navigation";
+    import Alerts from "./Alerts.svelte";
 
     const { data, children } = $props();
 
@@ -33,3 +34,5 @@
 </svelte:head>
 
 {@render children()}
+
+<Alerts />

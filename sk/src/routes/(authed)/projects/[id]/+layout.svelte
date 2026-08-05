@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import type { Snippet } from "svelte";
     import { setProjectContext, watchProject, type ProjectContext } from "./context";
     import { page } from "$app/state";

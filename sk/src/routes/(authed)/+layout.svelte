@@ -11,7 +11,7 @@
 <script lang="ts">
     import "../../app.scss";
     import { page } from "$app/state";
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { onMount } from "svelte";
     import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from '@lucide/svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { watch } from "$lib/pocketbase";
     import { authModel } from "$lib/pocketbase/auth";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-    import { Trophy, Medal, CheckCheck, PlusSquare, UserPlus, Globe, Folder, SquarePlus } from "@lucide/svelte";
+    import { Trophy, Medal, Globe, Folder } from "@lucide/svelte";
 
     // technically duplicated with the nav data but... meh
     const projects = $derived(deasyncify(watch(Collections.Projects, {

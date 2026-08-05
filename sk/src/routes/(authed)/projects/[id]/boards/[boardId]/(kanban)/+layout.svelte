@@ -6,7 +6,7 @@
     import type { ProjectLinkedSite } from "$lib/data/project";
     import ProjectPage from "../../../ProjectPage.svelte";
     import { getBoardContext } from "../../../context";
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
 
     const {
         children

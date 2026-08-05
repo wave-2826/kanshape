@@ -3,7 +3,7 @@
     import { untrack } from "svelte";
     import { batch, deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { deepEqual } from "$lib/util";
     import { type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";

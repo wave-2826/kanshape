@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import LinkOnshapeDocument from "../LinkOnshapeDocument.svelte";
     import { getOnshapeContext, LinkedProjectType } from "$lib/components/nav/onshapeContext.svelte";
     import { nav } from "$lib/navigation";

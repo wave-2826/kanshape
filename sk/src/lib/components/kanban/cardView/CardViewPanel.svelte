@@ -341,7 +341,7 @@
         align-items: center;
         gap: 0.5rem;
 
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 2px var(--shadow);
 
         button {
             --bg-color: var(--bg-primary);

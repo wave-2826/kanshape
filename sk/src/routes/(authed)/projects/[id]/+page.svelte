@@ -9,7 +9,7 @@
     import { Collections } from "$lib/pocketbase/generated-types";
     import ActivityEntry from "../../log/ActivityEntry.svelte";
     import { relativeTime } from "$lib/datetime";
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import BoardButtons from "./boards/[boardId]/(kanban)/BoardButtons.svelte";
 
     const project = $derived(getProjectContext().project);

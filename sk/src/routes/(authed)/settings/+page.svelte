@@ -1,48 +1,48 @@
 <script lang="ts">
-import { updateConfig, configTypes, getConfig, getDefaultConfigValue } from "$lib/config";
-import type { AppConfig, ConfigPath, ConfigValueType } from "$lib/config";
-import { metadata } from "$lib/metadata";
+    import { updateConfig, configTypes, getConfig, getDefaultConfigValue } from "$lib/config";
+    import type { AppConfig, ConfigPath, ConfigValueType } from "$lib/config";
+    import { metadata } from "$lib/site";
     import { watch, type ExpandResponse } from "$lib/pocketbase";
     import { Collections } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
-import FileInput from "./FileInput.svelte";
-import FileManager from "./FileManager.svelte";
-import OAuthProviderDropdown from "./OAuthProviderDropdown.svelte";
+    import FileInput from "./FileInput.svelte";
+    import FileManager from "./FileManager.svelte";
+    import OAuthProviderDropdown from "./OAuthProviderDropdown.svelte";
 
-$effect(() => {
-    $metadata.title = "Application settings";
-});
-
-let config: AppConfig = getConfig();
-let saving = $state(false);
-
-const categories = Object.keys(configTypes).reduce((acc, path) => {
-    const [category, key] = path.split("/");
-    if(!acc[category]) acc[category] = [];
-    
-    acc[category].push({ 
-        path: path as ConfigPath,
-        key,
-        type: configTypes[path as keyof typeof configTypes] 
+    $effect(() => {
+        $metadata.title = "Application settings";
     });
-    return acc;
-}, {} as Record<string, { path: ConfigPath, key: string, type: ConfigValueType }[]>);
 
-async function handleSave(path: ConfigPath, value: string | boolean | number) {
-    saving = true;
-    try {
-        await updateConfig(path, value as any);
-    } catch (e) {
-        console.error("Failed to save config:", e);
+    let config: AppConfig = getConfig();
+    let saving = $state(false);
+
+    const categories = Object.keys(configTypes).reduce((acc, path) => {
+        const [category, key] = path.split("/");
+        if(!acc[category]) acc[category] = [];
+        
+        acc[category].push({ 
+            path: path as ConfigPath,
+            key,
+            type: configTypes[path as keyof typeof configTypes] 
+        });
+        return acc;
+    }, {} as Record<string, { path: ConfigPath, key: string, type: ConfigValueType }[]>);
+
+    async function handleSave(path: ConfigPath, value: string | boolean | number) {
+        saving = true;
+        try {
+            await updateConfig(path, value as any);
+        } catch (e) {
+            console.error("Failed to save config:", e);
+        }
+        saving = false;
     }
-    saving = false;
-}
 
-let files = $state<ExpandResponse<"files", "">[] | null>(null);
-const filesWatch = deasyncify(watch(Collections.Files));
-$effect(() => {
-    files = $filesWatch?.items ?? null;
-});
+    let files = $state<ExpandResponse<"files", "">[] | null>(null);
+    const filesWatch = deasyncify(watch(Collections.Files));
+    $effect(() => {
+        files = $filesWatch?.items ?? null;
+    });
 </script>
 
 <div class="layout">

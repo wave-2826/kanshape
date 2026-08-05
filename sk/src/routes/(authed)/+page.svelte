@@ -2,16 +2,15 @@
     import Masonry from "$lib/components/Masonry.svelte";
     import { getPriorityColor } from "$lib/data/cards";
     import { relativeTime } from "$lib/datetime";
-    import { metadata } from "$lib/metadata.js";
+    import { metadata } from "$lib/site";
     import { nav } from "$lib/navigation";
     import { watch } from "$lib/pocketbase";
     import { Collections, type AssignedCardsResponse } from "$lib/pocketbase/generated-types";
     import { deasyncify } from "$lib/util";
     import { AlarmClock, ChevronDown, ChevronUp, Clock, ExternalLink, Flag, Folder, Goal, Info, Kanban, SquareKanban, Tag } from "@lucide/svelte";
     import type { ListResult } from "pocketbase";
-    import { writable, type Readable } from "svelte/store";
+    import { writable } from "svelte/store";
     import ActivityEntry from "./log/ActivityEntry.svelte";
-    import type { TypedProjectOverviewResponse } from "$lib/data/project";
 
     $effect(() => {
         $metadata.title = "Overview";

@@ -190,6 +190,7 @@
 
     .assigned & {
         background-color: var(--bg-selection);
+        // I wouldn't typically use a box shadow but we want an inset border
         box-shadow: 0 0 0 2px inset var(--bg-primary);
         font-weight: bold;
     }

@@ -1,18 +1,16 @@
 <script lang="ts">
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { getOnshapeContext, LinkedProjectType } from "../../../lib/components/nav/onshapeContext.svelte";
     import LinkOnshapeDocument from "./LinkOnshapeDocument.svelte";
     import { Collections } from "$lib/pocketbase/generated-types";
-    import { save, watch, watchOne, type ExpandResponse } from "$lib/pocketbase";
+    import { save, watch, watchOne } from "$lib/pocketbase";
     import SelectionBanner from "./SelectionBanner.svelte";
     import { Plus } from "@lucide/svelte";
-    import { deasyncify, deepEqual } from "$lib/util";
+    import { deasyncify } from "$lib/util";
     import CardPart from "$lib/components/parts/CardPart.svelte";
     import KanbanListEntry from "$lib/components/kanban/KanbanListEntry.svelte";
     import { nav } from "$lib/navigation";
     import { derived } from "svelte/store";
-    import CardViewPanel from "$lib/components/kanban/cardView/CardViewPanel.svelte";
-    import { untrack } from "svelte";
     import { createOpenCardState } from "$lib/components/kanban/cardView/state.svelte";
     import BoardCardViewPanel from "$lib/components/kanban/cardView/BoardCardViewPanel.svelte";
     

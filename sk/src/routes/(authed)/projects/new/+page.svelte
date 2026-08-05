@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { metadata } from "$lib/metadata";
+    import { metadata } from "$lib/site";
     import { batch, save } from "$lib/pocketbase";
     import { Collections, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "@lucide/svelte";

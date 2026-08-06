@@ -11,7 +11,7 @@
 <script lang="ts">
     import "../../app.scss";
     import { page } from "$app/state";
-    import { metadata } from "$lib/site";
+    import { metadata, showAlert } from "$lib/site";
     import { onMount } from "svelte";
     import { CornerDownLeft, ExternalLink, PanelRightClose, PanelRightOpen } from '@lucide/svelte';
     import NavContent from "$lib/components/nav/NavContent.svelte";
@@ -74,8 +74,11 @@
     let showNav = $derived(!onOnshape && (navOpen || forceNavOpen));
 
     if(page.url.searchParams.has("oauth_error")) {
-        // TODO: this should really be a notification popup thingy
-        alert(`OAuth error ${page.url.searchParams.get("oauth_error")}: ${page.url.searchParams.get("oauth_error_description")}`);
+        showAlert({
+            severity: "error",
+            title: `OAuth error ${page.url.searchParams.get("oauth_error")}`,
+            text: page.url.searchParams.get("oauth_error_description") ?? ""
+        });
         const url = new URL(page.url.toString());
         url.searchParams.delete("oauth_error");
         url.searchParams.delete("oauth_error_description");

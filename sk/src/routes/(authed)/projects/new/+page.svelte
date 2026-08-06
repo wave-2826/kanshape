@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { metadata } from "$lib/site";
+    import { metadata, showAlert } from "$lib/site";
     import { batch, save } from "$lib/pocketbase";
     import { Collections, type Create } from "$lib/pocketbase/generated-types";
     import { Plus } from "@lucide/svelte";
@@ -58,7 +58,10 @@
         }
 
         if(boardIds.length !== boards.length || subprojectIds.length !== subprojects.length) {
-            alert("Failed to create all boards or subprojects");
+            showAlert({
+                severity: "error",
+                text: "Failed to create all boards or subprojects"
+            });
             return;
         }
 

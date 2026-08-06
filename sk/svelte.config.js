@@ -20,7 +20,7 @@ const config = {
             // Prerendering turned off. Turn it on if you know what you're doing.
             prerender: { entries: [] },
             fallback: "index.html", // enable SPA mode
-        }),
+        })
     }
 };
 

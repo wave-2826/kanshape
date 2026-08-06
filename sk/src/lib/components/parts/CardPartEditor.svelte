@@ -67,7 +67,7 @@
         }
 
         if(!record) {
-            alert("Failed to save part. Please try again.");
+            showAlert({ severity: "error", text: "Failed to save part." });
             return null;
         }
 
@@ -93,6 +93,7 @@
     import CardPart from "./CardPart.svelte";
     import { RefreshCw } from "@lucide/svelte";
     import { getPartData, type PartSelection } from "./partData";
+    import { showAlert } from "$lib/site";
 
     let {
         value = $bindable(),
@@ -160,8 +161,7 @@
 
     async function addPart() {
         if(!cardId) {
-            // temporary until i figure out this handling
-            alert("No card ID provided. Cannot add part.");
+            showAlert({ severity: "error", title: "Cannot add part", text: "No card ID provided." });
             return;
         }
 

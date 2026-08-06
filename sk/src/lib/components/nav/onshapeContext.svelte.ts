@@ -4,6 +4,7 @@ import { nav } from "$lib/navigation";
 import { OnshapeClient, type OnshapeLocation } from "$lib/onshape/client";
 import { watch, type ExpandResponse } from "$lib/pocketbase";
 import { Collections } from "$lib/pocketbase/generated-types";
+import { showAlert } from "$lib/site";
 import { createContext, untrack } from "svelte";
 
 export enum LinkedProjectType {
@@ -121,7 +122,7 @@ export function watchOnshapeContext(
             });
         });
     } else {
-        alert("No document ID provided");
+        showAlert({ severity: "warning", title: "No document ID provided", text: "Can't access Onshape document without a document ID" });
     }
 
     return () => unsub?.();

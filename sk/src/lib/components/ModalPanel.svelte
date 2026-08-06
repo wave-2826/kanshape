@@ -17,8 +17,6 @@
         collapse?: boolean
     } = $props();
 
-    // TODO: shallow routing for this
-
     const mobileLayout = $derived(new MediaQuery("screen and (max-width: 640px)").current);
 </script>
 

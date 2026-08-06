@@ -3,7 +3,7 @@
     import { untrack } from "svelte";
     import { batch, deleteRecord, queryOne, save } from "$lib/pocketbase";
     import { Collections, type BoardsRecord, type SectionsRecord, type SubprojectsRecord } from "$lib/pocketbase/generated-types";
-    import { metadata } from "$lib/site";
+    import { metadata, showAlert } from "$lib/site";
     import { deepEqual } from "$lib/util";
     import { type ProjectLinkedSite, type TypedProjectsResponse } from "$lib/data/project";
     import ProjectDetails from "$lib/components/projects/ProjectDetails.svelte";
@@ -177,9 +177,13 @@
             });
 
             nav("/");
-        } catch(err) {
+        } catch(err: any) {
             console.error("Failed to delete project:", err);
-            alert("Failed to fully delete project. Please try again.");
+            showAlert({
+                severity: "error",
+                title: "Failed to delete project",
+                text: err.message
+            });
         }
     }
 </script>

@@ -2,6 +2,7 @@ import type { AssemblyData, PartData } from "$lib/data/parts";
 import { generateRecordID, type OnshapeClient, type OnshapeSelection } from "$lib/onshape/client";
 import { getPartHeuristics } from "$lib/onshape/partHeuristics";
 import type { components } from "$lib/onshape/schema";
+import { showAlert } from "$lib/site";
 import type { OnshapeContext } from "../nav/onshapeContext.svelte";
 
 export type PartSelection = {
@@ -188,9 +189,11 @@ export async function getPartData(
             linkDocumentId, sel.configuration
         );
         if(!heuristics || "error" in heuristics) {
-            alert(`Failed to gather part heuristics: ${
-                heuristics && "error" in heuristics ? heuristics.error : "Unknown error"
-            }. Please try again.`);
+            showAlert({
+                severity: "warning",
+                title: "Failed to gather part heuristics",
+                text: heuristics && "error" in heuristics ? heuristics.error as string : "Unknown error"
+            });
             return null;
         }
         sel.partId = heuristics.partID ?? sel.partId; // in case the original was a child entity
@@ -212,7 +215,11 @@ export async function getPartData(
         });
 
         if(!data) {
-            alert(`Failed to fetch assembly metadata: ${error ?? "Unknown error"}. Please try again.`);
+            showAlert({
+                severity: "warning",
+                title: "Failed to fetch assembly metadata",
+                text: error ?? "Unknown error"
+            });
             return null;
         }
 

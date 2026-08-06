@@ -1,20 +1,9 @@
 <script lang="ts">
     import { balanceText } from "$lib/actions";
-    import { alerts, showAlert } from "$lib/site";
+    import { alerts } from "$lib/site";
     import { X } from "@lucide/svelte";
     import { fly, slide } from "svelte/transition";
 </script>
-
-<!-- for testing -->
-<!-- <svelte:window onkeydown={(e) => {
-    if(e.key === "a") {
-        const type = (["info", "warning", "error"] as const)[Math.floor(Math.random() * 3)];
-        showAlert({
-            text: `This is a test ${type} alert with a loooooooooooooooooot of text omg so much teeeeeeeeeeext.`,
-            severity: type
-        });
-    }
-}} /> -->
 
 <div class="alerts">
     {#each $alerts as alert (alert.id)}
@@ -32,10 +21,12 @@
                 <button class="close" aria-label="Close" onclick={() => alerts.update(a =>
                     a.filter((a) => a.id !== alert.id)
                 )}><X /></button>
-                {#if alert.title}
+                {#if alert.title && alert.title.trim().length > 0}
                     <span class="title">{alert.title}</span>
                 {/if}
-                <span class="text" use:balanceText>{alert.text}</span>
+                {#if alert.text && alert.text.trim().length > 0}
+                    <span class="text" use:balanceText>{alert.text}</span>
+                {/if}
             </div>
         </div>
     {/each}

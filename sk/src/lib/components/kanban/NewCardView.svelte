@@ -14,6 +14,7 @@
     import { generateRecordID } from "$lib/onshape/client";
     import type { TypedBoardsResponse } from "$lib/data/project";
     import { CREATE_SYMBOL, transformMetadata, walkMetadata, type CreationExportPartTarget, type MetadataFile, type MetadataValue } from "$lib/data/metadata";
+    import { showAlert } from "$lib/site";
 
     const {
         board,
@@ -151,7 +152,7 @@
 
         if(!record) {
             console.error("Failed to create card, no record returned");
-            alert("Failed to create card");
+            showAlert({ severity: "error", text: "Failed to create card" });
             return;
         }
 
@@ -160,7 +161,7 @@
             const partRecord = await updatePartRecord(p.existingOrNewId, p.part.sel, p.part.partData, record.id);
             if(!partRecord) {
                 console.error("Failed to create part:", p.part);
-                alert("Failed to create part");
+                showAlert({ severity: "error", text: "Failed to create part" });
                 return;
             }
 

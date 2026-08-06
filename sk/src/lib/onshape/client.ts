@@ -4,6 +4,7 @@ import createClient from "openapi-fetch";
 import { ONSHAPE_CUSTOM_BODY_SYMBOL, onshapeApiFetch } from "./requests";
 import type { paths } from "./schema";
 import type { PartSelection } from "$lib/components/parts/partData";
+import { showAlert } from "$lib/site";
 
 type OnshapeSelectionType = "BODY" | "ENTITY" | "FEATURE" | "OCCURRENCE" | "ROLLBACKBAR" | "MATE_CONNECTOR";
 type OnshapeEntityType = "EDGE" | "FACE" | "VERTEX" | "DEGENERATE_EDGE" | "UNKNOWN";
@@ -331,7 +332,6 @@ export class OnshapeClient {
         return response;
     }
 
-    // TODO: all the alerts in here should be error popups in the UI instead of alert()
     async getPartSelection(): Promise<PartSelection | null> {
         if(this.location === "right-panel-part-studio" || this.location === "right-panel-assembly") {
             const selections = await this.requestSelection("Select a part to create a card for.", ["BODY"]);
@@ -355,48 +355,80 @@ export class OnshapeClient {
 
             // sanity checks
             if(selection.isSurface) {
-                alert("Please select a part, not a surface.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "Please select a part, not a surface."
+                });
                 return null;
             }
             // meshes are okay
             if(selection.isFlattenedBody) {
-                alert("Please select a part, not a flattened body.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "Please select a part, not a flattened body."
+                });
                 return null;
             }
             if(selection.isComposite) {
                 // probably fine. uh, maybe
             }
             if((selection.elementType !== "partstudio" || !selection.elementId) && selection.elementType !== "assembly") {
-                alert("Please select a part from a part studio or assembly.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "Please select a part from a part studio or assembly."
+                });
                 return null;
             }
             if(selection.itemType !== "part" && selection.itemType !== "assembly") {
-                alert("Please select a part or assembly, not a part studio.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "Please select a part or assembly, not a part studio."
+                });
                 return null;
             }
 
             let documentId = selection.documentId;
             if(!documentId) {
-                alert("No document found for selected part.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "No document found for selected part."
+                });
                 return null;
             }
 
             let elementId = selection.elementId;
             if(!elementId) {
-                alert("No part studio or assembly found for selected item.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "No part studio or assembly found for selected item."
+                });
                 return null;
             }
 
             let partId = selection.idTag;
             if(selection.itemType === "part" && !partId) {
-                alert("No part found for selected part (???).");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "No part found for selected item."
+                });
                 return null;
             }
 
             let workspaceId = selection.workspaceId;
             let versionId = selection.versionId;
             if(!workspaceId && !versionId) {
-                alert("No workspace or version found for selected part.");
+                showAlert({
+                    severity: "warning",
+                    title: "Can't create part",
+                    text: "No workspace or version found for selected part."
+                });
                 return null;
             }
 

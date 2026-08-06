@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { CardMetadataFieldType } from "$lib/data/metadata";
     import type { CustomCardFields } from "$lib/data/project";
+    import { showAlert } from "$lib/site";
     import LeftPaneChooser from "../LeftPaneChooser.svelte";
     import CardFieldSchemaEditor from "../kanban/cardView/schemaEditor/CardFieldSchemaEditor.svelte";
 
@@ -44,7 +45,11 @@
         // we don't need to worry about collisions or anything idk
         const id = Math.random().toString(36).substring(2, 8);
         if(customFields[id]) {
-            alert("go buy a lottery ticket bc this is very very unlikely to ever happen");
+            showAlert({
+                severity: "error",
+                title: "Failed to create custom field",
+                text: "go buy a lottery ticket bc this is very very unlikely to ever happen"
+            });
             return;
         }
         customFields[id] = { name: `New field`, type: { base: "empty" }, description: "" };

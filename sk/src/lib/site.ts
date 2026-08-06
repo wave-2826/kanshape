@@ -9,8 +9,17 @@ export const metadata = writable({
 
 export type Alert = {
     severity: "info" | "warning" | "error";
+    /**
+     * An optional title.
+     * Good practice is for the title to display the _result_ of an issue in a few words without
+     * punctuation and the text to show the specific issue.
+     */
     title?: string;
-    text: string;
+    /**
+     * Alerts should almost always have text unless they optionally show it for extra details.  
+     * If an alert only has one line, use text instead of title.
+     */
+    text?: string;
     /** If an alert is persistent, it must be dismissed manually. Doesn't persist across page loads. */
     persistent?: boolean;
 };

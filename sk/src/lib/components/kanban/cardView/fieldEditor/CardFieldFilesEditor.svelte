@@ -6,6 +6,7 @@
     import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
     import { CREATE_SYMBOL, type CardMetadataFieldType, type MetadataFile } from '$lib/data/metadata';
     import { Box, Boxes, FileIcon, Plus, Sparkles, SquareArrowRightExit, Upload, X } from '@lucide/svelte';
+    import { showAlert } from '$lib/site';
 
     let {
         type, value = $bindable()
@@ -52,7 +53,9 @@
                         e.preventDefault();
                         const url = getFileUrl(file as MetadataFile);
                         // TODO: Download progress indicator
-                        // TODO: Handle errors
+                        // we could also use a request middleware to add a content-disposition header
+                        // with the correct name based on a query param or something instead of this
+                        // custom logic? would allow using the browser download thingy.
                         fetch(url).then(async (res) => {
                             if(res.status !== 200) {
                                 console.error("Failed to download file", res.status, await res.text());
@@ -63,6 +66,13 @@
                             a.href = URL.createObjectURL(blob);
                             a.download = (file as MetadataFile).name;
                             a.click();
+                        }).catch((err) => {
+                            console.warn("Failed to download file", err);
+                            showAlert({
+                                severity: "warning",
+                                title: "Failed to download file",
+                                text: err.message
+                            });
                         });
                     }}
                 >{(file as MetadataFile).name}</a>

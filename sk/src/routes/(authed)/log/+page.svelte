@@ -5,6 +5,7 @@
     import Paginator from "$lib/pocketbase/Paginator.svelte";
     import { Trash } from "@lucide/svelte";
     import ActivityEntry from "./ActivityEntry.svelte";
+    import { showAlert } from "$lib/site";
 
     const changes = $derived(await watch(Collections.ActivityLogPreview, {
         sort: "-date"
@@ -25,7 +26,11 @@
                             method: "POST"
                         }).catch((err) => {
                             console.error("Failed to clear activity log:", err);
-                            alert("Failed to clear activity log.");
+                            showAlert({
+                                severity: "error",
+                                title: "Failed to clear activity log",
+                                text: err.message
+                            });
                         });
                     }
                 }} class="clear-log"><Trash class={$css("icon")} /> Clear log</button>
